@@ -22,3 +22,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+src/app/OurService.jsx
+
+
+src/assets/workcategory/barber.png
+src/assets/workcategory/construction.png
+src/assets/workcategory/event.png
+src/assets/workcategory/halwai.png
+src/assets/workcategory/makeup.png
+src/assets/workcategory/musician.png
+src/assets/workcategory/painter.png
+src/assets/workcategory/truck.png
+src/App.jsx
+src/app/work_category.jsx

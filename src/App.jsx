@@ -5,6 +5,7 @@ import OtpVerification from "./app/otp_verification";
 import RoleSelection from "./app/selection";
 import WorkCategory from "./app/work_category";
 import Footer from "./component/footer";
+import OurServices from "./app/OurService";
 
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
       <Route path="/selection" element={<RoleSelection />} />
       <Route path="/workcategory" element={<WorkCategory />} />
       <Route path="/footer" element={<Footer />} />
+      <Route  path="/ourservice" element={<OurServices/>}/>
       
     </Routes>
   );
