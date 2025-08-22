@@ -1,6 +1,8 @@
 import { Weight } from "lucide-react";
 import {useSelector } from "react-redux";
 import React from "react";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
 
 export default function WorkCategories() {
    const selectedRoles = useSelector((state) => state.role.selectedRoles);
@@ -9,7 +11,9 @@ export default function WorkCategories() {
   console.log(selectedRoles);
   
   return (
-    <div className="font-sans text-gray-800">
+      <>
+                  <Header />
+    <div className="font-sans text-gray-800 mt-20">
 
       {/* Hero Section */}
       <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] bg-gray-200">
@@ -175,5 +179,9 @@ export default function WorkCategories() {
       </div>
 
     </div>
+    <div className="mt-[50px]">
+                    <Footer />
+                  </div>
+            </>
   );
 }
