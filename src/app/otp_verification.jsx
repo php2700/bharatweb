@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import Header from "../component/Header2";
+import Footer from "../component/Footer";
 
 export default function OtpVerification() {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -10,6 +12,8 @@ export default function OtpVerification() {
   };
 
   return (
+     <>
+              <Header />
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
         {/* Left Image - visible only on md+ screens */}
@@ -97,6 +101,9 @@ export default function OtpVerification() {
         </div>
       </div>
     </div>
+     <div className="mt-[50px]">
+                <Footer />
+              </div>
+        </>
   );
 }
-// otp

@@ -1,7 +1,13 @@
 import { Weight } from "lucide-react";
+import {useSelector } from "react-redux";
 import React from "react";
 
-export default function work_category() {
+export default function WorkCategories() {
+   const selectedRoles = useSelector((state) => state.role.selectedRoles);
+   
+  
+  console.log(selectedRoles);
+  
   return (
     <div className="font-sans text-gray-800">
 

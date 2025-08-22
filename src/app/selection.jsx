@@ -1,12 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
 import { toggleRole } from "../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
+import Header from "../component/Header2";
+import Footer from "../component/Footer";
 
 export default function RoleSelection() {
-  const dispatch = useDispatch();
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
+  const dispatch = useDispatch();
+  console.log(selectedRoles);
+  
 
   return (
+     <>
+              <Header />
+
     <div className="flex justify-center items-center min-h-screen bg-white px-4">
       <div className="bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] pb-40">
         {/* Title */}
@@ -102,6 +109,11 @@ export default function RoleSelection() {
         </button>
       </div>
     </div>
+    
+  <div className="mt-[50px]">
+                <Footer />
+              </div>
+        </>
   );
 }
 // Selection
