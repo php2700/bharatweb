@@ -6,7 +6,7 @@ import RoleSelection from "./app/selection";
 import WorkCategory from "./app/WorkCategories";
 
 import OurServices from "./app/OurService";
-import OurSubCategories from "./app/subcategories";
+import OurSubCategories from "./app/SubCategories";
 import AboutUs from './app/AboutUs';
 import WorkerList from "./app/workerlist";
 import AddWorkerDetails from './app/AddWorker';
@@ -26,7 +26,7 @@ export default function App() {
       <Route path="/workcategory" element={<WorkCategory />} />
       
       <Route  path="/ourservice" element={<OurServices/>}/>
-      <Route  path="/Subcategories" element={<OurSubCategories/>}/>
+      <Route  path="/subcategories" element={<OurSubCategories/>}/>
       <Route path="aboutus" element={<AboutUs/>}/>
       <Route path="workerlist" element={<WorkerList/>}/>
       <Route path="addworker" element={<AddWorkerDetails/>}/>
