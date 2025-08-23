@@ -39,16 +39,19 @@ export default function Profile() {
       </div>
 
       {/* Main Form */}
-      <main className="flex-grow container mx-auto px-4 flex justify-center items-center">
-        <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md mt-[50px]">
-          <h2 className="text-center text-lg font-bold mb-6">
+      <div className="flex justify-center items-center min-h-screen bg-white px-4">
+        <div className="bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[80px] lg:pb-[80px]">
+          {/* Title */}
+         <main className="flex-grow container mx-auto px-4 flex justify-center items-center">
+        <div className="p-6 w-full max-w-md ">
+          <h2 className="text-center text-[24px] font-[700] text-[#000000] mb-6">
             Complete Profile
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D] mb-1 block text-center">
                 What's your Name?
               </label>
               <input
@@ -57,13 +60,13 @@ export default function Profile() {
                 placeholder="Enter Your Name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Age */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D] mb-1 block text-center">
                 Your Age
               </label>
               <input
@@ -72,13 +75,13 @@ export default function Profile() {
                 placeholder="Enter Your Age"
                 value={formData.age}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Gender */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D] mb-1 block text-center">
                 Gender
               </label>
               <input
@@ -87,13 +90,13 @@ export default function Profile() {
                 placeholder="Enter Gender"
                 value={formData.gender}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Location */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D] mb-1 block text-center">
                 Location (GPS)
               </label>
               <input
@@ -102,13 +105,13 @@ export default function Profile() {
                 placeholder="Enter Location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Full Address */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D] mb-1 block text-center">
                 Full Address (Landmark)
               </label>
               <input
@@ -117,13 +120,13 @@ export default function Profile() {
                 placeholder="Enter Full Address"
                 value={formData.address}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Referral Code */}
             <div>
-              <label className="text-sm font-bold text-gray-700 mb-1 block text-center">
+              <label className="text-[18px] font-[700] text-[#191A1D]0 mb-1 block text-center">
                 Referral code (Optional)
               </label>
               <input
@@ -132,14 +135,14 @@ export default function Profile() {
                 placeholder="Enter Referral Code"
                 value={formData.referral}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center"
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px]  outline-none focus:ring-2 focus:ring-green-600 placeholder:text-center p-[15px]"
               />
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-[#228B22] hover:bg-green-800 text-white py-2 rounded-md font-medium shadow"
+              className="w-40 bg-[#228B22] hover:bg-green-800 text-white py-2 rounded-[15px] font-medium shadow"
             >
               Submit
             </button>
@@ -147,8 +150,19 @@ export default function Profile() {
         </div>
         
       </main>
-
-      <Footer />
+          {/* //yahan */}
+        </div>
+      </div>
+<div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+        <img
+          src="src/assets/banner.png"
+          alt="Gardening"
+          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+        />
+      </div>
+      <div className="mt-[50px]">
+              <Footer />
+            </div>
     </div>
   );
 }

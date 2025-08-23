@@ -1,24 +1,19 @@
+// src/redux/roleSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
-const roleSlice = createSlice({
+const initialState = {
+  selectedRoles: [], // single select ke liye
+};
+
+export const roleSlice = createSlice({
   name: "role",
-  initialState: {
-    selectedRoles: [],
-  },
+  initialState,
   reducers: {
-    toggleRole: (state, action) => {
-      const role = action.payload;
-      if (state.selectedRoles.includes(role)) {
-        state.selectedRoles = state.selectedRoles.filter((r) => r !== role);
-      } else {
-        state.selectedRoles.push(role);
-      }
-    },
-    clearRoles: (state) => {
-      state.selectedRoles = [];
+    selectRole: (state, action) => {
+      state.selectedRoles = [action.payload]; // sirf ek role rakho
     },
   },
 });
 
-export const { toggleRole, clearRoles } = roleSlice.actions;
+export const { selectRole } = roleSlice.actions;
 export default roleSlice.reducer;

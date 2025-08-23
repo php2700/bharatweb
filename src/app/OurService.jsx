@@ -1,37 +1,47 @@
-import React from "react";
+
+import React, { useState,useEffect} from "react";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
+import { useNavigate } from "react-router-dom";
 
 
-const services = [
-  { id:'1',title: "Bandwala", desc: "Elevate your celebrations with the perfect musical experience. Our talented band ensures unforgettable melodies for weddings, events, and festive occasions.", icon: "/src/assets/workcategory/bandwala.png" },
-  { id:'11',title: "Event Organizer", desc: "Plan your events effortlessly with our expert organizers. From weddings to corporate gatherings, we ensure every detail is perfectly executed.", icon: "/src/assets/workcategory/event.png" },
-  { id:'12',title: "Halwai for Events", desc: "Delight your guests with authentic, delicious sweets and snacks. Our experienced Halwai ensures quality and taste for every occasion.", icon: "/src/assets/workcategory/halwai.png" },
-  { id:'13',title: "Barbers/Massage", desc: "Experience professional grooming and relaxation at your doorstep. Our barbers and massage experts provide top-notch services for your comfort.", icon: "/src/assets/workcategory/barber.png" },
-  { id:'14',title: "Makeup Artists", desc: "Look your best for any event with our skilled makeup artists. From weddings to parties, we enhance your beauty with precision.", icon: "/src/assets/workcategory/makeup.png" },
-  { id:'15',title: "Painter", desc: "Transform your space with vibrant colors and seamless finishes. Our professional painters deliver exceptional results for all projects.", icon: "/src/assets/workcategory/painter.png" },
-  { id:'16',title: "Plumber", desc: "Solve all your plumbing issues with our skilled professionals. From installations to leak repairs, we’ve got you covered.", icon: "/src/assets/workcategory/plumber.png" },
-  { id:'17',title: "Carpenter", desc: "Bring craftsmanship to your home with our expert carpenters. From custom furniture to repairs, quality is guaranteed.", icon: "/src/assets/workcategory/carpenter.png" },
-  { id:'18',title: "Electrician", desc: "Ensure your home or office is safe with our certified electricians. We handle repairs, installations, and maintenance with care.", icon: "/src/assets/workcategory/electrician.png" },
-  { id:'19',title: "Construction", desc: "Build with confidence with our skilled construction team. From foundation to finishing, we deliver durable and efficient solutions.", icon: "/src/assets/workcategory/construction.png" },
-  { id:'20',title: "Truckers", desc: "Reliable transportation for all your needs. Our truckers ensure timely and secure delivery of goods, locally or long-distance.", icon: "/src/assets/workcategory/truck.png" },
-  { id:'21',title: "Musician", desc: "Make your events unforgettable with our talented musicians. We bring life to every occasion with soulful tunes and lively performances.", icon: "/src/assets/workcategory/musician.png" },
-  { id:'22',title: "Painter", desc: "Transform your space with vibrant colors and seamless finishes. Our professional painters deliver exceptional results for all projects.", icon: "/src/assets/workcategory/painter.png" },
-  { id:'23',title: "Plumber", desc: "Solve all your plumbing issues with our skilled professionals. From installations to leak repairs, we’ve got you covered.", icon: "/src/assets/workcategory/plumber.png" },
-  { id:'24',title: "Carpenter", desc: "Bring craftsmanship to your home with our expert carpenters. From custom furniture to repairs, quality is guaranteed.", icon: "/src/assets/workcategory/carpenter.png" },
-  { id:'25',title: "Electrician", desc: "Ensure your home or office is safe with our certified electricians. We handle repairs, installations, and maintenance with care.", icon: "/src/assets/workcategory/electrician.png" },
-  { id:'26',title: "Construction", desc: "Build with confidence with our skilled construction team. From foundation to finishing, we deliver durable and efficient solutions.", icon: "/src/assets/workcategory/construction.png" },
-  { id:'27',title: "Truckers", desc: "Reliable transportation for all your needs. Our truckers ensure timely and secure delivery of goods, locally or long-distance.", icon: "/src/assets/workcategory/truck.png" },
-  { id:'28',title: "Musician", desc: "Make your events unforgettable with our talented musicians. We bring life to every occasion with soulful tunes and lively performances.", icon: "/src/assets/workcategory/musician.png" },
- 
 
-];
 
 export default function OurServices() {
-  const handleClick = (id) => {
-     localStorage.setItem("clickedServiceId", id);
-    console.log("Clicked service id:", id);
-  };
+  const navigate = useNavigate();
+
+const handleServicecategoryClick = (service) => {
+  navigate("/subcategories", { state: { service } });
+};
+
+  const [services, setServices] = useState([]);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL; // apna base URL
+  const token = localStorage.getItem("token"); // ya sessionStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/work-category`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+       
+        if (res.ok && data.status) {
+          setServices(data.data || []); // response categories me aayega
+        }
+      } catch (err) {
+        console.error("Error fetching services:", err);
+      }
+    };
+
+    fetchServices();
+  }, []);
+  
+
 
   return (
      <>
@@ -41,11 +51,11 @@ export default function OurServices() {
       <h2 className="text-[37px] font-bold text-center mb-2">Our Services</h2>
       <p className="text-[20px] font-[500] text-center text-[#000000] mb-10">Categories</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 mt-[60px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-[60px]">
         {services.map((service) => (
           <div
-            key={service.id}
-            onClick={() => handleClick(service.id)} // <-- Click handler
+            key={service._id}
+              onClick={() => handleServicecategoryClick(service._id)}
             className="bg-white rounded-[30px] p-6 
                        shadow-[0px_5px_29px_0px_#64646F26] 
                        hover:shadow-[0px_10px_50px_0px_#64646F50] 
@@ -55,14 +65,30 @@ export default function OurServices() {
           >
             <div className="flex justify-center mb-4">
               <div className="w-15 h-15 flex items-center justify-center rounded-full bg-[#D3E8D3]">
-                <img src={service.icon} alt={service.title} className="w-[39px] h-[39px]" />
+                         <img
+  src={service.image ? service.image : "/src/assets/workcategory/default.png"}
+  alt={service.name}
+  className="w-[39px] h-[39px] filter brightness-0 sepia saturate-100 hue-rotate-100"
+  style={{
+    filter:
+      "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
+  }}
+/>
               </div>
             </div>
-            <h3 className="text-[23px] font-[500] text-center mb-2 text-[#000000]">{service.title}</h3>
-            <p className="text-[#777777] text-[17px] text-center">{service.desc}</p>
+            <h3 className="text-[23px] font-[500] text-center mb-2 text-[#000000]">{service.name}</h3>
+            
           </div>
         ))}
       </div>
+    </div>
+      <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+      {/* Foreground image */}
+      <img
+        src="src/assets/banner.png" // apna image path yahan lagao
+        alt="Gardening"
+        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+      />
     </div>
     <div className="mt-[50px]">
                 <Footer />

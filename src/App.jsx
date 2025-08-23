@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./app/login";
-import OtpVerification from "./app/otp_verification";
+import OtpVerification from "./app/OtpVerification";
 import RoleSelection from "./app/selection";
 import WorkCategory from "./app/WorkCategories";
 
@@ -21,7 +21,7 @@ export default function App() {
      <Route path="/" element={<LoginPage />} />
       <Route path="/Home-service_provider" element={<ServiceProviderHome />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/verification" element={<OtpVerification />} />
+      <Route path="/verifyotp" element={<OtpVerification />} />
       <Route path="/selection" element={<RoleSelection />} />
       <Route path="/workcategory" element={<WorkCategory />} />
       
