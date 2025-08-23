@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { useLocation } from "react-router-dom";
 
 export default function OurSubCategories() {

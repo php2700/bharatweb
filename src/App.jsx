@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./app/login";
+import LoginPage from "./app/Login";
 import OtpVerification from "./app/OtpVerification";
 import RoleSelection from "./app/selection";
 import WorkCategory from "./app/WorkCategories";

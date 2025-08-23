@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectRole } from "../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
 import Header from "../component/Header2";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { Link } from "react-router-dom";
 
 export default function RoleSelection() {

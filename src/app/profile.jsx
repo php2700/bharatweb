@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header2 from "../component/Header2";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 
 export default function Profile() {
   const [formData, setFormData] = useState({

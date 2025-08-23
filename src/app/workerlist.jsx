@@ -1,7 +1,7 @@
 // src/pages/WorkerList.jsx
 import React from "react";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { Link } from "react-router-dom";
 
 const workers = [

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {

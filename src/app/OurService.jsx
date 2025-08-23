@@ -1,7 +1,7 @@
 
 import React, { useState,useEffect} from "react";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { useNavigate } from "react-router-dom";
 
 
