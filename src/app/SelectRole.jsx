@@ -1,23 +1,36 @@
+// RoleSelection.jsx
 import { useDispatch, useSelector } from "react-redux";
 import { selectRole } from "../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
 import Header from "../component/Header2";
 import Footer from "../component/footer";
-import business from '../assets/selection/business.png';
-import customer from '../assets/selection/customer.png';
-import banner from '../assets/banner.png';
+import business from "../assets/selection/business.png";
+import customer from "../assets/selection/customer.png";
+import banner from "../assets/banner.png";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function RoleSelection() {
-  const selectedRoles = useSelector((state) => state.role.selectedRoles);
+  const selectedRole = useSelector((state) => state.role.selectedRole); // ✅ string
   const dispatch = useDispatch();
-  console.log(selectedRoles);
+    const navigate = useNavigate();
+ 
+  const roleMap = {
+  service_provider: "Business",
+  user: "Customer",
+};
+ const handleContinue = () => {
+    if (selectedRole) {
+      localStorage.setItem("role", selectedRole); // save in localStorage
+      navigate("/profile"); // ✅ redirect to profile page
+    }
+  };
 
   return (
     <>
       <Header />
-      
- <div className="container mx-auto px-4 py-4">
+
+      <div className="container mx-auto px-4 py-4">
         <Link
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
@@ -26,30 +39,31 @@ export default function RoleSelection() {
           Back
         </Link>
       </div>
+
       <div className="flex justify-center items-center min-h-screen bg-white px-4">
-       
         <div className="bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[147px] lg:pb-[147px]">
           {/* Title */}
           <h2 className="text-[22px] font-bold text-gray-800">
             Select Your Role
           </h2>
           <p className="text-[16px] text-gray-500 font-medium mt-1">
-            Please choose whether you are a Worker or a <br /> Customer to proceed
+            Please choose whether you are a Worker or a <br /> Customer to
+            proceed
           </p>
 
           {/* Role Options */}
           <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 mt-6">
             {/* Business */}
             <div
-              onClick={() => dispatch(selectRole("business"))}
+              onClick={() => dispatch(selectRole("service_provider"))}
               className={`flex flex-col items-center cursor-pointer transition-transform ${
-                selectedRoles.includes("business") ? "scale-105" : ""
+                selectedRole === "business" ? "scale-105" : ""
               }`}
             >
               <div className="relative">
                 <div
                   className={`w-24 h-24 sm:w-36 sm:h-36 rounded-full flex items-center justify-center border-4 bg-white shadow-[0px_2px_1px_1px_#bab1b1] ${
-                    selectedRoles.includes("business")
+                    selectedRole === "service_provider"
                       ? "border-green-600"
                       : "border-transparent"
                   }`}
@@ -61,7 +75,7 @@ export default function RoleSelection() {
                   />
                 </div>
 
-                {selectedRoles.includes("business") && (
+                {selectedRole === "service_provider" && (
                   <CheckCircle
                     size={20}
                     className="absolute bottom-1 right-7 rounded-full p-[3px] bg-[#228B22] stroke-white"
@@ -75,15 +89,15 @@ export default function RoleSelection() {
 
             {/* Customer */}
             <div
-              onClick={() => dispatch(selectRole("customer"))}
+              onClick={() => dispatch(selectRole("user"))}
               className={`flex flex-col items-center cursor-pointer transition-transform ${
-                selectedRoles.includes("customer") ? "scale-105" : ""
+                selectedRole === "customer" ? "scale-105" : ""
               }`}
             >
               <div className="relative">
                 <div
                   className={`w-28 h-28 sm:w-36 sm:h-36 rounded-full flex items-center justify-center border-4 bg-white shadow-[0px_2px_1px_1px_#bab1b1] ${
-                    selectedRoles.includes("customer")
+                    selectedRole === "user"
                       ? "border-green-600"
                       : "border-transparent"
                   }`}
@@ -95,7 +109,7 @@ export default function RoleSelection() {
                   />
                 </div>
 
-                {selectedRoles.includes("customer") && (
+                {selectedRole === "user" && (
                   <CheckCircle
                     size={20}
                     className="absolute bottom-1 right-7 rounded-full p-[3px] bg-[#228B22] stroke-white"
@@ -114,19 +128,17 @@ export default function RoleSelection() {
           </p>
 
           {/* Button */}
-          <button
-            className={`mt-[67px] w-full sm:w-80 py-3 rounded-[15px] font-semibold transition 
-              bg-[#228B22] text-white ${
-                selectedRoles.length === 0
-                  ? " cursor-not-allowed"
-                  : "hover:bg-green-700"
-              }`}
-            disabled={selectedRoles.length === 0}
-          >
-            {selectedRoles.length > 0
-              ? `Continue as ${selectedRoles.join(" & ")}`
-              : "Select Any One"}
-          </button>
+          {/* Button */}
+<button
+onClick={handleContinue}
+  className={`mt-[67px] w-full sm:w-80 py-3 rounded-[15px] font-semibold transition 
+    bg-[#228B22] text-white ${
+      !selectedRole ? " cursor-not-allowed" : "hover:bg-green-700"
+    }`}
+  disabled={!selectedRole}
+>
+  {selectedRole ? `Continue as ${roleMap[selectedRole]}` : "Select Any One"}
+</button>
         </div>
       </div>
 

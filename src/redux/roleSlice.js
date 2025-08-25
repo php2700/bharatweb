@@ -2,7 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  selectedRoles: [], // single select ke liye
+  selectedRole: "", // ✅ ab ye string hoga
 };
 
 export const roleSlice = createSlice({
@@ -10,7 +10,7 @@ export const roleSlice = createSlice({
   initialState,
   reducers: {
     selectRole: (state, action) => {
-      state.selectedRoles = [action.payload]; // sirf ek role rakho
+      state.selectedRole = action.payload; // ✅ sirf ek string assign hoga
     },
   },
 });

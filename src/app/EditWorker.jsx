@@ -118,6 +118,7 @@ export default function EditWorkerDetails() {
                    }
                    className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
                  />
+
        
                  {/* Date of Birth */}
                  <div className="relative">
@@ -145,7 +146,38 @@ export default function EditWorkerDetails() {
                    onChange={(e) => handleInputChange("address", e.target.value)}
                    className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
                  />
-       
+        <div className="w-full">
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => handleInputChange("aadharImage", e.target.files[0])}
+    className="hidden"
+    id="aadharUpload"
+  />
+
+  {/* Custom Upload Button (placeholder style) */}
+  <label
+    htmlFor="aadharUpload"
+    className="flex items-center justify-start h-[55px] cursor-pointer text-gray-500 border border-gray-300 bg-white rounded-[19px] px-3 w-full"
+  >
+    {formData.aadharImage ? (
+      <span className="text-green-600 font-medium">
+        {formData.aadharImage.name}
+      </span>
+    ) : (
+      "Upload your Aadhaar Image"
+    )}
+  </label>
+
+  {/* Preview image (optional) */}
+  {formData.aadharImage && (
+    <img
+      src={URL.createObjectURL(formData.aadharImage)}
+      alt="Aadhaar Preview"
+      className="mt-3 w-40 h-40 object-cover rounded-lg border"
+    />
+  )}
+</div>
                  {/* Submit Button */}
                  <div className="pt-6">
                    <button

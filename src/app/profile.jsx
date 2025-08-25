@@ -10,6 +10,7 @@ import {
 } from "@react-google-maps/api";
 
 export default function Profile() {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -21,10 +22,19 @@ export default function Profile() {
 
   const [errors, setErrors] = useState({});
   const [isOpen, setIsOpen] = useState(false); // Location Modal
+  const [addressModalOpen, setAddressModalOpen] = useState(false); // Address Modal
   const [successModal, setSuccessModal] = useState(false); // Success Modal
   const [currentLocation, setCurrentLocation] = useState(null);
   const [map, setMap] = useState(null);
   const autoCompleteRef = useRef(null);
+
+  const [tempAddress, setTempAddress] = useState({
+    title: "",
+    landmark: "",
+    address: "",
+    latitude: null,
+    longitude: null,
+  });
 
   // Load Google Maps JS API
   const { isLoaded } = useJsApiLoader({
@@ -42,9 +52,7 @@ export default function Profile() {
             lng: pos.coords.longitude,
           };
           setCurrentLocation(loc);
-          if (map) {
-            map.panTo(loc);
-          }
+          if (map) map.panTo(loc);
         },
         (err) => {
           console.error(err);
@@ -56,10 +64,7 @@ export default function Profile() {
 
   // Input change handler
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // Convert lat/lng → address
@@ -103,49 +108,93 @@ export default function Profile() {
     }
   };
 
-  // ✅ Validation Function
+  // Validation Function
   const validateForm = () => {
     let newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    } else if (formData.name.length < 3) {
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    else if (formData.name.length < 3)
       newErrors.name = "Name must be at least 3 characters";
-    }
 
-    if (!formData.age) {
-      newErrors.age = "Age is required";
-    } else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100) {
+    if (!formData.age) newErrors.age = "Age is required";
+    else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100)
       newErrors.age = "Enter a valid age between 1 and 100";
-    }
 
-    if (!formData.gender.trim()) {
-      newErrors.gender = "Gender is required";
-    }
+    if (!formData.gender.trim()) newErrors.gender = "Gender is required";
 
-    if (!formData.location.trim()) {
+    if (!formData.location.trim())
       newErrors.location = "Please select your location";
-    }
 
-    if (!formData.address.trim()) {
+    if (!formData.address.trim())
       newErrors.address = "Address is required";
-    } else if (formData.address.length < 5) {
+    else if (formData.address.length < 5)
       newErrors.address = "Address must be at least 5 characters";
-    }
 
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
   };
 
-  // Form Submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      console.log("Form Data:", formData);
-      setSuccessModal(true); // ✅ Show success modal
+  // Form Submit with API call
+ // Form Submit with API call
+ const role=localStorage.getItem('role');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (validateForm()) {
+    try {
+      const payload = {
+        full_name: formData.name,
+        role: role,
+        gender: formData.gender,
+        age: Number(formData.age),
+        location: {
+          latitude: currentLocation?.lat || 0,
+          longitude: currentLocation?.lng || 0,
+          address: formData.location,
+        },
+        full_address: [
+          {
+            latitude: tempAddress.latitude || currentLocation?.lat || 0,
+            longitude: tempAddress.longitude || currentLocation?.lng || 0,
+            address: tempAddress.address,
+            landmark: tempAddress.landmark,
+            title: tempAddress.title,
+          },
+        ],
+        referral_code: formData.referral,
+      };
+
+      // Get token from localStorage
+      const token = localStorage.getItem("token"); // <- यहाँ आपका token key
+
+      const response = await fetch(
+        `${BASE_URL}/user/updateUserProfile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // <- Bearer token
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (response.ok) {
+        setSuccessModal(true);
+      } else {
+        const errorData = await response.json();
+        console.error("Error updating profile:", errorData);
+        alert("Profile update failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Network error. Please check your connection.");
     }
-  };
+  }
+  console.log(payload);
+};
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -207,25 +256,25 @@ export default function Profile() {
                 </div>
 
                 {/* Gender */}
-               <div>
-  <label className="text-[18px] font-[700] mb-1 block text-center">
-    Gender
-  </label>
-  <select
-    name="gender"
-    value={formData.gender}
-    onChange={handleChange}
-    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] text-center"
-  >
-    <option value="">Select Gender</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-    <option value="other">Other</option>
-  </select>
-  {errors.gender && (
-    <p className="text-red-500 text-sm">{errors.gender}</p>
-  )}
-</div>
+                <div>
+                  <label className="text-[18px] font-[700] mb-1 block text-center">
+                    Gender
+                  </label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] text-center"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="text-red-500 text-sm">{errors.gender}</p>
+                  )}
+                </div>
 
                 {/* Location */}
                 <div>
@@ -246,7 +295,7 @@ export default function Profile() {
                   )}
                 </div>
 
-                {/* Address */}
+                {/* Full Address */}
                 <div>
                   <label className="text-[18px] font-[700] mb-1 block text-center">
                     Full Address (Landmark)
@@ -254,10 +303,11 @@ export default function Profile() {
                   <input
                     type="text"
                     name="address"
-                    placeholder="Enter Full Address"
+                    placeholder="Click to enter address"
                     value={formData.address}
-                    onChange={handleChange}
-                    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
+                    readOnly
+                    onClick={() => setAddressModalOpen(true)}
+                    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
                   />
                   {errors.address && (
                     <p className="text-red-500 text-sm">{errors.address}</p>
@@ -290,70 +340,115 @@ export default function Profile() {
           </main>
         </div>
       </div>
-       <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
-      {/* Foreground image */}
-      <img
-        src="src/assets/banner.png" // apna image path yahan lagao
-        alt="Gardening"
-        className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-      />
-    </div>
-    <div className="mt-[50px]">
-                    <Footer />
-                  </div>
-{/* ✅ Location Modal */}
-{isOpen && isLoaded && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-lg">
-      <h2 className="text-lg font-bold mb-4">Select Location</h2>
 
-      {/* Search Box */}
-      <Autocomplete
-        onLoad={(ref) => (autoCompleteRef.current = ref)}
-        onPlaceChanged={handlePlaceChanged}
-      >
-        <input
-          type="text"
-          placeholder="Search location"
-          className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
-        />
-      </Autocomplete>
+      {/* Address Modal */}
+      {addressModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-md">
+            <h2 className="text-lg font-bold mb-4">Enter Address Details</h2>
 
-      {/* Google Map */}
-      <GoogleMap
-        mapContainerStyle={{ height: "350px", width: "100%" }}
-        center={currentLocation || { lat: 28.6139, lng: 77.209 }} // fallback to Delhi
-        zoom={15}
-        onLoad={(map) => setMap(map)}
-        onClick={(e) => {
-          const lat = e.latLng.lat();
-          const lng = e.latLng.lng();
-          setCurrentLocation({ lat, lng });
-          getAddressFromLatLng(lat, lng);
-        }}
-      >
-        {currentLocation && <Marker position={currentLocation} />}
-      </GoogleMap>
+            <input
+              type="text"
+              placeholder="Title"
+              value={tempAddress.title}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, title: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Landmark"
+              value={tempAddress.landmark}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, landmark: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <textarea
+              placeholder="Address"
+              value={tempAddress.address}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, address: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
 
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={() => setIsOpen(false)}
-          className="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSelectLocation}
-          className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
-        >
-          Confirm Location
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setAddressModalOpen(false)}
+                className="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    address: tempAddress.address,
+                  }));
+                  setAddressModalOpen(false);
+                }}
+                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
+              >
+                Save Address
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* ✅ Success Modal */}
+      {/* Location Modal */}
+      {isOpen && isLoaded && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-lg">
+            <h2 className="text-lg font-bold mb-4">Select Location</h2>
+
+            <Autocomplete
+              onLoad={(ref) => (autoCompleteRef.current = ref)}
+              onPlaceChanged={handlePlaceChanged}
+            >
+              <input
+                type="text"
+                placeholder="Search location"
+                className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+              />
+            </Autocomplete>
+
+            <GoogleMap
+              mapContainerStyle={{ height: "350px", width: "100%" }}
+              center={currentLocation || { lat: 28.6139, lng: 77.209 }}
+              zoom={15}
+              onLoad={(map) => setMap(map)}
+              onClick={(e) => {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
+                setCurrentLocation({ lat, lng });
+                getAddressFromLatLng(lat, lng);
+              }}
+            >
+              {currentLocation && <Marker position={currentLocation} />}
+            </GoogleMap>
+
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSelectLocation}
+                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
+              >
+                Confirm Location
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
       {successModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-sm h-[462px]">
@@ -363,11 +458,9 @@ export default function Profile() {
               className="mx-auto mb-4 w-[244px] h-[185px]"
             />
             <p className="text-[22px] font-[400] text-[#363636] mb-4">
-              Registration have been completed.
+              Registration has been completed.
             </p>
-            <br />
             <hr className="text-[#228B2296]" />
-            <br />
             <br />
             <button
               onClick={() => setSuccessModal(false)}
@@ -378,6 +471,10 @@ export default function Profile() {
           </div>
         </div>
       )}
+
+      <div className="mt-[50px]">
+        <Footer />
+      </div>
     </div>
   );
 }
