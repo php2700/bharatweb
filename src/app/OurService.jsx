@@ -60,7 +60,7 @@ const handleServicecategoryClick = (service) => {
                        shadow-[0px_5px_29px_0px_#64646F26] 
                        hover:shadow-[0px_10px_50px_0px_#64646F50] 
                        hover:scale-105 
-                       transition-transform transition-shadow duration-300 ease-in-out
+                       transition-transform duration-300 ease-in-out
                        cursor-pointer" // <-- pointer cursor
           >
             <div className="flex justify-center mb-4">

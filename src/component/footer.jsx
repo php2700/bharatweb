@@ -1,4 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
+import Logo from "../assets/logo.svg"
+
 export default function Footer() {
   return (
     <footer className="bg-[#1B1514] text-white py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24">
@@ -10,7 +12,7 @@ export default function Footer() {
         <div className="md:flex justify-center md:justify-start">
           <div className="bg-white w-[120px] h-[60px] sm:w-[140px] sm:h-[70px] md:w-[160px] md:h-[75px] lg:w-[185px] lg:h-[90px] flex items-center justify-center mx-auto md:mx-0">
             <img
-              src="/logo.png"
+              src={Logo}
               alt="The Bharat Works"
               className="w-[100px] h-[32px] sm:w-[120px] sm:h-[38px] md:w-[140px] md:h-[44px] lg:w-[150px] lg:h-[48px] object-contain"
             />

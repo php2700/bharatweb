@@ -1,4 +1,7 @@
 import { useState } from "react";
+import Search from "../assets/search-normal.svg";
+import Logo from "../assets/logo.svg";
+import Dropdown from "../assets/dropdown.svg";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,14 +12,14 @@ export default function Header() {
         {/* Left Section - Logo */}
         <div className="flex items-center gap-4 flex-1">
           <div className="flex-shrink-0">
-            <img src="/logo.svg" alt="Logo" className="h-12 w-[180px]" />
+            <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
           </div>
 
           {/* Search Bar - hidden on very small screens */}
           <div className="hidden sm:block w-full max-w-md">
             <div className="relative">
               <img
-                src="/search-normal.svg"
+                src={Search}
                 alt="Search"
                 className="absolute inset-y-0 left-3 my-auto w-4 h-4 text-gray-400"
               />
@@ -52,7 +55,7 @@ export default function Header() {
           {/* Profile Dropdown - hide on very small screens */}
           <div className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer">
             Raj Sharma
-            <img src="/dropdown.svg" alt="Dropdown" className="w-6 h-6" />
+            <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
           </div>
 
           {/* Hamburger Icon - only on mobile */}
@@ -99,7 +102,7 @@ export default function Header() {
 
             <div className="bg-white px-4 py-2 rounded-lg shadow text-base font-medium flex items-center gap-2 cursor-pointer">
               Raj Sharma
-              <img src="/dropdown.svg" alt="Dropdown" className="w-5 h-5" />
+              <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
             </div>
           </div>
         </div>

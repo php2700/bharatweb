@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../component/Header2";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../firebase";
 import { ToastContainer, toast } from "react-toastify";
+import banner from "../assets/banner.png"
 import "react-toastify/dist/ReactToastify.css";
 
 
@@ -179,7 +180,7 @@ export default function LoginPage() {
        <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
       {/* Foreground image */}
       <img
-        src="src/assets/banner.png" // apna image path yahan lagao
+        src={banner} // apna image path yahan lagao
         alt="Gardening"
         className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
       />

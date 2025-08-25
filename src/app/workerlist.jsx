@@ -84,7 +84,7 @@ export default function WorkerList() {
               </div>
 
               <div className="lg:mb-[123px]">
-                <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] font-semibold text-gray-800">
+                <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
                   {worker.name}
                 </h2>
                 <p className="text-sm lg:text-[17px] text-gray-500">{worker.location}</p>

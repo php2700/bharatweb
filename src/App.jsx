@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./app/Login";
+import LoginPage from "./app/login";
 import OtpVerification from "./app/OtpVerification";
 import RoleSelection from "./app/selection";
 import WorkCategory from "./app/WorkCategories";
@@ -13,6 +13,7 @@ import AddWorkerDetails from './app/AddWorker';
 import EditWorkerDetails from './app/EditWorker';
 import ServiceProviderHome from "./app/Home-service_provider";
 import Profile from "./app/profile";
+import Details from "./app/Details";
 
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="workerlist" element={<WorkerList/>}/>
       <Route path="addworker" element={<AddWorkerDetails/>}/>
       <Route path="editworker" element={<EditWorkerDetails/>}/>
+      <Route path="Details" element={<Details/>}/>
       
       
     </Routes>

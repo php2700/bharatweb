@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
+import Hiring from "../assets/Home-SP/hiring1.png";
+import Bidding from "../assets/Home-SP/bidding.png";
+import Emergency from "../assets/Home-SP/emergency.png";
+import Promise from "../assets/Home-SP/promise.png";
+import Paper from "../assets/Home-SP/paper.svg";
+import Vector from "../assets/Home-SP/vector.svg";
+import Banner from "../assets/Home-SP/banner.jpg";
 
 export default function ServiceProviderHome() {
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
   const [directHiring, setDirectHiring] = useState([
     {
-      image: "/Home-SP/hiring1.png",
+      image: Hiring,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -15,7 +22,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/hiring1.png",
+      image: Hiring,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -23,7 +30,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/hiring1.png",
+      image: Hiring,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -31,7 +38,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/hiring1.png",
+      image: Hiring,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -42,7 +49,7 @@ export default function ServiceProviderHome() {
 
   const [bidding, setBidding] = useState([
     {
-      image: "/Home-SP/bidding.png",
+      image: Bidding,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -50,7 +57,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/bidding.png",
+      image: Bidding,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -58,7 +65,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/bidding.png",
+      image: Bidding,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -66,7 +73,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/bidding.png",
+      image: Bidding,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -77,7 +84,7 @@ export default function ServiceProviderHome() {
 
   const [emergency, setEmergency] = useState([
     {
-      image: "/Home-SP/emergency.png",
+      image: Emergency,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -85,7 +92,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/emergency.png",
+      image: Emergency,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -93,7 +100,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/emergency.png",
+      image: Emergency,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -101,7 +108,7 @@ export default function ServiceProviderHome() {
       location: "Indore M.P.",
     },
     {
-      image: "/Home-SP/emergency.png",
+      image: Emergency,
       work: "Make a chair",
       description:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
@@ -121,7 +128,7 @@ export default function ServiceProviderHome() {
       {/* First Full Width Image */}
       <div className="w-full">
         <img
-          src="/Home-SP/banner.jpg"
+          src={Banner}
           alt="Banner"
           className="w-full h-[400px] object-cover mt-[60px] max-md:h-[200px]"
         />
@@ -130,7 +137,7 @@ export default function ServiceProviderHome() {
       {/* Second Image with Button */}
       <div className="w-[90%] mx-auto relative mt-8">
         <img
-          src="/Home-SP/promise.png"
+          src={Promise}
           alt="Second Banner"
           className="w-full rounded-2xl object-cover h-[150px] border border-[#228B22] max-md:h-[120px]"
         />
@@ -140,7 +147,7 @@ export default function ServiceProviderHome() {
           <div className="flex items-center gap-[100px]">
             {/* White Circular Div */}
             <div className="w-[100px] h-[100px] bg-white rounded-full shadow flex items-center justify-center">
-              <img src="/Home-SP/paper.svg" alt="Icon" className="w-12 h-12" />
+              <img src={Paper} alt="Icon" className="w-12 h-12" />
             </div>
 
             {/* Text Content */}
@@ -167,7 +174,7 @@ export default function ServiceProviderHome() {
           {/* Circle + Text Section */}
           <div className="flex items-center gap-3">
             <div className="w-[70px] h-[70px] bg-white rounded-full shadow flex items-center justify-center">
-              <img src="/Home-SP/paper.svg" alt="Icon" className="w-8 h-8" />
+              <img src={Paper} alt="Icon" className="w-8 h-8" />
             </div>
             <div className="flex flex-col">
               <h2 className="text-lg font-semibold text-black">Pro Plan</h2>
@@ -181,7 +188,7 @@ export default function ServiceProviderHome() {
       {/* Emergency Toggle Section */}
       <div className="md:w-[70%] w-[90%] mx-auto mt-8 flex items-center justify-between p-4 rounded-lg border border-white shadow-lg bg-[#CEFFDE]">
         <div className="flex items-center gap-2">
-          <img src="/Home-SP/Vector.svg" alt="Warning Icon" className="w-6 h-6" />
+          <img src={Vector} alt="Warning Icon" className="w-6 h-6" />
           <span className="text-black font-medium text-lg max-md:text-sm">
             Are you ready for Emergency task?
           </span>

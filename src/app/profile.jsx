@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header2 from "../component/Header2";
 import Footer from "../component/footer";
+import Gardening from "../assets/profile/profile image.png";
+import Arrow from "../assets/profile/arrow_back.svg";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
@@ -33,14 +35,14 @@ export default function Profile() {
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
-          <img src="/profile/arrow_back.svg" className="w-6 h-6 mr-2" />
+          <img src={Arrow} className="w-6 h-6 mr-2" />
           Back
         </Link>
       </div>
 
       {/* Main Form */}
       <div className="flex justify-center items-center min-h-screen bg-white px-4">
-        <div className="bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[80px] lg:pb-[80px]">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[80px] lg:pb-[80px]">
           {/* Title */}
          <main className="flex-grow container mx-auto px-4 flex justify-center items-center">
         <div className="p-6 w-full max-w-md ">
@@ -155,7 +157,7 @@ export default function Profile() {
       </div>
 <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
         <img
-          src="src/assets/banner.png"
+          src={Gardening}
           alt="Gardening"
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
         />

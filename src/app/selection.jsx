@@ -25,7 +25,7 @@ export default function RoleSelection() {
       </div>
       <div className="flex justify-center items-center min-h-screen bg-white px-4">
        
-        <div className="bg-white shadow-md rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[147px] lg:pb-[147px]">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] xl:pb-[147px] lg:pb-[147px]">
           {/* Title */}
           <h2 className="text-[22px] font-bold text-gray-800">
             Select Your Role
