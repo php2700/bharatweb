@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../component/Header";
 import Footer from "../component/footer";
+import banner from '../assets/banner.png';
 import { useLocation } from "react-router-dom";
 
 export default function OurSubCategories() {
@@ -112,6 +113,14 @@ export default function OurSubCategories() {
           </div>
         )}
       </div>
+      <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+            {/* Foreground image */}
+            <img
+              src= {banner}// apna image path yahan lagao
+              alt="Gardening"
+              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            />
+          </div>
       <div className="mt-[50px]">
         <Footer />
       </div>

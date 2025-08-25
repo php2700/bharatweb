@@ -3,6 +3,9 @@ import Header from "../component/Header2";
 import Footer from "../component/footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import banner from '../assets/banner.png';
+import image from '../assets/login/img.png';
+import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function OtpVerification() {
@@ -41,7 +44,7 @@ export default function OtpVerification() {
         localStorage.removeItem("mobileNumber");
 
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/selection");
         }, 2000);
       } else {
         toast.error(data.message || "OTP verification failed");
@@ -82,7 +85,7 @@ export default function OtpVerification() {
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
           <div className="md:block md:w-1/2">
             <img
-              src="/src/assets/login/img.png"
+              src={image}
               alt="Plumber working"
               className="w-full h-full object-cover"
             />
@@ -91,7 +94,7 @@ export default function OtpVerification() {
           <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16">
             <div className="flex flex-col items-center space-y-6">
               <img
-                src="/logo.png"
+                src={logo}
                 alt="The Bharat Works"
                 className="w-[200px] md:w-[286px] h-auto object-contain mb-24"
               />
@@ -167,7 +170,7 @@ export default function OtpVerification() {
       <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
         {/* Foreground image */}
         <img
-          src="src/assets/banner.png"
+          src={banner}
           alt="Gardening"
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
         />

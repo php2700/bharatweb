@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Header from "../component/Header";
 import Footer from "../component/footer";
+import images from '../assets/workcategory/image.png';
+import banner1 from '../assets/workcategory/banner1.png';
+import hire1 from '../assets/workcategory/hire1.png';
+import hire2 from '../assets/workcategory/hire2.png';
+import banner from '../assets/workcategory/banner.png';
+import hire3 from '../assets/workcategory/hire3.png';
 import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {
@@ -53,7 +59,7 @@ const navigate = useNavigate();
         {/* Hero Section */}
         <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] bg-gray-200">
           <img
-            src="/src/assets/workcategory/banner.png"
+            src={banner}
             alt="Hero"
             className="w-full h-full object-cover"
           />
@@ -122,7 +128,7 @@ const navigate = useNavigate();
                 >
                   <div className="relative">
                     <img
-                      src="/src/assets/workcategory/image.png"
+                      src={images}
                       alt="Profile"
                       className="w-full h-48 sm:h-50 object-cover rounded-2xl"
                     />
@@ -174,7 +180,7 @@ const navigate = useNavigate();
         {/* About Section */}
         <div className="mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2 gap-6 items-center lg:pl-0">
           <img
-            src="/src/assets/workcategory/banner1.png"
+            src={banner1}
             alt="Worker"
             className="rounded-lg w-full"
           />
@@ -209,7 +215,7 @@ const navigate = useNavigate();
               </button>
             </div>
             <img
-              src="/src/assets/workcategory/banner1.png"
+              src={banner1}
               alt="Emergency"
               className="rounded-lg w-full"
             />
@@ -217,35 +223,50 @@ const navigate = useNavigate();
         </div>
 
         {/* Blog Section */}
-        <div className="font-sans">
-          <div className="bg-gray-200 text-[#228B22] h-[48px] pt-[11px] pl-[16px] sm:pl-[112px] text-[19px] sm:text-[20px] font-semibold">
-            My Hire
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 sm:p-6">
+  {/* Card 1 - Direct Hiring */}
+  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+    <img
+      src={hire1}
+      alt="Direct Hiring"
+      className="w-full h-[322px] sm:h-[383px] object-cover"
+    />
+    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+        Direct Hiring
+      </button>
+    </div>
+  </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 sm:p-6">
-            {[1, 2, 3].map((card) => (
-              <div
-                key={card}
-                className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]"
-              >
-                <img
-                  src={`/src/assets/workcategory/hire${card}.png`}
-                  alt="Direct Hiring"
-                  className="w-full h-[322px] sm:h-[383px] object-cover"
-                />
-                <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-                  <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
-                    {card === 1
-                      ? "Direct Hiring"
-                      : card === 2
-                      ? "Bidding"
-                      : "Emergency"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+  {/* Card 2 - Bidding */}
+  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+    <img
+      src={hire2}
+      alt="Bidding"
+      className="w-full h-[322px] sm:h-[383px] object-cover"
+    />
+    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+        Bidding
+      </button>
+    </div>
+  </div>
+
+  {/* Card 3 - Emergency */}
+  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+    <img
+      src={hire3}
+      alt="Emergency"
+      className="w-full h-[322px] sm:h-[383px] object-cover"
+    />
+    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+        Emergency
+      </button>
+    </div>
+  </div>
+</div>
+
       </div>
 
       <div className="mt-[50px]">

@@ -3,6 +3,7 @@ import React from "react";
 import Header from "../component/Header";
 import Footer from "../component/footer";
 import { Link } from "react-router-dom";
+import image from '../assets/workcategory/image.png';
 
 const workers = [
   {
@@ -10,28 +11,28 @@ const workers = [
     name: "Dipak Sharma",
     location: "Indore MP",
     status: "Verified by Admin",
-    image: "/src/assets/workcategory/image.png",
+    image: image,
   },
   {
     id: 2,
     name: "Dipak Sharma",
     location: "Indore MP",
     status: "Verified by Admin",
-    image: "/src/assets/workcategory/image.png",
+    image: image,
   },
   {
     id: 3,
     name: "Dipak Sharma",
     location: "Indore MP",
     status: "Verified by Admin",
-    image: "/src/assets/workcategory/image.png",
+    image: image,
   },
   {
     id: 4,
     name: "Dipak Sharma",
     location: "Indore MP",
     status: "Verified by Admin",
-    image: "/src/assets/workcategory/image.png",
+    image: image,
   },
 ];
 

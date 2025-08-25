@@ -3,6 +3,9 @@ import { selectRole } from "../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
 import Header from "../component/Header2";
 import Footer from "../component/footer";
+import business from '../assets/selection/business.png';
+import customer from '../assets/selection/customer.png';
+import banner from '../assets/banner.png';
 import { Link } from "react-router-dom";
 
 export default function RoleSelection() {
@@ -52,7 +55,7 @@ export default function RoleSelection() {
                   }`}
                 >
                   <img
-                    src="/src/assets/selection/business.png"
+                    src={business}
                     alt="Business"
                     className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-[82px]"
                   />
@@ -86,7 +89,7 @@ export default function RoleSelection() {
                   }`}
                 >
                   <img
-                    src="/src/assets/selection/customer.png"
+                    src={customer}
                     alt="Customer"
                     className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-[82px]"
                   />
@@ -130,7 +133,7 @@ export default function RoleSelection() {
       {/* Banner */}
       <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-15">
         <img
-          src="src/assets/banner.png"
+          src={banner}
           alt="Gardening"
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
         />

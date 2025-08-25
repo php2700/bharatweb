@@ -4,8 +4,11 @@ import Header from "../component/Header2";
 import Footer from "../component/footer";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../firebase";
+import banner from '../assets/banner.png';
+import image from '../assets/login/img.png';
+import flag from '../assets/login/flag.png';
+import logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
-import banner from "../assets/banner.png"
 import "react-toastify/dist/ReactToastify.css";
 
 
@@ -106,7 +109,7 @@ export default function LoginPage() {
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
           <div className="md:block md:w-1/2">
             <img
-              src="/src/assets/login/img.png"
+              src={image}
               alt="Plumber working"
               className="w-full h-full object-cover"
             />
@@ -115,7 +118,7 @@ export default function LoginPage() {
           <div className="w-full md:w-1/2 flex flex-col justify-center p-6 sm:p-8 md:p-12 lg:p-16">
             <div className="flex flex-col items-center space-y-6 w-full">
               <img
-                src="/logo.png"
+                src={logo}
                 alt="The Bharat Works"
                 className="w-[180px] sm:w-[220px] md:w-[260px] lg:w-[286px] h-auto object-contain mb-32"
               />
@@ -136,7 +139,7 @@ export default function LoginPage() {
               >
                 <div className="flex items-center px-3 w-[280px] sm:w-[320px] md:w-[330px] lg:w-[390px] py-2 rounded-xl border-2 border-[#C6C6C6] bg-white">
                   <img
-                    src="/src/assets/login/flag.png"
+                    src={flag}
                     alt="India Flag"
                     className="w-6 h-4 mr-2"
                   />

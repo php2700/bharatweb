@@ -33,6 +33,9 @@ export default function App() {
       <Route path="addworker" element={<AddWorkerDetails/>}/>
       <Route path="editworker" element={<EditWorkerDetails/>}/>
       <Route path="Details" element={<Details/>}/>
+      <Route path="/workerlist" element={<WorkerList/>}/>
+      <Route path="/addworker" element={<AddWorkerDetails/>}/>
+      <Route path="/editworker" element={<EditWorkerDetails/>}/>
       
       
     </Routes>
