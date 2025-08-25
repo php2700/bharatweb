@@ -1,6 +1,9 @@
 import React from "react";
 import Header from "../component/Header";
 import Footer from "../component/footer";
+import img1 from '../assets/aboutus/img1.png';
+import img2 from '../assets/aboutus/img2.png';
+import img3 from '../assets/aboutus/img3.png';
 
 export default function AboutUs() {
   return (
@@ -29,7 +32,7 @@ export default function AboutUs() {
         {/* Right Column */}
         <div>
           <img 
-            src="/src/assets/aboutus/img1.png" 
+          src={img1 }
             alt="Home Services" 
             className="rounded-[44px] w-full shadow-lg"
           />
@@ -41,7 +44,7 @@ export default function AboutUs() {
         {/* Left Column */}
         <div>
           <img 
-           src="/src/assets/aboutus/img2.png"
+           src={img2}
             alt="Effortless Services" 
             className="rounded-[44px] w-full shadow-lg"
           />
@@ -69,7 +72,7 @@ export default function AboutUs() {
     {/* Left Side Image */}
     <div className="flex justify-center">
       <img
-        src="/src/assets/aboutus/img3.png"
+        src={img3}
         alt="Painter"
         className="w-[250px] sm:w-[300px] md:w-[350px] lg:w-[400px] object-contain"
       />

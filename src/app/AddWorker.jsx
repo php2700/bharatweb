@@ -1,6 +1,12 @@
 import { useState } from "react";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
+import image from '../assets/workcategory/image.png';
+import editicon from '../assets/addworker/icon.png';
+import flag from '../assets/addworker/flag.png';
+import dob from '../assets/addworker/dob.png';
+import banner from '../assets/banner.png';
+import downarrow from '../assets/addworker/downarrow.png';
 
 
 
@@ -47,7 +53,7 @@ export default function AddWorkerDetails() {
             <div className="w-46 h-46 rounded-full overflow-hidden  p-1">
               <div className="w-full h-full rounded-full overflow-hidden">
                 <img
-                  src="/src/assets/workcategory/image.png"
+                  src={image}
                   alt="Worker profile"
                   className="w-full h-full object-cover"
                 />
@@ -55,7 +61,7 @@ export default function AddWorkerDetails() {
             </div>
             <div className="absolute bottom-7 right-2 w-7 h-7 bg-[#228B22] rounded-full flex items-center justify-center ">
               <img
-                src="/src/assets/addworker/icon.png"
+                src={editicon}
                 alt="Verified"
                 className="w-3.5 h-3.5"
               />
@@ -79,13 +85,13 @@ export default function AddWorkerDetails() {
   {/* Left: Flag + Country Code */}
   <div className="flex items-center gap-2">
     <img
-      src="/src/assets/addworker/flag.png"
+      src={flag}
       alt="India Flag"
       className="w-5 h-5 object-cover rounded-sm"
     />
     <span className="text-[#000000] font-[700]">+91</span>
     <img
-    src="/src/assets/addworker/downarrow.png"
+    src={downarrow}
     alt="Arrow"
     className="w-4 h-4"
   />
@@ -129,7 +135,7 @@ export default function AddWorkerDetails() {
               className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3"
             />
             <img
-              src="/src/assets/addworker/dob.png"
+              src={dob}
               alt="Calendar"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5"
             />
@@ -160,6 +166,13 @@ export default function AddWorkerDetails() {
       
       
     </div>
+     <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-15">
+            <img
+              src={banner}
+              alt="Gardening"
+              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            />
+          </div>
     <div className="mt-[50px]">
                 <Footer />
               </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../component/Header";
-import Footer from "../component/Footer";
+import Footer from "../component/footer";
 
 export default function ServiceProviderHome() {
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);

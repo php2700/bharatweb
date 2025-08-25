@@ -28,9 +28,9 @@ export default function App() {
       <Route  path="/ourservice" element={<OurServices/>}/>
       <Route  path="/subcategories" element={<OurSubCategories/>}/>
       <Route path="aboutus" element={<AboutUs/>}/>
-      <Route path="workerlist" element={<WorkerList/>}/>
-      <Route path="addworker" element={<AddWorkerDetails/>}/>
-      <Route path="editworker" element={<EditWorkerDetails/>}/>
+      <Route path="/workerlist" element={<WorkerList/>}/>
+      <Route path="/addworker" element={<AddWorkerDetails/>}/>
+      <Route path="/editworker" element={<EditWorkerDetails/>}/>
       
       
     </Routes>
