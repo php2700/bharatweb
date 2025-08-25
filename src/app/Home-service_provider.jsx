@@ -7,7 +7,7 @@ import Bidding from "../assets/Home-SP/bidding.png";
 import Emergency from "../assets/Home-SP/emergency.png";
 import Promise from "../assets/Home-SP/promise.png";
 import Paper from "../assets/Home-SP/paper.svg";
-import Vector from "../assets/Home-SP/vector.svg";
+import Vector from "../assets/Home-SP/Vector.svg";
 import Banner from "../assets/Home-SP/banner.jpg";
 
 export default function ServiceProviderHome() {
