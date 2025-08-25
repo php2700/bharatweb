@@ -14,6 +14,8 @@ import EditWorkerDetails from './app/EditWorker';
 import ServiceProviderHome from "./app/Home-service_provider";
 import Profile from "./app/profile";
 import Details from "./app/Details";
+import Subscription from "./app/Subscription";
+import Referral from "./app/Referral";
 
 
 export default function App() {
@@ -36,6 +38,8 @@ export default function App() {
       <Route path="/workerlist" element={<WorkerList/>}/>
       <Route path="/addworker" element={<AddWorkerDetails/>}/>
       <Route path="/editworker" element={<EditWorkerDetails/>}/>
+      <Route path="/Subscription" element={<Subscription/>}/>
+      <Route path="/Referral" element={<Referral/>}/>
       
       
     </Routes>
