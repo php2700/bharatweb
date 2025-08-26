@@ -61,7 +61,7 @@ export default function WorkerList() {
 </h1>
 
   <button className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-full shadow hover:bg-[#121212] w-[200px] -md:mr-[211px] lg:w-[293px] lg:h-[57px] text-[17px] font-[500]">
-    <Link to={'/addworker'}>Add Worker</Link>
+    <Link to='/addworker'>Add Worker</Link>
   </button>
 </div>
 
