@@ -22,39 +22,36 @@ export default function App() {
     <Routes>
       {/* //public route */}
      <Route path="/" element={<LoginPage />} />
-      <Route path="/Home-service_provider" element={<ServiceProviderHome />} />
+      <Route path="/homeservice" element={<ServiceProviderHome />} />
      
       
-      <Route path="/selectrole" element={<RoleSelection />} />
-      <Route path="/workcategory" element={<WorkCategory />} />
+      
+      <Route path="/homeuser" element={<WorkCategory />} />
       
       <Route  path="/ourservice" element={<OurServices/>}/>
       <Route  path="/subcategories" element={<OurSubCategories/>}/>
-      <Route path="aboutus" element={<AboutUs/>}/>
+      <Route path="/aboutus" element={<AboutUs/>}/>
       <Route path="/workerlist" element={<WorkerList/>}/>
       <Route path="/addworker" element={<AddWorkerDetails/>}/>
       <Route path="/editworker" element={<EditWorkerDetails/>}/>
       
       {/* //protected Route */}
-<Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
+
+        <Route 
+  path="/profile" 
+  element={<PrivateRoute element={<Profile />} />} 
+/>
       <Route path="/verifyotp" element={
         <PrivateotpVerify>
            <OtpVerification />
         </PrivateotpVerify>
        
         } />
-      <Route path="/selectrole" element={
-       <PrivateRoute>
-           <RoleSelection />
-        </PrivateRoute>
-        } />
+    <Route 
+  path="/selectrole" 
+  element={<PrivateRoute element={<RoleSelection />} />} 
+/>
+
     </Routes>
   );
 }
