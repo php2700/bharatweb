@@ -16,6 +16,7 @@ import Profile from "./app/profile";
 import Details from "./app/Details";
 import Subscription from "./app/Subscription";
 import Referral from "./app/Referral";
+import SendMoney from "./app/SendMoney";
 
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
       <Route path="/editworker" element={<EditWorkerDetails/>}/>
       <Route path="/Subscription" element={<Subscription/>}/>
       <Route path="/Referral" element={<Referral/>}/>
+      <Route path="/SendMoney" element={<SendMoney/>}/>
       
       
     </Routes>
