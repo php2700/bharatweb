@@ -126,12 +126,12 @@ export default function Details() {
                     </button>
                   </div>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
                   </p>
                 </div>
               </div>
@@ -184,12 +184,12 @@ export default function Details() {
                     </button>
                   </div>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
-                    <br/>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                    <br />
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
                   </p>
                 </div>
                 <div className="flex gap-4 mt-4">
@@ -308,87 +308,85 @@ export default function Details() {
             </div>
 
             {/* Document Section */}
-<div className="container mx-auto max-w-[750px] px-6 py-6">
-  <div className="bg-white rounded-xl shadow-md p-6">
-    <div className="flex justify-between items-start">
-      <h2 className="text-xl font-bold">Document</h2>
-      <span className="bg-green-100 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
-        Verified by Admin
-      </span>
-    </div>
-    <div className="flex justify-between items-center mt-4">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 flex items-center justify-center rounded-lg">
-  <img
-    src={Aadhar} // replace Sample with your document icon image import
-    alt="Document Icon"
-    className="w-9 h-9"
-  />
-</div>
+            <div className="container mx-auto max-w-[750px] px-6 py-6">
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex justify-between items-start">
+                  <h2 className="text-xl font-bold">Document</h2>
+                  <span className="bg-green-100 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
+                    Verified by Admin
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-lg">
+                      <img
+                        src={Aadhar}
+                        alt="Document Icon"
+                        className="w-9 h-9"
+                      />
+                    </div>
+                    <p className="font-medium">Aadhar card</p>
+                  </div>
+                  <img
+                    src={Sample2}
+                    alt="Document Preview"
+                    className="w-40 h-24 object-cover rounded-md shadow"
+                  />
+                </div>
+              </div>
+            </div>
 
-        <p className="font-medium">Aadhar card</p>
-      </div>
-      <img
-        src={Sample2} // Replace with actual Aadhar preview image
-        alt="Document Preview"
-        className="w-40 h-24 object-cover rounded-md shadow"
-      />
-    </div>
-  </div>
-</div>
+            {/* Rate & Reviews Section */}
+            <div className="container mx-auto max-w-[750px] px-6 py-6">
+              <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
 
-{/* Rate & Reviews Section */}
-<div className="container mx-auto max-w-[750px] px-6 py-6">
-  <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
+              {/* Review Card */}
+              {[1, 2].map((item, index) => (
+                <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
+                  {/* Star Rating */}
+                  <div className="flex gap-1 mb-2">
+                    {[1, 2, 3, 4, 5].map((star, i) => (
+                      <span key={i} className={i < 4 ? "text-yellow-400" : "text-gray-300"}>
+                        ★
+                      </span>
+                    ))}
+                  </div>
 
-  {/* Review Card */}
-  {[1, 2].map((item, index) => (
-    <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
-      {/* Star Rating */}
-      <div className="flex gap-1 mb-2">
-        {[1, 2, 3, 4, 5].map((star, i) => (
-          <span key={i} className={i < 4 ? "text-yellow-400" : "text-gray-300"}>
-            ★
-          </span>
-        ))}
-      </div>
+                  {/* Review Content */}
+                  <h3 className="font-semibold">Made a computer table</h3>
+                  <p className="text-gray-600 text-sm">
+                    It is a long established fact that a reader will be distracted by the readable
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">14 Apr, 2023</p>
 
-      {/* Review Content */}
-      <h3 className="font-semibold">Made a computer table</h3>
-      <p className="text-gray-600 text-sm">
-        It is a long established fact that a reader will be distracted by the readable
-      </p>
-      <p className="text-xs text-gray-400 mt-2">14 Apr, 2023</p>
+                  {/* Reviewer Images */}
+                  <div className="flex mt-3">
+                    {[1, 2, 3, 4].map((img) => (
+                      <img
+                        key={img}
+                        src={User}
+                        alt="Reviewer"
+                        className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
 
-      {/* Reviewer Images */}
-      <div className="flex mt-3">
-        {[1, 2, 3, 4].map((img) => (
-          <img
-            key={img}
-            src={User} // Replace with reviewer profile img
-            alt="Reviewer"
-            className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
-          />
-        ))}
-      </div>
-    </div>
-  ))}
+              {/* See All Review Button */}
+              <div className="text-center mt-4">
+                <button className="text-[#228B22] font-semibold hover:underline">
+                  See All Review
+                </button>
+              </div>
+            </div>
 
-  {/* See All Review Button */}
-  <div className="text-center mt-4">
-    <button className="text-[#228B22] font-semibold hover:underline">
-      See All Review
-    </button>
-  </div>
-</div>
-
-{/* Add Workers Button */}
-<div className="container mx-auto max-w-[550px] px-6 py-6">
-  <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">
-    Add workers
-  </button>
-</div>
-
+            {/* Add Workers Button */}
+            <div className="container mx-auto max-w-[550px] px-6 py-6">
+              <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">
+                Add workers
+              </button>
+            </div>
           </div>
         )}
       </div>

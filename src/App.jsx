@@ -19,12 +19,14 @@ import Subscription from "./app/CommonScreens/Subscription";
 import Referral from "./app/CommonScreens/Referral";
 import SendMoney from "./app/CommonScreens/SendMoney";
 import ProcessingPayment from "./app/CommonScreens/ProcessingPayment";
+import Home from "./app/CommonScreens/Home";
 
 export default function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<Home/>} />
+      <Route path="/login/signup" element={<LoginPage />} />
       <Route path="/Home-service_provider" element={<ServiceProviderHome />} />
       <Route path="/selectrole" element={<RoleSelection />} />
       <Route path="/workcategory" element={<WorkCategory />} />
