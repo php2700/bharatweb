@@ -9,6 +9,7 @@ import logo from "../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function OtpVerification() {
+  
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
@@ -78,7 +79,7 @@ export default function OtpVerification() {
       toast.error("Something went wrong while resending OTP");
     }
   };
-
+const otpv=localStorage.getItem('otp');
   return (
     <>
       <Header />
@@ -100,7 +101,7 @@ export default function OtpVerification() {
                 alt="The Bharat Works"
                 className="w-[200px] md:w-[286px] h-auto object-contain mb-24"
               />
-
+                <h1 className="text-[#ff2108] text-[20px]">Otp is : {otpv}</h1>
               <h2 className="text-2xl font-bold text-gray-900 relative top-[18px]">
                 Verify OTP
               </h2>

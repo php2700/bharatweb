@@ -87,6 +87,8 @@ export default function LoginPage() {
 
       if (res.ok) {
         localStorage.setItem("mobileNumber", mobile);
+        localStorage.setItem("otp", data.temp_otp);
+        
         toast.success("OTP sent successfully!");
         setTimeout(() => {
         navigate("/verifyotp");

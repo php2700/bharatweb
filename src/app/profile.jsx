@@ -183,8 +183,9 @@ const handleSubmit = async (e) => {
           body: JSON.stringify(payload),
         }
       );
-
+ const data = await response.json()
       if (response.ok) {
+        localStorage.setItem('isProfileComplete',data.user.isProfileComplete);
         setSuccessModal(true);
       } else {
         const errorData = await response.json();
@@ -196,7 +197,7 @@ const handleSubmit = async (e) => {
       alert("Network error. Please check your connection.");
     }
   }
-  console.log(payload);
+  
 };
 
 
