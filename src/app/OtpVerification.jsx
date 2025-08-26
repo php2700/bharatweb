@@ -40,11 +40,13 @@ export default function OtpVerification() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem('role',data.role);
+        localStorage.setItem('isProfileComplete',data.isProfileComplete);
         toast.success("OTP verified successfully!");
         localStorage.removeItem("mobileNumber");
 
         setTimeout(() => {
-          navigate("/selection");
+          navigate("/selectrole");
         }, 2000);
       } else {
         toast.error(data.message || "OTP verification failed");
