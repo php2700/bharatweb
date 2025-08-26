@@ -1,13 +1,13 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../component/Header2";
-import Footer from "../component/footer";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
 import { getToken } from "firebase/messaging";
-import { messaging } from "../firebase";
-import banner from '../assets/banner.png';
-import image from '../assets/login/img.png';
-import flag from '../assets/login/flag.png';
-import logo from "../assets/logo.svg";
+import { messaging } from "../../firebase";
+import banner from '../../assets/banner.png';
+import image from '../../assets/login/img.png';
+import flag from '../../assets/login/flag.png';
+import logo from "../../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

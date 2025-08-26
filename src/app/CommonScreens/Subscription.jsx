@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import Arrow from "../assets/profile/arrow_back.svg";
-import CheckIcon from "../assets/Subscription/tick.svg";
-import Gardening from "../assets/profile/profile image.png";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import Arrow from "../../assets/profile/arrow_back.svg";
+import CheckIcon from "../../assets/Subscription/tick.svg";
+import Gardening from "../../assets/profile/profile image.png";
 
 
 export default function Subscription() {

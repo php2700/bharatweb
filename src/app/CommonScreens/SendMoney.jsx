@@ -1,10 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Arrow from "../assets/profile/arrow_back.svg";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import Arrow from "../../assets/profile/arrow_back.svg";
 
 export default function SendMoney() {
   return (
     <>
+    <Header/>
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
         <Link
@@ -18,7 +21,7 @@ export default function SendMoney() {
 
       {/* Send Money Layout */}
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className="p-6 w-full max-w-md text-center">
+        <div className="bg-white shadow-lg rounded-xl p-9 w-full max-w-md text-center">
           <h2 className="text-3xl font-bold mt-10 tracking-tight">Send Money</h2>
           <p className="text-gray-500 mt-1 text-xl font-500 tracking-tight">Enter amount to send</p>
 
@@ -41,6 +44,7 @@ export default function SendMoney() {
           </button>
         </div>
       </div>
+      <Footer/>
     </>
   );
 }

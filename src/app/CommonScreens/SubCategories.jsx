@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import banner from '../assets/banner.png';
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import banner from '../../assets/banner.png';
 import { useLocation } from "react-router-dom";
 
 export default function OurSubCategories() {

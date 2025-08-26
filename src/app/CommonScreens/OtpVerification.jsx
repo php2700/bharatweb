@@ -1,11 +1,11 @@
 import React, { useState, useRef } from "react";
-import Header from "../component/Header2";
-import Footer from "../component/footer";
+import Header2 from "../../component/Header2";
+import Footer from "../../component/footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import banner from '../assets/banner.png';
-import image from '../assets/login/img.png';
-import logo from "../assets/logo.svg";
+import banner from '../../assets/banner.png';
+import image from '../../assets/login/img.png';
+import logo from "../../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function OtpVerification() {
@@ -82,7 +82,7 @@ export default function OtpVerification() {
 const otpv=localStorage.getItem('otp');
   return (
     <>
-      <Header />
+      <Header2 />
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen flex items-center justify-center bg-white mt-[50px]">
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">

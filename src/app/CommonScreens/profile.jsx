@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import Header2 from "../component/Header2";
-import Footer from "../component/footer";
-import Gardening from "../assets/profile/profile image.png";
-import Arrow from "../assets/profile/arrow_back.svg";
-import RegistrationCompleted from "../assets/registration_completed.png"; // Import the success modal image
+import Header2 from "../../component/Header2";
+import Footer from "../../component/footer";
+import Gardening from "../../assets/profile/profile image.png";
+import Arrow from "../../assets/profile/arrow_back.svg";
+import RegistrationCompleted from "../../assets/registration_completed.png"; // Import the success modal image
 import {
   GoogleMap,
   Marker,

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import Header from "../component/Header";
-import Footer from "../component/footer";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
 
 // Placeholder image imports (replace with actual paths in your project)
-import image from "../assets/worker-profile.jpg";
-import editicon from "../assets/edit-icon.svg";
-import flag from "../assets/india-flag.png";
-import downarrow from "../assets/down-arrow.svg";
-import dob from "../assets/calendar-icon.svg";
-import banner from "../assets/gardening-banner.jpg";
+import image from "../../assets/addworker/worker-profile.png";
+import editicon from "../../assets/addworker/edit-icon.svg";
+import flag from "../../assets/addworker/flag.png";
+import downarrow from "../../assets/addworker/downarrow.png";
+import dob from "../../assets//addworker/calendar.svg";
+import banner from "../../assets/Details/Gardening.png";
 
 export default function AddWorkerDetails() {
   const [formData, setFormData] = useState({
@@ -60,7 +60,7 @@ export default function AddWorkerDetails() {
                   </div>
                 </div>
                 <div className="absolute bottom-7 right-2 w-7 h-7 bg-[#228B22] rounded-full flex items-center justify-center">
-                  <img src={editicon} alt="Edit profile" className="w-3.5 h-3.5" />
+                  <img src={editicon} alt="Edit profile" className="w-7 h-7" />
                 </div>
               </div>
             </div>

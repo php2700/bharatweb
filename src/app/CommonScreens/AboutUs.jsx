@@ -1,9 +1,9 @@
 import React from "react";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import img1 from '../assets/aboutus/img1.png';
-import img2 from '../assets/aboutus/img2.png';
-import img3 from '../assets/aboutus/img3.png';
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import img1 from '../../assets/aboutus/img1.png';
+import img2 from '../../assets/aboutus/img2.png';
+import img3 from '../../assets/aboutus/img3.png';
 
 export default function AboutUs() {
   return (

@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import Gardening from "../assets/Details/Gardening.png";
-import Arrow from "../assets/profile/arrow_back.svg";
-import User from "../assets/Details/User.png";
-import Edit from "../assets/Details/edit.svg";
-import Pencil from "../assets/Details/pencil.svg";
-import Location from "../assets/Details/location.svg";
-import Call from "../assets/Details/call.svg";
-import Chat from "../assets/Details/chat.svg";
-import Sample from "../assets/Details/sample.png";
-import Sample2 from "../assets/Details/sample2.jpg";
-import Vector from "../assets/Home-SP/Vector.svg";
-import Aadhar from "../assets/Details/profile-line.svg";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import Gardening from "../../assets/Details/Gardening.png";
+import Arrow from "../../assets/profile/arrow_back.svg";
+import User from "../../assets/Details/User.png";
+import Edit from "../../assets/Details/edit.svg";
+import Pencil from "../../assets/Details/pencil.svg";
+import Location from "../../assets/Details/location.svg";
+import Call from "../../assets/Details/call.svg";
+import Chat from "../../assets/Details/chat.svg";
+import Sample from "../../assets/Details/sample.png";
+import Sample2 from "../../assets/Details/sample2.jpg";
+import Vector from "../../assets/Home-SP/Vector.svg";
+import Aadhar from "../../assets/Details/profile-line.svg";
 
 export default function Details() {
   const [activeTab, setActiveTab] = useState("user");

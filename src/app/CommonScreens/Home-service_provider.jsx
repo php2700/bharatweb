@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import Hiring from "../assets/Home-SP/hiring1.png";
-import Bidding from "../assets/Home-SP/bidding.png";
-import Emergency from "../assets/Home-SP/emergency.png";
-import Promise from "../assets/Home-SP/promise.png";
-import Paper from "../assets/Home-SP/paper.svg";
-import Vector from "../assets/Home-SP/Vector.svg";
-import Banner from "../assets/Home-SP/banner.jpg";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import Hiring from "../../assets/Home-SP/hiring1.png";
+import Bidding from "../../assets/Home-SP/bidding.png";
+import Emergency from "../../assets/Home-SP/emergency.png";
+import Promise from "../../assets/Home-SP/promise.png";
+import Paper from "../../assets/Home-SP/paper.svg";
+import Vector from "../../assets/Home-SP/Vector.svg";
+import Banner from "../../assets/Home-SP/banner.jpg";
 
 export default function ServiceProviderHome() {
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);

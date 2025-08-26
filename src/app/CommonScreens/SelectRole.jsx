@@ -1,12 +1,12 @@
 // RoleSelection.jsx
 import { useDispatch, useSelector } from "react-redux";
-import { selectRole } from "../redux/roleSlice";
+import { selectRole } from "../../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
-import Header from "../component/Header2";
-import Footer from "../component/footer";
-import business from "../assets/selection/business.png";
-import customer from "../assets/selection/customer.png";
-import banner from "../assets/banner.png";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import business from "../../assets/selection/business.png";
+import customer from "../../assets/selection/customer.png";
+import banner from "../../assets/banner.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import images from '../assets/workcategory/image.png';
-import banner1 from '../assets/workcategory/banner1.png';
-import hire1 from '../assets/workcategory/hire1.png';
-import hire2 from '../assets/workcategory/hire2.png';
-import banner from '../assets/workcategory/banner.png';
-import hire3 from '../assets/workcategory/hire3.png';
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import images from '../../assets/workcategory/image.png';
+import banner1 from '../../assets/workcategory/banner1.png';
+import hire1 from '../../assets/workcategory/hire1.png';
+import hire2 from '../../assets/workcategory/hire2.png';
+import banner from '../../assets/workcategory/banner.png';
+import hire3 from '../../assets/workcategory/hire3.png';
 import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {

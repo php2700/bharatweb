@@ -1,24 +1,24 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import LoginPage from "./app/login";
-import OtpVerification from "./app/OtpVerification";
-import RoleSelection from "./app/SelectRole";
-import WorkCategory from "./app/WorkCategories";
-import OurServices from "./app/OurService"; // Fixed casing to match component usage
-import OurSubCategories from "./app/SubCategories";
-import AboutUs from "./app/AboutUs";
-import WorkerList from "./app/workerlist";
-import AddWorkerDetails from "./app/AddWorker";
-import EditWorkerDetails from "./app/EditWorker";
-import ServiceProviderHome from "./app/Home-service_provider";
-import Profile from "./app/profile";
+import LoginPage from "./app/CommonScreens/login";
+import OtpVerification from "./app/CommonScreens/OtpVerification";
+import RoleSelection from "./app/CommonScreens/SelectRole";
+import WorkCategory from "./app/CommonScreens/WorkCategories";
+import OurServices from "./app/CommonScreens/OurService"; // Fixed casing to match component usage
+import OurSubCategories from "./app/CommonScreens/SubCategories";
+import AboutUs from "./app/CommonScreens/AboutUs";
+import WorkerList from "./app/CommonScreens/workerlist";
+import AddWorkerDetails from "./app/CommonScreens/AddWorker";
+import EditWorkerDetails from "./app/CommonScreens/EditWorker";
+import ServiceProviderHome from "./app/CommonScreens/Home-service_provider";
+import Profile from "./app/CommonScreens/profile";
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
 import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
-import Details from "./app/Details";
-import Subscription from "./app/Subscription";
-import Referral from "./app/Referral";
-import SendMoney from "./app/SendMoney";
-import ProcessingPayment from "./app/ProcessingPayment";
+import Details from "./app/CommonScreens/Details";
+import Subscription from "./app/CommonScreens/Subscription";
+import Referral from "./app/CommonScreens/Referral";
+import SendMoney from "./app/CommonScreens/SendMoney";
+import ProcessingPayment from "./app/CommonScreens/ProcessingPayment";
 
 export default function App() {
   return (

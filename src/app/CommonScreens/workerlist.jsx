@@ -1,9 +1,9 @@
 // src/pages/WorkerList.jsx
 import React from "react";
-import Header from "../component/Header";
-import Footer from "../component/footer";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
 import { Link } from "react-router-dom";
-import image from '../assets/workcategory/image.png';
+import image from '../../assets/workcategory/image.png';
 
 const workers = [
   {
