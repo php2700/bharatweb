@@ -91,7 +91,7 @@ export default function LoginPage() {
         
         toast.success("OTP sent successfully!");
         setTimeout(() => {
-        navigate("/verifyotp");
+        navigate("/verify-otp");
     }, 2000);
         } 
         else {

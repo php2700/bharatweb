@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 
 import ServiceProviderHisWork from "./ServiceProviderHisWork";
 import HireModel from "./HireModel";
-import PaymentModel from "./paymentModel";
+import PaymentModel from "./PaymentModel";
 
 export default function ServiceProviderHireDetail() {
   const [isHireModel, setIsHireModel] = useState(false);

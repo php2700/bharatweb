@@ -14,10 +14,10 @@ const PrivateRoute = ({ element: Component }) => {
 
   // 2. Role null hai → selectrole
   if (!role || role === "null") {
-    if (location.pathname === "/selectrole") {
+    if (location.pathname === "/select-role") {
       return <>{Component}</>;
     }
-    return <Navigate to="/selectrole" replace />;
+    return <Navigate to="/select-role" replace />;
   }
 
   // 3. Profile incomplete aur role set hai → profile page
