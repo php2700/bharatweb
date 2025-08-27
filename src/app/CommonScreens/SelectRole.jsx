@@ -9,6 +9,7 @@ import customer from "../../assets/selection/customer.png";
 import banner from "../../assets/banner.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Arrow from "../../assets/profile/arrow_back.svg";
 
 export default function RoleSelection() {
   const selectedRole = useSelector((state) => state.role.selectedRole); // ✅ string
@@ -35,7 +36,7 @@ export default function RoleSelection() {
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
-          <img src="/profile/arrow_back.svg" className="w-6 h-6 mr-2" />
+          <img src={Arrow} className="w-6 h-6 mr-2" />
           Back
         </Link>
       </div>

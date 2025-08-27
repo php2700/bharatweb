@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Header2 from "../../component/Header2";
+import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Banner from "../../assets/Homepage/banner.png";
 import Mask from "../../assets/Homepage/Mask.png";
@@ -15,6 +15,11 @@ import Choose from "../../assets/Homepage/choose.png";
 import one from "../../assets/Homepage/one.jpg";
 import two from "../../assets/Homepage/two.jpg";
 import three from "../../assets/Homepage/three.jpg";
+import man1 from "../../assets/Homepage/man1.jpg";
+import man2 from "../../assets/Homepage/man2.jpg";
+import man3 from "../../assets/Homepage/man3.jpg";
+import man4 from "../../assets/Homepage/man4.jpg";
+import footer from "../../assets/Homepage/footer.svg";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -254,7 +259,7 @@ export default function Home() {
 
   return (
     <>
-      <Header2 />
+      <Header />
 
       {/* Hero Section */}
       <div className="container mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 items-center">
@@ -415,7 +420,7 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            <style jsx>{`
+            <style>{`
               div::-webkit-scrollbar {
                 display: none;
               }
@@ -486,7 +491,7 @@ export default function Home() {
 
           {/* Right Content */}
           <div className="mr-20">
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mt-[-40px]">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 md:mt-[-40px] mt-">
               Why Should You Choose ?
             </h2>
 
@@ -584,7 +589,11 @@ export default function Home() {
             <div className="relative w-40 h-40">
               {/* Circular Image */}
               <div className="w-40 h-40 rounded-full overflow-hidden shadow-lg">
-                <img src={one} alt="Step 1" className="w-full h-full object-cover" />
+                <img
+                  src={one}
+                  alt="Step 1"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Number Badge */}
@@ -600,7 +609,11 @@ export default function Home() {
             <div className="relative w-40 h-40">
               {/* Circular Image */}
               <div className="w-40 h-40 rounded-full overflow-hidden shadow-lg">
-                <img src={two} alt="Step 2" className="w-full h-full object-cover" />
+                <img
+                  src={two}
+                  alt="Step 2"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Number Badge */}
@@ -616,7 +629,11 @@ export default function Home() {
             <div className="relative w-40 h-40">
               {/* Circular Image */}
               <div className="w-40 h-40 rounded-full overflow-hidden shadow-lg">
-                <img src={three} alt="Step 3" className="w-full h-full object-cover" />
+                <img
+                  src={three}
+                  alt="Step 3"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Number Badge */}
@@ -628,13 +645,194 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* Pricing Section */}
-<div className="w-full bg-[#382C28] py-16 px-6 text-center mt-[100px]">
-  <h2 className="text-3xl md:text-4xl font-bold text-white">
-    Transparent & Flexible Pricing <br />
-    to Match Your Needs & Budget
-  </h2>
+      <div className="w-full bg-[#382C28] py-16 px-6 text-center mt-[100px]">
+        <h2 className="text-3xl md:text-4xl font-bold text-white">
+          Transparent & Flexible Pricing <br />
+          to Match Your Needs & Budget
+        </h2>
+
+        <div className="container mx-auto px-2 py-16 flex flex-col md:flex-row md:justify-center md:gap-5 max-w-[70%]">
+  {[
+    {
+      title: "Standard",
+      price: "$10",
+      features: [
+        "Affordable rates suitable for routine cleaning needs.",
+        "Includes basic cleaning tasks such as dusting, vacuuming, and bathroom cleaning.",
+        "Ideal for maintaining a clean and tidy living or workspace.",
+      ],
+    },
+    {
+      title: "Premium",
+      price: "$25",
+      features: [
+        "Competitive pricing for a more thorough and comprehensive clean.",
+        "Covers deep cleaning tasks like baseboard cleaning, appliance detailing, and interior window cleaning.",
+        "Perfect for periodic deep cleaning or before special occasions.",
+      ],
+    },
+    {
+      title: "Customized",
+      price: "$$",
+      features: [
+        "Tailored pricing based on your unique cleaning requirements.",
+        "Allows you to select specific services and create a cleaning package that suits your preferences.",
+        "Provides the flexibility to address your individual needs and budget constraints.",
+      ],
+    },
+  ].map((plan, index) => (
+    <div
+      key={index}
+      className="group bg-white p-6 rounded-lg shadow-lg text-center transition-all duration-300 flex flex-col justify-between flex-1"
+    >
+      {/* Wrap content and button separately */}
+      <div>
+        {/* Title */}
+        <h3 className="text-3xl font-bold text-[#382C28] group-hover:text-[#228B22] mb-4 transition">
+          {plan.title}
+        </h3>
+
+        {/* Price */}
+        <p className="text-5xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-[50px] transition">
+          {plan.price}
+          <span className="text-lg font-medium">/yr.</span>
+        </p>
+
+        {/* Features */}
+        <ul className="mt-[70px] space-y-2 flex flex-col items-start w-full">
+          {plan.features.map((feature, i) => (
+            <li
+              key={i}
+              className="flex text-left text-[#000000] font-semibold max-w-[300px]"
+            >
+              <span className="w-7 h-7 aspect-square flex items-center justify-center bg-[#382C28] group-hover:bg-[#228B22] rounded-full mr-2 transition">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </span>
+              {feature}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Button (always bottom) */}
+      <button className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-3 px-7 rounded transition mt-6">
+        BOOK NOW
+      </button>
+    </div>
+  ))}
 </div>
+
+
+
+
+
+      </div>
+      <div className="w-[80%] py-16 px-6 text-center justify-center mt-[50px] mx-auto">
+  <h2 className="text-3xl md:text-5xl font-bold text-[#382C28] mb-12">
+    Hear What Our Satisfied Customers <br />
+    Have to Say
+  </h2>
+
+  <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+    {/* Testimonial 1 */}
+    <div className="text-center max-w-2xl mx-auto">
+            <img
+              src={man1}
+              alt="Customer 1"
+              className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+            />
+            <p className="text-[#808080] mb-4 ">
+              We've been using their services for over a year now, and we're
+              consistently impressed with the attention to detail and the
+              friendly, professional team. Our home has never been cleaner.
+            </p>
+            <h3 className="font-bold text-[#382C28] text-lg">Randy Septimus</h3>
+          </div>
+
+          {/* Testimonial 2 */}
+          <div className="text-center">
+            <img
+              src={man2}
+              alt="Customer 2"
+              className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+            />
+            <p className="text-[#808080] mb-4">
+              These guys have been a lifesaver for our busy office. Their
+              reliability and trustworthiness in maintaining a clean workspace
+              are unparalleled. Highly recommended.
+            </p>
+            <h3 className="font-bold text-[#382C28] text-lg">
+              Dulce Passaquindici Arcand
+            </h3>
+          </div>
+
+          {/* Testimonial 3 */}
+          <div className="text-center">
+            <img
+              src={man3}
+              alt="Customer 3"
+              className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+            />
+            <p className="text-[#808080] mb-4">
+              The deep cleaning they did before our family reunion was
+              exceptional. They went above and beyond our expectations, leaving
+              our home spotless and ready to welcome guests.
+            </p>
+            <h3 className="font-bold text-[#382C28] text-lg">
+              Cooper Septimus
+            </h3>
+          </div>
+
+          {/* Testimonial 4 */}
+          <div className="text-center">
+            <img
+              src={man4}
+              alt="Customer 4"
+              className="w-24 h-24 mx-auto rounded-full mb-4 object-cover"
+            />
+            <p className="text-[#808080] mb-4">
+              We love the customized cleaning package they offer. It's great to
+              choose the specific services we need, and the team always delivers
+              a thorough and detailed cleaning. Couldn't be happier!
+            </p>
+            <h3 className="font-bold text-[#382C28] text-lg">Corey Mango</h3>
+          </div>
+        </div>
+      </div>
+      {/* Image Section */}
+      <div className="relative w-full flex justify-center items-center mt-12">
+        {/* Background Image */}
+        <img
+          src={footer}
+          alt="Service Illustration"
+          className="shadow-lg w-full h-[536px] object-cover rounded-lg"
+        />
+
+        {/* Green Overlay Div */}
+        <div className="absolute bg-[#228B22] w-[82%] h-[60%] rounded-lg flex flex-col items-center justify-center">
+          <p className="text-white text-4xl font-bold text-center">
+            Click here to post your project and get <br /> started!
+          </p>
+
+          {/* Post Work Button */}
+          <button className="mt-6 bg-white text-[#228B22] font-semibold px-9 py-3 rounded-sm shadow hover:bg-gray-100">
+            Post Work
+          </button>
+        </div>
+      </div>
 
       <div className="mt-10">
         <Footer />

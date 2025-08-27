@@ -26,84 +26,71 @@ import OtpVerification from "./app/CommonScreens/OtpVerification";
 // Informational Pages
 import CustomerReview from "./app/CommonScreens/Customer-review";
 import Hiswork from "./app/CommonScreens/His-work";
-import TermCondtion from "./app/CommonScreens/Term-condition";
+import TermCondition from "./app/CommonScreens/Term-condition";
 import HelpFaqs from "./app/CommonScreens/Help-faqs";
 import PrivacyPolicy from "./app/CommonScreens/Privacy-policy";
 import CustomerCare from "./app/CommonScreens/Customer-care";
 import BankDetails from "./app/CommonScreens/BankDetails";
 
 // Direct Hiring
-import DirectHiring from "./app/directHiring/DirectHiring";
+import DirectHiring from "./app/directHiring/User/DirectHiring";
+import ServiceProviderDetail from "./app/directHiring/User/ServiceProviderDetail";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
-import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
-import ServiceProviderDetail from "./app/directHiring/ServiceProviderDetail";
+import PrivateOtpVerify from "./component/RouteProtected/PrivateOtp";
 
 export default function App() {
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/login/signup" element={<LoginPage />} />
-      <Route path="/ourservices" element={<OurServices />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/our-services" element={<OurServices />} />
       <Route path="/subcategories" element={<OurSubCategories />} />
-      <Route path="/aboutus" element={<AboutUs />} />
-      
-      {/* Worker-Related Routes Routes */}
+      <Route path="/about-us" element={<AboutUs />} />
+
+      {/* Worker-Related Routes */}
       <Route path="/workerlist" element={<WorkerList />} />
-      <Route path="/addworker" element={<AddWorkerDetails />} />
-      <Route path="/editworker" element={<EditWorkerDetails />} />
-      
+      <Route path="/add-worker" element={<AddWorkerDetails />} />
+      <Route path="/editworker/:id" element={<EditWorkerDetails />} />
+
       {/* Service Provider Routes */}
-      <Route path="/home-service-provider" element={<ServiceProviderHome />} />
-      <Route path="/workcategory" element={<WorkCategory />} />
-      
+      <Route path="/home-service-provider" element={<PrivateRoute element={<ServiceProviderHome />} />} />
+      <Route path="/work-category" element={<WorkCategory />} />
+
       {/* Financial Routes */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/referral" element={<Referral />} />
-      <Route path="/sendmoney" element={<SendMoney />} />
-      <Route path="/processingpayment" element={<ProcessingPayment />} />
+      <Route path="/send-money" element={<SendMoney />} />
+      <Route path="/processing-payment" element={<ProcessingPayment />} />
       <Route path="/bank-details" element={<BankDetails />} />
-      
+
       {/* Informational Routes */}
-      <Route path="/customer-review" element={<CustomerReview />} />
+      <Route path="/customer-reviews" element={<CustomerReview />} />
       <Route path="/his-work" element={<Hiswork />} />
-      <Route path="/term-condition" element={<TermCondtion />} />
+      <Route path="/terms-and-conditions" element={<TermCondition />} />
       <Route path="/help-faq" element={<HelpFaqs />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
-      
-      {/* Direct Hiring Route */}
+
+      {/* Direct Hiring Routes */}
       <Route path="/direct-hiring" element={<DirectHiring />} />
-      <Route path='/service-provider-detail' element={<ServiceProviderDetail/>} />
-      
+      <Route path="/service-provider-detail" element={<ServiceProviderDetail />} />
+
       {/* Protected Routes */}
+      <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
       <Route
-        path="/profile"
+        path="/verify-otp"
         element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/verifyotp"
-        element={
-          <PrivateotpVerify>
+          <PrivateOtpVerify>
             <OtpVerification />
-          </PrivateotpVerify>
+          </PrivateOtpVerify>
         }
       />
-      <Route
-        path="/selectrole"
-        element={
-          <PrivateRoute>
-            <RoleSelection />
-          </PrivateRoute>
-        }
-      />
-      
+      <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
+      <Route path="/home-user" element={<PrivateRoute element={<WorkCategory />} />} />
+
       {/* Details Route */}
       <Route path="/details" element={<Details />} />
     </Routes>

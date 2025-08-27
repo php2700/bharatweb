@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Header2 from "../../component/Header2";
+import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Gardening from "../../assets/profile/profile image.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
@@ -214,7 +214,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header2 />
+      <Header />
 
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">

@@ -4,6 +4,7 @@ import Footer from "../../component/footer";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2"; // Added SweetAlert2 import
 import image from "../../assets/workcategory/image.png";
+import Arrow from "../../assets/profile/arrow_back.svg";
 
 export default function WorkerList() {
   const [workers, setWorkers] = useState([]); // Moved to state
@@ -74,15 +75,18 @@ export default function WorkerList() {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex flex-col items-center p-4 sm:p-6 bg-gray-50">
-        <div className="w-full max-w-4xl flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
-            &lt; Back
-          </button>
-        </div>
+      <div className="container mx-auto px-4 py-4">
+              <Link
+                to="/"
+                className="flex items-center text-[#008000] hover:text-green-800 font-semibold text-xl"
+              >
+                <img src={Arrow} className="w-9 h-9 mr-2" alt="Back arrow" />
+                Back
+              </Link>
+            </div>
 
         {/* Title + Add Worker */}
-        <div className="w-full max-w-[81rem] shadow-[0px_4px_4px_0px_#00000040] rounded-xl p-3 sm:p-4 space-y-4">
+        <div className="w-full max-w-[81rem] shadow-[0px_4px_4px_0px_#00000040] rounded-xl p-3 sm:p-4 space-y-4 mx-auto">
           <div className="w-full max-w-4xl flex justify-between items-center mb-6 xl:ml-[300px]">
             <h1 className="w-full text-center text-lg sm:text-xl lg:text-[25px] font-[700] text-gray-800">
               Worker List
@@ -93,7 +97,7 @@ export default function WorkerList() {
           </div>
 
           {/* Worker Cards */}
-          <div className="w-full max-w-4xl">
+          <div className="w-full max-w-5xl mt-4 mx-auto">
             {workers.length === 0 ? (
               <p className="text-center text-gray-600">No workers found</p>
             ) : (
@@ -143,7 +147,6 @@ export default function WorkerList() {
             )}
           </div>
         </div>
-      </div>
       <div className="mt-[50px]">
         <Footer />
       </div>

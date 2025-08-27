@@ -1,5 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import Logo from "../assets/logo.svg"
+import { Link } from "react-router-dom";
+
 
 export default function Footer() {
   return (
@@ -27,11 +29,11 @@ export default function Footer() {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-3 text-sm sm:text-base md:text-lg">Navigation</h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
-              <li><a href="#" className="hover:text-white">Home</a></li>
-              <li><a href="#" className="hover:text-white">About Us</a></li>
-              <li><a href="#" className="hover:text-white">Services</a></li>
-              <li><a href="#" className="hover:text-white">Pricing</a></li>
-              <li><a href="#" className="hover:text-white">Contact Us</a></li>
+              <li><Link to="/" className="hover:text-white">Home</Link></li>
+              <li><Link to="/aboutus" className="hover:text-white">About Us</Link></li>
+              <li><Link to="/ourservices" className="hover:text-white">Services</Link></li>
+              <li><Link to="/subscription" className="hover:text-white">Pricing</Link></li>
+              <li><Link to="/customer-care" className="hover:text-white">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -39,9 +41,23 @@ export default function Footer() {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-3 text-sm sm:text-base md:text-lg">Help</h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
-              <li><a href="#" className="hover:text-white">FAQ</a></li>
-              <li><a href="#" className="hover:text-white">Terms of Services</a></li>
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+              <li>
+  <Link to="/help-faq" className="hover:text-white">
+    FAQ
+  </Link>
+</li>
+              <li>
+  <Link to="/term-condition" className="hover:text-white">
+    Terms of Services
+  </Link>
+</li>
+
+<li>
+  <Link to="/privacy-policy" className="hover:text-white">
+    Privacy Policy
+  </Link>
+</li>
+
             </ul>
           </div>
 
@@ -49,10 +65,10 @@ export default function Footer() {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-3 text-sm sm:text-base md:text-lg">Social</h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
-              <li><a href="#" className="hover:text-white">Facebook</a></li>
-              <li><a href="#" className="hover:text-white">Twitter</a></li>
-              <li><a href="#" className="hover:text-white">Instagram</a></li>
-              <li><a href="#" className="hover:text-white">YouTube</a></li>
+              <li><Link to="#" className="hover:text-white">Facebook</Link></li>
+              <li><Link to="#" className="hover:text-white">Twitter</Link></li>
+              <li><Link to="#" className="hover:text-white">Instagram</Link></li>
+              <li><Link to="#" className="hover:text-white">YouTube</Link></li>
             </ul>
           </div>
 
@@ -80,7 +96,7 @@ export default function Footer() {
       </div>
 
       {/* Custom Styles for Responsiveness */}
-      <style jsx>{`
+      <style >{`
         @media (max-width: 768px) {
           footer .grid {
             display: flex;
