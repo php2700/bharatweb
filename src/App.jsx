@@ -36,7 +36,7 @@ import BankDetails from "./app/CommonScreens/BankDetails";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
-import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
+import PrivateOtpVerify from "./component/RouteProtected/PrivateOtp";
 import ServiceProviderList from "./app/directHiring/User/ServiceProviderList";
 import ServiceProviderHireDetail from "./app/directHiring/User/ServiceProviderHireDetail";
 import DirectHiring from "./app/directHiring/User/DirectHiring";
