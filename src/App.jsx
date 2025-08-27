@@ -62,7 +62,7 @@ export default function App() {
       {/* Service Provider Routes */}
       <Route path="/home-service-provider" element={<PrivateRoute element={<ServiceProviderHome />} />} />
       <Route path="/work-category" element={<WorkCategory />} />
-
+{/* comment */}
       {/* Financial Routes */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/referral" element={<Referral />} />
