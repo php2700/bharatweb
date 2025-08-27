@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Header from "../../component/Header";
-import Footer from "../../component/footer";
-import image from "../../assets/workcategory/image.png";
-import banner from "../../assets/banner.png";
-import ratingImg from "../../assets/rating/ic_round-star.png";
+import image from "../../../assets/workcategory/image.png"
+import banner from "../../../assets/banner.png"
+import ratingImg from "../../../assets/rating/ic_round-star.png";
+ import Header from "../../../component/Header";
+ import Footer from "../../../component/footer";
 
 const workers = [
   {
@@ -53,7 +53,7 @@ const workers = [
   },
 ];
 
-export default function DirectHiring  ()  {
+export default function ServiceProviderList  ()  {
   return (
     <>
       <Header />

@@ -1,32 +1,13 @@
-import Header from "../../component/Header";
-import banner from "../../assets/banner.png";
-import Footer from "../../component/footer";
-import serviceProviderImg from "../../assets/directHiring/service-provider.png";
-import ratingImg from "../../assets/rating/ic_round-star.png";
-import locationIcon from "../../assets/directHiring/location-icon.png";
-import hisWorkImg from "../../assets/directHiring/his-work.png";
-import { useEffect, useState } from "react";
+import Header from "../../../component/Header";
+import banner from "../../../assets/banner.png";
+import Footer from "../../../component/footer";
+import serviceProviderImg from "../../../assets/directHiring/service-provider.png";
+import ratingImg from "../../../assets/rating/ic_round-star.png";
+import locationIcon from "../../../assets/directHiring/location-icon.png";
 
-export default function ServiceProviderDetail() {
-  const imagsArray = [
-    hisWorkImg,
-    serviceProviderImg,
-    hisWorkImg,
-    serviceProviderImg,
-    hisWorkImg,
-    serviceProviderImg,
-  ];
-  const [imageIndex, setImageIndex] = useState(0);
+import ServiceProviderHisWork from "./ServiceProviderHisWork";
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % imagsArray.length);
-    }, 2000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [imagsArray?.length]);
-
+export default function ServiceProviderHireDetail() {
   return (
     <>
       <Header />
@@ -130,18 +111,7 @@ export default function ServiceProviderDetail() {
           </div>
         </div>
 
-        {/* his work */}
-       <div className="bg-[#D3FFD3] h-90 flex items-center relative">
-  <img className="h-80 w-1/2 mx-auto" src={imagsArray[imageIndex]} />
-  
-  {/* indicators */}
-  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
-    {imagsArray?.map((ele, idx) => (
-      <div key={idx}>O</div>
-    ))}
-  </div>
-</div>
-
+        {<ServiceProviderHisWork />}
       </div>
       <Footer />
     </>
