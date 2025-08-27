@@ -33,6 +33,8 @@ import CustomerCare from "./app/CommonScreens/Customer-care";
 import BankDetails from "./app/CommonScreens/BankDetails";
 
 // Direct Hiring
+import Dispute from "./app/directHiring/User/Dispute";
+import MyWork from "./app/directHiring/Worker/MyWork";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
@@ -80,7 +82,9 @@ export default function App() {
       <Route path="/service-provider-list" element={<ServiceProviderList />} />
       <Route path='/service-provider-hire-detail' element={<ServiceProviderHireDetail/>} />
       <Route path='/direct-hiring' element={<DirectHiring />} />
+      <Route path='/dispute' element={<Dispute />} />
       <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
+      <Route path="/mywork" element={<MyWork />}  />
        
       {/* Protected Routes */}
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
