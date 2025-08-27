@@ -1,14 +1,14 @@
 // src/pages/EditWorker.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../component/Header";
-import Footer from "../component/footer";
-import image from "../assets/addworker/worker-profile.png";
-import editicon from "../assets/addworker/edit-icon.svg";
-import flag from "../assets/addworker/flag.png";
-import downarrow from "../assets/addworker/downarrow.png";
-import dobIcon from "../assets/addworker/icon.png";
-import banner from "../assets/Details/Gardening.png";
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
+import image from "../../assets/addworker/worker-profile.png";
+import editicon from "../../assets/addworker/edit-icon.svg";
+import flag from "../../assets/addworker/flag.png";
+import downarrow from "../../assets/addworker/downarrow.png";
+import dobIcon from "../../assets/addworker/icon.png";
+import banner from "../../assets/Details/Gardening.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
