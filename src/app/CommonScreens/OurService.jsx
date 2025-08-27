@@ -52,7 +52,7 @@ const handleServicecategoryClick = (service) => {
       <h2 className="text-[37px] font-bold text-center mb-2">Our Services</h2>
       <p className="text-[20px] font-[500] text-center text-[#000000] mb-10">Categories</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-[60px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-[60px]">
         {services.map((service) => (
           <div
             key={service._id}

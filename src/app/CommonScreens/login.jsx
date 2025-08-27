@@ -183,7 +183,7 @@ export default function LoginPage() {
         
       </div>
        <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
-      {/* Foreground image */}
+      
       <img
         src={banner} // apna image path yahan lagao
         alt="Gardening"

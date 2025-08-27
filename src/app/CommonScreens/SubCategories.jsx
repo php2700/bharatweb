@@ -79,7 +79,7 @@ export default function OurSubCategories() {
         ) : subcategories.length === 0 ? (
           <p className="text-center text-gray-500">No subcategories found.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-[60px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-[60px]">
             {subcategories.map((sub, index) => {
               const isSelected = selectedIndexes.includes(index);
 

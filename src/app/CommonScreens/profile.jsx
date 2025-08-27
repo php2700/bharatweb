@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Header2 from "../../component/Header2";
 import Footer from "../../component/footer";
@@ -13,6 +14,16 @@ import {
 } from "@react-google-maps/api";
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const ProfileComplete=()=>{
+    const role=localStorage.getItem('role');
+    if(role === "service_provider"){
+        navigate('/homeservice');
+    }
+    if(role==='user'){
+      navigate('/homeuser');
+    }
+  }
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [formData, setFormData] = useState({
     name: "",
@@ -41,7 +52,7 @@ export default function Profile() {
 
   // Load Google Maps JS API
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "YOUR_API_KEY_HERE", // Replace with your actual Google Maps API key
+    googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4", // Replace with your actual Google Maps API key
     libraries: ["places"],
   });
 
@@ -471,7 +482,7 @@ const handleSubmit = async (e) => {
             <hr className="text-[#228B2296]" />
             <br />
             <button
-              onClick={() => setSuccessModal(false)}
+              onClick={() => ProfileComplete()}
               className="bg-[#228B22] hover:bg-green-700 text-white px-16 py-2 rounded-[8px] font-semibold"
               aria-label="Close success modal"
             >

@@ -38,6 +38,10 @@ import DirectHiring from "./app/directHiring/DirectHiring";
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
 import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
+import Details from "./app/Details";
+import Subscription from "./app/Subscription";
+import Referral from "./app/Referral";
+import SendMoney from "./app/SendMoney";
 
 export default function App() {
   return (

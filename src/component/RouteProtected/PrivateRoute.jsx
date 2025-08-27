@@ -12,14 +12,15 @@ const PrivateRoute = ({ element: Component }) => {
     return <Navigate to="/" replace />;
   }
 
-  // 2. Token hai lekin profile incomplete ya role null
-  if (isProfileComplete === "false" && (!role || role === "null")) {
+  // 2. Role null hai → selectrole
+  if (!role || role === "null") {
     if (location.pathname === "/selectrole") {
-      return <>{Component}</>; // ✅ component render karo
+      return <>{Component}</>;
     }
     return <Navigate to="/selectrole" replace />;
   }
 
+  // 3. Profile incomplete aur role set hai → profile page
   if (isProfileComplete === "false") {
     if (location.pathname === "/profile") {
       return <>{Component}</>;
@@ -27,15 +28,15 @@ const PrivateRoute = ({ element: Component }) => {
     return <Navigate to="/profile" replace />;
   }
 
-  // 3. Role ke hisaab se redirect
-  if (role === "service_provider") {
+  // 4. Role ke hisaab se redirect
+  if (token && role === "service_provider" &&isProfileComplete === "true") {
     if (location.pathname === "/homeservice") {
       return <>{Component}</>;
     }
     return <Navigate to="/homeservice" replace />;
   }
 
-  if (role === "user") {
+  if (token && role === "user" && isProfileComplete === "true") {
     if (location.pathname === "/homeuser") {
       return <>{Component}</>;
     }

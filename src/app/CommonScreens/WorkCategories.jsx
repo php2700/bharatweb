@@ -50,6 +50,9 @@ const navigate = useNavigate();
     navigate('/ourservice')
   }
 
+ const OurSubCategories=(service)=>{
+  navigate("/subcategories", { state: { service } });
+ }
  
 
   return (
@@ -74,28 +77,33 @@ const navigate = useNavigate();
           {loading ? (
             <p className="text-center text-gray-500">Loading categories...</p>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 justify-items-center gap-4">
+            <div 
+            
+            className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 justify-items-center gap-4">
               {categories.slice(0, 15).map((cat, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center p-4 sm:p-6 rounded-lg w-28 sm:w-32"
-                >
-                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D3E8D3]">
-                    <img
-  src={cat.image ? cat.image : "/src/assets/workcategory/default.png"}
-  alt={cat.name}
-  className="w-[27px] filter brightness-0 sepia saturate-100 hue-rotate-100"
-  style={{
-    filter:
-      "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
-  }}
-/>
+       <div
+  key={index}
+  className="flex flex-col items-center p-4 sm:p-6 rounded-lg w-28 sm:w-32 
+             transition transform hover:scale-120 hover:shadow-lg cursor-pointer"
+  onClick={() => OurSubCategories(cat._id)}
+>
+  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D3E8D3]">
+    <img
+      src={cat.image ? cat.image : "/src/assets/workcategory/default.png"}
+      alt={cat.name}
+      className="w-[27px] filter brightness-0 sepia saturate-100 hue-rotate-100"
+      style={{
+        filter:
+          "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
+      }}
+    />
+  </div>
+  <p className="mt-2 text-[13px] sm:text-[15px] text-[#191A1D] font-[500] ml-[21px]">
+    {cat.name}
+  </p>
+</div>
 
-                  </div>
-                  <p className="mt-2 text-[13px] sm:text-[15px] text-[#191A1D] font-[500] ml-[21px]">
-                    {cat.name}
-                  </p>
-                </div>
+
               ))}
             </div>
           )}
