@@ -48,7 +48,7 @@ export default function ServiceProviderHisWork() {
               <span className="bg-green-100 p-2 rounded">📄</span>
               <span className="font-medium">Aadhar card</span>
             </div>
-            <div className="bg-green-500 h-24 w-40 flex justify-center">
+            <div className="bg-[#A9FFB3] h-24 w-40 flex justify-center">
               <img
                 src={aadharImg}
                 alt="Document"
@@ -106,13 +106,13 @@ export default function ServiceProviderHisWork() {
         </div>
 
         <div className="text-center">
-          <button className="text-green-600 font-medium hover:underline">
+          <button className=" font-medium hover:underline">
             See All Review
           </button>
         </div>
 
         <div className="text-center">
-          <button className="bg-green-600 hover:bg-green-700 text-white w-full px-10 py-3 rounded-md font-semibold">
+          <button className="bg-[#228B22]  text-white w-full px-10 py-3 rounded-md font-semibold">
             Hire
           </button>
         </div>

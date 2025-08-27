@@ -44,10 +44,19 @@ export default function ServiceProviderHireDetail() {
                 <div className="text-lg sm:text-xl font-semibold text-gray-800">
                   Mohan Sharma
                 </div>
-                <div className="flex items-center text-sm text-gray-700">
-                  <span>(4.5</span>
-                  <img className="h-5 w-5 mx-1" src={ratingImg} alt="Rating" />
-                  <span>)</span>
+                <div className="flex flex-col gap-1 items-end">
+                  <div className="flex items-center text-sm  text-gray-700">
+                    <span className="font-semibold">(4.5</span>
+                    <img
+                      className="h-5 w-5 mx-1"
+                      src={ratingImg}
+                      alt="Rating"
+                    />
+                    <span className="font-semibold">)</span>
+                  </div>
+                  <div className="text-[#228B22] underline font-semibold">
+                    150 Reviews
+                  </div>
                 </div>
               </div>
 
@@ -86,15 +95,18 @@ export default function ServiceProviderHireDetail() {
                   printer took a galley of type and scrambled it to make a type
                   specimen book. It has survived not only five centuries, but
                   also the leap into electronic typesetting.
+                   standard dummy text ever since the 1500s, when an unknown
+                  printer took a galley of type and scrambled it to make a type
+                  specimen book. It has survived not only five centuries, but
+                  also the leap into electronic typesetting.
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4">
-                <button className="flex-1 flex items-center justify-center gap-2 bg-green-100 text-green-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-green-200">
+              <div className="flex justify-center gap-4">
+                <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-4 rounded-lg">
                   💬 Message
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 bg-green-100 text-green-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-green-200">
+                <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-8 rounded-lg">
                   📞 Call
                 </button>
               </div>
@@ -102,10 +114,10 @@ export default function ServiceProviderHireDetail() {
           </div>
 
           <div className="flex justify-center gap-4 my-10">
-            <button className="py-1 px-10 rounded-lg border text-green-500 cursor-pointer">
+            <button className="py-1 px-10 bg-[#D3FFD3] rounded-lg border text-[#008000] cursor-pointer">
               His Work
             </button>
-            <button className="py-1 px-6 rounded-lg border text-green-500 cursor-pointer">
+            <button className="py-1 px-6 rounded-lg border text-[#008000] cursor-pointer">
               Customer Review
             </button>
           </div>

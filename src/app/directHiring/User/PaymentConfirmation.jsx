@@ -7,7 +7,7 @@ export default function PaymentConfirmation() {
   return (
     <>
       <Header />
-      <div className="min-h-screen   bg-gray-50">
+      <div className="min-h-screen p-4  bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
           <button className="text-green-600 text-sm hover:underline">
             &lt; Back
@@ -64,8 +64,8 @@ export default function PaymentConfirmation() {
             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
           />
         </div>
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 }
