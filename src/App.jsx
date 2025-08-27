@@ -38,7 +38,7 @@ import DirectHiring from "./app/directHiring/DirectHiring";
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
 import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
-// Removed duplicate imports of Details, Subscription, Referral, and SendMoney
+import ServiceProviderDetail from "./app/directHiring/ServiceProviderDetail";
 
 export default function App() {
   return (
@@ -76,6 +76,7 @@ export default function App() {
       
       {/* Direct Hiring Route */}
       <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path='/service-provider-detail' element={<ServiceProviderDetail/>} />
       
       {/* Protected Routes */}
       <Route
