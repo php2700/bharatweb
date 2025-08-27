@@ -22,26 +22,26 @@ export default function CustomerCare ()  {
           <div className="text-3xl font-bold text-center m-4">
             Customer Care
           </div>
-          <div className=" text-center ">
+          <div className=" text-center text-[#777777] ">
             Please Feel Free To Talk To Us If You Have Any Questions.
           </div>
-          <div className="text-center mb-4">
+          <div className="text-center text-[#777777] mb-4">
             We Endeavour To Answer Within 24 Hours.
           </div>
-          <div className="flex justify-center gap-4 m-2">
+          <div className="flex justify-center gap-4 m-2 mt-[55px]">
             <div
               onClick={() => handleContactOpen(true)}
               className={`${
-                isContactOpen ? "bg-[#228B22]" : "bg-gray-500"
-              } text-white px-8 py-1 border rounded-lg cursor-pointer`}
+                isContactOpen ? "bg-[#28A745]" : "bg-[#BBBBBB]"
+              } text-white px-8 py-2 border rounded-lg cursor-pointer`}
             >
               Contact via Email
             </div>
             <div
               onClick={() => handleContactOpen(false)}
               className={`${
-                isContactOpen ? "bg-gray-500" : "bg-[#228B22]"
-              } text-white px-8 py-1 border rounded-lg cursor-pointer`}
+                isContactOpen ? "bg-[#BBBBBB]" : "bg-[#28A745]"
+              } text-white px-8 py-2 border rounded-lg cursor-pointer`}
             >
               Contact via Call
             </div>
