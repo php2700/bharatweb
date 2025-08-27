@@ -33,11 +33,12 @@ import CustomerCare from "./app/CommonScreens/Customer-care";
 import BankDetails from "./app/CommonScreens/BankDetails";
 
 // Direct Hiring
-import DirectHiring from "./app/DirectHiring/DirectHiring";
+import DirectHiring from "./app/directHiring/DirectHiring";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
 import PrivateotpVerify from "./component/RouteProtected/PrivateOtp";
+import ServiceProviderDetail from "./app/directHiring/ServiceProviderDetail";
 
 export default function App() {
   return (
@@ -75,6 +76,7 @@ export default function App() {
       
       {/* Direct Hiring Route */}
       <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path='/service-provider-detail' element={<ServiceProviderDetail/>} />
       
       {/* Protected Routes */}
       <Route
