@@ -580,7 +580,7 @@ export default function Home() {
         {/* Steps - perfectly centered on wave */}
         <div className="flex justify-between items-center w-[850px] z-10">
           {/* Step 1 */}
-          <div className="flex flex-col items-center -translate-y-6">
+          <div className="flex flex-col items-center -translate-y-2">
             <div className="relative w-40 h-40">
               {/* Circular Image */}
               <div className="w-40 h-40 rounded-full overflow-hidden shadow-lg">
@@ -588,11 +588,11 @@ export default function Home() {
               </div>
 
               {/* Number Badge */}
-              <div className="absolute -bottom-4 -right-4 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
+              <div className="absolute -bottom-1 right-4 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
                 1
               </div>
             </div>
-            <p className="mt-2 font-semibold">Book Service Online</p>
+            <p className="mt-3 font-bold">Book Service Online</p>
           </div>
 
           {/* Step 2 */}
@@ -604,15 +604,15 @@ export default function Home() {
               </div>
 
               {/* Number Badge */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
+              <div className="absolute top-2 -right-1 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
                 2
               </div>
             </div>
-            <p className="mt-2 font-semibold">Wait till Completion</p>
+            <p className="mt-3 font-bold">Wait till Completion</p>
           </div>
 
           {/* Step 3 */}
-          <div className="flex flex-col items-center -translate-y-6">
+          <div className="flex flex-col items-center -translate-y-2">
             <div className="relative w-40 h-40">
               {/* Circular Image */}
               <div className="w-40 h-40 rounded-full overflow-hidden shadow-lg">
@@ -620,14 +620,21 @@ export default function Home() {
               </div>
 
               {/* Number Badge */}
-              <div className="absolute -bottom-4 -right-4 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
+              <div className="absolute -bottom-1 right-3 w-8 h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-sm shadow-md">
                 3
               </div>
             </div>
-            <p className="mt-2 font-semibold">Enjoy the Services</p>
+            <p className="mt-3 font-bold">Enjoy the Services</p>
           </div>
         </div>
       </div>
+      {/* Pricing Section */}
+<div className="w-full bg-[#382C28] py-16 px-6 text-center mt-[100px]">
+  <h2 className="text-3xl md:text-4xl font-bold text-white">
+    Transparent & Flexible Pricing <br />
+    to Match Your Needs & Budget
+  </h2>
+</div>
 
       <div className="mt-10">
         <Footer />
