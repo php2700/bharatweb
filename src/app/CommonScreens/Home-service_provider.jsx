@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Hiring from "../../assets/Home-SP/hiring1.png";
@@ -11,6 +11,7 @@ import Vector from "../../assets/Home-SP/Vector.svg";
 import Banner from "../../assets/Home-SP/banner.jpg";
 
 export default function ServiceProviderHome() {
+  const navigate=useNavigate()
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
   const [directHiring, setDirectHiring] = useState([
     {
@@ -121,6 +122,10 @@ export default function ServiceProviderHome() {
     setIsEmergencyOn(!isEmergencyOn);
   };
 
+  const handlePlan=()=>{
+navigate('/subscription')
+  }
+
   return (
     <>
       <Header />
@@ -159,7 +164,7 @@ export default function ServiceProviderHome() {
           </div>
         </div>
         <div className="hidden max-md:!hidden md:block absolute right-[100px] top-1/2 -translate-y-1/2">
-          <button className="bg-[#228B22] hover:bg-green-800 text-white px-6 py-2 rounded-xl shadow">
+          <button onClick={()=>{handlePlan()}} className="bg-[#228B22] hover:bg-green-800 text-white px-6 py-2 rounded-xl shadow">
             Upgrade Now
           </button>
         </div>

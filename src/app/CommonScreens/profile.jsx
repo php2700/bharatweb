@@ -15,15 +15,15 @@ import {
 
 export default function Profile() {
   const navigate = useNavigate();
-  const ProfileComplete=()=>{
-    const role=localStorage.getItem('role');
-    if(role === "service_provider"){
-        navigate('/homeservice');
+  const ProfileComplete = () => {
+    const role = localStorage.getItem("role");
+    if (role === "service_provider") {
+      navigate("/homeservice");
     }
-    if(role==='user'){
-      navigate('/homeuser');
+    if (role === "user") {
+      navigate("/homeuser");
     }
-  }
+  };
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [formData, setFormData] = useState({
     name: "",
@@ -140,8 +140,7 @@ export default function Profile() {
     if (!formData.location.trim())
       newErrors.location = "Please select your location";
 
-    if (!formData.address.trim())
-      newErrors.address = "Address is required";
+    if (!formData.address.trim()) newErrors.address = "Address is required";
     else if (formData.address.length < 5)
       newErrors.address = "Address must be at least 5 characters";
 
@@ -151,66 +150,64 @@ export default function Profile() {
   };
 
   // Form Submit with API call
- // Form Submit with API call
- const role=localStorage.getItem('role');
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // Form Submit with API call
+  const role = localStorage.getItem("role");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (validateForm()) {
-    try {
-      const payload = {
-        full_name: formData.name,
-        role: role,
-        gender: formData.gender,
-        age: Number(formData.age),
-        location: {
-          latitude: currentLocation?.lat || 0,
-          longitude: currentLocation?.lng || 0,
-          address: formData.location,
-        },
-        full_address: [
-          {
-            latitude: tempAddress.latitude || currentLocation?.lat || 0,
-            longitude: tempAddress.longitude || currentLocation?.lng || 0,
-            address: tempAddress.address,
-            landmark: tempAddress.landmark,
-            title: tempAddress.title,
+    if (validateForm()) {
+      try {
+        const payload = {
+          full_name: formData.name,
+          role: role,
+          gender: formData.gender,
+          age: Number(formData.age),
+          location: {
+            latitude: currentLocation?.lat || 0,
+            longitude: currentLocation?.lng || 0,
+            address: formData.location,
           },
-        ],
-        referral_code: formData.referral,
-      };
+          full_address: [
+            {
+              latitude: tempAddress.latitude || currentLocation?.lat || 0,
+              longitude: tempAddress.longitude || currentLocation?.lng || 0,
+              address: tempAddress.address,
+              landmark: tempAddress.landmark,
+              title: tempAddress.title,
+            },
+          ],
+          referral_code: formData.referral,
+        };
 
-      // Get token from localStorage
-      const token = localStorage.getItem("token"); // <- यहाँ आपका token key
+        // Get token from localStorage
+        const token = localStorage.getItem("token"); // <- यहाँ आपका token key
 
-      const response = await fetch(
-        `${BASE_URL}/user/updateUserProfile`,
-        {
+        const response = await fetch(`${BASE_URL}/user/updateUserProfile`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // <- Bearer token
           },
           body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem(
+            "isProfileComplete",
+            data.user.isProfileComplete
+          );
+          setSuccessModal(true);
+        } else {
+          const errorData = await response.json();
+          console.error("Error updating profile:", errorData);
+          alert("Profile update failed. Please try again.");
         }
-      );
- const data = await response.json()
-      if (response.ok) {
-        localStorage.setItem('isProfileComplete',data.user.isProfileComplete);
-        setSuccessModal(true);
-      } else {
-        const errorData = await response.json();
-        console.error("Error updating profile:", errorData);
-        alert("Profile update failed. Please try again.");
+      } catch (error) {
+        console.error("Network error:", error);
+        alert("Network error. Please check your connection.");
       }
-    } catch (error) {
-      console.error("Network error:", error);
-      alert("Network error. Please check your connection.");
     }
-  }
-  
-};
-
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -274,26 +271,26 @@ const handleSubmit = async (e) => {
               )}
             </div>
 
-                {/* Gender */}
-                <div>
-                  <label className="text-[18px] font-[700] mb-1 block text-center">
-                    Gender
-                  </label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] text-center"
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                  {errors.gender && (
-                    <p className="text-red-500 text-sm">{errors.gender}</p>
-                  )}
-                </div>
+            {/* Gender */}
+            <div>
+              <label className="text-[18px] font-[700] mb-1 block text-center">
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] text-center"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.gender && (
+                <p className="text-red-500 text-sm">{errors.gender}</p>
+              )}
+            </div>
 
             {/* Location */}
             <div>
@@ -315,24 +312,24 @@ const handleSubmit = async (e) => {
               )}
             </div>
 
-                {/* Full Address */}
-                <div>
-                  <label className="text-[18px] font-[700] mb-1 block text-center">
-                    Full Address (Landmark)
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Click to enter address"
-                    value={formData.address}
-                    readOnly
-                    onClick={() => setAddressModalOpen(true)}
-                    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
-                  />
-                  {errors.address && (
-                    <p className="text-red-500 text-sm">{errors.address}</p>
-                  )}
-                </div>
+            {/* Full Address */}
+            <div>
+              <label className="text-[18px] font-[700] mb-1 block text-center">
+                Full Address (Landmark)
+              </label>
+              <input
+                type="text"
+                name="address"
+                placeholder="Click to enter address"
+                value={formData.address}
+                readOnly
+                onClick={() => setAddressModalOpen(true)}
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
+              />
+              {errors.address && (
+                <p className="text-red-500 text-sm">{errors.address}</p>
+              )}
+            </div>
 
             {/* Referral */}
             <div>
@@ -499,8 +496,8 @@ const handleSubmit = async (e) => {
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
         />
       </div>
-<div className="mt-10">
-      <Footer />
+      <div className="mt-10">
+        <Footer />
       </div>
 
       <div className="mt-[50px]">

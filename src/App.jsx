@@ -61,7 +61,7 @@ export default function App() {
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
 
       {/* Service Provider Routes */}
-      <Route path="/home-service-provider" element={<PrivateRoute element={<ServiceProviderHome />} />} />
+      <Route path="/homeservice" element={<PrivateRoute element={<ServiceProviderHome />} />} />
       <Route path="/work-category" element={<WorkCategory />} />
 {/* comment */}
       {/* Financial Routes */}
