@@ -35,6 +35,7 @@ import BankDetails from "./app/CommonScreens/BankDetails";
 // Direct Hiring
 import Dispute from "./app/directHiring/User/Dispute";
 import MyWork from "./app/directHiring/Worker/MyWork";
+import ViewProfile from "./app/directHiring/Worker/ViewProfile";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
@@ -50,9 +51,9 @@ export default function App() {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/our-services" element={<OurServices />} />
+      <Route path="/ourservices" element={<OurServices />} />
       <Route path="/subcategories" element={<OurSubCategories />} />
-      <Route path="/about-us" element={<AboutUs />} />
+      <Route path="/aboutus" element={<AboutUs />} />
 
       {/* Worker-Related Routes */}
       <Route path="/workerlist" element={<WorkerList />} />
@@ -73,7 +74,7 @@ export default function App() {
       {/* Informational Routes */}
       <Route path="/customer-reviews" element={<CustomerReview />} />
       <Route path="/his-work" element={<Hiswork />} />
-      <Route path="/terms-and-conditions" element={<TermCondition />} />
+      <Route path="/term-condition" element={<TermCondition />} />
       <Route path="/help-faq" element={<HelpFaqs />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
@@ -85,6 +86,8 @@ export default function App() {
       <Route path='/dispute' element={<Dispute />} />
       <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
       <Route path="/mywork" element={<MyWork />}  />
+      <Route path="/view-profile" element={<ViewProfile />}  />
+
        
       {/* Protected Routes */}
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
@@ -97,7 +100,7 @@ export default function App() {
         }
       />
       <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
-      <Route path="/home-user" element={<PrivateRoute element={<WorkCategory />} />} />
+      <Route path="/homeuser" element={<PrivateRoute element={<WorkCategory />} />} />
 
       {/* Details Route */}
       <Route path="/details" element={<Details />} />

@@ -6,6 +6,7 @@ import Footer from "../../../component/footer";
 import image from "../../../assets/workcategory/image.png";
 import banner from "../../../assets/banner.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
+import Arrow from "../../../assets/profile/arrow_back.svg";
 
 const workers = [
   {
@@ -17,7 +18,7 @@ const workers = [
     amount: "200",
     rating: 4.5,
     skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
   },
   {
     id: 2,
@@ -28,7 +29,7 @@ const workers = [
     amount: "200",
     rating: 4.5,
     skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
   },
   {
     id: 3,
@@ -39,7 +40,7 @@ const workers = [
     amount: "200",
     rating: 4.5,
      skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
   },
   {
     id: 4,
@@ -50,7 +51,7 @@ const workers = [
     amount: "200",
     rating: 4.5,
     skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
   },
 ];
 
@@ -60,11 +61,15 @@ export default function ServiceProviderList() {
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         {/* Back button */}
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
-            &lt; Back
-          </button>
-        </div>
+        <div className="container mx-auto px-4 py-4">
+                <Link
+                  to="/"
+                  className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
+                >
+                  <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
+                  Back
+                </Link>
+              </div>
 
         {/* Banner */}
         <div className="w-full mx-auto rounded-[30px] overflow-hidden relative bg-[#f2e7ca] h-40 sm:h-60 md:h-80 mt-5">

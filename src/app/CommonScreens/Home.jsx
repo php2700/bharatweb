@@ -20,6 +20,7 @@ import man2 from "../../assets/Homepage/man2.jpg";
 import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
 import footer from "../../assets/Homepage/footer.svg";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -728,9 +729,11 @@ export default function Home() {
       </div>
 
       {/* Button (always bottom) */}
-      <button className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-3 px-7 rounded transition mt-6">
-        BOOK NOW
-      </button>
+      <Link to="/subscription">
+  <button className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-3 px-7 rounded transition mt-6">
+    BOOK NOW
+  </button>
+</Link>
     </div>
   ))}
 </div>
