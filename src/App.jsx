@@ -63,7 +63,7 @@ export default function App() {
       {/* Service Provider Routes */}
       <Route path="/homeservice" element={<PrivateRoute element={<ServiceProviderHome />} />} />
       <Route path="/work-category" element={<WorkCategory />} />
-{/* comment */}
+      {/* comment */}
       {/* Financial Routes */}
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/referral" element={<Referral />} />
@@ -78,10 +78,10 @@ export default function App() {
       <Route path="/help-faq" element={<HelpFaqs />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
-      
+
       {/* Direct Hiring Route */}
       <Route path="/service-provider-list" element={<ServiceProviderList />} />
-      <Route path='/service-provider-hire-detail' element={<ServiceProviderHireDetail/>} />
+      <Route path='/service-provider-hire-detail' element={<ServiceProviderHireDetail />} />
       <Route path='/direct-hiring' element={<DirectHiring />} />
       <Route path='/dispute' element={<Dispute />} />
       <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
@@ -91,14 +91,7 @@ export default function App() {
        
       {/* Protected Routes */}
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-      <Route
-        path="/verify-otp"
-        element={
-          <PrivateOtpVerify>
-            <OtpVerification />
-          </PrivateOtpVerify>
-        }
-      />
+      <Route path="/verify-otp"element={<PrivateOtpVerify><OtpVerification /></PrivateOtpVerify>}/>
       <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
       <Route path="/homeuser" element={<PrivateRoute element={<WorkCategory />} />} />
 

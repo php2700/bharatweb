@@ -25,6 +25,8 @@ const requestNotificationPermission = async () => {
 };
 
 export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
  
   const navigate = useNavigate();
@@ -49,59 +51,62 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!mobile || mobile.length !== 10) {
-      toast.error("Enter a valid 10-digit mobile number");
-      return;
-    }
 
-    const permissionGranted = await requestNotificationPermission();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!mobile || mobile.length !== 10) {
+    toast.error("Enter a valid 10-digit mobile number");
+    return;
+  }
+const permissionGranted = await requestNotificationPermission();
     if (!permissionGranted) {
       toast.error("Please allow notifications to proceed");
       return;
     }
+  setLoading(true); // Button loading start
+   
 
-    try {
-      const fcmToken = await getToken(messaging, {
-        vapidKey:
-          "BB4krNzHVO1aWqrQAHGbz-5Y4LRP97M0YJHKahBZM_tte_CFxz2OEY4SZI-ao9KuwS_JRKnN2XtRXtBYzYgtQ6c",
-      });
+  try {
+    const fcmToken = await getToken(messaging, {
+      vapidKey:
+        "BB4krNzHVO1aWqrQAHGbz-5Y4LRP97M0YJHKahBZM_tte_CFxz2OEY4SZI-ao9KuwS_JRKnN2XtRXtBYzYgtQ6c",
+    });
 
-      if (!fcmToken) {
-        toast.error("Failed to get device token");
-        return;
-      }
-
-      const res = await fetch(
-        `${BASE_URL}/user/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: mobile, firebase_token: fcmToken }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        localStorage.setItem("mobileNumber", mobile);
-        localStorage.setItem("otp", data.temp_otp);
-        
-        toast.success("OTP sent successfully!");
-        setTimeout(() => {
-        navigate("/verify-otp");
-    }, 2000);
-        } 
-        else {
-        toast.error(data.message || "Failed to send OTP");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      toast.error("Something went wrong");
+    if (!fcmToken) {
+      toast.error("Failed to get device token");
+      setLoading(false);
+      return;
     }
-  };
+
+    const res = await fetch(`${BASE_URL}/user/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: mobile, firebase_token: fcmToken }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("mobileNumber", mobile);
+      localStorage.setItem("otp", data.temp_otp);
+
+      toast.success("OTP sent successfully!");
+      setTimeout(() => {
+        navigate("/verify-otp");
+      }, 2000);
+    } else {
+      toast.error(data.message || "Failed to send OTP");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    toast.error("Something went wrong");
+  } finally {
+    setLoading(false); // Button loading end
+  }
+};
+
 
   return (
     <>
@@ -171,11 +176,13 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                  type="submit"
-                  className="w-[280px] sm:w-[320px] md:w-[330px] lg:w-[390px] bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-2xl text-[16px] sm:text-[18px] md:text-[19px]"
-                >
-                  Send OTP
-                </button>
+  type="submit"
+  className="w-[280px] sm:w-[320px] md:w-[330px] lg:w-[390px] bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-2xl text-[16px] sm:text-[18px] md:text-[19px]"
+  disabled={loading} // optional: double click na ho
+>
+  {loading ? "Please wait..." : "Send OTP"}
+</button>
+
               </form>
             </div>
           </div>

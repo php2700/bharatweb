@@ -87,12 +87,12 @@ const otpv=localStorage.getItem('otp');
       <div className="min-h-screen flex items-center justify-center bg-white mt-[50px]">
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
           <div className="md:block md:w-1/2">
-            <img
-              src={image}
-              alt="Plumber working"
-              className="w-full h-full object-cover"
-            />
-          </div>
+                      <img
+                        src={image}
+                        alt="Plumber working"
+                        className="w-full h-full object-cover [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
+                      />
+                    </div>
 
           <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16">
             <div className="flex flex-col items-center space-y-6">
