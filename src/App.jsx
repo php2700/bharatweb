@@ -44,6 +44,8 @@ import ServiceProviderList from "./app/directHiring/User/ServiceProviderList";
 import ServiceProviderHireDetail from "./app/directHiring/User/ServiceProviderHireDetail";
 import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
+import WorkerDetail from "./app/directHiring/User/WorkerDetail";
+import MyHire from "./app/directHiring/User/MyHire";
 
 export default function App() {
   return (
@@ -87,6 +89,8 @@ export default function App() {
       <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
       <Route path="/mywork" element={<MyWork />}  />
       <Route path="/view-profile" element={<ViewProfile />}  />
+      <Route path='/worker-detail' element={<WorkerDetail />} />
+      <Route path='/my-hire' element={<MyHire/>} />
 
        
       {/* Protected Routes */}
