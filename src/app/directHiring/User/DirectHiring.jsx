@@ -1,204 +1,168 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Search, Filter } from "lucide-react"
+import React, { useState } from "react";
+import { Calendar, MapPin } from "lucide-react"; // optional icons
 import Header from "../../../component/Header";
-import Footer from "../../../component/footer";
-import image from "../../../assets/workcategory/image.png";
-import banner from "../../../assets/banner.png";
-import ratingImg from "../../../assets/rating/ic_round-star.png";
+import { useNavigate } from "react-router-dom";
 
-const workers = [
-  {
-    id: 1,
-    name: "Dipak Sharma",
-    location: "Indore MP",
-    status: "Add Feature",
-    image: image,
-    amount: "200",
-    rating: 4.5,
-    skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
-  },
-  {
-    id: 2,
-    name: "Dipak Sharma",
-    location: "Indore MP",
-    status: "Add Feature",
-    image: image,
-    amount: "200",
-    rating: 4.5,
-    skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
-  },
-  {
-    id: 3,
-    name: "Dipak Sharma",
-    location: "Indore MP",
-    status: "Add Feature",
-    image: image,
-    amount: "200",
-    rating: 4.5,
-     skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
-  },
-  {
-    id: 4,
-    name: "Dipak Sharma",
-    location: "Indore MP",
-    status: "Add Feature",
-    image: image,
-    amount: "200",
-    rating: 4.5,
-    skills:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,"
-  },
-];
+const DirectHiring = () => {
+  const navigate=useNavigate()
+  const [title, setTitle] = useState("");
+  const [address, setAddress] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [images, setImages] = useState([]);
 
-export default function ServiceProviderList() {
+  const handleImageUpload = (e) => {
+    if (!e.target.files) return;
+    const selectedFiles = Array.from(e.target.files);
+
+    if (images.length + selectedFiles.length > 5) {
+      alert("You can only upload up to 5 images.");
+      return;
+    }
+    setImages((prev) => [...prev, ...selectedFiles]);
+  };
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log({ title, address, deadline, images });
+    alert("Form submitted ✅");
+  };
+
+  const handleBack=()=>{
+    navigate('/homeuser')
+  }
+
   return (
     <>
       <Header />
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
-        {/* Back button */}
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
-            &lt; Back
-          </button>
-        </div>
-
-        {/* Banner */}
-        <div className="w-full mx-auto rounded-[30px] overflow-hidden relative bg-[#f2e7ca] h-40 sm:h-60 md:h-80 mt-5">
-          <img
-            src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full w-full object-cover"
-          />
-        </div>
-
-        {/* Main container */}
-        <div className="container max-w-5xl mx-auto my-10">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-3">
-            <div className="text-xl sm:text-2xl font-bold">Direct Hiring</div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-  {/* Search box */}
-  <div className="flex items-center bg-[#efefef] rounded-xl px-3 py-3 w-full sm:w-64">
-    <Search className="h-5 w-5 text-gray-500" />
-    <input
-      type="text"
-      placeholder="Search for services"
-      className="bg-transparent outline-none px-2 w-full text-sm text-gray-700"
-    />
-  </div>
-
-  {/* Filter button */}
-  <button className="p-1 rounded-xl border border-[#334247 ] hover:bg-gray-100">
-    <Filter className="h-5 w-5 text-gray-600" />
-  </button>
-</div>
-          </div>
-
-          {/* Worker cards */}
-          <div className="w-full rounded-xl p-3 sm:p-4 space-y-6">
-            {workers.map((worker) => (
-              <div
-                key={worker.id}
-                className="grid grid-cols-1 sm:grid-cols-12 bg-white rounded-lg shadow-lg overflow-hidden"
-              >
-                {/* Left image */}
-                <div className="relative col-span-4">
-                  <img
-                    src={worker.image}
-                    alt={worker.name}
-                    className="h-60 sm:h-full w-full object-cover rounded-[20px]"
-                  />
-                  <span className="absolute bottom-2 left-0 w-full bg-black/70 text-white font-medium text-xs sm:text-sm px-2 sm:px-4 py-2 text-center">
-                    {worker?.status}
-                  </span>
-                </div>
-
-                {/* Right content */}
-                <div className="col-span-8 p-4 flex flex-col gap-2">
-                  {/* Name + Rating */}
-                  <div className="flex flex-col sm:flex-row justify-between gap-2">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800">
-                      {worker.name}
-                    </h2>
-                    <div className="flex items-center gap-1">
-                    <img className="h-[26px] w-[26px]" src={ratingImg} alt="rating" />
-                      <span className="lg:text-[20px] text-sm sm:text-base font-[700]">
-                        {worker?.rating}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <p className="text-[#334247] text-sm sm:text-base font-[500]">
-                    &#8377;{worker.amount}.00
-                  </p>
-
-                  {/* Skills */}
-                  <div>
-                    <div className="font-semibold text-base sm:text-lg text-gray-800 mb-1">
-                      About My Skill
-                    </div>
-                    <p className="text-sm sm:text-base leading-snug text-gray-600 line-clamp-3 sm:line-clamp-none">
-                      {worker?.skills}
-                    </p>
-                  </div>
-
-                  {/* Location + Actions */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
-                    <div className="text-white bg-[#F27773] text-xs sm:text-sm px-9 py-1 rounded-full">
-                      {worker?.location}
-                    </div>
-                    <div className="flex gap-3">
-  {/* View Profile */}
-  <button
-    className="relative overflow-hidden border border-[#228B22] text-[#228B22] py-1 px-5 rounded-lg text-sm font-semibold 
-    transition-all duration-300 ease-out group"
-  >
-    <span className="relative z-10 group-hover:text-white">View Profile</span>
-    <span className="absolute inset-0 bg-[#228B22] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-  </button>
-
-  {/* Hire */}
-  <button
-    className="relative overflow-hidden bg-[#228B22] text-white py-1 px-8 sm:px-12 rounded-lg text-sm font-semibold
-    transition-all duration-300 ease-out transform hover:scale-105 hover:shadow-lg"
-  >
-    Hire
-  </button>
-</div>
-
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* See All button */}
-          <div className="flex justify-center my-8">
-            <button className="py-2 px-6 text-white rounded-full w-65 sm:w-65 text-center bg-[#228B22]">
-              See All
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom banner */}
-        <div className="w-full mx-auto rounded-[30px] overflow-hidden relative bg-[#f2e7ca] h-40 sm:h-60 md:h-80 mt-5">
-          <img
-            src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full w-342 object-cover"
-          />
-        </div>
+      <div className="w-full max-w-6xl mx-auto flex justify-start mt-4">
+        <button
+          onClick={() => {
+            handleBack;
+          }}
+          className="text-green-600 text-sm hover:underline"
+        >
+          &lt; Back
+        </button>
       </div>
+      <div className="min-h-screen flex justify-center  py-10">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-xl bg-white shadow-2xl rounded-lg p-6"
+        >
+          <h2 className="text-center text-xl font-semibold mb-6">
+            Direct hiring
+          </h2>
 
-      <div className="mt-12">
-        <Footer />
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700">Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter Title of work"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-green-600 focus:ring-green-600"
+            />
+          </label>
+
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700">Platform Fees</span>
+            <input
+              type="text"
+              value="Rs 200.00"
+              disabled
+              className="mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 px-3 py-2 text-sm text-gray-600"
+            />
+          </label>
+
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700">Description</span>
+            <textarea
+              rows={3}
+              value="Lorem Ipsum is simply dummy text of the printing and typesetting industry..."
+              disabled
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700 flex items-center justify-between">
+              Address{" "}
+              <span className="text-green-600 cursor-pointer">Edit</span>
+            </span>
+            <div className="relative">
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter Full Address"
+                className="mt-1 block w-full rounded-md border border-gray-300 pr-9 pl-3 py-2 text-sm focus:border-green-600 focus:ring-green-600"
+              />
+              <MapPin className="absolute right-2 top-3 h-4 w-4 text-gray-400" />
+            </div>
+          </label>
+
+          <label className="block mb-4">
+            <span className="text-sm text-gray-700">Add deadline and time</span>
+            <div className="relative">
+              <input
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 pl-9 pr-3 py-2 text-sm focus:border-green-600 focus:ring-green-600"
+              />
+              <Calendar className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+            </div>
+          </label>
+
+          <label className="block mb-2">
+            <span className="text-sm text-gray-700">Upload (5 Max photos)</span>
+          </label>
+          <div className="border rounded-md p-4 text-center mb-4">
+            <label className="cursor-pointer text-green-600 text-sm font-medium">
+              Upload Image
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </label>
+
+            <div className="flex gap-3 flex-wrap mt-3 justify-center">
+              {images.map((file, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt="preview"
+                    className="w-20 h-20 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white font-semibold py-2 rounded-md hover:bg-green-700 transition"
+          >
+            Hire
+          </button>
+        </form>
       </div>
     </>
   );
-}
-// fdfd
+};
+
+export default DirectHiring;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import image from "../../../assets/workcategory/image.png";
@@ -55,12 +55,17 @@ const workers = [
 ];
 
 export default function ServiceProviderList  ()  {
+  const navigate=useNavigate();
+
+  const handleBack=()=>{
+    navigate('/homeuser')
+  }
   return (
     <>
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
+          <button onClick={()=>{handleBack}} className="text-green-600 text-sm hover:underline">
             &lt; Back
           </button>
         </div>

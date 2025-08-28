@@ -50,9 +50,9 @@ export default function App() {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/our-services" element={<OurServices />} />
+      <Route path="/ourservices" element={<OurServices />} />
       <Route path="/subcategories" element={<OurSubCategories />} />
-      <Route path="/about-us" element={<AboutUs />} />
+      <Route path="/aboutus" element={<AboutUs />} />
 
       {/* Worker-Related Routes */}
       <Route path="/workerlist" element={<WorkerList />} />
@@ -60,7 +60,7 @@ export default function App() {
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
 
       {/* Service Provider Routes */}
-      <Route path="/home-service-provider" element={<PrivateRoute element={<ServiceProviderHome />} />} />
+      <Route path="/homeservice" element={<PrivateRoute element={<ServiceProviderHome />} />} />
       <Route path="/work-category" element={<WorkCategory />} />
 {/* comment */}
       {/* Financial Routes */}
@@ -73,7 +73,7 @@ export default function App() {
       {/* Informational Routes */}
       <Route path="/customer-reviews" element={<CustomerReview />} />
       <Route path="/his-work" element={<Hiswork />} />
-      <Route path="/terms-and-conditions" element={<TermCondition />} />
+      <Route path="/term-condition" element={<TermCondition />} />
       <Route path="/help-faq" element={<HelpFaqs />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
@@ -97,7 +97,7 @@ export default function App() {
         }
       />
       <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
-      <Route path="/home-user" element={<PrivateRoute element={<WorkCategory />} />} />
+      <Route path="/homeuser" element={<PrivateRoute element={<WorkCategory />} />} />
 
       {/* Details Route */}
       <Route path="/details" element={<Details />} />

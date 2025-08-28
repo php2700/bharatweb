@@ -6,21 +6,27 @@ import ratingImg from "../../../assets/rating/ic_round-star.png";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import { useEffect, useState } from "react";
-
 import ServiceProviderHisWork from "./ServiceProviderHisWork";
 import HireModel from "./HireModel";
 import PaymentModel from "./PaymentModel";
+import PaymentProceedModel from "./PaymentProceedModel";
 
 export default function ServiceProviderHireDetail() {
   const [isHireModel, setIsHireModel] = useState(false);
-  const [isPaymentModelOpen,setIsPaymentModelOpen]=useState(true)
+  const [isPaymentModelOpen, setIsPaymentModelOpen] = useState(false);
+  const [isPaymentProceedModelOpen, setIsPaymentProceedModelOpen] =
+    useState(false);
 
-const closeHireModel=()=>{
-  setIsHireModel(false)
-}
-const closePaymentModel=()=>{
-  setIsPaymentModelOpen(false)
-}
+  const closeHireModel = () => {
+    setIsHireModel(false);
+  };
+  const closePaymentModel = () => {
+    setIsPaymentModelOpen(false);
+  };
+
+  const closePaymentProceedModel = () => {
+    setIsPaymentProceedModelOpen(false);
+  };
 
   return (
     <>
@@ -141,7 +147,15 @@ const closePaymentModel=()=>{
       </div>
       <Footer />
       {isHireModel && <HireModel open={isHireModel} close={closeHireModel} />}
-      {isPaymentModelOpen && <PaymentModel open={isPaymentModelOpen} close={closePaymentModel} />}
+      {isPaymentModelOpen && (
+        <PaymentModel open={isPaymentModelOpen} close={closePaymentModel} />
+      )}
+      {isPaymentProceedModelOpen && (
+        <PaymentProceedModel
+          open={isPaymentProceedModelOpen}
+          close={closePaymentProceedModel}
+        />
+      )}
     </>
   );
 }

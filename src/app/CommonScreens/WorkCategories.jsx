@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import images from '../../assets/workcategory/image.png';
-import banner1 from '../../assets/workcategory/banner1.png';
-import hire1 from '../../assets/workcategory/hire1.png';
-import hire2 from '../../assets/workcategory/hire2.png';
-import banner from '../../assets/workcategory/banner.png';
-import hire3 from '../../assets/workcategory/hire3.png';
+import images from "../../assets/workcategory/image.png";
+import banner1 from "../../assets/workcategory/banner1.png";
+import hire1 from "../../assets/workcategory/hire1.png";
+import hire2 from "../../assets/workcategory/hire2.png";
+import banner from "../../assets/workcategory/banner.png";
+import hire3 from "../../assets/workcategory/hire3.png";
 import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,6 @@ const navigate = useNavigate();
       });
 
       const data = await res.json();
-      
 
       if (res.ok && data.status) {
         setCategories(data.data || []);
@@ -46,26 +45,36 @@ const navigate = useNavigate();
   useEffect(() => {
     fetchCategories();
   }, []);
-  const SeeAll=()=>{
-    navigate('/ourservice')
+  const SeeAll = () => {
+    navigate("/ourservices");
+  };
+
+  const OurSubCategories = (service) => {
+    navigate("/subcategories", { state: { service } });
+  };
+
+  const viewProfile = (item) => {
+    navigate("/details");
+  };
+
+  const directHiring = () => {
+    navigate("/service-provider-list");
+  };
+  
+  const WorkerList = () => {
+    navigate("/service-provider-list");
+  };
+
+  const hireWorker=(item)=>{
+    navigate('/direct-hiring')
   }
-
- const OurSubCategories=(service)=>{
-  navigate("/subcategories", { state: { service } });
- }
- 
-
   return (
     <>
       <Header />
       <div className="font-sans text-gray-800 mt-20">
         {/* Hero Section */}
         <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] bg-gray-200">
-          <img
-            src={banner}
-            alt="Hero"
-            className="w-full h-full object-cover"
-          />
+          <img src={banner} alt="Hero" className="w-full h-full object-cover" />
         </div>
 
         {/* Categories */}
@@ -77,40 +86,43 @@ const navigate = useNavigate();
           {loading ? (
             <p className="text-center text-gray-500">Loading categories...</p>
           ) : (
-            <div 
-            
-            className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 justify-items-center gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 justify-items-center gap-4">
               {categories.slice(0, 15).map((cat, index) => (
-       <div
-  key={index}
-  className="flex flex-col items-center p-4 sm:p-6 rounded-lg w-28 sm:w-32 
+                <div
+                  key={index}
+                  className="flex flex-col items-center p-4 sm:p-6 rounded-lg w-28 sm:w-32 
              transition transform hover:scale-120 hover:shadow-lg cursor-pointer"
-  onClick={() => OurSubCategories(cat._id)}
->
-  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D3E8D3]">
-    <img
-      src={cat.image ? cat.image : "/src/assets/workcategory/default.png"}
-      alt={cat.name}
-      className="w-[27px] filter brightness-0 sepia saturate-100 hue-rotate-100"
-      style={{
-        filter:
-          "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
-      }}
-    />
-  </div>
-  <p className="mt-2 text-[13px] sm:text-[15px] text-[#191A1D] font-[500] ml-[21px]">
-    {cat.name}
-  </p>
-</div>
-
-
+                  onClick={() => OurSubCategories(cat._id)}
+                >
+                  <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D3E8D3]">
+                    <img
+                      src={
+                        cat.image
+                          ? cat.image
+                          : "/src/assets/workcategory/default.png"
+                      }
+                      alt={cat.name}
+                      className="w-[27px] filter brightness-0 sepia saturate-100 hue-rotate-100"
+                      style={{
+                        filter:
+                          "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
+                      }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[13px] sm:text-[15px] text-[#191A1D] font-[500] ml-[21px]">
+                    {cat.name}
+                  </p>
+                </div>
               ))}
             </div>
           )}
 
           {/* See All Button */}
           <div className="flex justify-center mt-8">
-            <button onClick={SeeAll} className="w-[200px] sm:w-[222px] h-[46px] bg-[#228B22] text-white rounded-[15px] hover:scale-105 transition-all duration-300">
+            <button
+              onClick={SeeAll}
+              className="w-[200px] sm:w-[222px] h-[46px] bg-[#228B22] text-white rounded-[15px] hover:scale-105 transition-all duration-300"
+            >
               See All
             </button>
           </div>
@@ -123,7 +135,13 @@ const navigate = useNavigate();
               <h2 className="font-bold text-[19px] sm:text-[22px] text-[#303030]">
                 Direct Hiring
               </h2>
-              <button type="button" className="font-bold text-[19px] sm:text-[22px] text-[#303030] mt-2 sm:mt-0">
+              <button
+                onClick={() => {
+                  WorkerList();
+                }}
+                type="button"
+                className="font-bold text-[19px] sm:text-[22px] text-[#303030] mt-2 sm:mt-0"
+              >
                 See All
               </button>
             </div>
@@ -172,10 +190,17 @@ const navigate = useNavigate();
                   </div>
 
                   <div className="flex gap-2 mt-4 sm:mt-6">
-                    <button className="flex-1 border border-[#228B22] py-2 rounded font-semibold text-[#228B22] hover:bg-[#228B22] hover:text-white hover:shadow-md hover:scale-105 transition-all duration-300">
+                    <button
+                      onClick={() => {
+                        viewProfile(item);
+                      }}
+                      className="flex-1 border border-[#228B22] py-2 rounded font-semibold text-[#228B22] hover:bg-[#228B22] hover:text-white hover:shadow-md hover:scale-105 transition-all duration-300"
+                    >
                       View Profile
                     </button>
-                    <button className="flex-1 bg-[#228B22] text-white py-2 rounded font-semibold text-center hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+                    <button  onClick={() => {
+                        hireWorker(item);
+                      }} className="flex-1 bg-[#228B22] text-white py-2 rounded font-semibold text-center hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
                       Hire
                     </button>
                   </div>
@@ -187,11 +212,7 @@ const navigate = useNavigate();
 
         {/* About Section */}
         <div className="mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2 gap-6 items-center lg:pl-0">
-          <img
-            src={banner1}
-            alt="Worker"
-            className="rounded-lg w-full"
-          />
+          <img src={banner1} alt="Worker" className="rounded-lg w-full" />
           <div>
             <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
               Post Work with bidder
@@ -222,59 +243,59 @@ const navigate = useNavigate();
                 Post Work
               </button>
             </div>
-            <img
-              src={banner1}
-              alt="Emergency"
-              className="rounded-lg w-full"
-            />
+            <img src={banner1} alt="Emergency" className="rounded-lg w-full" />
           </div>
         </div>
 
         {/* Blog Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4 sm:p-6">
-  {/* Card 1 - Direct Hiring */}
-  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
-    <img
-      src={hire1}
-      alt="Direct Hiring"
-      className="w-full h-[322px] sm:h-[383px] object-cover"
-    />
-    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
-        Direct Hiring
-      </button>
-    </div>
-  </div>
+          {/* Card 1 - Direct Hiring */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+            <img
+              src={hire1}
+              alt="Direct Hiring"
+              className="w-full h-[322px] sm:h-[383px] object-cover"
+            />
+            <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+              <button
+                onClick={() => {
+                  directHiring();
+                }}
+                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+              >
+                Direct Hiring
+              </button>
+            </div>
+          </div>
 
-  {/* Card 2 - Bidding */}
-  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
-    <img
-      src={hire2}
-      alt="Bidding"
-      className="w-full h-[322px] sm:h-[383px] object-cover"
-    />
-    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
-        Bidding
-      </button>
-    </div>
-  </div>
+          {/* Card 2 - Bidding */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+            <img
+              src={hire2}
+              alt="Bidding"
+              className="w-full h-[322px] sm:h-[383px] object-cover"
+            />
+            <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+                Bidding
+              </button>
+            </div>
+          </div>
 
-  {/* Card 3 - Emergency */}
-  <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
-    <img
-      src={hire3}
-      alt="Emergency"
-      className="w-full h-[322px] sm:h-[383px] object-cover"
-    />
-    <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-      <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
-        Emergency
-      </button>
-    </div>
-  </div>
-</div>
-
+          {/* Card 3 - Emergency */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden w-full relative h-[322px] sm:h-[383px]">
+            <img
+              src={hire3}
+              alt="Emergency"
+              className="w-full h-[322px] sm:h-[383px] object-cover"
+            />
+            <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
+              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+                Emergency
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-[50px]">

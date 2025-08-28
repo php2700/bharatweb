@@ -6,7 +6,6 @@ import Arrow from "../../assets/profile/arrow_back.svg";
 import CheckIcon from "../../assets/Subscription/tick.svg";
 import Gardening from "../../assets/profile/profile image.png";
 
-
 export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState(null);
 
@@ -39,7 +38,7 @@ export default function Subscription() {
       <Header />
       <div className="container mx-auto px-4 py-4">
         <Link
-          to="/"
+          to="/homeservice"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
@@ -118,7 +117,7 @@ export default function Subscription() {
         />
       </div>
       <div className="mt-10">
-      <Footer />
+        <Footer />
       </div>
     </>
   );
