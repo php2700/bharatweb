@@ -78,7 +78,7 @@ export default function Dispute() {
               type="text"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
               placeholder="Enter amount"
             />
             {errors.amount && (
@@ -95,7 +95,7 @@ export default function Dispute() {
               rows="3"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
               placeholder="Enter description"
             ></textarea>
             {errors.description && (
@@ -112,7 +112,7 @@ export default function Dispute() {
               rows="3"
               value={requirement}
               onChange={(e) => setRequirement(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
               placeholder="Enter requirement"
             ></textarea>
             {errors.requirement && (
@@ -123,7 +123,7 @@ export default function Dispute() {
           {/* Upload */}
           <div>
             <label className="block text-base font-medium mb-2">Upload</label>
-            <label className="w-full flex justify-center items-center border-2 border-[#777777] rounded-lg py-6 cursor-pointer text-[#228B22] hover:bg-green-50">
+            <label className="w-full flex justify-center items-center border-2 border-[#c1b9b9] rounded-lg py-6 cursor-pointer text-[#228B22] hover:bg-green-50">
               <input
                 type="file"
                 className="hidden"

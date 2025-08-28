@@ -37,7 +37,7 @@ export default function Header() {
           </button>
           {/* Profile Dropdown - hide on very small screens */}
           <Link
-            to="/login/signup"
+            to="/login"
             className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer"
           >
             Login/Signup
@@ -86,7 +86,7 @@ export default function Header() {
             </button>
 
             <Link
-              to="/login/signup"
+              to="/login"
               className="bg-white px-4 py-2 rounded-lg shadow text-base font-medium flex items-center gap-2 cursor-pointer"
             >
               Login/Signup
