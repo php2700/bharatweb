@@ -1,6 +1,8 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import image from "../../../assets/workcategory/image.png";
 import warningImg from "../../../assets/directHiring/warning.png";
+import callIcon from "../../../assets/directHiring/call.png";
+import messageIcon from "../../../assets/directHiring/message.png";
 
 export default function Accepted() {
   return (
@@ -28,10 +30,10 @@ export default function Accepted() {
             <p className="font-medium mb-2">Contact with him</p>
             <div className="flex gap-3 justify-center">
               <button className="p-2 bg-gray-200 rounded-full">
-                <Phone className="h-5 w-5 text-green-600" />
+                <img src={callIcon} className="h-5 w-5" />
               </button>
               <button className="p-2 bg-gray-200 rounded-full">
-                <MessageCircle className="h-5 w-5 text-green-600" />
+                <img src={messageIcon} className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -97,7 +99,7 @@ export default function Accepted() {
           <img
             src={warningImg}
             alt="Warning"
-            className="absolute left-1/2 -translate-x-1/2 -top-[45%] w-60 h-auto"
+            className="absolute left-1/2 -translate-x-1/2 -top-[35%]  md:-top-[42%] lg:-top-[45%] w-60 h-auto"
           />
           <div className="bg-yellow-100 border border-yellow-300 rounded-lg shadow-md p-6 pt-30 text-center">
             <h4 className="text-red-600 font-semibold text-lg">
