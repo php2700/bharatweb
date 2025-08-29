@@ -1,198 +1,235 @@
-
-
-
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import Calender from '../../../assets/bidding/Calender.png'
-import { useState } from "react";
-import Gardening from "../../../assets/profile/profile image.png";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-const tasks = [
-  {
-    id: "#we2323",
-    title: "Make a chair",
-    price: "₹1,500",
-    date: "21/02/25",
-    desc: "Lorem ipsum dolor ...",
-    location: "Indore M.P",
-    status: "pending",
-  },
-  {
-    id: "#we2323",
-    title: "Make a chair",
-    price: "₹1,500",
-    date: "21/02/25",
-    desc: "Lorem ipsum dolor ...",
-    location: "Indore M.P",
-    status: "cancelled",
-  },
-  {
-    id: "#we2323",
-    title: "Make a chair",
-    price: "₹1,500",
-    date: "21/02/25",
-    desc: "Lorem ipsum dolor ...",
-    location: "Indore M.P",
-    status: "accepted",
-  },
-  {
-    id: "#we2323",
-    title: "Make a chair",
-    price: "₹1,500",
-    date: "21/02/25",
-    desc: "Lorem ipsum dolor ...",
-    location: "Indore M.P",
-    status: "completed",
-  },
-  {
-    id: "#we2323",
-    title: "Make a chair",
-    price: "₹1,500",
-    date: "21/02/25",
-    desc: "Lorem ipsum dolor ...",
-    location: "Indore M.P",
-    status: "cancelled",
-  },
-];
-
-const statusColors = {
-  pending: "bg-gray-200 text-gray-700",
-  cancelled: "bg-red-100 text-red-600",
-  accepted: "bg-green-100 text-green-600",
-  completed: "bg-green-200 text-green-700",
-};
+import Gardening from "../../../assets/profile/profile image.png";
+import Work from "../../../assets/directHiring/Work.png";
+import Search from "../../../assets/search-normal.svg";
 
 export default function MyHireBidding() {
-    const [activeTab, setActiveTab] = useState("Bidding Task");
- const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    subCategory: [],
-    location: "",
-    googleAddress: "",
-    description: "",
-    cost: "",
-    deadline: "",
-  });
+  const [activeTab, setActiveTab] = useState("Bidding Task");
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
- 
+  const work = [
+    {
+      id: 1,
+      name: "Make a chair",
+      image: Work,
+      date: "21/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹1,500",
+      location: "Indore M.P.",
+      status: null,
+      showStatus: false, // Status dikhega
+    },
+    {
+      id: 2,
+      name: "Make a table",
+      image: Work,
+      date: "22/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹2,000",
+      location: "Indore M.P.",
+      status: "Cancelled", // Status nahi dikhayenge
+      showStatus: true,
+    },
+    {
+      id: 3,
+      name: "Paint wall",
+      image: Work,
+      date: "23/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹1,200",
+      location: "Indore M.P.",
+      status: "Accepted",
+      showStatus: true, // Status dikhega
+    },
+    {
+      id: 4,
+      name: "Make a shelf",
+      image: Work,
+      date: "24/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹1,800",
+      location: "Indore M.P.",
+      status: "Completed",
+      showStatus: true, // Status nahi dikhega
+    },
+    {
+      id: 5,
+      name: "Make a shelf",
+      image: Work,
+      date: "24/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹1,800",
+      location: "Indore M.P.",
+      status: null,
+      showStatus: false, // Status nahi dikhega
+    },
+    {
+      id: 6,
+      name: "Make a shelf",
+      image: Work,
+      date: "24/02/25",
+      description:
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
+      price: "₹1,800",
+      location: "Indore M.P.",
+      status: "Cancelled", // Status nahi dikhayenge
+      showStatus: true, // Status nahi dikhega
+    },
+  ];
 
   return (
-     <>
+    <>
       <Header />
 
+      {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
         <Link
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
-          <img src={Arrow} className="w-6 h-6 mr-2" />
+          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
         </Link>
       </div>
-<div className="bg-white min-h-screen px-4 py-6">
-  <div className="max-w-5xl mx-auto">
-    {/* Page Title */}
-    <h1 className="text-xl font-semibold mb-4">My Hire</h1>
 
-    {/* Tabs */}
-    <div className="flex gap-3 mb-4 lg:gap-57 bg-[#F6F6F6]">
-      {["Bidding Task", "Hire", "Emergency Tasks"].map((tab) => (
-        <button
-          key={tab}
-          onClick={() => setActiveTab(tab)}
-          className={`px-5 py-1 rounded-full border transition w-[185px] h-[42px] ${
-            activeTab === tab
-              ? "bg-[#228B22] text-white"
-              : "bg-white text-[#4CA04C] border-[#228B22] font-[600]"
-          }`}
-        >
-          {tab}
-        </button>
-      ))}
-    </div>
+      {/* Work Section */}
+      <div className="container max-w-full mx-auto my-10">
+        <div className="text-xl sm:text-2xl max-w-5xl font-bold mx-auto">
+          My Work
+        </div>
 
-    {/* Search Bar */}
-    <div className="mb-6">
-      <input
-        type="text"
-        placeholder="Search for services"
-        className="w-full border rounded-full px-4 py-2 outline-none shadow-sm"
-      />
-    </div>
+        {/* Tabs */}
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-[90px] lg:gap-[227px] bg-gray-100 p-2 mb-6">
+          {["Bidding Task", "Hire", "Emergency Tasks"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-6 sm:px-9 py-1 rounded-full font-semibold ${
+                activeTab === tab
+                  ? "bg-[#228B22] text-white"
+                  : "text-[#228B22] border border-[#228b22]"
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-    {/* Task Cards */}
-    <div className="space-y-5">
-      {tasks.map((task, idx) => (
-        <div
-          key={idx}
-          className="flex bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition"
-        >
-          {/* Image */}
-          <img
-            src="https://img.freepik.com/premium-photo/young-carpenter-working-workshop-wood-working-skill_31965-68566.jpg"
-            alt={task.title}
-            className="w-40 h-32 object-cover"
-          />
-
-          {/* Details */}
-          <div className="flex-1 p-4 flex flex-col justify-between">
-            <div>
-              <p className="text-[21px] text-[#191A1D] font-[600]">{task.id}</p>
-              <h2 className="text-lg font-semibold">{task.title}</h2>
-              <p className="font-bold">{task.price}</p>
-              <p className="text-sm text-gray-500">Date: {task.date}</p>
-              <p className="text-sm text-gray-500">{task.desc}</p>
-              <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                {task.location}
-              </span>
-            </div>
-
-            {/* Status + Button */}
-            <div className="flex justify-between items-center mt-3">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  statusColors[task.status]
-                }`}
-              >
-                {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-              </span>
-              <button className="bg-green-600 text-white px-4 py-1 rounded-lg hover:bg-green-700">
-                View Details
-              </button>
-            </div>
+        {/* Search */}
+        <div className="flex justify-center mb-6 px-4">
+          <div className="relative w-full max-w-5xl">
+            <img
+              src={Search}
+              alt="Search"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
+            />
+            <input
+              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none"
+              type="search"
+              placeholder="Search for services"
+            />
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</div>
 
+        {/* Work Cards */}
+        <div className="space-y-6 max-w-5xl justify-center mx-auto px-4">
+          {activeTab === "Bidding Task" &&
+            work.map((work) => (
+              <div
+                key={work.id}
+                className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
+              >
+                {/* Left Image */}
+                <div className="relative w-full sm:w-1/3 h-64 sm:h-auto">
+                  <img
+                    src={work.image}
+                    alt={work.name}
+                    className="h-full w-full object-cover"
+                  />
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-17 py-3 rounded-full">
+                    #ewe2323
+                  </span>
+                </div>
 
-      
+                {/* Right Content */}
+                <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {work.name}
+                    </h2>
+                    <p className="text-[17px] text-[#008000] mt-2 font-[500]">
+                      {work.price}
+                    </p>
+                    <p className="text-sm text-[#334247] mt-2 font-[400]">
+                      Date: {work.date}
+                    </p>
+                    <p className="text-sm text-[#334247] mt-1 font-[400]">
+                      {work.description}
+                    </p>
+                  </div>
 
-      {/* Banner */}
-      <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-15">
-        <img
-          src={Gardening}
-          alt="Gardening"
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-        />
+                  {/* Footer Section */}
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 gap-2">
+                    {/* Location */}
+                    <span className="bg-[#F27773] text-white py-1 px-7 rounded-full text-center sm:text-left">
+                      {work.location}
+                    </span>
+
+                    {/* Status & Button */}
+                    <div className="flex flex-col items-end gap-2">
+                      {/* Status badge optional */}
+                      {work.showStatus && work.status && (
+                        <span
+                          className={`py-1 px-7 rounded-full text-white font-semibold ${
+                            work.status === "Cancelled"
+                              ? "bg-[#DB5757]"
+                              : work.status === "Completed"
+                              ? "bg-[#56DB56]"
+                              : "bg-[#56DB56]"
+                          }`}
+                        >
+                          {work.status}
+                        </span>
+                      )}
+
+                      {/* View Profile always */}
+                      <button className="text-white py-1 px-7 border border-[#228B22] rounded-lg bg-[#228B22]">
+                        View Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {/* See All */}
+        <div className="flex justify-center my-8">
+          <button className="py-2 px-8 text-white rounded-full bg-[#228B22]">
+            See All
+          </button>
+        </div>
+
+        {/* Banner Image */}
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={Gardening}
+            alt="Gardening illustration"
+            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+          />
+        </div>
       </div>
 
-      <div className="mt-[50px]">
-        <Footer />
-      </div>
+      <Footer />
     </>
   );
 }
