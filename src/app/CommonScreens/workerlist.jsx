@@ -13,7 +13,7 @@ export default function WorkerList() {
 
   const fetchWorkers = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("bharat_token");
       const res = await fetch(`${BASE_URL}/worker/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });

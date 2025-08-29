@@ -89,7 +89,7 @@ const handleImageChange = (e) => {
       bodyData.append("image", images);
       bodyData.append("aadharImage", formData.aadharImage);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("bharat_token");
 
       const res = await fetch(`${BASE_URL}/worker/add`, {
         method: "POST",

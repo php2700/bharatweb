@@ -48,7 +48,7 @@ export default function BankDetails() {
     e.preventDefault();
     if (validate()) {
       try {
-        const token = localStorage.getItem("token"); // token yaha se milega
+        const token = localStorage.getItem("bharat_token"); // token yaha se milega
 
         const response = await fetch(
           "https://api.thebharatworks.com/api/user/updateBankDetails",

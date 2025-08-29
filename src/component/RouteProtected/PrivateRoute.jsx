@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRoute = ({ element: Component }) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("bharat_token");
   const role = localStorage.getItem("role"); // "service_provider" | "user" | null
   const isProfileComplete = localStorage.getItem("isProfileComplete"); // "true" / "false"
   const location = useLocation();
