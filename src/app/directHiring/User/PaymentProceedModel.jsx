@@ -1,4 +1,4 @@
-import paymentProceed from "../../../assets/directHiring/paymentproceed.png";
+import paymentProceed from "../../../assets/directHiring/paymentProceed.png";
 import { X } from "lucide-react";
 
 export default function PaymentProceedModel({ open, close }) {
@@ -8,7 +8,7 @@ export default function PaymentProceedModel({ open, close }) {
     <div className="fixed inset-0 flex items-center justify-center bg-gray/10 backdrop-blur-[1px] z-50">
       <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md px-8 py-10 text-center">
         <div className="flex justify-end ">
-          <X className="w-10 h-10 text-white rounded-full py-2 px-2 bg-green-700 rounded-full" />
+          <X className="w-10 h-10 text-white py-2 px-2 bg-green-700 rounded-full" />
         </div>
         <img
           src={paymentProceed}
