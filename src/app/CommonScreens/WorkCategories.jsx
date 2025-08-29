@@ -69,6 +69,17 @@ export default function WorkCategories() {
   const hireWorker = () => {
     navigate('/direct-hiring');
   };
+
+
+  const postWork=()=>{
+    navigate('/bidding/newtask')
+  }
+
+  const handleBidding=()=>{
+    navigate('/bidding/myhire')
+  }
+
+  
   return (
     <>
       <Header />
@@ -223,7 +234,7 @@ export default function WorkCategories() {
               typesetting industry. Lorem Ipsum has been the industry's <br />
               standard dummy text ever since the 1500s...
             </p>
-            <button className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+            <button  onClick={postWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
               Post Work
             </button>
           </div>
@@ -240,7 +251,7 @@ export default function WorkCategories() {
                 Lorem Ipsum is simply dummy text of the printing and <br />
                 typesetting industry. Lorem Ipsum has been the industry's...
               </p>
-              <button className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <button onClick={postWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
                 Post Work
               </button>
             </div>
@@ -277,7 +288,7 @@ export default function WorkCategories() {
               className="w-full h-[322px] sm:h-[383px] object-cover"
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+              <button onClick={handleBidding} className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
                 Bidding
               </button>
             </div>
