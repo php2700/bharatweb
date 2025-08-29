@@ -1,4 +1,4 @@
-import paymentProcess from "../../../assets/directHiring/paymentprocess.png";
+import paymentProcess from "../../../assets/directHiring/Paymentprocess.png";
 
 export default function PaymentModel({ open, close }) {
   if (!open) return null;

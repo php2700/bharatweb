@@ -47,11 +47,17 @@ import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 import MyHire from "./app/directHiring/User/MyHire";
+import MyHireBidding from "./app/Bidding/User/MyHire";
 
+//Bidding 
+import BiddingNewTask from "./app/Bidding/User/NewTask"
 export default function App() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* \-------------------------------------------------------------------------------------------------------/
+           \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
+            \-------------------------------------------------------------------------------------------------- /  */}
+      
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/ourservices" element={<OurServices />} />
@@ -95,16 +101,30 @@ export default function App() {
 
       <Route path='/worker-detail' element={<WorkerDetail />} />
       <Route path='/my-hire' element={<MyHire/>} />
+      
+      <Route path="/details" element={<Details />} />
 
-       
-      {/* Protected Routes */}
+      {/* Bidding Route Of user */}
+      <Route path="/bidding/newtask" element={<BiddingNewTask/>}/>
+      <Route path="/bidding/myhire" element={<MyHireBidding/>}/>
+
+      {/* \------------------------------------------------------------------------------------------------------------------------------/
+           \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
+            \--------------------------------------------------------------------------------------------------------------------------/    */}
+
+      {/*  \-----------------------------------------------------------------------------------------------------------------------------/
+            \                 ╔════════════════════════════════ Protected Routes Start ═══════════════════════════╗                      /
+             \--------------------------------------------------------------------------------------------------------------------------/    */}
+     
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
       <Route path="/verify-otp"element={<PrivateOtpVerify><OtpVerification /></PrivateOtpVerify>}/>
       <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
       <Route path="/homeuser" element={<PrivateRoute element={<WorkCategory />} />} />
 
-      {/* Details Route */}
-      <Route path="/details" element={<Details />} />
+      {/* \---------------------------------------------------------------------------------------------------------------------------------/
+           \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
+            \-----------------------------------------------------------------------------------------------------------------------------/ */}
+
     </Routes>
   );
 }

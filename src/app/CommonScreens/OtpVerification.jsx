@@ -70,6 +70,7 @@ export default function OtpVerification() {
       const data = await res.json();
 
       if (res.ok) {
+        localStorage.setItem("otp", data.temp_otp);
         toast.success("OTP resent successfully!");
       } else {
         toast.error(data.message || "Failed to resend OTP");
