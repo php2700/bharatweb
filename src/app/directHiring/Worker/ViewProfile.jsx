@@ -13,11 +13,7 @@ export default function ViewProfile() {
   const navigate = useNavigate();
 
   // Fallback data with validation
-  const work = location.state?.work 
-  || location.state?.DirectHiring 
-  || location.state?.Bidding 
-  || location.state?.task 
-  || {
+  const work = location.state?.work || {
     id: 1,
     name: "Chair work",
     image: null,
@@ -25,7 +21,6 @@ export default function ViewProfile() {
     skills: "No details available.",
     location: "Indore M.P.",
   };
-
 
   const profile = location.state?.profile || {
     name: "Mohan Sharma",
@@ -71,7 +66,7 @@ export default function ViewProfile() {
           />
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
-              <div className="space-y-2 text-[#303030] text-lg font-bold">
+              <div className="space-y-2 text-[#303030] text-lg font-semibold">
                 <span>{work.name}</span>
                 <div>
                   Chhawani Usha Ganj

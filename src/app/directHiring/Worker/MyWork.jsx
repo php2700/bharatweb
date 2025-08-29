@@ -11,7 +11,7 @@ export default function MyWork() {
   const [activeTab, setActiveTab] = useState("My Hire");
   const navigate = useNavigate();
 
-  const DirectHiring = [
+  const work = [
     {
       id: 1,
       name: "Chair work",
@@ -134,20 +134,20 @@ export default function MyWork() {
         {/* Work Cards */}
         <div className="space-y-6 max-w-5xl justify-center mx-auto">
           {activeTab === "My Hire" &&
-            DirectHiring.map((DirectHiring) => (
+            work.map((work) => (
               <div
-                key={DirectHiring.id}
+                key={work.id}
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Left Image */}
                 <div className="relative w-1/3">
                   <img
-                    src={DirectHiring.image}
-                    alt={DirectHiring.name}
+                    src={work.image}
+                    alt={work.name}
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                    #{DirectHiring.id}2025
+                    #{work.id}2025
                   </span>
                 </div>
 
@@ -155,13 +155,11 @@ export default function MyWork() {
                 <div className="w-2/3 p-4 flex flex-col justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {DirectHiring.name}
+                      {work.name}
                     </h2>
-                    <p className="text-sm text-[#334247] mt-1">
-                      {DirectHiring.skills}
-                    </p>
+                    <p className="text-sm text-[#334247] mt-1">{work.skills}</p>
                     <p className="text-sm text-[#334247] mt-4 font-semibold">
-                      Posted Date: {DirectHiring.date}
+                      Posted Date: {work.date}
                     </p>
                   </div>
 
@@ -169,15 +167,13 @@ export default function MyWork() {
                   <div className="flex justify-between items-center w-full">
                     {/* Location */}
                     <span className="bg-[#F27773] text-white py-0 px-7 rounded-full">
-                      {DirectHiring.location}
+                      {work.location}
                     </span>
 
                     {/* View Profile Button */}
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
-                      onClick={() =>
-                        navigate("/view-profile", { state: { DirectHiring } })
-                      }
+                      onClick={() => navigate("/view-profile", { state: { work } })}
                     >
                       View Profile
                     </button>
@@ -197,7 +193,7 @@ export default function MyWork() {
           <img
             src={Gardening}
             alt="Gardening illustration"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
       </div>
