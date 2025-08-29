@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
+  console.log(selectedRoles);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -20,7 +21,7 @@ export default function WorkCategories() {
   // ✅ API Call
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("token"); // ya sessionStorage
+      const token = localStorage.getItem("bharat_token"); // ya sessionStorage
       const res = await fetch(`${BASE_URL}/work-category`, {
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +54,7 @@ export default function WorkCategories() {
     navigate("/subcategories", { state: { service } });
   };
 
-  const viewProfile = (item) => {
+  const viewProfile = () => {
     navigate("/details");
   };
 
@@ -65,9 +66,9 @@ export default function WorkCategories() {
     navigate("/service-provider-list");
   };
 
-  const hireWorker=(item)=>{
-    navigate('/direct-hiring')
-  }
+  const hireWorker = () => {
+    navigate('/direct-hiring');
+  };
   return (
     <>
       <Header />
@@ -290,7 +291,7 @@ export default function WorkCategories() {
               className="w-full h-[322px] sm:h-[383px] object-cover"
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300" onClick={() => navigate('/emergency/userPost')}>
                 Emergency
               </button>
             </div>

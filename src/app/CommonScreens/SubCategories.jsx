@@ -8,7 +8,7 @@ export default function OurSubCategories() {
   const location = useLocation();
   const { service } = location.state || {};
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("bharat_token");
 
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -68,7 +68,7 @@ export default function EditWorker() {
   useEffect(() => {
     const fetchWorker = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("bharat_token");
         const res = await fetch(`${BASE_URL}/worker/get/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });

@@ -50,8 +50,10 @@ import MyHire from "./app/directHiring/User/MyHire";
 import MyHireBidding from "./app/Bidding/User/MyHire";
 
 //Bidding
-import BiddingNewTask from "./app/Bidding/User/NewTask";
 import RecentPost from "./app/Bidding/Worker/RecentPost";
+//Bidding 
+import BiddingNewTask from "./app/Bidding/User/NewTask"
+import Post from "./app/emergency/User/Post";
 export default function App() {
   return (
     <Routes>
@@ -145,6 +147,11 @@ export default function App() {
       {/* \---------------------------------------------------------------------------------------------------------------------------------/
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
+
+
+   {/* // Emergency Routes */}
+   <Route path="/emergency/userpost" element={<Post />} />
+
     </Routes>
   );
 }

@@ -180,7 +180,7 @@ export default function Profile() {
         };
 
         // Get token from localStorage
-        const token = localStorage.getItem("token"); // <- यहाँ आपका token key
+        const token = localStorage.getItem("bharat_token"); // <- यहाँ आपका token key
 
         const response = await fetch(`${BASE_URL}/user/updateUserProfile`, {
           method: "POST",
