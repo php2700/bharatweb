@@ -36,7 +36,7 @@ import BankDetails from "./app/CommonScreens/BankDetails";
 import Dispute from "./app/directHiring/User/Dispute";
 import MyWork from "./app/directHiring/Worker/MyWork";
 import ViewProfile from "./app/directHiring/Worker/ViewProfile";
-import AssignWork from "./app/directHiring/Worker/AssignWork"
+import AssignWork from "./app/directHiring/Worker/AssignWork";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
@@ -47,19 +47,26 @@ import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 import MyHire from "./app/directHiring/User/MyHire";
+import MyHireBidding from "./app/Bidding/User/MyHire";
+import Worklist from "./app/emergency/Worker/Worklist";
 
-
+//Bidding
+import RecentPost from "./app/Bidding/Worker/RecentPost";
 //Bidding 
 import BiddingNewTask from "./app/Bidding/User/NewTask"
 import MyHireBidding from "./app/Bidding/User/MyHire";
 import BidderWorkDetail from "./app/Bidding/User/WorkDetail";
+import Post from "./app/emergency/User/Post";
+import OrderDetails from "./app/emergency/Worker/OrderDetail";
+import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
+import Tasklist from "./app/Bidding/Worker/Tasklist";
 export default function App() {
   return (
     <Routes>
       {/* \-------------------------------------------------------------------------------------------------------/
            \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
             \-------------------------------------------------------------------------------------------------- /  */}
-      
+
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/ourservices" element={<OurServices />} />
@@ -72,7 +79,10 @@ export default function App() {
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
 
       {/* Service Provider Routes */}
-      <Route path="/homeservice" element={<PrivateRoute element={<ServiceProviderHome />} />} />
+      <Route
+        path="/homeservice"
+        element={<PrivateRoute element={<ServiceProviderHome />} />}
+      />
       <Route path="/work-category" element={<WorkCategory />} />
       {/* comment */}
       {/* Financial Routes */}
@@ -92,24 +102,30 @@ export default function App() {
 
       {/* Direct Hiring Route */}
       <Route path="/service-provider-list" element={<ServiceProviderList />} />
-      <Route path='/service-provider-hire-detail' element={<ServiceProviderHireDetail />} />
-      <Route path='/direct-hiring' element={<DirectHiring />} />
-      <Route path='/dispute' element={<Dispute />} />
-      <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
-      <Route path="/mywork" element={<MyWork />}  />
-      <Route path="/view-profile" element={<ViewProfile />}  />
-      <Route path="/assign-work" element={<AssignWork />}  />
+      <Route
+        path="/service-provider-hire-detail"
+        element={<ServiceProviderHireDetail />}
+      />
+      <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path="/dispute" element={<Dispute />} />
+      <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
+      <Route path="/mywork" element={<MyWork />} />
+      <Route path="/view-profile" element={<ViewProfile />} />
+      <Route path="/assign-work" element={<AssignWork />} />
+      <Route path="/worker-detail" element={<WorkerDetail />} />
+      <Route path="/my-hire" element={<MyHire />} />
 
+      {/* Bidding Worker */}
+      <Route path="/bidding/task-list" element={<Tasklist />} />
+      <Route path="/bidding/recent-post" element={<RecentPost />} />
 
-      <Route path='/worker-detail' element={<WorkerDetail />} />
-      <Route path='/my-hire' element={<MyHire/>} />
-      
       <Route path="/details" element={<Details />} />
 
       {/* Bidding Route Of user */}
-      <Route path="/bidding/newtask" element={<BiddingNewTask/>}/>
-      <Route path="/bidding/myhire" element={<MyHireBidding/>}/>
-      <Route path="/bidding/workdetails" element={<BidderWorkDetail/>}/>
+      <Route path="/bidding/newtask" element={<BiddingNewTask />} />
+      <Route path="/bidding/myhire" element={<MyHireBidding />} />
+
+      
 
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
@@ -118,15 +134,37 @@ export default function App() {
       {/*  \-----------------------------------------------------------------------------------------------------------------------------/
             \                 ╔════════════════════════════════ Protected Routes Start ═══════════════════════════╗                      /
              \--------------------------------------------------------------------------------------------------------------------------/    */}
-     
+
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-      <Route path="/verify-otp"element={<PrivateOtpVerify><OtpVerification /></PrivateOtpVerify>}/>
-      <Route path="/select-role" element={<PrivateRoute element={<RoleSelection />} />} />
-      <Route path="/homeuser" element={<PrivateRoute element={<WorkCategory />} />} />
+      <Route
+        path="/verify-otp"
+        element={
+          <PrivateOtpVerify>
+            <OtpVerification />
+          </PrivateOtpVerify>
+        }
+      />
+      <Route
+        path="/select-role"
+        element={<PrivateRoute element={<RoleSelection />} />}
+      />
+      <Route
+        path="/homeuser"
+        element={<PrivateRoute element={<WorkCategory />} />}
+      />
 
       {/* \---------------------------------------------------------------------------------------------------------------------------------/
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
+
+
+   {/* // Emergency Routes- User */}
+   <Route path="/emergency/userpost" element={<Post />} />
+
+      {/* // Emergency Routes- Worker */}
+<Route path="/emergency/Work-list" element={<Worklist />} />
+<Route path="/emergency/order-detail" element={<OrderDetails />} />
+<Route path="/emergency/choose-worker" element={<ChooseWorker />} />
 
     </Routes>
   );

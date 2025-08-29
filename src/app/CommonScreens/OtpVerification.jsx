@@ -40,7 +40,7 @@ export default function OtpVerification() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("bharat_token", data.token);
         localStorage.setItem('role',data.role);
         localStorage.setItem('isProfileComplete',data.isProfileComplete);
         toast.success("OTP verified successfully!");

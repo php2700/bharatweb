@@ -7,11 +7,11 @@ import Gardening from "../../../assets/profile/profile image.png";
 import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 
-export default function MyWork() {
-  const [activeTab, setActiveTab] = useState("My Hire");
+export default function Tasklist() {
+  const [activeTab, setActiveTab] = useState("Bidding");
   const navigate = useNavigate();
 
-  const DirectHiring = [
+  const Bidding = [
     {
       id: 1,
       name: "Chair work",
@@ -131,23 +131,22 @@ export default function MyWork() {
           </div>
         </div>
 
-        {/* Work Cards */}
         <div className="space-y-6 max-w-5xl justify-center mx-auto">
-          {activeTab === "My Hire" &&
-            DirectHiring.map((DirectHiring) => (
+          {activeTab === "My Bidding" &&
+            Bidding.map((Bidding) => (
               <div
-                key={DirectHiring.id}
+                key={Bidding.id}
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Left Image */}
                 <div className="relative w-1/3">
                   <img
-                    src={DirectHiring.image}
-                    alt={DirectHiring.name}
+                    src={Bidding.image}
+                    alt={Bidding.name}
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                    #{DirectHiring.id}2025
+                    #{Bidding.id}2024
                   </span>
                 </div>
 
@@ -155,13 +154,13 @@ export default function MyWork() {
                 <div className="w-2/3 p-4 flex flex-col justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {DirectHiring.name}
+                      {Bidding.name}
                     </h2>
                     <p className="text-sm text-[#334247] mt-1">
-                      {DirectHiring.skills}
+                      {Bidding.skills}
                     </p>
                     <p className="text-sm text-[#334247] mt-4 font-semibold">
-                      Posted Date: {DirectHiring.date}
+                      Posted Date: {Bidding.date}
                     </p>
                   </div>
 
@@ -169,14 +168,14 @@ export default function MyWork() {
                   <div className="flex justify-between items-center w-full">
                     {/* Location */}
                     <span className="bg-[#F27773] text-white py-0 px-7 rounded-full">
-                      {DirectHiring.location}
+                      {Bidding.location}
                     </span>
 
                     {/* View Profile Button */}
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
-                        navigate("/view-profile", { state: { DirectHiring } })
+                        navigate("/view-profile", { state: { Bidding } })
                       }
                     >
                       View Profile

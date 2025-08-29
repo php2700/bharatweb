@@ -17,7 +17,7 @@ const handleServicecategoryClick = (service) => {
 
   const [services, setServices] = useState([]);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL; // apna base URL
-  const token = localStorage.getItem("token"); // ya sessionStorage.getItem("token");
+  const token = localStorage.getItem("bharat_token"); // ya sessionStorage.getItem("token");
 
   useEffect(() => {
     const fetchServices = async () => {
