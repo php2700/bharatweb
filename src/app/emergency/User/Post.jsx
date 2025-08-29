@@ -11,7 +11,7 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 import Select from "react-select";
-
+import paymentConfirmationImage from "../../../assets/paymentconfirmation.svg"
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
 
@@ -231,7 +231,6 @@ const Post = () => {
           },
         }
       );
-      console.log("API Response:", response.data); // Debug API response
       if (response.data.razorpay_order) {
         const { id, amount } = response.data.razorpay_order;
         setRazorpayOrder({ id, amount: amount / 100 }); // Convert paise to INR
@@ -256,13 +255,14 @@ const Post = () => {
   // Handle payment with Razorpay
   const initiatePayment = (razorpayOrderId, amount) => {
     const options = {
-      key: `${import.meta.env.RAZORPAY_KEY_ID}`, // Replace with your Razorpay Key ID
+      key: `${import.meta.env.VITE_RAZORPAY_KEY_ID}`, // Replace with your Razorpay Key ID
       amount: amount, // Amount in paise
       currency: "INR",
       name: "Your Company Name",
       description: "Emergency Task Platform Fee",
       order_id: razorpayOrderId,
       handler: async (response) => {
+// Debug Razorpay response
         try {
           const verifyData = {
             razorpay_order_id: response.razorpay_order_id,
@@ -280,7 +280,7 @@ const Post = () => {
             }
           );
           if (verifyResponse.status === 200) {
-            navigate("/success-route");
+            navigate("/emergency/Work-list");
           } else {
             setError("Payment verification failed");
           }
@@ -599,7 +599,7 @@ const Post = () => {
             <div className="flex justify-center mb-4">
               {/* Replace with actual illustration path */}
               <img
-                src="/path-to-card-phone-illustration.png"
+                src={paymentConfirmationImage}
                 alt="Payment"
                 className="w-32"
               />
