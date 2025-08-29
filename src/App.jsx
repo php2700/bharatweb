@@ -36,7 +36,7 @@ import BankDetails from "./app/CommonScreens/BankDetails";
 import Dispute from "./app/directHiring/User/Dispute";
 import MyWork from "./app/directHiring/Worker/MyWork";
 import ViewProfile from "./app/directHiring/Worker/ViewProfile";
-// import AssignWork from "./app/directHiring/Worker/AssignWork"
+import AssignWork from "./app/directHiring/Worker/AssignWork"
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
@@ -88,7 +88,7 @@ export default function App() {
       <Route path='/payment-confirmation' element={<PaymentConfirmation/>} />
       <Route path="/mywork" element={<MyWork />}  />
       <Route path="/view-profile" element={<ViewProfile />}  />
-      {/* <Route path="/assign-work" element={<AssignWork />}  /> */}
+      <Route path="/assign-work" element={<AssignWork />}  />
 
 
 
