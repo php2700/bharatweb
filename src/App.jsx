@@ -47,10 +47,12 @@ import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 import MyHire from "./app/directHiring/User/MyHire";
-import MyHireBidding from "./app/Bidding/User/MyHire";
+
 
 //Bidding 
 import BiddingNewTask from "./app/Bidding/User/NewTask"
+import MyHireBidding from "./app/Bidding/User/MyHire";
+import BidderWorkDetail from "./app/Bidding/User/WorkDetail";
 export default function App() {
   return (
     <Routes>
@@ -107,6 +109,7 @@ export default function App() {
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask/>}/>
       <Route path="/bidding/myhire" element={<MyHireBidding/>}/>
+      <Route path="/bidding/workdetails" element={<BidderWorkDetail/>}/>
 
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
