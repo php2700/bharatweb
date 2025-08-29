@@ -52,8 +52,10 @@ import Worklist from "./app/emergency/Worker/Worklist";
 
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
-//Bidding
-import BiddingNewTask from "./app/Bidding/User/NewTask";
+//Bidding 
+import BiddingNewTask from "./app/Bidding/User/NewTask"
+import MyHireBidding from "./app/Bidding/User/MyHire";
+import BidderWorkDetail from "./app/Bidding/User/WorkDetail";
 import Post from "./app/emergency/User/Post";
 import OrderDetails from "./app/emergency/Worker/OrderDetail";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
@@ -127,6 +129,7 @@ export default function App() {
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
+      <Route path="/bidding/workdetail" element={<BidderWorkDetail />} />
 
       
 
