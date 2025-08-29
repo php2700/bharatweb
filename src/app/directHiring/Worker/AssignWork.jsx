@@ -1,11 +1,12 @@
 import React from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom"; // Add useLocation import
+import { useNavigate, Link } from "react-router-dom"; // Changed <a> to <Link>
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/banner.png";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 
+// cardData.ts (you can place it in a `data` folder or same file)
 export const cardData = [
   {
     id: 1,
@@ -67,27 +68,23 @@ export const cardData = [
 
 export default function AssignWork() {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Retrieve work data from location.state
-  const work = location.state?.work || {
-    id: 1,
-    name: "Chair work",
-    image: null,
-    date: "21/02/25",
-    skills: "No details available.",
-    location: "Indore M.P.",
-  };
 
   const handleAddWorker = (worker) => {
-  navigate("/view-profile", {
-    state: {
-      work,                // keep work data
-      assignedWorker: worker, // only forward assigned worker
-    },
-  });
-};
-
+    navigate("/view-profile", {
+      state: {
+        work: {
+          id: 1,
+          name: "Chair work",
+          image: null,
+          date: "21/02/25",
+          skills: "No details available.",
+          location: "Indore M.P.",
+        },
+        profile: worker, // Pass the worker as the profile
+        assignedWorker: worker, // Explicitly set assignedWorker
+      },
+    });
+  };
 
   return (
     <>
@@ -97,7 +94,6 @@ export default function AssignWork() {
       <div className="container mx-auto px-4 py-4">
         <Link
           to="/view-profile"
-          state={{ work }} // Pass work data back to ViewProfile
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
@@ -110,7 +106,6 @@ export default function AssignWork() {
         {/* Cards Section */}
         <div className="bg-white w-full max-w-6xl shadow-2xl rounded-lg p-8">
           <h1 className="text-3xl font-bold ml-40">Worker List</h1>
-
           <div className="flex flex-col items-center space-y-6 mt-3">
             {cardData.map((card) => (
               <div
@@ -124,6 +119,8 @@ export default function AssignWork() {
                     alt={card.name}
                     className="w-52 h-52 object-cover rounded-lg"
                   />
+
+                  {/* Verified Badge */}
                   {card.verified && (
                     <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#6DEA6D] text-white text-sm font-semibold px-5 py-2 rounded-full shadow-md whitespace-nowrap">
                       Verified by Admin
@@ -142,7 +139,7 @@ export default function AssignWork() {
                 {/* Button */}
                 <button
                   onClick={() => handleAddWorker(card)}
-                  className="bg-[#228B22] text-white px-7 py-2 rounded-lg hover:bg-green-700"
+                  className="bg-[#228B22] text-white px-5 py-2 rounded-lg hover:bg-green-700"
                 >
                   {card.buttonText}
                 </button>
