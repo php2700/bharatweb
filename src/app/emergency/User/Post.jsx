@@ -280,7 +280,7 @@ const Post = () => {
             }
           );
           if (verifyResponse.status === 200) {
-            navigate("/emergency/Work-list");
+            navigate("/emergency/user/work-list");
           } else {
             setError("Payment verification failed");
           }
@@ -343,7 +343,8 @@ const Post = () => {
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-4 hover:underline"
         >
-          ← Back
+				<img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
+           Back
         </button>
 
         <div className="bg-white rounded-2xl shadow p-6">

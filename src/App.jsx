@@ -47,8 +47,8 @@ import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 import MyHire from "./app/directHiring/User/MyHire";
-import Worklist from "./app/emergency/Worker/Worklist";
-
+import WorkerWorklist from "./app/emergency/Worker/Worklist";
+import UserWorklist from "./app/emergency/User/Worklist";
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
 //Bidding 
@@ -164,7 +164,8 @@ export default function App() {
       <Route path="/emergency/userpost" element={<Post />} />
 
       {/* // Emergency Routes- Worker */}
-      <Route path="/emergency/Work-list" element={<Worklist />} />
+      <Route path="/emergency/user/work-list" element={<UserWorklist />} />
+      <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
       <Route path="/emergency/order-detail" element={<OrderDetails />} />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
 
