@@ -62,7 +62,7 @@ export default function WorkerDetail() {
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
+          <button className="text-[#228B22] text-sm hover:underline">
             &lt; Back
           </button>
         </div>
@@ -98,7 +98,7 @@ export default function WorkerDetail() {
 
             <h3 className="text-lg font-semibold">Work Title</h3>
 
-            <div className="border border-green-400 rounded-lg p-4 text-sm text-gray-700 space-y-3">
+            <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>
                 Lorem Ipsum is simply dummy text of the printing and typesetting
                 industry. Lorem Ipsum has been the industry's standard dummy
@@ -118,7 +118,7 @@ export default function WorkerDetail() {
 
             {/* default ui we show */}
 
-            <div className="flex items-center justify-between border border-green-400 rounded-lg py-4 px-6">
+            <div className="flex items-center justify-between border border-[#228B22] rounded-lg py-4 px-6">
               <div className="flex items-center gap-4">
                 <img
                   src={image}
@@ -130,14 +130,14 @@ export default function WorkerDetail() {
                   <p className="text-sm text-gray-600">
                     Project Fees - <span className="font-medium">₹200/-</span>
                   </p>
-                  <button className="bg-green-600 text-white px-6 py-1 rounded-lg text-sm mt-2">
+                  <button className="bg-[#228B22] text-white px-6 py-1 rounded-lg text-sm mt-2">
                     View Profile
                   </button>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3">
-                <button className="bg-green-200 text-green-800 px-6 py-2 rounded-lg font-medium">
+              <div className="flex  flex-col gap-3">
+                <button className="bg-green-200 text-green-800 px-2 md:px-6 py-2 rounded-lg font-medium">
                   Offer Sent
                 </button>
                 <button className="bg-red-500 text-white px-6 py-2 rounded-lg font-medium">
@@ -152,7 +152,7 @@ export default function WorkerDetail() {
         </div>
 
         {/* filter data getting  */}
-        {/* <FilterWorker /> */}
+        <FilterWorker />
 
         <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
           <img

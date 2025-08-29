@@ -1,4 +1,56 @@
+import filterIcon from "../../../assets/directHiring/filter-square.png";
+import { SearchIcon } from "lucide-react";
+import image from "../../../assets/workcategory/image.png";
+import ratingImg from "../../../assets/rating/ic_round-star.png";
+
+
 export default function FilterWorker(){
+  const workers = [
+      {
+        id: 1,
+        name: "Dipak Sharma",
+        location: "Indore MP",
+        status: "Add Feature",
+        image: image,
+        amount: "200",
+        rating: 4.5,
+        skills:
+          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime",
+      },
+      {
+        id: 2,
+        name: "Dipak Sharma",
+        location: "Indore MP",
+        status: "Add Feature",
+        image: image,
+        amount: "200",
+        rating: 4.5,
+        skills:
+          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+      },
+      {
+        id: 3,
+        name: "Dipak Sharma",
+        location: "Indore MP",
+        status: "Add Feature",
+        image: image,
+        amount: "200",
+        rating: 4.5,
+        skills:
+          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+      },
+      {
+        id: 4,
+        name: "Dipak Sharma",
+        location: "Indore MP",
+        status: "Add Feature",
+        image: image,
+        amount: "200",
+        rating: 4.5,
+        skills:
+          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+      },
+    ];
     return (
         <>
           <div className="max-w-4xl  container mx-auto p-10">
