@@ -51,9 +51,12 @@ import MyHireBidding from "./app/Bidding/User/MyHire";
 
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
-//Bidding 
-import BiddingNewTask from "./app/Bidding/User/NewTask"
+//Bidding
+import BiddingNewTask from "./app/Bidding/User/NewTask";
 import Post from "./app/emergency/User/Post";
+import Bid from "./app/Bidding/Worker/Bid";
+import EditBid from "./app/Bidding/Worker/EditBid";
+
 export default function App() {
   return (
     <Routes>
@@ -111,6 +114,8 @@ export default function App() {
 
       {/* Bidding Worker */}
       <Route path="/bidding/recent-post" element={<RecentPost />} />
+      <Route path="/bidding/bid" element={<Bid />} />
+      <Route path="/bidding/edit-bid" element={<EditBid />} />
 
       <Route path="/details" element={<Details />} />
 
@@ -148,10 +153,8 @@ export default function App() {
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
 
-
-   {/* // Emergency Routes */}
-   <Route path="/emergency/userpost" element={<Post />} />
-
+      {/* // Emergency Routes */}
+      <Route path="/emergency/userpost" element={<Post />} />
     </Routes>
   );
 }
