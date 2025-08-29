@@ -48,12 +48,16 @@ import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 import MyHire from "./app/directHiring/User/MyHire";
 import MyHireBidding from "./app/Bidding/User/MyHire";
+import Worklist from "./app/emergency/Worker/Worklist";
 
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
 //Bidding 
 import BiddingNewTask from "./app/Bidding/User/NewTask"
 import Post from "./app/emergency/User/Post";
+import OrderDetails from "./app/emergency/Worker/OrderDetail";
+import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
+import Tasklist from "./app/Bidding/Worker/Tasklist";
 export default function App() {
   return (
     <Routes>
@@ -110,6 +114,7 @@ export default function App() {
       <Route path="/my-hire" element={<MyHire />} />
 
       {/* Bidding Worker */}
+      <Route path="/bidding/task-list" element={<Tasklist />} />
       <Route path="/bidding/recent-post" element={<RecentPost />} />
 
       <Route path="/details" element={<Details />} />
@@ -117,6 +122,8 @@ export default function App() {
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
+
+      
 
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
@@ -149,8 +156,13 @@ export default function App() {
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
 
 
-   {/* // Emergency Routes */}
+   {/* // Emergency Routes- User */}
    <Route path="/emergency/userpost" element={<Post />} />
+
+      {/* // Emergency Routes- Worker */}
+<Route path="/emergency/Work-list" element={<Worklist />} />
+<Route path="/emergency/order-detail" element={<OrderDetails />} />
+<Route path="/emergency/choose-worker" element={<ChooseWorker />} />
 
     </Routes>
   );

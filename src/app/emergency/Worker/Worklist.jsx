@@ -7,16 +7,18 @@ import Gardening from "../../../assets/profile/profile image.png";
 import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 
-export default function MyWork() {
-  const [activeTab, setActiveTab] = useState("My Hire");
+export default function Worklist() {
+  const [activeTab, setActiveTab] = useState("Emergency Tasks");
   const navigate = useNavigate();
 
-  const DirectHiring = [
+  const Emergency = [
     {
       id: 1,
       name: "Chair work",
       image: Work,
       date: "21/02/25",
+      completiondate: "21/2/2",
+      price: "₹1,500",
       skills:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting",
       location: "Indore M.P.",
@@ -26,6 +28,8 @@ export default function MyWork() {
       name: "Chair work",
       image: Work,
       date: "21/02/25",
+      completiondate: "21/2/2",
+      price: "₹1,500",
       skills:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting",
       location: "Indore M.P.",
@@ -35,6 +39,8 @@ export default function MyWork() {
       name: "Chair work",
       image: Work,
       date: "21/02/25",
+      completiondate: "21/2/2",
+      price: "₹1,500",
       skills:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting",
       location: "Indore M.P.",
@@ -44,6 +50,8 @@ export default function MyWork() {
       name: "Chair work",
       image: Work,
       date: "21/02/25",
+      completiondate: "21/2/2",
+      price: "₹1,500",
       skills:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting",
       location: "Indore M.P.",
@@ -131,52 +139,62 @@ export default function MyWork() {
           </div>
         </div>
 
-        {/* Work Cards */}
         <div className="space-y-6 max-w-5xl justify-center mx-auto">
-          {activeTab === "My Hire" &&
-            DirectHiring.map((DirectHiring) => (
+          {activeTab === "Emergency Tasks" &&
+            Emergency.map((task) => (
               <div
-                key={DirectHiring.id}
+                key={task.id}
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
               >
-                {/* Left Image */}
+                {/* Left Image Section */}
                 <div className="relative w-1/3">
                   <img
-                    src={DirectHiring.image}
-                    alt={DirectHiring.name}
+                    src={task.image}
+                    alt={task.name}
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                    #{DirectHiring.id}2025
+                    #{task.id}2323
                   </span>
                 </div>
 
-                {/* Right Content */}
+                {/* Right Content Section */}
                 <div className="w-2/3 p-4 flex flex-col justify-between">
-                  <div>
+                  {/* Top: Title + Dates */}
+                  <div className="flex justify-between items-start">
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {DirectHiring.name}
+                      {task.name}
                     </h2>
-                    <p className="text-sm text-[#334247] mt-1">
-                      {DirectHiring.skills}
-                    </p>
-                    <p className="text-sm text-[#334247] mt-4 font-semibold">
-                      Posted Date: {DirectHiring.date}
+                    <p className="text-sm text-[#334247] font-semibold">
+                      Posted Date: {task.date}
                     </p>
                   </div>
 
-                  {/* Footer Section */}
-                  <div className="flex justify-between items-center w-full">
-                    {/* Location */}
-                    <span className="bg-[#F27773] text-white py-0 px-7 rounded-full">
-                      {DirectHiring.location}
+                  {/* Description */}
+                  <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
+
+                  {/* Price + Completion Date */}
+                  <div className="mt-3">
+                    <p className="text-green-600 font-bold">{task.price}</p>
+                    <p className="text-sm text-[#334247] mt-1 font-semibold">
+                      Completion Date: {task.completiondate}
+                    </p>
+                  </div>
+
+                  {/* Bottom: Location + View Profile Button */}
+                  <div className="flex justify-between items-center mt-4">
+                    {/* Location Tag */}
+                    <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
+                      {task.location}
                     </span>
 
-                    {/* View Profile Button */}
+                    {/* View Profile */}
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
-                        navigate("/view-profile", { state: { DirectHiring } })
+                        navigate("/emergency/order-detail", {
+                          state: { work: task },
+                        })
                       }
                     >
                       View Profile
