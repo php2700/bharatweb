@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
-  console.log(selectedRoles);
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);

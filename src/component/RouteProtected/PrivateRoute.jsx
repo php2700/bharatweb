@@ -42,6 +42,7 @@ const PrivateRoute = ({ element: Component }) => {
     }
     return <Navigate to="/homeuser" replace />;
   }
+ 
 
   // Agar sab sahi hai toh component render karo
   return <>{Component}</>;
