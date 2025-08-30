@@ -9,8 +9,9 @@ const PrivateRoute = ({ element: Component }) => {
 
   // 1. Token nahi hai toh login
   if (!token) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
+  
 
   // 2. Role null hai → selectrole
   if (!role || role === "null") {

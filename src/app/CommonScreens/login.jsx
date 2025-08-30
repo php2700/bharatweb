@@ -175,13 +175,16 @@ const permissionGranted = await requestNotificationPermission();
                   />
                 </div>
 
-                <button
+           <button
   type="submit"
-  className="w-[280px] sm:w-[320px] md:w-[330px] lg:w-[390px] bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-2xl text-[16px] sm:text-[18px] md:text-[19px]"
-  disabled={loading} // optional: double click na ho
+  className={`w-[280px] sm:w-[320px] md:w-[330px] lg:w-[390px] 
+              ${loading ? "bg-[#228B22] cursor-not-allowed" : "bg-[#228B22] hover:bg-green-700"} 
+              text-white font-semibold py-3 rounded-2xl text-[16px] sm:text-[18px] md:text-[19px]`}
+  disabled={loading} // ✅ Button disable jab loading true ho
 >
   {loading ? "Please wait..." : "Send OTP"}
 </button>
+
 
               </form>
             </div>
