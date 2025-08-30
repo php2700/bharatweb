@@ -53,10 +53,10 @@ export default function Worklist() {
           price: task.service_payment?.amount
             ? `₹${task.service_payment.amount}`
             : "Price TBD",
-          completiondate: t.deadline
-            ? new Date(t.deadline).toLocaleDateString()
+          completiondate: task.deadline
+            ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
-          location: t.google_address || "Unknown Location",
+          location: task.google_address || "Unknown Location",
         }));
 
         setTaskData(mappedTasks);

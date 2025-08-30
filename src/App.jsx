@@ -75,6 +75,7 @@ import WorkerWorklist from "./app/emergency/Worker/Worklist";
 import UserWorklist from "./app/emergency/User/Worklist";
 import Post from "./app/emergency/User/Post";
 import EmergencyOrderDetails from "./app/emergency/User/OrderDetail";
+import EmergencyWorkerOrderDetails from "./app/emergency/Worker/OrderDetail";
 
 export default function App() {
   return (
@@ -190,7 +191,7 @@ export default function App() {
 
       {/* // Emergency Routes- Worker */}
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
-      <Route path="/emergency/order-detail" element={<OrderDetails />} />
+      <Route path="/emergency/worker/order-detail/:id" element={<EmergencyWorkerOrderDetails />} />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
       <Route path="/emergency/tasks" element={<EmergencyTasks />} />
 
