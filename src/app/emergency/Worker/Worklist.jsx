@@ -193,7 +193,7 @@ export default function Worklist() {
                       <button
                         className="text-[#228B22] py-2 px-5 border border-[#228B22] rounded-lg text-sm" // Smaller button
                         onClick={() =>
-                          navigate(`/emergency/worker/order-detail/${task.id}`)
+                          navigate(`/emergency/worker/${task.id}`)
                         }
                       >
                         View Details
