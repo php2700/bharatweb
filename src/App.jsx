@@ -37,6 +37,7 @@ import Dispute from "./app/directHiring/User/Dispute";
 import MyWork from "./app/directHiring/Worker/MyWork";
 import ViewProfile from "./app/directHiring/Worker/ViewProfile";
 import AssignWork from "./app/directHiring/Worker/AssignWork";
+import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 
 // Route Protection Components
 import PrivateRoute from "./component/RouteProtected/PrivateRoute";
@@ -45,17 +46,21 @@ import ServiceProviderList from "./app/directHiring/User/ServiceProviderList";
 import ServiceProviderHireDetail from "./app/directHiring/User/ServiceProviderHireDetail";
 import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
-import WorkerDetail from "./app/directHiring/User/WorkerDetail";
+
 import MyHire from "./app/directHiring/User/MyHire";
-import MyHireBidding from "./app/Bidding/User/MyHire";
+
 import Worklist from "./app/emergency/Worker/Worklist";
 
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
-//Bidding 
+//Bidding User
 import BiddingNewTask from "./app/Bidding/User/NewTask"
+import BiddingWorkerDetail from './app/Bidding/User/WorkDetail';
 import MyHireBidding from "./app/Bidding/User/MyHire";
-import BidderWorkDetail from "./app/Bidding/User/WorkDetail";
+import HireDetail from "./app/Bidding/User/HireDetail";
+import BiddingDispute from "./app/Bidding/User/dispute";
+
+
 import Post from "./app/emergency/User/Post";
 import OrderDetails from "./app/emergency/Worker/OrderDetail";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
@@ -114,16 +119,20 @@ export default function App() {
       <Route path="/assign-work" element={<AssignWork />} />
       <Route path="/worker-detail" element={<WorkerDetail />} />
       <Route path="/my-hire" element={<MyHire />} />
+      <Route path="/directhiring/workdetail" element={<WorkerDetail />} />
 
       {/* Bidding Worker */}
       <Route path="/bidding/task-list" element={<Tasklist />} />
       <Route path="/bidding/recent-post" element={<RecentPost />} />
-
       <Route path="/details" element={<Details />} />
 
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
+      
+      <Route path="/bidding/hiredetail" element={<HireDetail />} />
+      <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
+      <Route path="/bidding/dispute" element={<BiddingDispute />} />
 
       
 

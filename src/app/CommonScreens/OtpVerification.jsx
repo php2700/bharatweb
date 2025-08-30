@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
+import { useDispatch } from "react-redux";
+import { setUserProfile } from "../../redux/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import banner from '../../assets/banner.png';
@@ -8,8 +10,9 @@ import image from '../../assets/login/img.png';
 import logo from "../../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
+
 export default function OtpVerification() {
-  
+  const dispatch = useDispatch();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
@@ -44,8 +47,17 @@ export default function OtpVerification() {
         localStorage.setItem('role',data.role);
         localStorage.setItem('isProfileComplete',data.isProfileComplete);
         toast.success("OTP verified successfully!");
-        localStorage.removeItem("mobileNumber");
+        const profileRes = await fetch("https://api.thebharatworks.com/api/user/getUserProfileData", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
 
+    const profileData = await profileRes.json();
+    if (profileRes.ok) {
+      dispatch(setUserProfile(profileData));
+    }
+        localStorage.removeItem("mobileNumber");
+         
         setTimeout(() => {
           navigate("/select-role");
         }, 2000);
