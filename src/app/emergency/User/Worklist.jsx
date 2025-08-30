@@ -30,11 +30,12 @@ export default function Worklist() {
             },
           }
         );
-        console.log("Fetched Emergency Tasks:", response.data); // Debug fetched data
+        
 
         // Map API response to the expected structure
         const mappedTasks = response.data.data.map((task) => ({
-          id: task.project_id,
+          id: task._id,
+          project_id: task.project_id,
           image: task.image_urls?.[0] || Work, // Use first image or fallback
           name: task.category_id?.name || "Unnamed Task",
           date: new Date(task.createdAt).toLocaleDateString(), // Format date
@@ -163,7 +164,7 @@ export default function Worklist() {
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                    {task.id}
+                    {task.project_id}
                   </span>
                 </div>
 
@@ -191,12 +192,10 @@ export default function Worklist() {
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
-                        navigate("/emergency/order-detail", {
-                          state: { work: task },
-                        })
+                        navigate(`/emergency/order-detail/${task.id}`)
                       }
                     >
-                      View Profile
+                      View Details
                     </button>
                   </div>
                 </div>
