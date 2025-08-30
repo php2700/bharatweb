@@ -1,3 +1,4 @@
+// ViewProfile.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
@@ -8,7 +9,7 @@ import Gardening from "../../../assets/profile/profile image.png";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Accepted from "../../directHiring/User/Accepted";
+import Accepted from "./Accepted";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ViewProfile() {
@@ -41,22 +42,24 @@ export default function ViewProfile() {
               Authorization: `Bearer ${token}`,
             },
           }),
-          axios.get(
-            `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
+          orderData?.hire_status === "pending"
+            ? axios.get(
+                `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              )
+            : { data: { providers: [] } }, // Skip provider fetch if not pending
         ]);
         console.log("Order Response:", orderResponse.data);
         console.log("Providers Response:", providersResponse.data);
         setAssignedWorker(orderResponse.data.assignedWorker || null);
         setOrderData(orderResponse.data.data);
         setServiceProviders(providersResponse.data.providers || []);
-        setIsHired(!!orderData?.service_provider_id);
+        setIsHired(!!orderResponse.data.data?.service_provider_id);
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
         console.error("Error:", err);
@@ -66,27 +69,42 @@ export default function ViewProfile() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, orderData?.hire_status]);
 
   const handleHire = async (providerId) => {
-    const response = await axios.post(
-      `${BASE_URL}/emergency-order/assignEmergencyOrder/${id}`,
-      {
-        service_provider_id: providerId,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/assignEmergencyOrder/${id}`,
+        {
+          service_provider_id: providerId,
         },
-      }
-    );
-    console.log("Hire Response:", response.data);
-    setIsHired(true);
-    setServiceProviders([]);
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+        }
+      );
+      console.log("Hire Response:", response.data);
+      setIsHired(true);
+      setServiceProviders([]);
+      // Refresh order data after hiring
+      const orderResponse = await axios.get(
+        `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+        }
+      );
+      setOrderData(orderResponse.data.data);
+      setAssignedWorker(orderResponse.data.assignedWorker || null);
+    } catch (err) {
+      setError("Failed to hire provider. Please try again later.");
+      console.error("Error:", err);
+    }
   };
-
-  const service_provider = orderData?.service_provider_id;
 
   const handleConfirmCancel = async () => {
     setShowModal(false);
@@ -242,44 +260,17 @@ export default function ViewProfile() {
                 Cancel Task
               </button>
             </div>
-            {service_provider && (
-              <div className="mt-6 bg-gray-100 p-4 rounded-lg">
-                <h2 className="text-lg font-bold mb-2">Service Provider</h2>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={service_provider.profile_pic || Profile}
-                    alt={`Profile of ${service_provider.full_name || "Worker"}`}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="text-lg font-semibold">
-                      {service_provider.full_name || "Unknown Worker"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {assignedWorker && (
-              <div className="mt-6 bg-gray-100 p-4 rounded-lg">
-                <h2 className="text-lg font-bold mb-2">Assigned Worker</h2>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={assignedWorker.image || Profile}
-                    alt={`Profile of ${assignedWorker.name || "Worker"}`}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="text-lg font-semibold">
-                      {assignedWorker.name || "Unknown Worker"}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Render Accepted component when hire_status is assigned */}
+            {orderData?.hire_status === "assigned" && (
+              <Accepted
+                serviceProvider={orderData?.service_provider_id}
+                assignedWorker={assignedWorker}
+                paymentHistory={orderData?.service_payment?.payment_history}
+              />
             )}
           </div>
         </div>
-        <Accepted />
       </div>
 
       {!isHired && (
