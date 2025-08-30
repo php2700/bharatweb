@@ -1,21 +1,26 @@
 import React, { useState } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import Header from "../../../component/Header";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DirectHiring = () => {
   const navigate = useNavigate();
+  const { workerId } = useParams();
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [images, setImages] = useState([]);
+  const [error, setError] = useState();
 
   const handleImageUpload = (e) => {
     if (!e.target.files) return;
     const selectedFiles = Array.from(e.target.files);
 
     if (images.length + selectedFiles.length > 5) {
-      alert("You can only upload up to 5 images.");
+      setError("You can only upload up to 5 images.");
       return;
     }
     setImages((prev) => [...prev, ...selectedFiles]);
@@ -25,10 +30,49 @@ const DirectHiring = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log({ title, address, deadline, images });
-    alert("Form submitted ✅");
+  const validate = () => {
+    const errors = {};
+    if (!title) {
+      errors["title"] = "title is required";
+    }
+    if (!address) {
+      errors["address"] = "address is required";
+    }
+    if (!description) {
+      errors["description"] = "description is required";
+    }
+    if (!deadline) {
+      errors["deadline"] = "deadline is required";
+    }
+    if (!images?.length) {
+      errors["images"] = "images is required";
+    }
+
+    return Object.keys(errors)?.length == 0;
+  };
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      if (!validate()) {
+        setError("Please fill in all required fields.");
+        return;
+      }
+      if (!workerId) throw new Error("something went wrong");
+
+      const formData = new FormData();
+      formData.append("first_provider_id", workerId);
+      formData.append("title", title);
+      formData.append("address", address);
+      formData.append("description", description);
+      formData.append("deadline", deadline);
+      formData.append("image", images);
+
+      const res = await axios.post(`${BASE_URL}/direct-order/create`, formData);
+      console.log(res);
+    } catch (error) {
+      setError(`error`);
+    }
   };
 
   const handleBack = () => {
@@ -56,8 +100,8 @@ const DirectHiring = () => {
           <h2 className="text-center text-3xl font-bold text-gray-800 mb-8">
             Direct hiring
           </h2>
+          {error && <p className="text-red-500 text-center">{error}</p>}
 
-          {/* Title */}
           <label className="block">
             <span className="text-sm font-medium text-gray-600">Title</span>
             <input
@@ -87,8 +131,9 @@ const DirectHiring = () => {
             </span>
             <textarea
               rows={4}
-              value="Lorem Ipsum is simply dummy text of the printing and typesetting industry..."
-              disabled
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-base"
             />
           </label>

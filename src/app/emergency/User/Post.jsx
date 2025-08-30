@@ -11,7 +11,7 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 import Select from "react-select";
-
+import paymentConfirmationImage from "../../../assets/paymentconfirmation.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
 
@@ -231,7 +231,6 @@ const Post = () => {
           },
         }
       );
-      console.log("API Response:", response.data); // Debug API response
       if (response.data.razorpay_order) {
         const { id, amount } = response.data.razorpay_order;
         setRazorpayOrder({ id, amount: amount / 100 }); // Convert paise to INR
@@ -240,7 +239,9 @@ const Post = () => {
         setError("No Razorpay order found in response");
       }
     } catch (err) {
-      setError("Failed to submit task: " + (err.response?.data?.message || err.message));
+      setError(
+        "Failed to submit task: " + (err.response?.data?.message || err.message)
+      );
       console.error("Submission Error:", err);
     }
   };
@@ -256,13 +257,14 @@ const Post = () => {
   // Handle payment with Razorpay
   const initiatePayment = (razorpayOrderId, amount) => {
     const options = {
-      key: `${import.meta.env.RAZORPAY_KEY_ID}`, // Replace with your Razorpay Key ID
+      key: `${import.meta.env.VITE_RAZORPAY_KEY_ID}`, // Replace with your Razorpay Key ID
       amount: amount, // Amount in paise
       currency: "INR",
       name: "Your Company Name",
       description: "Emergency Task Platform Fee",
       order_id: razorpayOrderId,
       handler: async (response) => {
+        // Debug Razorpay response
         try {
           const verifyData = {
             razorpay_order_id: response.razorpay_order_id,
@@ -280,7 +282,7 @@ const Post = () => {
             }
           );
           if (verifyResponse.status === 200) {
-            navigate("/success-route");
+            navigate(`/user/work-list/Emergency Tasks`);
           } else {
             setError("Payment verification failed");
           }
@@ -299,7 +301,9 @@ const Post = () => {
 
     const rzp = new window.Razorpay(options);
     rzp.on("payment.failed", (response) => {
-      setError("Payment failed. Please try again: " + response.error.description);
+      setError(
+        "Payment failed. Please try again: " + response.error.description
+      );
       console.error(response.error);
     });
     rzp.open();
@@ -343,7 +347,8 @@ const Post = () => {
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-4 hover:underline"
         >
-          ← Back
+          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
+          Back
         </button>
 
         <div className="bg-white rounded-2xl shadow p-6">
@@ -357,12 +362,16 @@ const Post = () => {
           <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Work Category */}
             <div>
-              <label className="block text-sm mb-1 font-bold">Work Category</label>
+              <label className="block text-sm mb-1 font-bold">
+                Work Category
+              </label>
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
                 className={`w-full border ${
-                  validationErrors.category_id ? "border-red-500" : "border-green-500"
+                  validationErrors.category_id
+                    ? "border-red-500"
+                    : "border-green-500"
                 } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
               >
                 <option value="">Select category</option>
@@ -373,13 +382,17 @@ const Post = () => {
                 ))}
               </select>
               {validationErrors.category_id && (
-                <p className="text-red-500 text-sm">{validationErrors.category_id}</p>
+                <p className="text-red-500 text-sm">
+                  {validationErrors.category_id}
+                </p>
               )}
             </div>
 
             {/* SubCategories */}
             <div>
-              <label className="block text-sm mb-1 font-bold">SubCategories</label>
+              <label className="block text-sm mb-1 font-bold">
+                SubCategories
+              </label>
               <Select
                 isMulti
                 options={subcategoryOptions}
@@ -503,11 +516,15 @@ const Post = () => {
                 onChange={handleInputChange}
                 placeholder="0123456789"
                 className={`w-full border ${
-                  validationErrors.contact ? "border-red-500" : "border-green-500"
+                  validationErrors.contact
+                    ? "border-red-500"
+                    : "border-green-500"
                 } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
               />
               {validationErrors.contact && (
-                <p className="text-red-500 text-sm">{validationErrors.contact}</p>
+                <p className="text-red-500 text-sm">
+                  {validationErrors.contact}
+                </p>
               )}
             </div>
 
@@ -528,7 +545,9 @@ const Post = () => {
                 } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
               />
               {validationErrors.deadline && (
-                <p className="text-red-500 text-sm">{validationErrors.deadline}</p>
+                <p className="text-red-500 text-sm">
+                  {validationErrors.deadline}
+                </p>
               )}
             </div>
 
@@ -543,11 +562,15 @@ const Post = () => {
                 accept="image/*"
                 onChange={handleFileChange}
                 className={`w-full border ${
-                  validationErrors.images ? "border-red-500" : "border-green-500"
+                  validationErrors.images
+                    ? "border-red-500"
+                    : "border-green-500"
                 } rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500`}
               />
               {validationErrors.images && (
-                <p className="text-red-500 text-sm">{validationErrors.images}</p>
+                <p className="text-red-500 text-sm">
+                  {validationErrors.images}
+                </p>
               )}
               {formData.images.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -599,7 +622,7 @@ const Post = () => {
             <div className="flex justify-center mb-4">
               {/* Replace with actual illustration path */}
               <img
-                src="/path-to-card-phone-illustration.png"
+                src={paymentConfirmationImage}
                 alt="Payment"
                 className="w-32"
               />

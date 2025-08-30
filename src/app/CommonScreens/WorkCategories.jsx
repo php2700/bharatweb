@@ -66,8 +66,8 @@ export default function WorkCategories() {
     navigate("/service-provider-list");
   };
 
-  const hireWorker = () => {
-    navigate('/direct-hiring');
+  const hireWorker = (workerDetail) => {
+    navigate(`/direct-hiring/${workerDetail?._id}`);
   };
 
 
@@ -77,6 +77,10 @@ export default function WorkCategories() {
 
   const handleBidding=()=>{
     navigate('/bidding/myhire')
+  }
+
+  const postEmergencyWork=()=>{
+    navigate('/emergency/userpost')
   }
 
   
@@ -251,7 +255,7 @@ export default function WorkCategories() {
                 Lorem Ipsum is simply dummy text of the printing and <br />
                 typesetting industry. Lorem Ipsum has been the industry's...
               </p>
-              <button onClick={postWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <button onClick={postEmergencyWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
                 Post Work
               </button>
             </div>
