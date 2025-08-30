@@ -29,6 +29,7 @@ export default function Worklist() {
     const fetchTasks = async () => {
       try {
         setLoading(true);
+<<<<<<< HEAD
 
         const endpoints = {
           "Emergency Tasks": `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
@@ -59,6 +60,31 @@ export default function Worklist() {
             "No skills listed",
           price: t.service_payment?.amount
             ? `₹${t.service_payment.amount}`
+=======
+        const response = await axios.get(
+          `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        
+
+        // Map API response to the expected structure
+        const mappedTasks = response.data.data.map((task) => ({
+          id: task._id,
+          project_id: task.project_id,
+          image: task.image_urls?.[0] || Work, // Use first image or fallback
+          name: task.category_id?.name || "Unnamed Task",
+          date: new Date(task.createdAt).toLocaleDateString(), // Format date
+          skills: task.sub_category_ids
+            ?.map((sub) => sub.name)
+            .join(", ") || "No skills listed",
+          price: task.service_payment?.amount
+            ? `₹${task.service_payment.amount}`
+>>>>>>> b794c34d7f8e38766ab49747b3c32f5299f988d9
             : "Price TBD",
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()
@@ -179,7 +205,7 @@ export default function Worklist() {
                     className="h-full w-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                    {task.id}
+                    {task.project_id}
                   </span>
                 </div>
 
@@ -207,12 +233,10 @@ export default function Worklist() {
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
-                        navigate("/emergency/order-detail", {
-                          state: { work: task },
-                        })
+                        navigate(`/emergency/order-detail/${task.id}`)
                       }
                     >
-                      View Profile
+                      View Details
                     </button>
                   </div>
                 </div>

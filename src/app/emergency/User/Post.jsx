@@ -3,6 +3,7 @@ import Footer from "../../../component/footer";
 import banner from "../../../assets/profile/banner.png";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import {
   useJsApiLoader,

@@ -48,8 +48,7 @@ import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 
 import MyHire from "./app/directHiring/User/MyHire";
-import WorkerWorklist from "./app/emergency/Worker/Worklist";
-import UserWorklist from "./app/emergency/User/Worklist";
+
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
 //Bidding
@@ -65,13 +64,21 @@ import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/Bidding/User/dispute";
 
 
-import Post from "./app/emergency/User/Post";
 import OrderDetails from "./app/emergency/Worker/OrderDetail";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
 import Tasklist from "./app/Bidding/Worker/Tasklist";
 import Bid from "./app/Bidding/Worker/Bid";
 import EditBid from "./app/Bidding/Worker/EditBid";
 import EmergencyTasks from "./app/emergency/Worker/EmergencyTasks";
+
+
+
+
+//Emergency
+import WorkerWorklist from "./app/emergency/Worker/Worklist";
+import UserWorklist from "./app/emergency/User/Worklist";
+import Post from "./app/emergency/User/Post";
+import EmergencyOrderDetails from "./app/emergency/User/OrderDetail";
 
 export default function App() {
   return (
@@ -182,6 +189,8 @@ export default function App() {
 
       {/* // Emergency Routes- User */}
       <Route path="/emergency/userpost" element={<Post />} />
+      <Route path="/emergency/user/work-list" element={<UserWorklist />} />
+			<Route path="/emergency/order-detail/:id" element={<EmergencyOrderDetails />} />
 
       {/* // Emergency Routes- Worker */}
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
