@@ -51,7 +51,7 @@ import WorkerWorklist from "./app/emergency/Worker/Worklist";
 import UserWorklist from "./app/emergency/User/Worklist";
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
-//Bidding 
+//Bidding
 import BiddingNewTask from "./app/Bidding/User/NewTask";
 import MyHireBidding from "./app/Bidding/User/MyHire";
 import BidderWorkDetail from "./app/Bidding/User/WorkDetail";
@@ -109,7 +109,7 @@ export default function App() {
         path="/service-provider-hire-detail"
         element={<ServiceProviderHireDetail />}
       />
-      <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path="/direct-hiring/:workerId" element={<DirectHiring />} />
       <Route path="/dispute" element={<Dispute />} />
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
       <Route path="/mywork" element={<MyWork />} />
@@ -161,11 +161,13 @@ export default function App() {
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
 
+      {/* common page for user's worker list */}
+      <Route path="/user/work-list/:task" element={<UserWorklist />} />
+
       {/* // Emergency Routes- User */}
       <Route path="/emergency/userpost" element={<Post />} />
 
       {/* // Emergency Routes- Worker */}
-      <Route path="/emergency/user/work-list" element={<UserWorklist />} />
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
       <Route path="/emergency/order-detail" element={<OrderDetails />} />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />

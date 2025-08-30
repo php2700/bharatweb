@@ -58,7 +58,11 @@ export default function ServiceProviderList  ()  {
   const navigate=useNavigate();
 
   const handleBack=()=>{
-    navigate('/homeuser')
+    navigate(-1)
+  }
+
+  const handleHire=()=>{
+    navigate('/direct-hiring')
   }
   return (
     <>
@@ -129,7 +133,7 @@ export default function ServiceProviderList  ()  {
                       <button className="text-[#228B22] py-1 px-4 border rounded-lg">
                         View Profile
                       </button>
-                      <button className="text-white bg-[#228B22] py-1 px-10 rounded-lg ">
+                      <button onClick={()=>handleHire()} className="text-white bg-[#228B22] py-1 px-10 rounded-lg ">
                         Hire
                       </button>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -10,57 +10,73 @@ import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
-  const [activeTab, setActiveTab] = useState("Emergency Tasks");
-  const [emergencyTasks, setEmergencyTasks] = useState([]);
+  const { task } = useParams();
+  const [activeTab, setActiveTab] = useState();
+  const [taskData, setTaskData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
 
   useEffect(() => {
-    const fetchEmergencyTasks = async () => {
+    if (!task) return;
+    setActiveTab(task);
+  }, [task]);
+
+  useEffect(() => {
+    if (!activeTab) return;
+
+    const fetchTasks = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Fetched Emergency Tasks:", response.data); // Debug fetched data
 
-        // Map API response to the expected structure
-        const mappedTasks = response.data.data.map((task) => ({
-          id: task.project_id,
-          image: task.image_urls?.[0] || Work, // Use first image or fallback
-          name: task.category_id?.name || "Unnamed Task",
-          date: new Date(task.createdAt).toLocaleDateString(), // Format date
-          skills: task.sub_category_ids
-            ?.map((sub) => sub.name)
-            .join(", ") || "No skills listed",
-          price: task.service_payment?.amount
-            ? `₹${task.service_payment.amount}`
+        const endpoints = {
+          "Emergency Tasks": `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
+          "My Bidding": `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`,
+          "My Hire": `${BASE_URL}/direct-order/apiGetAllDirectOrders`,
+        };
+
+        const url = endpoints[activeTab];
+        if (!url) throw new Error("Invalid tab selected");
+
+        const response = await axios.get(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log(`Fetched ${activeTab}:`, response.data);
+
+        // Reusable mapping function
+        const mappedTasks = response.data.data.map((t) => ({
+          id: t.project_id,
+          image: t.image_urls?.[0] || Work,
+          name: t.category_id?.name || "Unnamed Task",
+          date: new Date(t.createdAt).toLocaleDateString(),
+          skills:
+            t.sub_category_ids?.map((sub) => sub.name).join(", ") ||
+            "No skills listed",
+          price: t.service_payment?.amount
+            ? `₹${t.service_payment.amount}`
             : "Price TBD",
-          completiondate: task.deadline
-            ? new Date(task.deadline).toLocaleDateString()
+          completiondate: t.deadline
+            ? new Date(t.deadline).toLocaleDateString()
             : "No deadline",
-          location: task.google_address || "Unknown Location",
+          location: t.google_address || "Unknown Location",
         }));
 
-        setEmergencyTasks(mappedTasks);
-        setLoading(false);
+        setTaskData(mappedTasks);
+        setError(null);
       } catch (err) {
-        setError("Failed to fetch emergency tasks. Please try again later.");
+        console.error(err);
+        setError(`Failed to fetch ${activeTab}. Please try again later.`);
+      } finally {
         setLoading(false);
       }
     };
 
-    if (activeTab === "Emergency Tasks") {
-      fetchEmergencyTasks();
-    }
+    fetchTasks();
   }, [activeTab]);
 
   return (
@@ -147,10 +163,10 @@ export default function Worklist() {
             <div className="text-center">Loading...</div>
           ) : error ? (
             <div className="text-center text-red-500">{error}</div>
-          ) : emergencyTasks.length === 0 ? (
-            <div className="text-center">No emergency tasks available.</div>
+          ) : taskData.length === 0 ? (
+            <div className="text-center">No {activeTab} available.</div>
           ) : (
-            emergencyTasks.map((task) => (
+            taskData.map((task) => (
               <div
                 key={task.id}
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
