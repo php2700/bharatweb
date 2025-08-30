@@ -1,19 +1,57 @@
 // redux/userSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const initialState = {
-  profile: null,
-};
+// ✅ Async thunk for fetching profile
+export const fetchUserProfile = createAsyncThunk(
+  "user/fetchUserProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) return rejectWithValue("No token found");
+
+      const res = await fetch("https://api.thebharatworks.com/api/user/getUserProfileData", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) return rejectWithValue("Failed to fetch profile");
+
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
-  initialState,
+  initialState: {
+    profile: null,
+    loading: false,
+    error: null,
+  },
   reducers: {
-    setUserProfile: (state, action) => {
-      state.profile = action.payload;
+    clearUserProfile: (state) => {
+      state.profile = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { setUserProfile } = userSlice.actions;
+export const { clearUserProfile } = userSlice.actions;
 export default userSlice.reducer;

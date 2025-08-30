@@ -37,7 +37,7 @@ export default function OurSubCategories() {
         });
 
         const data = await res.json();
-            console.log(data.data);
+            
         if (res.ok && data.status) {
           setSubcategories(data.data || []);
         } else {

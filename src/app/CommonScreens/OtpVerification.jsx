@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { useDispatch } from "react-redux";
-import { setUserProfile } from "../../redux/userSlice";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import banner from '../../assets/banner.png';
@@ -47,15 +47,9 @@ export default function OtpVerification() {
         localStorage.setItem('role',data.role);
         localStorage.setItem('isProfileComplete',data.isProfileComplete);
         toast.success("OTP verified successfully!");
-        const profileRes = await fetch("https://api.thebharatworks.com/api/user/getUserProfileData", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${data.token}` },
-    });
+        
 
-    const profileData = await profileRes.json();
-    if (profileRes.ok) {
-      dispatch(setUserProfile(profileData));
-    }
+    
         localStorage.removeItem("mobileNumber");
          
         setTimeout(() => {

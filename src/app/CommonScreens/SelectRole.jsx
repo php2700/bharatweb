@@ -1,9 +1,11 @@
 // RoleSelection.jsx
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRole } from "../../redux/roleSlice";
 import { CheckCircle } from "lucide-react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
+import { fetchUserProfile } from "../../redux/userSlice"; 
 import business from "../../assets/selection/business.png";
 import customer from "../../assets/selection/customer.png";
 import banner from "../../assets/banner.png";
@@ -12,8 +14,15 @@ import { useNavigate } from "react-router-dom";
 import Arrow from "../../assets/profile/arrow_back.svg";
 
 export default function RoleSelection() {
-  const selectedRole = useSelector((state) => state.role.selectedRole); // ✅ string
   const dispatch = useDispatch();
+  const selectedRole = useSelector((state) => state.role.selectedRole);
+      const { profile, loading } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch])
+  
+
     const navigate = useNavigate();
  
   const roleMap = {

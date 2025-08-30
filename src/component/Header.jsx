@@ -1,9 +1,28 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link } from "react-router-dom";
 
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "../redux/userSlice";
+
 export default function Header() {
+  const dispatch = useDispatch();
+ 
+  const { profile, loading } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+
+  // ✅ Safe name check
+ const fullName =
+    profile && profile.data && profile.data.full_name
+      ? profile.data.full_name
+      : null;
+
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -36,13 +55,25 @@ export default function Header() {
             + Post a Task
           </button>
           {/* Profile Dropdown - hide on very small screens */}
-          <Link
-            to="/login"
-            className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer"
-          >
-            Login/Signup
-            <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
-          </Link>
+            <div>
+      {loading ? (
+        <p>Loading...</p>
+      ) : fullName ? (
+        <h1  className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer">{fullName}
+
+        <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
+        </h1>
+
+      ) : (
+        <Link
+          to="/login"
+          className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer"
+        >
+          Login / Signup
+          <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
+        </Link>
+      )}
+    </div>
           {/* Hamburger Icon - only on mobile */}
           <button
             className="md:hidden flex items-center justify-center p-0 rounded-md border border-gray-300 bg-[#228B22]"
