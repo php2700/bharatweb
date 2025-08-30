@@ -29,38 +29,6 @@ export default function Worklist() {
     const fetchTasks = async () => {
       try {
         setLoading(true);
-<<<<<<< HEAD
-
-        const endpoints = {
-          "Emergency Tasks": `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
-          "My Bidding": `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`,
-          "My Hire": `${BASE_URL}/direct-order/apiGetAllDirectOrders`,
-        };
-
-        const url = endpoints[activeTab];
-        if (!url) throw new Error("Invalid tab selected");
-
-        const response = await axios.get(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        console.log(`Fetched ${activeTab}:`, response.data);
-
-        // Reusable mapping function
-        const mappedTasks = response.data.data.map((t) => ({
-          id: t.project_id,
-          image: t.image_urls?.[0] || Work,
-          name: t.category_id?.name || "Unnamed Task",
-          date: new Date(t.createdAt).toLocaleDateString(),
-          skills:
-            t.sub_category_ids?.map((sub) => sub.name).join(", ") ||
-            "No skills listed",
-          price: t.service_payment?.amount
-            ? `₹${t.service_payment.amount}`
-=======
         const response = await axios.get(
           `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
           {
@@ -84,7 +52,6 @@ export default function Worklist() {
             .join(", ") || "No skills listed",
           price: task.service_payment?.amount
             ? `₹${task.service_payment.amount}`
->>>>>>> b794c34d7f8e38766ab49747b3c32f5299f988d9
             : "Price TBD",
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()

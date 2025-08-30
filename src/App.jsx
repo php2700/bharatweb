@@ -51,11 +51,7 @@ import MyHire from "./app/directHiring/User/MyHire";
 
 //Bidding
 import RecentPost from "./app/Bidding/Worker/RecentPost";
-//Bidding
-import BiddingNewTask from "./app/Bidding/User/NewTask";
 
-//Bidding
-import RecentPost from "./app/Bidding/Worker/RecentPost";
 //Bidding User
 import BiddingNewTask from "./app/Bidding/User/NewTask"
 import BiddingWorkerDetail from './app/Bidding/User/WorkDetail';

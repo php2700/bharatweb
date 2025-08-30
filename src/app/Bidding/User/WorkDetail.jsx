@@ -125,83 +125,6 @@ export default function BiddingWorkerDetail() {
 
           
 
-<<<<<<< HEAD
-          {/* Tabs Section */}
-          <div className="bg-white rounded-2xl p-4 shadow-[0px_4px_4px_0px_#00000040]">
-            {/* Tabs */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
-              <button
-                onClick={() => setTab("bidder")}
-                className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
-                  tab === "bidder"
-                    ? "bg-[#228B22] text-white border-3"
-                    : "bg-gray-100 text-[#228B22]"
-                }`}
-              >
-                Bidder
-              </button>
-              <button
-                onClick={() => setTab("related")}
-                className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
-                  tab === "related"
-                    ? "bg-[#228B22] text-white border-3"
-                    : "bg-gray-100 text-[#228B22]"
-                }`}
-              >
-                Related Worker
-              </button>
-            </div>
-
-            {/* Search Box */}
-            <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-              <Search className="w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for services"
-                className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-              />
-              <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
-            </div>
-
-            {/* Conditional Rendering */}
-            {tab === "bidder" ? (
-              // 🚨 Bidder me empty state dikhega
-              <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                <img
-                  src={Nowork}
-                  alt="No worker"
-                  className="w-48 sm:w-72 md:w-96 mb-4"
-                />
-              </div>
-            ) : (
-              // 🚨 Related Worker me Worker Cards dikhenge
-              <div className="mt-6 space-y-4">
-                {[1, 2, 3, 4].map((id) => (
-                  <div
-                    key={id}
-                    className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
-                  >
-                    {/* Worker Image */}
-                    <img
-                      src={images}
-                      alt="Worker"
-                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                    />
-
-                    {/* Worker Details */}
-                    <div className="flex-1 text-center sm:text-left">
-                      <h3 className="text-[17px] font-bold text-[#303030]">
-                        Dipak Sharma
-                      </h3>
-                      <p className="text-sm text-gray-500">Lorems learn….</p>
-                      <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
-                        Indore M.P.
-                      </span>
-                      <div>
-                        <button className="text-green-600 font-medium text-sm mt-1">
-                          View Profile
-                        </button>
-=======
             {/* payment page */}
             <div className="space-y-6">
                     <div className="flex items-center justify-between border bg-gray-100  border-[#228B22] rounded-lg p-4">
@@ -234,10 +157,9 @@ export default function BiddingWorkerDetail() {
                         </div>
                       </div>
                       <div className="flex items-center ">
-                        <p className="mt-2 bg-[#228B22] text-white px-3 py-1 text-md rounded-lg py-1 font-medium">
+                        <p className="mt-2 bg-[#228B22] text-white px-3 text-md rounded-lg py-1 font-medium">
                           Accepted by worker
                         </p>
->>>>>>> fc4abb5404d8883e75f0051f9c71ac3b22f5a496
                       </div>
                     </div>
             
