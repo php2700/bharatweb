@@ -152,7 +152,7 @@ export default function WorkerDetail() {
         </div>
 
         {/* filter data getting  */}
-        <FilterWorker />
+        
 
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
