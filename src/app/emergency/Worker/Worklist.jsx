@@ -4,7 +4,6 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/profile/banner.png";
-import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -38,18 +37,19 @@ export default function Worklist() {
         }
 
         const data = await response.json();
-console.log("Fetched tasks:", data);
-        const transformedData = data.data.slice(0, 4).map((item) => ({
-          id: item.id,
-          name: item.title || `Task ${item.id}`, // Use title or fallback
-          image: Work, // Static image, replace with item.image if API provides one
-          date: item.posted_date || "21/02/25", // Use API date or fallback
-          completiondate: item.completion_date || "21/2/25", // Use API completion date or fallback
-          price: item.price ? `₹${item.price.toLocaleString()}` : "₹1,500",
-          skills: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          location: item.location || "Indore M.P.", 
+        console.log("Fetched tasks:", data);
+        const transformedData = data.data.map((item) => ({
+          id: item._id,
+					project_id: item.project_id,
+          name: item.category_id.name,
+          image: item.image_urls[0] || "https://via.placeholder.com/150",
+          date: new Date(item.createdAt).toLocaleDateString("en-GB"),
+          completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
+          price: item.platform_fee ? `₹${item.platform_fee.toLocaleString()}` : "₹0",
+          skills: item.sub_category_ids.map((sub) => sub.name).join(", "),
+          location: item.google_address || "Unknown Location",
         }));
-
+        console.log("Transformed tasks:", transformedData);
         setTasks(transformedData);
         setError(null);
       } catch (error) {
@@ -61,7 +61,7 @@ console.log("Fetched tasks:", data);
     };
 
     fetchTasks();
-  }, [token]); // Add token to dependency array to refetch if token changes
+  }, [token]);
 
   return (
     <>
@@ -79,13 +79,12 @@ console.log("Fetched tasks:", data);
 
       {/* Top Banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                <img
-                  src={banner}
-                  alt="Gardening illustration"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
@@ -155,7 +154,7 @@ console.log("Fetched tasks:", data);
               tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex bg-white rounded-xl shadow-md overflow-hidden"
+                  className="flex bg-white rounded-xl shadow-md overflow-hidden max-h-[200px]" // Reduced card height
                 >
                   {/* Left Image Section */}
                   <div className="relative w-1/3">
@@ -164,38 +163,37 @@ console.log("Fetched tasks:", data);
                       alt={task.name}
                       className="h-full w-full object-cover"
                     />
-                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                      #{task.id}2323
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-0.5 rounded-full">
+                      {task.project_id}
                     </span>
                   </div>
 
                   {/* Right Content Section */}
-                  <div className="w-2/3 p-4 flex flex-col justify-between">
+                  <div className="w-2/3 p-3 flex flex-col justify-between"> {/* Reduced padding */}
                     <div className="flex justify-between items-start">
-                      <h2 className="text-lg font-semibold text-gray-800">
+                      <h2 className="text-base font-semibold text-gray-800"> {/* Reduced font size */}
                         {task.name}
                       </h2>
-                      <p className="text-sm text-[#334247] font-semibold">
+                      <p className="text-xs text-[#334247] font-semibold"> {/* Reduced font size */}
                         Posted Date: {task.date}
                       </p>
                     </div>
-                    <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
-                    <div className="mt-3">
-                      <p className="text-green-600 font-bold">{task.price}</p>
-                      <p className="text-sm text-[#334247] mt-1 font-semibold">
-                        Completion Date: {task.completiondate}
+                    <p className="text-xs text-[#334247] mt-1 line-clamp-2"> {/* Reduced font size and truncated text */}
+                      {task.skills}
+                    </p>
+                    <div className="mt-2"> {/* Reduced margin */}
+                      <p className="text-green-600 font-bold text-sm"> {/* Reduced font size */}
+                        {task.price}
                       </p>
                     </div>
-                    <div className="flex justify-between items-center mt-4">
-                      <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
+                    <div className="flex justify-between items-center mt-2"> {/* Reduced margin */}
+                      <span className="bg-[#F27773] text-white py-2 px-4 rounded-full text-xs"> {/* Smaller button */}
                         {task.location}
                       </span>
                       <button
-                        className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
+                        className="text-[#228B22] py-2 px-5 border border-[#228B22] rounded-lg text-sm" // Smaller button
                         onClick={() =>
-                          navigate("/emergency/order-detail", {
-                            state: { work: task },
-                          })
+                          navigate(`/emergency/worker/order-detail/${task.id}`)
                         }
                       >
                         View Details
@@ -214,12 +212,12 @@ console.log("Fetched tasks:", data);
           </button>
         </div>
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                  <img
-                    src={banner}
-                    alt="Gardening illustration"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       <Footer />
