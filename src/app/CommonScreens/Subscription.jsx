@@ -4,7 +4,7 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import CheckIcon from "../../assets/Subscription/tick.svg";
-import Gardening from "../../assets/profile/profile image.png";
+import banner from "../../assets/profile/banner.png";
 
 export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -109,13 +109,14 @@ export default function Subscription() {
         </button>
         <p className="mt-3 text-gray-500 text-sm cursor-pointer">Not Now</p>
       </div>
-      <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={Gardening}
-          alt="Gardening illustration"
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-        />
-      </div>
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
       <div className="mt-10">
         <Footer />
       </div>

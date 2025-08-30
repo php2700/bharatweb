@@ -1,6 +1,6 @@
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
-import banner from "../../../assets/banner.png";
+import banner from "../../../assets/profile/banner.png";
 import filterIcon from "../../../assets/directHiring/filter-square.png";
 import { SearchIcon } from "lucide-react";
 import image from "../../../assets/workcategory/image.png";

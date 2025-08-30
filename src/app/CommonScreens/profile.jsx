@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import Gardening from "../../assets/profile/profile image.png";
+import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import RegistrationCompleted from "../../assets/registration_completed.png"; // Import the success modal image
 import {
@@ -491,7 +491,7 @@ export default function Profile() {
       {/* Gardening Image Section */}
       <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
         <img
-          src={Gardening}
+          src={banner}
           alt="Gardening illustration"
           className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
         />

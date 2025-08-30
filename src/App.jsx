@@ -61,6 +61,7 @@ import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
 import Tasklist from "./app/Bidding/Worker/Tasklist";
 import Bid from "./app/Bidding/Worker/Bid";
 import EditBid from "./app/Bidding/Worker/EditBid";
+import EmergencyTasks from "./app/emergency/Worker/EmergencyTasks";
 
 export default function App() {
   return (
@@ -168,6 +169,7 @@ export default function App() {
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
       <Route path="/emergency/order-detail" element={<OrderDetails />} />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
+      <Route path="/emergency/tasks" element={<EmergencyTasks />} />
 
     </Routes>
   );

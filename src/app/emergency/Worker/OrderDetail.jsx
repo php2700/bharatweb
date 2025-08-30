@@ -8,24 +8,23 @@ import msg from "../../../assets/ViewProfile/msg.svg";
 import Warning from "../../../assets/ViewProfile/warning.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 
-export default function ViewProfile() {
+export default function OrderDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
   // Fallback data with validation
   const work = location.state?.work 
-  || location.state?.DirectHiring 
-  || location.state?.Bidding 
-  || location.state?.task 
-  || {
-    id: 1,
-    name: "Chair work",
-    image: null,
-    date: "21/02/25",
-    skills: "No details available.",
-    location: "Indore M.P.",
-  };
-
+    || location.state?.DirectHiring 
+    || location.state?.Bidding 
+    || location.state?.task 
+    || {
+      id: 1,
+      name: "Chair work",
+      image: null,
+      date: "21/02/25",
+      skills: "No details available.",
+      location: "Indore M.P.",
+    };
 
   const profile = location.state?.profile || {
     name: "Mohan Sharma",
@@ -37,13 +36,26 @@ export default function ViewProfile() {
 
   const [isAccepted, setIsAccepted] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
-
-  // Modal state
+  const [isRejected, setIsRejected] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
 
   const handleConfirmCancel = () => {
     setShowModal(false);
     navigate("/dispute");
+  };
+
+  const handleConfirmReject = () => {
+    setIsRejected(true);
+    setShowRejectModal(false);
+  };
+
+  const handleRejectClick = () => {
+    setShowRejectModal(true);
+  };
+
+  const handleAcceptClick = () => {
+    setIsAccepted(true);
   };
 
   return (
@@ -52,7 +64,7 @@ export default function ViewProfile() {
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
         <Link
-          to="/mywork"
+          to="/emergency/worker/work-list"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
@@ -102,120 +114,29 @@ export default function ViewProfile() {
               </div>
             </div>
           </div>
-
-          {/* Profile Section */}
-          <div className="mt-6 border border-[#228B22] bg-[#F5F5F5] shadow-md rounded-lg p-4 mx-auto flex flex-col md:flex-row justify-between items-center max-w-[95%]">
-            {isCancelled ? (
-              <>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={profile.image || Profile}
-                    alt={`Profile picture of ${profile.name}`}
-                    className="w-[100px] h-[100px] rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-xl text-[#191A1D]">
-                      {profile.name}
-                    </h3>
-                    <p className="text-gray-600 text-base font-semibold">
-                      Project Fees: {profile.fees}
-                    </p>
-                  </div>
-                </div>
-                <button className="bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto">
-                  Cancelled by me
-                </button>
-              </>
-            ) : isAccepted ? (
-              <div className="flex flex-col md:flex-row justify-between items-center w-full gap-6">
-                {/* Left - Profile Info */}
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={profile.image || Profile}
-                    alt={`Profile picture of ${profile.name}`}
-                    className="w-[100px] h-[100px] rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-xl text-[#191A1D]">
-                      {profile.name}
-                    </h3>
-                    <p className="text-gray-600 text-base font-semibold">
-                      Project Fees: {profile.fees}
-                    </p>
-                    <button className="mt-2 bg-[#228B22] text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto">
-                      View Profile
-                    </button>
-                  </div>
-                </div>
-
-                {/* Middle - Contact Section */}
-                <div className="flex flex-col items-center">
-                  <h4 className="font-semibold text-lg mb-2">
-                    Contact with him
-                  </h4>
-                  <div className="flex space-x-3">
-                    <button
-                      className="bg-gray-200 p-3 rounded-full hover:bg-green-100 flex items-center justify-center"
-                      aria-label="Call"
-                    >
-                      <img src={Call} alt="Call" className="w-6 h-6" />
-                    </button>
-
-                    <button
-                      className="bg-gray-200 p-3 rounded-full hover:bg-green-100 flex items-center justify-center"
-                      aria-label="Message"
-                    >
-                      <img src={msg} alt="Message" className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Right - Actions */}
-                <div className="flex flex-col items-center gap-3">
-                  <button className="bg-[#228B22] text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto">
-                    Accepted by me
-                  </button>
-                  <Link to="/assign-work">
-                    <button className="border border-[#228B22] text-[#228B22] px-6 py-2 rounded-lg hover:bg-green-50 text-sm font-semibold w-full md:w-auto">
-                      Assign Work
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={profile.image || Profile}
-                    alt={`Profile picture of ${profile.name}`}
-                    className="w-[100px] h-[100px] rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-xl text-[#191A1D]">
-                      {profile.name}
-                    </h3>
-                    <p className="text-gray-600 text-base font-semibold">
-                      Project Fees: {profile.fees}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-4 mt-4 md:mt-0 md:ml-auto w-full md:w-[160px]">
-                  <button
-                    onClick={() => setIsAccepted(true)}
-                    className="bg-[#228B22] text-white px-6 py-2 rounded-lg hover:bg-green-600 text-sm font-semibold w-full"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => setIsCancelled(true)}
-                    className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 text-sm font-semibold w-full"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          {(!isAccepted && !isRejected) && (
+            <div className="flex justify-center space-x-4 -mt-7 mb-5">
+              <button
+                onClick={handleAcceptClick}
+                className="bg-[#008000] text-white px-10 py-3 rounded-lg font-semibold hover:bg-green-800"
+              >
+                Accept
+              </button>
+              <button
+                onClick={handleRejectClick}
+                className="bg-[#FF0000] text-white px-10 py-3 rounded-lg font-semibold hover:bg-red-800"
+              >
+                Reject
+              </button>
+            </div>
+          )}
+          {isRejected && (
+            <div className="flex justify-center -mt-7 mb-5">
+              <span className="bg-[#FF0000] text-white px-10 py-3 rounded-lg font-semibold">
+                Cancelled by me
+              </span>
+            </div>
+          )}
 
           {/* Assigned Person Section (Displayed when a worker is assigned) */}
           {assignedWorker && (
@@ -243,8 +164,46 @@ export default function ViewProfile() {
             </div>
           )}
 
-          {/* Payment Summary */}
-          {isAccepted && (
+          {/* Accepted Worker Section */}
+          {isAccepted && !isRejected && (
+            <div className="mt-6 p-4 bg-gray-100 border border-[#228B22] rounded-lg shadow-md flex items-center justify-between max-w-[94%] mx-auto">
+              <div className="flex items-center space-x-4">
+                <img
+                  src={profile.image || "https://via.placeholder.com/50"}
+                  alt={`Profile picture of ${profile.name}`}
+                  className="w-16 h-16 rounded-full object-cover bg-yellow-300"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    {profile.name}
+                  </h3>
+                  <p className="text-gray-600 font-semibold">Project Fees - ₹{profile.fees}</p>
+                  <button className="bg-[#228B22] text-white px-4 py-2 mt-2 rounded-lg hover:bg-green-700">
+                    View Profile
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center space-x-6">
+                <div className="flex space-x-2">
+                  <button className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                    <img src={Call} alt="Call" className="w-7 h-7 " />
+                  </button>
+                  <button className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                    <img src={msg} alt="Message" className="w-7 h-7" />
+                  </button>
+                </div>
+                <div className="flex flex-col items-end space-y-2">
+                  <span className="bg-[#228B22] text-white px-6 py-2 rounded-lg font-semibold">Accepted by me</span>
+                  <button className="bg-white text-[#228B22] border border-[#228B22] px-9 py-1 rounded-lg">
+                    Assign Work
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Payment Summary (Displayed only when accepted and not rejected) */}
+          {isAccepted && !isRejected && (
             <div className="mt-6 border border-[#228B22] rounded-lg p-4 mx-auto max-w-[95%] bg-[#F5F5F5] shadow-md">
               <h2 className="font-bold text-lg mb-3">Payment Summary</h2>
               <div className="overflow-x-auto">
@@ -289,7 +248,7 @@ export default function ViewProfile() {
                   </div>
 
                   {/* Yellow background + paragraph */}
-                  <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+                  <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center mb-">
                     <h2 className="text-[#FE2B2B] font-bold -mt-2">
                       Warning Message
                     </h2>
@@ -317,7 +276,7 @@ export default function ViewProfile() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Task Cancellation Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg">
@@ -340,6 +299,34 @@ export default function ViewProfile() {
                 className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium"
               >
                 Yes, Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Confirmation Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Confirm Rejection
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to reject this work? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowRejectModal(false)}
+                className="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+              >
+                No, Go Back
+              </button>
+              <button
+                onClick={handleConfirmReject}
+                className="px-5 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium"
+              >
+                Yes, Reject
               </button>
             </div>
           </div>

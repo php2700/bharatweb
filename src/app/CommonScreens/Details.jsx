@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import Gardening from "../../assets/Details/Gardening.png";
+import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import User from "../../assets/Details/User.png";
 import Edit from "../../assets/Details/edit.svg";
@@ -55,13 +55,14 @@ export default function Details() {
         </Link>
       </div>
 
-      <div className="flex justify-center my-6 md:mt-[70px]">
-        <img
-          src={Gardening}
-          alt="Details Banner"
-          className="w-full max-h-[400px] object-cover"
-        />
-      </div>
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
 
       <div className="w-full bg-[#D9D9D9] py-6">
         <div className="flex justify-center gap-10 mt-6">

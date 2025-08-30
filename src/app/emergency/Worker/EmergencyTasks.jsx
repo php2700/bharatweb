@@ -8,7 +8,7 @@ import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function Worklist() {
+export default function EmergencyTasks() {
   const [activeTab, setActiveTab] = useState("Emergency Tasks");
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
@@ -39,15 +39,17 @@ export default function Worklist() {
 
         const data = await response.json();
 console.log("Fetched tasks:", data);
+        // Assuming API response is an array of tasks with fields like:
+        // { id, title, description, posted_date, completion_date, price, location }
         const transformedData = data.data.slice(0, 4).map((item) => ({
           id: item.id,
           name: item.title || `Task ${item.id}`, // Use title or fallback
           image: Work, // Static image, replace with item.image if API provides one
           date: item.posted_date || "21/02/25", // Use API date or fallback
           completiondate: item.completion_date || "21/2/25", // Use API completion date or fallback
-          price: item.price ? `₹${item.price.toLocaleString()}` : "₹1,500",
+          price: item.price ? `₹${item.price.toLocaleString()}` : "₹1,500", // Format price
           skills: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          location: item.location || "Indore M.P.", 
+          location: item.location || "Indore M.P.", // Use API location or fallback
         }));
 
         setTasks(transformedData);
@@ -90,40 +92,7 @@ console.log("Fetched tasks:", data);
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
         <div className="text-xl sm:text-2xl max-w-5xl font-bold mx-auto">
-          My Work
-        </div>
-        {/* Tabs */}
-        <div className="flex justify-center gap-[200px] bg-gray-100 p-2 mb-6">
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Bidding"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Bidding")}
-          >
-            My Bidding
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Hire"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Hire")}
-          >
-            My Hire
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "Emergency Tasks"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("Emergency Tasks")}
-          >
-            Emergency Tasks
-          </button>
+          Emergency Work
         </div>
 
         {/* Search */}
@@ -220,6 +189,7 @@ console.log("Fetched tasks:", data);
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
+
       </div>
 
       <Footer />

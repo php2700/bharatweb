@@ -4,7 +4,7 @@ import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import Gardening from "../../../assets/profile/profile image.png";
+import banner from "../../../assets/profile/banner.png";
 import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -78,13 +78,13 @@ export default function Worklist() {
       </div>
 
       {/* Top Banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
-        <img
-          src={Gardening}
-          alt="Gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+                <img
+                  src={banner}
+                  alt="Gardening illustration"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
@@ -211,13 +211,13 @@ export default function Worklist() {
             See All
           </button>
         </div>
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
-          <img
-            src={Gardening}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+                  <img
+                    src={banner}
+                    alt="Gardening illustration"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
       </div>
 
       <Footer />

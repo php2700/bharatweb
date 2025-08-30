@@ -6,7 +6,7 @@ import images from "../../assets/workcategory/image.png";
 import banner1 from "../../assets/workcategory/banner1.png";
 import hire1 from "../../assets/workcategory/hire1.png";
 import hire2 from "../../assets/workcategory/hire2.png";
-import banner from "../../assets/workcategory/banner.png";
+import banner from "../../assets/profile/banner.png";
 import hire3 from "../../assets/workcategory/hire3.png";
 import { useNavigate } from "react-router-dom";
 
@@ -74,9 +74,14 @@ export default function WorkCategories() {
       <Header />
       <div className="font-sans text-gray-800 mt-20">
         {/* Hero Section */}
-        <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] bg-gray-200">
-          <img src={banner} alt="Hero" className="w-full h-full object-cover" />
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
+
 
         {/* Categories */}
         <div className="mx-auto px-4 py-10 w-full">

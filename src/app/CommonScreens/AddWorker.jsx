@@ -7,7 +7,7 @@ import editicon from "../../assets/addworker/edit-icon.svg";
 import flag from "../../assets/addworker/flag.png";
 import downarrow from "../../assets/addworker/downarrow.png";
 import dob from "../../assets/addworker/icon.png";
-import banner from "../../assets/Details/Gardening.png";
+import banner from "../../assets/profile/banner.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -279,9 +279,14 @@ const handleImageChange = (e) => {
           </div>
         </div>
 
-        <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[412px] mt-15">
-          <img src={banner} alt="Gardening" className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover" />
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
+
         <div className="mt-[50px]">
           <Footer />
         </div>
