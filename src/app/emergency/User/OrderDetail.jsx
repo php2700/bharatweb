@@ -1,4 +1,3 @@
-// ViewProfile.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
@@ -6,10 +5,13 @@ import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Gardening from "../../../assets/profile/profile image.png";
+import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning image import
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import Search from "../../../assets/search-normal.svg";
 import Accepted from "./Accepted";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ViewProfile() {
@@ -147,7 +149,7 @@ export default function ViewProfile() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-red-600">{error}</div>
+        <div className="text-[#FF0000]">{error}</div>
       </div>
     );
   }
@@ -157,7 +159,7 @@ export default function ViewProfile() {
       <Header />
       <div className="container mx-auto px-4 py-4">
         <button
-          className="flex items-center text-green-600 hover:text-green-800 font-semibold"
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
@@ -204,8 +206,8 @@ export default function ViewProfile() {
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.detailed_address || "No Address Provided"}
-                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm mt-2">
-                    Location :-{" "}
+                  <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    {" "}
                     {orderData?.google_address || "Unknown Location"}
                   </div>
                 </div>
@@ -225,9 +227,9 @@ export default function ViewProfile() {
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
       ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
-      ${orderData?.hire_status === "cancelled" ? "bg-red-500" : ""}
-      ${orderData?.hire_status === "completed" ? "bg-green-500" : ""}
-      ${orderData?.hire_status === "cancelldispute" ? "bg-orange-500" : ""}
+      ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
+      ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
+      ${orderData?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
       ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
                   >
                     {orderData?.hire_status
@@ -253,37 +255,99 @@ export default function ViewProfile() {
             </div>
 
             <div className="text-center mb-6">
-              <button
-                className="px-8 py-3 bg-red-600 text-white rounded-full text-lg font-semibold hover:bg-red-700"
-                onClick={() => setShowModal(true)}
-              >
-                Cancel Task
-              </button>
+              {orderData?.hire_status === "cancelled" ? (
+                <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                  Cancelled by User
+                </span>
+              ) : orderData?.hire_status !== "assigned" ? (
+                <button
+                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                  onClick={() => setShowModal(true)}
+                >
+                  Cancel Task
+                </button>
+              ) : null}
             </div>
 
             {/* Render Accepted component when hire_status is assigned */}
             {orderData?.hire_status === "assigned" && (
-              <Accepted
-                serviceProvider={orderData?.service_provider_id}
-                assignedWorker={assignedWorker}
-                paymentHistory={orderData?.service_payment?.payment_history}
-              />
+              <>
+                <Accepted
+                  serviceProvider={orderData?.service_provider_id}
+                  assignedWorker={assignedWorker}
+                  paymentHistory={orderData?.service_payment?.payment_history}
+                />
+                <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                  {/* Yellow warning box */}
+                  <div className="relative max-w-2xl mx-auto">
+                    {/* Image */}
+                    <div className="relative z-10">
+                      <img
+                        src={Warning}
+                        alt="Warning"
+                        className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                      />
+                    </div>
+
+                    {/* Yellow background + paragraph */}
+                    <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center mb-">
+                      <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                        Warning Message
+                      </h2>
+                      <p className="text-gray-700 text-sm md:text-base">
+                        Lorem Ipsum is simply dummy text of the printing and
+                        typesetting industry. Lorem Ipsum has been the
+                        industry's standard dummy text ever since the 1500s,
+                        when an unknown printer took a galley of type and
+                        scrambled it to make a type specimen book. It has
+                        survived not only five centuries, but also the leap into
+                        electronic typesetting.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Cancel button */}
+                  <div className="flex space-x-4">
+                    {/* Green button (Mark as Complete) */}
+                    <button
+                      onClick={() => console.log("Marked as complete")}
+                      className="bg-[#228B22] hover:bg-green-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md"
+                    >
+                      Mark as Complete
+                    </button>
+
+                    {/* Red button (Cancel Task) */}
+                    <button
+                      onClick={() => setShowModal(true)}
+                      className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                    >
+                      Cancel Task and Create Dispute
+                    </button>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
       </div>
 
-      {!isHired && (
+      {!isHired && orderData?.hire_status !== "cancelled" && (
         <div className="container mx-auto px-4 py-6 max-w-4xl">
           <div className="relative mb-4">
             <input
               type="text"
               placeholder="Search providers by name..."
-              className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+              className="w-full p-2 pl-10  rounded-lg focus:outline-none bg-[#F5F5F5]"
               value={searchQuery}
               onChange={handleSearch}
             />
-            <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
+            <span className="absolute left-3 top-2.5">
+              <img
+                src={Search}
+                alt="Search"
+                className="w-5 h-5 text-gray-400"
+              />
+            </span>
           </div>
 
           {filteredProviders.length > 0 ? (
@@ -302,18 +366,18 @@ export default function ViewProfile() {
                     <p className="text-lg font-semibold">
                       {provider.full_name || "Unknown Provider"}
                     </p>
-                    <p className="bg-red-500 text-white px-3 py-1 rounded-full text-sm mt-2">
+                    <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                       {provider?.location?.address || "No Address Provided"}
                     </p>
                     <Link
                       to={`/service_provider/${provider._id}`}
-                      className="text-green-600 hover:underline"
+                      className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                     >
-                      view profile
+                      View Profile
                     </Link>
                   </div>
                   <button
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
                     onClick={() => handleHire(provider._id)}
                   >
                     Hire
@@ -358,7 +422,7 @@ export default function ViewProfile() {
                 No
               </button>
               <button
-                className="px-6 py-4 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-6 py-4 bg-[#FF0000] text-white rounded hover:bg-red-700"
                 onClick={handleConfirmCancel}
               >
                 Yes

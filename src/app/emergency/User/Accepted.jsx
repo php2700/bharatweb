@@ -13,12 +13,11 @@ export default function Accepted({
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
-      <h2 className="text-xl font-bold mb-4">Order Details (Assigned)</h2>
+      <h2 className="text-lg font-semibold mb-4">Order Details (Assigned)</h2>
 
       {/* Service Provider Details */}
       {serviceProvider && (
-        <div className="bg-gray-100 p-4 rounded-lg mb-4">
-          <h3 className="text-lg font-semibold mb-2">Service Provider</h3>
+        <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
           <div className="flex items-center space-x-4">
             <img
               src={serviceProvider.profile_pic || Profile}
@@ -28,9 +27,6 @@ export default function Accepted({
             <div>
               <p className="text-lg font-semibold">
                 {serviceProvider.full_name || "Unknown Worker"}
-              </p>
-              <p className="text-gray-600">
-                Phone: {serviceProvider.phone || "N/A"}
               </p>
             </div>
           </div>
