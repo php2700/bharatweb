@@ -4,13 +4,16 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
-import Gardening from "../../../assets/profile/profile image.png";
+import banner from "../../../assets/profile/banner.png";
 import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning image import
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Search from "../../../assets/search-normal.svg";
 import Accepted from "./Accepted";
+import ReviewModal from "../../CommonScreens/ReviewModal";
+import Swal from "sweetalert2";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -26,6 +29,8 @@ export default function ViewProfile() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isHired, setIsHired] = useState(false);
 
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
+   
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("bharat_token");
@@ -109,36 +114,38 @@ export default function ViewProfile() {
   };
 
   const handleMarkComplete = async () => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      await axios.post(
-        `${BASE_URL}/emergency-order/completeOrderUser`, // ✅ adjust endpoint if needed
-        { order_id: id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  try {
+    const token = localStorage.getItem("bharat_token");
+    const response = await axios.post(
+      `${BASE_URL}/emergency-order/completeOrderUser`,
+      { order_id: id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      alert("Order marked as complete successfully!");
-      // 👉 Refresh orderData so UI updates
-      const orderResponse = await axios.get(
-        `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setOrderData(orderResponse.data.data);
-    } catch (err) {
-      console.error("Error completing order:", err);
-      setError("Failed to mark order as complete. Please try again later.");
+    if (response.status === 200) {
+      // Show SweetAlert first
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Order marked as complete successfully!',
+        confirmButtonColor: '#228B22',
+      }).then(() => {
+        // Open the ReviewModal after user clicks "OK"
+        setShowCompletedModal(true);
+      });
     }
-  };
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops!',
+      text: 'Failed to mark order as complete. Please try again.',
+      confirmButtonColor: '#FF0000',
+    });
+  }
+};
+
+
 
   const handleConfirmCancel = async () => {
     setShowModal(false);
@@ -161,7 +168,7 @@ export default function ViewProfile() {
       setError("Failed to cancel order. Please try again later.");
     }
   };
-
+  
   const handleSearch = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
   };
@@ -292,9 +299,12 @@ export default function ViewProfile() {
                   Cancelled by User
                 </span>
               ) : orderData?.hire_status === "completed" ? (
-                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
-                  Task Completed
-                </span>
+                <span
+  className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer"
+>
+  Task Completed
+</span>
+
               ) : orderData?.hire_status !== "assigned" ? (
                 <button
                   className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
@@ -338,18 +348,26 @@ export default function ViewProfile() {
 
         {/* Action buttons */}
         <div className="flex space-x-4">
-          <button
-            onClick={handleMarkComplete}
-            className="bg-[#228B22] hover:bg-green-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md"
-          >
-            Mark as Complete
-          </button>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-          >
-            Cancel Task and Create Dispute
-          </button>
+          <>
+  <button
+  className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md" onClick={handleMarkComplete}>Mark as Complete</button>
+
+  <ReviewModal
+  show={showCompletedModal}
+  onClose={() => setShowCompletedModal(false)}
+  serviceProviderId={orderData?.service_provider_id} // pass the vendor ID
+  orderId={id} // optional if backend needs it
+  type="emergency" // optional if backend requires type
+/>
+</>
+          <Link to={`/dispute/${id}/emergency`}>
+  <button
+    className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+  >
+    Cancel Task and Create Dispute
+  </button>
+</Link>
+
         </div>
       </div>
     )}
@@ -423,7 +441,7 @@ export default function ViewProfile() {
 
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
         <img
-          src={Gardening}
+          src={banner}
           alt="Decorative gardening illustration"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -459,6 +477,8 @@ export default function ViewProfile() {
           </div>
         </div>
       )}
+
+      
     </>
   );
 }

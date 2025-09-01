@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
-import Footer from "../../../component/Footer";
+import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";

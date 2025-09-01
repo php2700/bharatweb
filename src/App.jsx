@@ -31,9 +31,10 @@ import HelpFaqs from "./app/CommonScreens/Help-faqs";
 import PrivacyPolicy from "./app/CommonScreens/Privacy-policy";
 import CustomerCare from "./app/CommonScreens/Customer-care";
 import BankDetails from "./app/CommonScreens/BankDetails";
+import ReviewModal from "./app/CommonScreens/ReviewModal";
 
 // Direct Hiring
-import Dispute from "./app/directHiring/User/Dispute";
+import Dispute from "./app/CommonScreens/dispute";
 import MyWork from "./app/directHiring/Worker/MyWork";
 import ViewProfile from "./app/directHiring/Worker/ViewProfile";
 import AssignWork from "./app/directHiring/Worker/AssignWork";
@@ -57,7 +58,7 @@ import BiddingNewTask from "./app/Bidding/User/NewTask"
 import BiddingWorkerDetail from './app/Bidding/User/WorkDetail';
 import MyHireBidding from "./app/Bidding/User/MyHire";
 import HireDetail from "./app/Bidding/User/HireDetail";
-import BiddingDispute from "./app/Bidding/User/dispute";
+import BiddingDispute from "./app/CommonScreens/dispute";
 
 
 import OrderDetails from "./app/emergency/Worker/AcceptReject";
@@ -100,6 +101,7 @@ export default function App() {
         path="/homeservice"
         element={<PrivateRoute element={<ServiceProviderHome />} />}
       />
+      {/* <Route path="/review" element={<Review />} /> */}
       <Route path="/work-category" element={<WorkCategory />} />
       {/* comment */}
       {/* Financial Routes */}
@@ -117,6 +119,7 @@ export default function App() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
 
+
       {/* Direct Hiring Route */}
       <Route path="/service-provider-list" element={<ServiceProviderList />} />
       <Route
@@ -124,7 +127,7 @@ export default function App() {
         element={<ServiceProviderHireDetail />}
       />
       <Route path="/direct-hiring/:workerId" element={<DirectHiring />} />
-      <Route path="/dispute" element={<Dispute />} />
+      <Route path="/dispute/:orderId/:type" element={<Dispute />} />
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
       <Route path="/mywork" element={<MyWork />} />
       <Route path="/view-profile" element={<ViewProfile />} />
@@ -149,7 +152,7 @@ export default function App() {
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
 
-      
+      <Route path="/review" element={<PrivateRoute element={<ReviewModal />} />} />
 
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
@@ -178,6 +181,7 @@ export default function App() {
         path="/homeuser"
         element={<PrivateRoute element={<WorkCategory />} />}
       />
+      
 
       {/* \---------------------------------------------------------------------------------------------------------------------------------/
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
