@@ -108,6 +108,38 @@ export default function ViewProfile() {
     }
   };
 
+  const handleMarkComplete = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      await axios.post(
+        `${BASE_URL}/emergency-order/completeOrderUser`, // ✅ adjust endpoint if needed
+        { order_id: id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Order marked as complete successfully!");
+      // 👉 Refresh orderData so UI updates
+      const orderResponse = await axios.get(
+        `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setOrderData(orderResponse.data.data);
+    } catch (err) {
+      console.error("Error completing order:", err);
+      setError("Failed to mark order as complete. Please try again later.");
+    }
+  };
+
   const handleConfirmCancel = async () => {
     setShowModal(false);
     try {
@@ -259,6 +291,10 @@ export default function ViewProfile() {
                 <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                   Cancelled by User
                 </span>
+              ) : orderData?.hire_status === "completed" ? (
+                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                  Task Completed
+                </span>
               ) : orderData?.hire_status !== "assigned" ? (
                 <button
                   className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
@@ -270,66 +306,55 @@ export default function ViewProfile() {
             </div>
 
             {/* Render Accepted component when hire_status is assigned */}
-            {orderData?.hire_status === "assigned" && (
-              <>
-                <Accepted
-                  serviceProvider={orderData?.service_provider_id}
-                  assignedWorker={assignedWorker}
-                  paymentHistory={orderData?.service_payment?.payment_history}
-                  orderId={orderData?._id}
-                />
-                <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                  {/* Yellow warning box */}
-                  <div className="relative max-w-2xl mx-auto">
-                    {/* Image */}
-                    <div className="relative z-10">
-                      <img
-                        src={Warning}
-                        alt="Warning"
-                        className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
-                      />
-                    </div>
+            {(orderData?.hire_status === "assigned" || orderData?.hire_status === "completed") && (
+  <>
+    <Accepted
+      serviceProvider={orderData?.service_provider_id}
+      assignedWorker={assignedWorker}
+      paymentHistory={orderData?.service_payment?.payment_history}
+      orderId={id}
+      hireStatus={orderData?.hire_status}
+    />
 
-                    {/* Yellow background + paragraph */}
-                    <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center mb-">
-                      <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                        Warning Message
-                      </h2>
-                      <p className="text-gray-700 text-sm md:text-base">
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
-                        when an unknown printer took a galley of type and
-                        scrambled it to make a type specimen book. It has
-                        survived not only five centuries, but also the leap into
-                        electronic typesetting.
-                      </p>
-                    </div>
-                  </div>
+    {/* Show buttons only if still assigned, not completed */}
+    {orderData?.hire_status === "assigned" && (
+      <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+        {/* Yellow warning box */}
+        <div className="relative max-w-2xl mx-auto">
+          <div className="relative z-10">
+            <img
+              src={Warning}
+              alt="Warning"
+              className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+            />
+          </div>
+          <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+            <h2 className="text-[#FE2B2B] font-bold -mt-2">Warning Message</h2>
+            <p className="text-gray-700 text-sm md:text-base">
+              Lorem Ipsum is simply dummy text...
+            </p>
+          </div>
+        </div>
 
-                  {/* Cancel button */}
-                  <div className="flex space-x-4">
-                    {/* Green button (Mark as Complete) */}
-                    <button
-                      onClick={() => console.log("Marked as complete")}
-                      className="bg-[#228B22] hover:bg-green-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md"
-                    >
-                      Mark as Complete
-                    </button>
-
-                    {/* Red button (Cancel Task) */}
-                    <Link to="/disputeg">
-                      <button
-                        onClick={() => setShowModal(true)}
-                        className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                      >
-                        Cancel Task and Create Dispute
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </>
-            )}
+        {/* Action buttons */}
+        <div className="flex space-x-4">
+          <button
+            onClick={handleMarkComplete}
+            className="bg-[#228B22] hover:bg-green-700 text-white px-10 py-3 rounded-lg font-semibold shadow-md"
+          >
+            Mark as Complete
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+          >
+            Cancel Task and Create Dispute
+          </button>
+        </div>
+      </div>
+    )}
+  </>
+)}
           </div>
         </div>
       </div>
@@ -369,7 +394,7 @@ export default function ViewProfile() {
                     <p className="text-lg font-semibold">
                       {provider.full_name || "Unknown Provider"}
                     </p>
-                    <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                       {provider?.location?.address || "No Address Provided"}
                     </p>
                     <Link

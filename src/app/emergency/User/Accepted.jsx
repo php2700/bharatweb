@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Call from "../../../assets/ViewProfile/call.svg";
 import Message from "../../../assets/ViewProfile/msg.svg";
+import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,67 +12,90 @@ export default function Accepted({
   assignedWorker,
   paymentHistory,
   orderId,
+  hireStatus,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
-  } 
+  }
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [showForm, setShowForm] = useState(false); // toggle form
 
-  const handlePay = (id) => {
-    alert(`Paying for payment with ID: ${id}`);
-  };
-
-  const handlePaymentSubmit = async () => {
-  if (!description || !amount) {
-    alert("Please enter both description and amount!");
-    return;
-  }
-
+  const handlePay = async (paymentId) => {
   try {
-    const response = await fetch(`${BASE_URL}/emergency-order/addPaymentStage/${orderId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
-      },
-      body: JSON.stringify({
-        description,
-        amount,
-      }),
-    });
-    console.log("Payment Response:", response);
+    const token = localStorage.getItem("bharat_token");
 
-    if (!response.ok) {
-      throw new Error("Failed to create payment");
+    const response = await axios.post(
+      `${BASE_URL}/emergency-order/user/request-release/${orderId}/${paymentId}`,
+      {}, // empty body (if API doesn’t need one)
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      alert("Payment successful!");
+      // refresh payments if needed
+    } else {
+      alert("Payment failed, please try again.");
     }
-
-    const data = await response.json();
-
-    // Add new payment to local state immediately
-    setPaymentHistory((prev) => [...prev, data]);
-
-    // reset form
-    setDescription("");
-    setAmount("");
-    setShowForm(false);
-
-    alert("Payment created successfully!");
   } catch (error) {
-    console.error("Error creating payment:", error);
-    alert("Something went wrong while creating payment.");
+    console.error("Payment error:", error);
+    alert(error.response?.data?.message || "Something went wrong while processing payment.");
   }
 };
 
+
+
+  const handlePaymentSubmit = async () => {
+    if (!description || !amount) {
+      alert("Please enter both description and amount!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/emergency-order/addPaymentStage/${orderId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+          body: JSON.stringify({
+            description,
+            amount,
+          }),
+        }
+      );
+      console.log("Payment Response:", response);
+
+      if (!response.ok) {
+        throw new Error("Failed to create payment");
+      }
+
+      await response.json();
+
+      // reset form
+      setDescription("");
+      setAmount("");
+      setShowForm(false);
+
+      alert("Payment created successfully!");
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      alert("Something went wrong while creating payment.");
+    }
+  };
 
   const handleCancel = () => {
     setDescription("");
     setAmount("");
     setShowForm(false); // hide form on cancel
     alert("Form cleared!");
-
-  
   };
 
   return (
@@ -90,23 +114,26 @@ export default function Accepted({
             />
 
             {/* Name */}
-            <div>
+            <div className="flex items-center w-full">
+              {/* Worker name */}
               <p className="text-lg font-semibold">
                 {serviceProvider.full_name || "Unknown Worker"}
               </p>
-            </div>
 
-            {/* Call & Message icons */}
-            <div className="flex items-center space-x-3 ml-auto">
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                <img src={Call} alt="Call" className="w-5 h-5" />
-              </div>
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                <img src={Message} alt="Message" className="w-5 h-5" />
-              </div>
+              {/* Call & Message icons (hide if completed) */}
+              {hireStatus !== "completed" && (
+                <div className="flex items-center space-x-3 ml-6">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                    <img src={Call} alt="Call" className="w-5 h-5" />
+                  </div>
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                    <img src={Message} alt="Message" className="w-5 h-5" />
+                  </div>
+                </div>
+              )}
 
-              {/* View Profile button */}
-              <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
+              {/* View Profile button — pushed to right corner */}
+              <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
                 View Profile
               </button>
             </div>
@@ -147,17 +174,19 @@ export default function Accepted({
       )}
 
       {/* Payment History */}
-      {paymentHistory && (
+      {paymentHistory && Array.isArray(paymentHistory) && (
         <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Payment Summary</h3>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
-            >
-              Create Payment
-            </button>
+            {hireStatus !== "completed" && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                Create Payment
+              </button>
+            )}
           </div>
 
           {/* Payment List */}
@@ -168,25 +197,33 @@ export default function Accepted({
             >
               {/* Index & Description */}
               <div className="flex items-center space-x-5">
-                {" "}
-                {/* reduced gap */}
                 <span className="font-semibold">{index + 1}.</span>
                 <span>{payment.description || "Starting Payment"}</span>
               </div>
 
               {/* Status */}
               <div className="mx-2">
-                {" "}
-                {/* small horizontal margin for balance */}
-                {payment.status === "Paid" ? (
-                  <span className="text-[#228B22] font-semibold">Paid</span>
-                ) : (
+                {(payment.status === "success"  && payment.release_status==="pending") && (
                   <button
                     onClick={() => handlePay(payment._id)}
                     className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
                   >
                     Pay
                   </button>
+                )}
+
+                {payment.release_status === "release_requested" && (
+                  <span className="text-yellow-600 font-semibold">
+                    Requested
+                  </span>
+                )}
+
+                {payment.release_status === "released" && (
+                  <span className="text-[#228B22] font-semibold">Paid</span>
+                )}
+
+                {payment.release_status === "refunded" && (
+                  <span className="text-blue-600 font-semibold">Refunded</span>
                 )}
               </div>
 
@@ -221,13 +258,13 @@ export default function Accepted({
               {/* Form Actions */}
               <div className="flex justify-end space-x-4 mt-4">
                 <button
-                  onClick={handlePaymentSubmit} // your submit handler
+                  onClick={handlePaymentSubmit}
                   className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
                 >
                   Submit
                 </button>
                 <button
-                  onClick={handleCancel} // your cancel handler
+                  onClick={handleCancel}
                   className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
                 >
                   Cancel
