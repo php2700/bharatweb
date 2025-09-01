@@ -60,7 +60,7 @@ import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/Bidding/User/dispute";
 
 
-import OrderDetails from "./app/emergency/Worker/OrderDetail";
+import OrderDetails from "./app/emergency/Worker/AcceptReject";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
 import Tasklist from "./app/Bidding/Worker/Tasklist";
 import Bid from "./app/Bidding/Worker/Bid";
@@ -75,7 +75,7 @@ import WorkerWorklist from "./app/emergency/Worker/Worklist";
 import UserWorklist from "./app/emergency/User/Worklist";
 import Post from "./app/emergency/User/Post";
 import EmergencyOrderDetails from "./app/emergency/User/OrderDetail";
-import EmergencyWorkerOrderDetails from "./app/emergency/Worker/OrderDetail";
+import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
 
 export default function App() {
   return (
@@ -193,10 +193,11 @@ export default function App() {
 
       {/* // Emergency Routes- Worker */}
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
-      <Route path="/emergency/worker/order-detail/:id" element={<EmergencyWorkerOrderDetails />} />
+      <Route path="/emergency/worker/:id" element={<EmergencyWorkerAcceptReject />} />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
       <Route path="/emergency/tasks" element={<EmergencyTasks />} />
 
     </Routes>
   );
 }
+

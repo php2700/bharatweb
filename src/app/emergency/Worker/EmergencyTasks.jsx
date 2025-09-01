@@ -41,15 +41,16 @@ export default function EmergencyTasks() {
 console.log("Fetched tasks:", data);
         // Assuming API response is an array of tasks with fields like:
         // { id, title, description, posted_date, completion_date, price, location }
-        const transformedData = data.data.slice(0, 4).map((item) => ({
-          id: item.id,
-          name: item.title || `Task ${item.id}`, // Use title or fallback
-          image: Work, // Static image, replace with item.image if API provides one
-          date: item.posted_date || "21/02/25", // Use API date or fallback
-          completiondate: item.completion_date || "21/2/25", // Use API completion date or fallback
-          price: item.price ? `₹${item.price.toLocaleString()}` : "₹1,500", // Format price
-          skills: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-          location: item.location || "Indore M.P.", // Use API location or fallback
+        const transformedData = data.data.map((item) => ({
+          id: item._id,
+					project_id: item.project_id,
+          name: item.category_id.name,
+          image: item.image_urls[0] || "https://via.placeholder.com/150",
+          date: new Date(item.createdAt).toLocaleDateString("en-GB"),
+          completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
+          price: item.platform_fee ? `₹${item.platform_fee.toLocaleString()}` : "₹0",
+          skills: item.sub_category_ids.map((sub) => sub.name).join(", "),
+          location: item.google_address || "Unknown Location",
         }));
 
         setTasks(transformedData);
@@ -134,7 +135,7 @@ console.log("Fetched tasks:", data);
                       className="h-full w-full object-cover"
                     />
                     <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                      #{task.id}2323
+                      {task.project_id}
                     </span>
                   </div>
 
@@ -161,10 +162,8 @@ console.log("Fetched tasks:", data);
                       </span>
                       <button
                         className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
-                        onClick={() =>
-                          navigate("/emergency/order-detail", {
-                            state: { work: task },
-                          })
+                         onClick={() =>
+                          navigate(`/emergency/worker/${task.id}`)
                         }
                       >
                         View Details
