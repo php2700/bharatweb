@@ -31,6 +31,7 @@ import HelpFaqs from "./app/CommonScreens/Help-faqs";
 import PrivacyPolicy from "./app/CommonScreens/Privacy-policy";
 import CustomerCare from "./app/CommonScreens/Customer-care";
 import BankDetails from "./app/CommonScreens/BankDetails";
+import EditProfile from "./app/CommonScreens/EditProfile";
 
 // Direct Hiring
 import Dispute from "./app/directHiring/User/Dispute";
@@ -94,6 +95,7 @@ export default function App() {
       <Route path="/workerlist" element={<WorkerList />} />
       <Route path="/add-worker" element={<AddWorkerDetails />} />
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
+      <Route path="/editprofile" element={<EditProfile />} />
 
       {/* Service Provider Routes */}
       <Route

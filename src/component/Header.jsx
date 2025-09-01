@@ -5,12 +5,15 @@ import Dropdown from "../assets/dropdown.svg";
 import { Link } from "react-router-dom";
 import profiles from '../assets/login/profile.webp'
 import logout from '../assets/login/logout.png'
+import membership from '../assets/login/membership.png'
+import bank from '../assets/login/bank.png'
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../redux/userSlice";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+    const [isAccountOpen, setIsAccountOpen] = useState(false);
   const dropdownRef = useRef(null);
  
 
@@ -115,6 +118,22 @@ export default function Header() {
   >
     <img src={profiles} alt="Profile" className="w-5 h-5" />
     Profile
+  </Link>
+  <Link
+    to="/Subscription"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    <img src={membership} alt="Profile" className="w-5 h-5" />
+    Membership
+  </Link>
+  <Link
+    to="/bank-details"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    <img src={bank} alt="Profile" className="w-5 h-5" />
+    Bank Detail
   </Link>
 
   {/* Logout Item */}
