@@ -276,6 +276,7 @@ export default function ViewProfile() {
                   serviceProvider={orderData?.service_provider_id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
+                  orderId={orderData?._id}
                 />
                 <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                   {/* Yellow warning box */}
@@ -317,12 +318,14 @@ export default function ViewProfile() {
                     </button>
 
                     {/* Red button (Cancel Task) */}
-                    <button
-                      onClick={() => setShowModal(true)}
-                      className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                    >
-                      Cancel Task and Create Dispute
-                    </button>
+                    <Link to="/disputeg">
+                      <button
+                        onClick={() => setShowModal(true)}
+                        className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                      >
+                        Cancel Task and Create Dispute
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </>
@@ -366,7 +369,7 @@ export default function ViewProfile() {
                     <p className="text-lg font-semibold">
                       {provider.full_name || "Unknown Provider"}
                     </p>
-                    <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                       {provider?.location?.address || "No Address Provided"}
                     </p>
                     <Link

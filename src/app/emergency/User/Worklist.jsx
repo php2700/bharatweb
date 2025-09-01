@@ -38,7 +38,6 @@ export default function Worklist() {
             },
           }
         );
-        
 
         // Map API response to the expected structure
         const mappedTasks = response.data.data.map((task) => ({
@@ -47,9 +46,9 @@ export default function Worklist() {
           image: task.image_urls?.[0] || Work, // Use first image or fallback
           name: task.category_id?.name || "Unnamed Task",
           date: new Date(task.createdAt).toLocaleDateString(), // Format date
-          skills: task.sub_category_ids
-            ?.map((sub) => sub.name)
-            .join(", ") || "No skills listed",
+          skills:
+            task.sub_category_ids?.map((sub) => sub.name).join(", ") ||
+            "No skills listed",
           price: task.service_payment?.amount
             ? `₹${task.service_payment.amount}`
             : "Price TBD",
@@ -88,12 +87,12 @@ export default function Worklist() {
 
       {/* Top Banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                <img
-                  src={banner}
-                  alt="Gardening illustration"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
@@ -219,12 +218,12 @@ export default function Worklist() {
           </button>
         </div>
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                  <img
-                    src={banner}
-                    alt="Gardening illustration"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       <Footer />

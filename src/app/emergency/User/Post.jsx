@@ -641,7 +641,7 @@ const Post = () => {
             <div className="flex justify-around">
               <button
                 onClick={handlePayConfirm}
-                className="bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800"
+                className="bg-[#008000] text-white py-2 px-4 rounded-md hover:bg-green-800"
               >
                 Pay
               </button>
