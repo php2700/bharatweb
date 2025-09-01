@@ -34,71 +34,78 @@ export default function WorkerList() {
     fetchWorkers();
   }, []);
 
-  const handleAssign = async (workerId) => {
-    if (!workerId || !orderId || !type) {
+ const handleAssign = async (workerId) => {
+  if (!workerId || !orderId || !type) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Information",
+      text: "Worker, Order, or Type is missing.",
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
+    return;
+  }
+
+  try {
+    console.log("Sending request with:", { worker_id: workerId, order_id: orderId, type });
+    const response = await axios.post(
+      `${BASE_URL}/worker/assign-order`,
+      {
+        worker_id: workerId,
+        order_id: orderId,
+        type: type,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("API Response:", response.data); // Log the full response
+
+    if (response.data.success) { // Changed from response.data.status to response.data.success
       Swal.fire({
-        icon: "warning",
-        title: "Missing Information",
-        text: "Worker, Order, or Type is missing.",
+        icon: "success",
+        title: "Order Assigned!",
+        text: response.data.message || "The worker has been assigned successfully.", // Use API message
         timer: 2000,
         showConfirmButton: false,
         toast: true,
         position: "top-end",
       });
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/worker/assign-order`,
-        {
-          worker_id: workerId,
-          order_id: orderId,
-          type: type,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.status) {
-        Swal.fire({
-          icon: "success",
-          title: "Order Assigned!",
-          text: "The worker has been assigned successfully.",
-          timer: 2000,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        }).then(() => {
-          navigate(`/emergency/worker/order-detail/${orderId}`);
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Failed",
-          text: response.data.message || "Could not assign order.",
-          timer: 2000,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-      }
-    } catch (error) {
+      setTimeout(() => {
+        console.log("Navigating to:", `/emergency/worker/order-detail/${orderId}`);
+        navigate(`/emergency/worker/order-detail/${orderId}`);
+      }, 2000); // Navigate after toast duration
+    } else {
+      console.log("Error Message:", response.data.message);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.response?.data?.message || "Something went wrong.",
+        title: "Failed",
+        text: response.data.message || "Could not assign order.",
         timer: 2000,
         showConfirmButton: false,
         toast: true,
         position: "top-end",
       });
     }
-  };
+  } catch (error) {
+    console.error("Request Failed:", error.response?.data || error.message);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.response?.data?.message || "Something went wrong.",
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end",
+    });
+  }
+};
 
   if (loading) {
     return (
