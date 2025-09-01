@@ -2,7 +2,8 @@ import { useState } from "react";
 import BankImg from "../../assets/bank/bank-account.png";
 import Footer from "../../component/footer";
 import Header from "../../component/Header";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function BankDetails() {
   const [formData, setFormData] = useState({
     bankName: "",
@@ -66,15 +67,14 @@ export default function BankDetails() {
 
         if (response.ok) {
           console.log("API Response ✅", data);
-          alert("Bank details added successfully!");
-          // yahan redirect ya state update kar sakte ho
+          toast.success("bank Detail Added Successfully!");
         } else {
-          console.error("API Error ❌", data);
-          alert(data.message || "Something went wrong. Please try again.");
+          toast.error("API Error ❌", data);
+          
         }
       } catch (error) {
-        console.error("Network Error ❌", error);
-        alert("Network error. Please try again.");
+        toast.error("Network Error ❌", error);
+       
       }
     }
   };
@@ -82,6 +82,7 @@ export default function BankDetails() {
   return (
     <>
       <Header />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="p-10">
         <div className="p-10 container max-w-5xl mx-auto">
           <div className="flex justify-center">

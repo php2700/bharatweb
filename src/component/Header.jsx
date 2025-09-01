@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useState,useRef } from "react";
 import { useEffect } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link } from "react-router-dom";
+import profiles from '../assets/login/profile.webp'
+import logout from '../assets/login/logout.png'
+import membership from '../assets/login/membership.png'
+import bank from '../assets/login/bank.png'
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../redux/userSlice";
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+    const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const dropdownRef = useRef(null);
+ 
+
+  // Outside click handle
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const dispatch = useDispatch();
  
   const { profile, loading } = useSelector((state) => state.user);
@@ -55,23 +74,78 @@ export default function Header() {
             + Post a Task
           </button>
           {/* Profile Dropdown - hide on very small screens */}
-            <div>
-      {loading ? (
-        <p>Loading...</p>
-      ) : fullName ? (
-        <h1  className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer">{fullName}
-
-        <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
-        </h1>
-
+           <div className="relative" ref={dropdownRef}>
+      {fullName ? (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer"
+        >
+          {fullName}
+          <img
+            src={Dropdown}
+            alt="Dropdown"
+            className={`w-6 h-6 transition-transform duration-300 ${
+              isOpen ? "rotate-180" : "rotate-0"
+            }`}
+          />
+        </button>
       ) : (
         <Link
           to="/login"
           className="hidden sm:flex bg-white border-transparent px-4 py-2 rounded-full shadow text-base font-medium items-center gap-2 cursor-pointer"
         >
           Login / Signup
-          <img src={Dropdown} alt="Dropdown" className="w-6 h-6" />
+          <img
+            src={Dropdown}
+            alt="Dropdown"
+            className="w-6 h-6"
+          />
         </Link>
+      )}
+
+      {/* Dropdown menu */}
+      {isOpen && fullName && (
+      <div
+  className={`absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg border border-gray-200 z-50 transition-all duration-300 transform ${
+    isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
+  }`}
+>
+  {/* Profile Item */}
+  <Link
+    to="/details"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    <img src={profiles} alt="Profile" className="w-5 h-5" />
+    Profile
+  </Link>
+  <Link
+    to="/Subscription"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    <img src={membership} alt="Profile" className="w-5 h-5" />
+    Membership
+  </Link>
+  <Link
+    to="/bank-details"
+    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+    onClick={() => setIsOpen(false)}
+  >
+    <img src={bank} alt="Profile" className="w-5 h-5" />
+    Bank Detail
+  </Link>
+
+  {/* Logout Item */}
+  <button
+   
+    className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
+  >
+    <img src={logout} alt="Logout" className="w-5 h-5" style={{color:'black'}} />
+    Logout
+  </button>
+</div>
+
       )}
     </div>
           {/* Hamburger Icon - only on mobile */}
