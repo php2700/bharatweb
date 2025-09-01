@@ -53,12 +53,11 @@ import MyHire from "./app/directHiring/User/MyHire";
 import RecentPost from "./app/Bidding/Worker/RecentPost";
 
 //Bidding User
-import BiddingNewTask from "./app/Bidding/User/NewTask"
-import BiddingWorkerDetail from './app/Bidding/User/WorkDetail';
+import BiddingNewTask from "./app/Bidding/User/NewTask";
+import BiddingWorkerDetail from "./app/Bidding/User/WorkDetail";
 import MyHireBidding from "./app/Bidding/User/MyHire";
 import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/Bidding/User/dispute";
-
 
 import OrderDetails from "./app/emergency/Worker/AcceptReject";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
@@ -67,15 +66,15 @@ import Bid from "./app/Bidding/Worker/Bid";
 import EditBid from "./app/Bidding/Worker/EditBid";
 import EmergencyTasks from "./app/emergency/Worker/EmergencyTasks";
 
-
-
-
 //Emergency
 import WorkerWorklist from "./app/emergency/Worker/Worklist";
 import UserWorklist from "./app/emergency/User/Worklist";
 import Post from "./app/emergency/User/Post";
 import EmergencyOrderDetails from "./app/emergency/User/OrderDetail";
 import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
+import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
+import AssignWorker from "./app/CommonScreens/AssignWorker";
+import ViewWorker from "./app/CommonScreens/ViewWorker";
 
 export default function App() {
   return (
@@ -128,7 +127,6 @@ export default function App() {
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
       <Route path="/mywork" element={<MyWork />} />
       <Route path="/view-profile" element={<ViewProfile />} />
-      <Route path="/assign-work" element={<AssignWork />} />
       <Route path="/worker-detail" element={<WorkerDetail />} />
       <Route path="/my-hire" element={<MyHire />} />
       <Route path="/directhiring/workdetail" element={<WorkerDetail />} />
@@ -144,12 +142,10 @@ export default function App() {
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
-      
+
       <Route path="/bidding/hiredetail" element={<HireDetail />} />
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
-
-      
 
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
@@ -172,8 +168,7 @@ export default function App() {
         path="/select-role"
         element={<PrivateRoute element={<RoleSelection />} />}
       />
-      
-      
+
       <Route
         path="/homeuser"
         element={<PrivateRoute element={<WorkCategory />} />}
@@ -189,15 +184,25 @@ export default function App() {
       {/* // Emergency Routes- User */}
       <Route path="/emergency/userpost" element={<Post />} />
       <Route path="/emergency/user/work-list" element={<UserWorklist />} />
-			<Route path="/emergency/order-detail/:id" element={<EmergencyOrderDetails />} />
+      <Route
+        path="/emergency/order-detail/:id"
+        element={<EmergencyOrderDetails />}
+      />
 
       {/* // Emergency Routes- Worker */}
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
-      <Route path="/emergency/worker/:id" element={<EmergencyWorkerAcceptReject />} />
+      <Route
+        path="/emergency/worker/:id"
+        element={<EmergencyWorkerAcceptReject />}
+      />
+      <Route
+        path="/emergency/worker/order-detail/:id"
+        element={<EmergencyProviderOrderDetails />}
+      />
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
       <Route path="/emergency/tasks" element={<EmergencyTasks />} />
-
+      <Route path="/assign-work/:orderId/:type" element={<AssignWorker />} />
+			<Route path="/view-worker/:id" element={<ViewWorker />} />
     </Routes>
   );
 }
-

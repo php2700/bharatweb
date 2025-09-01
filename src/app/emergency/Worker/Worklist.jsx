@@ -24,7 +24,7 @@ export default function Worklist() {
 
       setLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`, {
+        const response = await fetch(`${BASE_URL}/emergency-order/getAllEmergencyOrdersforProvider`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -193,7 +193,7 @@ export default function Worklist() {
                       <button
                         className="text-[#228B22] py-2 px-5 border border-[#228B22] rounded-lg text-sm" // Smaller button
                         onClick={() =>
-                          navigate(`/emergency/worker/${task.id}`)
+                          navigate(`/emergency/worker/order-detail/${task.id}`)
                         }
                       >
                         View Details
