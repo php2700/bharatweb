@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import Gardening from "../../../assets/profile/profile image.png";
+import banner from "../../../assets/profile/banner.png";
 import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 
@@ -86,19 +86,23 @@ export default function MyHireBidding() {
     },
   ];
 
+  const handleBack=()=>{
+    navigate(-1)
+  }
+
   return (
     <>
       <Header />
 
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
-        <Link
-          to="/"
+        <div
+         onClick={handleBack}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
-        </Link>
+        </div>
       </div>
 
       {/* Work Section */}
@@ -222,7 +226,7 @@ export default function MyHireBidding() {
         {/* Banner Image */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
-            src={Gardening}
+            src={banner}
             alt="Gardening illustration"
             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
           />

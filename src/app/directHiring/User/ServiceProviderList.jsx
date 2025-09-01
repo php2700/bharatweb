@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import image from "../../../assets/workcategory/image.png";
-import banner from "../../../assets/banner.png"
+import banner from "../../../assets/profile/banner.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 
 
@@ -58,7 +58,11 @@ export default function ServiceProviderList  ()  {
   const navigate=useNavigate();
 
   const handleBack=()=>{
-    navigate('/homeuser')
+    navigate(-1)
+  }
+
+  const handleHire=()=>{
+    navigate('/direct-hiring')
   }
   return (
     <>
@@ -69,13 +73,14 @@ export default function ServiceProviderList  ()  {
             &lt; Back
           </button>
         </div>
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
+
 
         <div className="container max-w-5xl mx-auto my-10">
           <div className="flex justify-between items-center p-3">
@@ -128,7 +133,7 @@ export default function ServiceProviderList  ()  {
                       <button className="text-[#228B22] py-1 px-4 border rounded-lg">
                         View Profile
                       </button>
-                      <button className="text-white bg-[#228B22] py-1 px-10 rounded-lg ">
+                      <button onClick={()=>handleHire()} className="text-white bg-[#228B22] py-1 px-10 rounded-lg ">
                         Hire
                       </button>
                     </div>

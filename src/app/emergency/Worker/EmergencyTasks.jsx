@@ -4,10 +4,11 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/profile/banner.png";
+import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function Worklist() {
+export default function EmergencyTasks() {
   const [activeTab, setActiveTab] = useState("Emergency Tasks");
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
@@ -37,19 +38,20 @@ export default function Worklist() {
         }
 
         const data = await response.json();
-        console.log("Fetched tasks:", data);
-        const transformedData = data.data.map((item) => ({
-          id: item._id,
-					project_id: item.project_id,
-          name: item.category_id.name,
-          image: item.image_urls[0] || "https://via.placeholder.com/150",
-          date: new Date(item.createdAt).toLocaleDateString("en-GB"),
-          completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
-          price: item.platform_fee ? `₹${item.platform_fee.toLocaleString()}` : "₹0",
-          skills: item.sub_category_ids.map((sub) => sub.name).join(", "),
-          location: item.google_address || "Unknown Location",
+console.log("Fetched tasks:", data);
+        // Assuming API response is an array of tasks with fields like:
+        // { id, title, description, posted_date, completion_date, price, location }
+        const transformedData = data.data.slice(0, 4).map((item) => ({
+          id: item.id,
+          name: item.title || `Task ${item.id}`, // Use title or fallback
+          image: Work, // Static image, replace with item.image if API provides one
+          date: item.posted_date || "21/02/25", // Use API date or fallback
+          completiondate: item.completion_date || "21/2/25", // Use API completion date or fallback
+          price: item.price ? `₹${item.price.toLocaleString()}` : "₹1,500", // Format price
+          skills: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          location: item.location || "Indore M.P.", // Use API location or fallback
         }));
-        console.log("Transformed tasks:", transformedData);
+
         setTasks(transformedData);
         setError(null);
       } catch (error) {
@@ -61,7 +63,7 @@ export default function Worklist() {
     };
 
     fetchTasks();
-  }, [token]);
+  }, [token]); // Add token to dependency array to refetch if token changes
 
   return (
     <>
@@ -79,50 +81,18 @@ export default function Worklist() {
 
       {/* Top Banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={banner}
-          alt="Gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </div>
+                <img
+                  src={banner}
+                  alt="Gardening illustration"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
         <div className="text-xl sm:text-2xl max-w-5xl font-bold mx-auto">
-          My Work
-        </div>
-        {/* Tabs */}
-        <div className="flex justify-center gap-[200px] bg-gray-100 p-2 mb-6">
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Bidding"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Bidding")}
-          >
-            My Bidding
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Hire"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Hire")}
-          >
-            My Hire
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "Emergency Tasks"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("Emergency Tasks")}
-          >
-            Emergency Tasks
-          </button>
+          Emergency Work
         </div>
 
         {/* Search */}
@@ -154,7 +124,7 @@ export default function Worklist() {
               tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex bg-white rounded-xl shadow-md overflow-hidden max-h-[200px]" // Reduced card height
+                  className="flex bg-white rounded-xl shadow-md overflow-hidden"
                 >
                   {/* Left Image Section */}
                   <div className="relative w-1/3">
@@ -163,37 +133,38 @@ export default function Worklist() {
                       alt={task.name}
                       className="h-full w-full object-cover"
                     />
-                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-0.5 rounded-full">
-                      {task.project_id}
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
+                      #{task.id}2323
                     </span>
                   </div>
 
                   {/* Right Content Section */}
-                  <div className="w-2/3 p-3 flex flex-col justify-between"> {/* Reduced padding */}
+                  <div className="w-2/3 p-4 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
-                      <h2 className="text-base font-semibold text-gray-800"> {/* Reduced font size */}
+                      <h2 className="text-lg font-semibold text-gray-800">
                         {task.name}
                       </h2>
-                      <p className="text-xs text-[#334247] font-semibold"> {/* Reduced font size */}
+                      <p className="text-sm text-[#334247] font-semibold">
                         Posted Date: {task.date}
                       </p>
                     </div>
-                    <p className="text-xs text-[#334247] mt-1 line-clamp-2"> {/* Reduced font size and truncated text */}
-                      {task.skills}
-                    </p>
-                    <div className="mt-2"> {/* Reduced margin */}
-                      <p className="text-green-600 font-bold text-sm"> {/* Reduced font size */}
-                        {task.price}
+                    <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
+                    <div className="mt-3">
+                      <p className="text-green-600 font-bold">{task.price}</p>
+                      <p className="text-sm text-[#334247] mt-1 font-semibold">
+                        Completion Date: {task.completiondate}
                       </p>
                     </div>
-                    <div className="flex justify-between items-center mt-2"> {/* Reduced margin */}
-                      <span className="bg-[#F27773] text-white py-2 px-4 rounded-full text-xs"> {/* Smaller button */}
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
                         {task.location}
                       </span>
                       <button
-                        className="text-[#228B22] py-2 px-5 border border-[#228B22] rounded-lg text-sm" // Smaller button
+                        className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                         onClick={() =>
-                          navigate(`/emergency/worker/order-detail/${task.id}`)
+                          navigate("/emergency/order-detail", {
+                            state: { work: task },
+                          })
                         }
                       >
                         View Details
@@ -212,12 +183,13 @@ export default function Worklist() {
           </button>
         </div>
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
+                  <img
+                    src={banner}
+                    alt="Gardening illustration"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+
       </div>
 
       <Footer />

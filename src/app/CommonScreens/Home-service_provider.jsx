@@ -8,11 +8,13 @@ import Emergency from "../../assets/Home-SP/emergency.png";
 import Promise from "../../assets/Home-SP/promise.png";
 import Paper from "../../assets/Home-SP/paper.svg";
 import Vector from "../../assets/Home-SP/Vector.svg";
-import Banner from "../../assets/Home-SP/banner.jpg";
+import banner from "../../assets/profile/banner.png";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ServiceProviderHome() {
   const navigate=useNavigate()
-  const [isEmergencyOn, setIsEmergencyOn] = useState(false);
+  const [isEmergencyOn, setIsEmergencyOn] = useState(true);
+  const token = localStorage.getItem("bharat_token");
   const [directHiring, setDirectHiring] = useState([
     {
       image: Hiring,
@@ -118,26 +120,48 @@ export default function ServiceProviderHome() {
     },
   ]);
 
-  const handleToggle = () => {
-    setIsEmergencyOn(!isEmergencyOn);
+  const handleToggle = async () => {
+    const newEmergencyState = !isEmergencyOn;
+    try {
+      const response = await fetch(`${BASE_URL}/user/emergency`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isEmergencyOn: newEmergencyState }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update emergency status");
+      }
+
+      // Update state only if API call is successful
+      setIsEmergencyOn(newEmergencyState);
+    } catch (error) {
+      console.error("Error updating emergency status:", error);
+      // Optionally, show an error message to the user
+      alert("Failed to update emergency status. Please try again.");
+    }
   };
 
-  const handlePlan=()=>{
-navigate('/subscription')
-  }
+  const handlePlan = () => {
+    navigate("/subscription");
+  };
 
   return (
     <>
       <Header />
 
       {/* First Full Width Image */}
-      <div className="w-full">
-        <img
-          src={Banner}
-          alt="Banner"
-          className="w-full h-[400px] object-cover mt-[60px] max-md:h-[200px]"
-        />
-      </div>
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
 
       {/* Second Image with Button */}
       <div className="w-[90%] mx-auto relative mt-8">

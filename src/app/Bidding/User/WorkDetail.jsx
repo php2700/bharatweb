@@ -157,7 +157,7 @@ export default function BiddingWorkerDetail() {
                         </div>
                       </div>
                       <div className="flex items-center ">
-                        <p className="mt-2 bg-[#228B22] text-white px-3 py-1 text-md rounded-lg py-1 font-medium">
+                        <p className="mt-2 bg-[#228B22] text-white px-3 text-md rounded-lg py-1 font-medium">
                           Accepted by worker
                         </p>
                       </div>

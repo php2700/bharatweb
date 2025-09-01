@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import Gardening from "../../assets/Details/Gardening.png";
+import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import User from "../../assets/Details/User.png";
 import Edit from "../../assets/Details/edit.svg";
@@ -14,8 +14,26 @@ import Sample from "../../assets/Details/sample.png";
 import Sample2 from "../../assets/Details/sample2.jpg";
 import Vector from "../../assets/Home-SP/Vector.svg";
 import Aadhar from "../../assets/Details/profile-line.svg";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "../../redux/userSlice";
 
 export default function Details() {
+  const dispatch = useDispatch();
+ 
+  const { profile, loading } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+  console.log(profile);
+  let full_name='N/A';
+  let address='N/A';
+   if(profile && profile.data){
+    full_name=profile.data.full_name ?profile.data.full_name:'N/A' ;
+    address=profile.data.location.address ?profile.data.location.address:'N/A' ;
+   }
+ 
+  
   const [activeTab, setActiveTab] = useState("user");
   const [vendorTab, setVendorTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,13 +73,14 @@ export default function Details() {
         </Link>
       </div>
 
-      <div className="flex justify-center my-6 md:mt-[70px]">
-        <img
-          src={Gardening}
-          alt="Details Banner"
-          className="w-full max-h-[400px] object-cover"
-        />
-      </div>
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+
 
       <div className="w-full bg-[#D9D9D9] py-6">
         <div className="flex justify-center gap-10 mt-6">
@@ -109,14 +128,14 @@ export default function Details() {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold">Mohan Sharma</h2>
+                  <h2 className="text-lg font-bold">{full_name}</h2>
                   <button aria-label="Edit Name">
                     <img src={Pencil} alt="Edit name icon" className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="flex items-center gap-2 font-bold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
-                  <span>Indore M.P. INDIA</span>
+                  <span>{address}</span>
                 </div>
                 <div className="p-4 shadow-xl mt-[70px] max-w-[600px]">
                   <div className="flex items-center justify-between">
@@ -157,14 +176,14 @@ export default function Details() {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold">Mohan Sharma</h2>
+                  <h2 className="text-lg font-bold">{full_name}</h2>
                   <button aria-label="Edit Vendor Name">
                     <img src={Pencil} alt="Edit name icon" className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-black font-bold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
-                  <span>Indore M.P. INDIA</span>
+                  <span>{address}</span>
                 </div>
                 <p className="text-base">
                   <span className="font-bold text-[#228B22]">Category-</span>{" "}

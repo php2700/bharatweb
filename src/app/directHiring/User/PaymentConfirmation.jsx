@@ -1,5 +1,5 @@
 import Header from "../../../component/Header";
-import banner from "../../../assets/banner.png";
+import banner from "../../../assets/profile/banner.png";
 import Footer from "../../../component/footer";
 import paymentImg from "../../../assets/directHiring/payment.png";
 
@@ -57,13 +57,14 @@ export default function PaymentConfirmation() {
           </div>
         </div>
 
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 my-10">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
+
       </div>
       <Footer />
     </>

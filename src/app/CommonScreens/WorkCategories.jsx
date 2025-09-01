@@ -6,7 +6,7 @@ import images from "../../assets/workcategory/image.png";
 import banner1 from "../../assets/workcategory/banner1.png";
 import hire1 from "../../assets/workcategory/hire1.png";
 import hire2 from "../../assets/workcategory/hire2.png";
-import banner from "../../assets/workcategory/banner.png";
+import banner from "../../assets/profile/banner.png";
 import hire3 from "../../assets/workcategory/hire3.png";
 import { useNavigate } from "react-router-dom";
 
@@ -66,17 +66,37 @@ export default function WorkCategories() {
     navigate("/service-provider-list");
   };
 
-  const hireWorker = () => {
-    navigate('/direct-hiring');
+  const hireWorker = (workerDetail) => {
+    navigate(`/direct-hiring/${workerDetail?._id}`);
   };
+
+
+  const postWork=()=>{
+    navigate('/bidding/newtask')
+  }
+
+  const handleBidding=()=>{
+    navigate('/bidding/myhire')
+  }
+
+  const postEmergencyWork=()=>{
+    navigate('/emergency/userpost')
+  }
+
+  
   return (
     <>
       <Header />
       <div className="font-sans text-gray-800 mt-20">
         {/* Hero Section */}
-        <div className="relative w-full h-[250px] sm:h-[300px] md:h-[400px] bg-gray-200">
-          <img src={banner} alt="Hero" className="w-full h-full object-cover" />
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
+
 
         {/* Categories */}
         <div className="mx-auto px-4 py-10 w-full">
@@ -223,7 +243,7 @@ export default function WorkCategories() {
               typesetting industry. Lorem Ipsum has been the industry's <br />
               standard dummy text ever since the 1500s...
             </p>
-            <button className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+            <button  onClick={postWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
               Post Work
             </button>
           </div>
@@ -240,7 +260,7 @@ export default function WorkCategories() {
                 Lorem Ipsum is simply dummy text of the printing and <br />
                 typesetting industry. Lorem Ipsum has been the industry's...
               </p>
-              <button className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <button onClick={postEmergencyWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
                 Post Work
               </button>
             </div>
@@ -277,7 +297,7 @@ export default function WorkCategories() {
               className="w-full h-[322px] sm:h-[383px] object-cover"
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+              <button onClick={handleBidding} className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
                 Bidding
               </button>
             </div>

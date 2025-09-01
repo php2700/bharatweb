@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link } from "react-router-dom";
-import profiles from '../assets/login/profile.png'
-import logout from '../assets/login/logout.jpg'
+import profiles from '../assets/login/profile.webp'
+import logout from '../assets/login/logout.png'
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../redux/userSlice";
@@ -109,7 +109,7 @@ export default function Header() {
 >
   {/* Profile Item */}
   <Link
-    to="/profile"
+    to="/details"
     className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
     onClick={() => setIsOpen(false)}
   >
@@ -122,7 +122,7 @@ export default function Header() {
    
     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
   >
-    <img src={logout} alt="Logout" className="w-5 h-5" />
+    <img src={logout} alt="Logout" className="w-5 h-5" style={{color:'black'}} />
     Logout
   </button>
 </div>

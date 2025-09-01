@@ -1,7 +1,7 @@
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
 import image from "../../../assets/workcategory/image.png";
-import banner from "../../../assets/banner.png";
+import banner from "../../../assets/profile/banner.png";
 import { Phone, MessageSquare } from "lucide-react";
 import HireCard from "./HireCard";
 
@@ -76,13 +76,14 @@ export default function MyHire() {
           </div>
         </div>
 
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         </div>
+
       </div>
       <Footer />
     </>
