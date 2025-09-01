@@ -24,7 +24,7 @@ export default function Worklist() {
 
       setLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/emergency-order/filtered-emergency-orders`, {
+        const response = await fetch(`${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
