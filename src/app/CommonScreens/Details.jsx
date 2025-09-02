@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRef } from "react";
-import { Link, Navigate,useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import banner from "../../assets/profile/banner.png";
@@ -15,11 +15,10 @@ import Sample from "../../assets/Details/sample.png";
 import Sample2 from "../../assets/Details/sample2.jpg";
 import Vector from "../../assets/Home-SP/Vector.svg";
 import Aadhar from "../../assets/Details/profile-line.svg";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
-import edit from '../../assets/login/edit.png';
+import edit from "../../assets/login/edit.png";
 import EditProfile from "./EditProfile";
-
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,107 +26,107 @@ export default function Details() {
   const [image, setImage] = useState(User); // image state
   const fileInputRef = useRef(null); // ref for hidden input
   const dispatch = useDispatch();
- 
+
   const { profile, loading } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
   console.log(profile);
-  let full_name='N/A';
-  let address='N/A';
-  let images=image;
-  let skill='N/A';
-  let category_name='N/A';
-  let subcategory_names='N/A';
-  let document='N/A';
-  let status=false;
+  let full_name = "N/A";
+  let address = "N/A";
+  let images = image;
+  let skill = "N/A";
+  let category_name = "N/A";
+  let subcategory_names = "N/A";
+  let document = "N/A";
+  let status = false;
   let verified;
-   if(profile && profile.data){
-    full_name=profile.data.full_name ?profile.data.full_name:'N/A' ;
-    address=profile.data.location.address ?profile.data.location.address:'N/A' ;
-    images=profile.data.profilePic?profile.data.profilePic:'N/A';
-    skill=profile.data.skill?profile.data.skill:'N/A';
-    category_name=profile.data.category_name?profile.data.category_name:'N/A';
-    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'N/A';
-    document=profile.data.documents?profile.data.documents:'N/A';
-    status=profile.data.verified?profile.data.verified:false;
-   }
-   if(status==true){
-       verified="Verified by Admin";
-   }
-   else{
-     verified="Pending";
-   }
-   console.log(verified);
-  
- 
- 
-
- 
-
+  if (profile && profile.data) {
+    full_name = profile.data.full_name ? profile.data.full_name : "N/A";
+    address = profile.data.location.address
+      ? profile.data.location.address
+      : "N/A";
+    images = profile.data.profilePic ? profile.data.profilePic : "N/A";
+    skill = profile.data.skill ? profile.data.skill : "N/A";
+    category_name = profile.data.category_name
+      ? profile.data.category_name
+      : "N/A";
+    subcategory_names = profile.data.subcategory_names
+      ? profile.data.subcategory_names
+      : "N/A";
+    document = profile.data.documents ? profile.data.documents : "N/A";
+    status = profile.data.verified ? profile.data.verified : false;
+  }
+  if (status == true) {
+    verified = "Verified by Admin";
+  } else {
+    verified = "Pending";
+  }
+  console.log(verified);
   // button click → input trigger
   const handleEditClick = () => {
     fileInputRef.current.click();
   };
 
   // file select hone par
- const handleFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // ✅ Allowed types check
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-  if (!allowedTypes.includes(file.type)) {
-    alert("Only JPG/PNG images are allowed!");
-    return;
-  }
-
-  // ✅ Preview ke liye
-  const reader = new FileReader();
-  reader.onload = (ev) => setImage(ev.target.result); // setImage = state for preview
-  reader.readAsDataURL(file);
-
-  // ✅ API me upload karne ke liye
-  try {
-    const token = localStorage.getItem("bharat_token");
-    const formData = new FormData();
-    formData.append("profilePic", file);
-
-    const res = await fetch(
-      "https://api.thebharatworks.com/api/user/updateProfilePic",
-      { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: formData }
-    );
-
-    const data = await res.json();
-
-    if (res.ok) {
-      toast.success("Profile image updated successfully!");
-    } else {
-      alert(data.message || "Failed to update profile image.");
+    // ✅ Allowed types check
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only JPG/PNG images are allowed!");
+      return;
     }
-  } catch (err) {
-    console.error("Error uploading profile pic:", err);
-    alert("Something went wrong while uploading the image!");
-  }
-};
 
-const navigate = useNavigate();
+    // ✅ Preview ke liye
+    const reader = new FileReader();
+    reader.onload = (ev) => setImage(ev.target.result); // setImage = state for preview
+    reader.readAsDataURL(file);
 
-  
-    
-  
+    // ✅ API me upload karne ke liye
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const formData = new FormData();
+      formData.append("profilePic", file);
+
+      const res = await fetch(
+        "https://api.thebharatworks.com/api/user/updateProfilePic",
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success("Profile image updated successfully!");
+      } else {
+        alert(data.message || "Failed to update profile image.");
+      }
+    } catch (err) {
+      console.error("Error uploading profile pic:", err);
+      alert("Something went wrong while uploading the image!");
+    }
+  };
+
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState("user");
- 
+
   const [vendorTab, setVendorTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
 
   const workImages = [Sample, Sample2];
   const reviewImages = [Sample2, Sample];
- const Editpage=()=>{
-  navigate('/editprofile', { state: { activeTab } });
- }
+  const Editpage = () => {
+    navigate("/editprofile", { state: { activeTab } });
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       if (activeTab === "vendor") {
@@ -149,7 +148,7 @@ const navigate = useNavigate();
   return (
     <>
       <Header />
-       <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="container mx-auto px-4 py-4">
         <Link
           to="/"
@@ -161,13 +160,12 @@ const navigate = useNavigate();
       </div>
 
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       <div className="w-full bg-[#D9D9D9] py-6">
         <div className="flex justify-center gap-10 mt-6">
@@ -197,49 +195,46 @@ const navigate = useNavigate();
       </div>
 
       <div className="container mx-auto px-6 py-6">
-          <button
-          onClick={()=>Editpage()}
-  type="button"
-  className="flex items-center gap-2 text-white bg-[#228B22] 
+        <button
+          onClick={() => Editpage()}
+          type="button"
+          className="flex items-center gap-2 text-white bg-[#228B22] 
              hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 
              dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
              me-2 mb-2 float-right"
->
-  <img src={edit} alt="Edit" width="20px" />
-  Edit Profile
-</button>
+        >
+          <img src={edit} alt="Edit" width="20px" />
+          Edit Profile
+        </button>
 
         {activeTab === "user" && (
-          
           <div className="p-6">
-          
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
               <div className="relative">
-      <img
-        src={images}
-        alt="User Profile"
-        className="w-full h-[550px] object-cover rounded-2xl shadow-md"
-      />
-      <button
-        className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
-        aria-label="Edit Profile Image"
-        onClick={handleEditClick} // 🔹 click triggers file input
-      >
-        <img src={Edit} alt="Edit icon" className="w-7 h-7" />
-      </button>
-      {/* Hidden file input */}
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-      />
-    </div>
+                <img
+                  src={images}
+                  alt="User Profile"
+                  className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                />
+                <button
+                  className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
+                  aria-label="Edit Profile Image"
+                  onClick={handleEditClick} // 🔹 click triggers file input
+                >
+                  <img src={Edit} alt="Edit icon" className="w-7 h-7" />
+                </button>
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+              </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
-                  
                 </div>
                 <div className="flex items-center gap-2 font-bold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
@@ -248,11 +243,9 @@ const navigate = useNavigate();
                 <div className="p-4 shadow-xl mt-[70px] max-w-[600px]">
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-xl">About My Skill</h3>
-                    
                   </div>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                     {skill}
-                     
+                    {skill}
                   </p>
                 </div>
               </div>
@@ -263,32 +256,31 @@ const navigate = useNavigate();
         {activeTab === "vendor" && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-                  <div className="relative">
-      <img
-        src={images}
-        alt="User Profile"
-        className="w-full h-[550px] object-cover rounded-2xl shadow-md"
-      />
-      <button
-        className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
-        aria-label="Edit Profile Image"
-        onClick={handleEditClick} // 🔹 click triggers file input
-      >
-        <img src={Edit} alt="Edit icon" className="w-7 h-7" />
-      </button>
-      {/* Hidden file input */}
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-      />
-    </div>
+              <div className="relative">
+                <img
+                  src={images}
+                  alt="User Profile"
+                  className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                />
+                <button
+                  className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
+                  aria-label="Edit Profile Image"
+                  onClick={handleEditClick} // 🔹 click triggers file input
+                >
+                  <img src={Edit} alt="Edit icon" className="w-7 h-7" />
+                </button>
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+              </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
-                  
                 </div>
                 <div className="flex items-center gap-2 text-black font-bold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
@@ -299,22 +291,23 @@ const navigate = useNavigate();
                   {category_name}
                 </p>
                 <p className="text-base -mt-4">
-  <span className="font-bold text-[#228B22]">Sub-Categories-</span>{" "}
-  {subcategory_names.map((name, index) => (
-    <span key={index}>
-      {name}{index !== subcategory_names.length - 1 ? ", " : ""}
-    </span>
-  ))}
-</p>
+                  <span className="font-bold text-[#228B22]">
+                    Sub-Categories-
+                  </span>{" "}
+                  {subcategory_names.map((name, index) => (
+                    <span key={index}>
+                      {name}
+                      {index !== subcategory_names.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
 
                 <div className="p-4 shadow-md bg-white max-w-[600px]">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-semibold">About My Skill</h3>
-                    
                   </div>
                   <p className="text-gray-700 text-sm leading-relaxed">
                     {skill}
-                   
                   </p>
                 </div>
                 <div className="flex gap-4 mt-4">
@@ -467,11 +460,17 @@ const navigate = useNavigate();
 
               {/* Review Card */}
               {[1, 2].map((item, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
+                <div
+                  key={index}
+                  className="bg-white rounded-xl shadow-md p-6 mb-4"
+                >
                   {/* Star Rating */}
                   <div className="flex gap-1 mb-2">
                     {[1, 2, 3, 4, 5].map((star, i) => (
-                      <span key={i} className={i < 4 ? "text-yellow-400" : "text-gray-300"}>
+                      <span
+                        key={i}
+                        className={i < 4 ? "text-yellow-400" : "text-gray-300"}
+                      >
                         ★
                       </span>
                     ))}
@@ -480,7 +479,8 @@ const navigate = useNavigate();
                   {/* Review Content */}
                   <h3 className="font-semibold">Made a computer table</h3>
                   <p className="text-gray-600 text-sm">
-                    It is a long established fact that a reader will be distracted by the readable
+                    It is a long established fact that a reader will be
+                    distracted by the readable
                   </p>
                   <p className="text-xs text-gray-400 mt-2">14 Apr, 2023</p>
 

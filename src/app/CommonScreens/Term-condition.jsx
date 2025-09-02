@@ -22,6 +22,7 @@ export default function TermCondtion  ()  {
 
   useEffect(() => {
     getTermAndConditionData();
+    window.scrollTo(0, 0); // 👈 ensures page opens from top
   }, []);
 
   return (

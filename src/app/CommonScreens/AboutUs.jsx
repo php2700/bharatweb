@@ -13,22 +13,23 @@ export default function AboutUs() {
 
   // Fetch API on mount
   useEffect(() => {
-    fetch(`${BASE_URL}/CompanyDetails/getAboutUs`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setAboutData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+  window.scrollTo(0, 0); // 👈 ensures page opens at the top
+  fetch(`${BASE_URL}/CompanyDetails/getAboutUs`)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      return res.json();
+    })
+    .then((data) => {
+      setAboutData(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      setError(err.message);
+      setLoading(false);
+    });
+}, []);
 
   // Conditional rendering for loading state
   if (loading) {
@@ -68,6 +69,8 @@ export default function AboutUs() {
       </>
     );
   }
+
+  
 
   return (
     <>

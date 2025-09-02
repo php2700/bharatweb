@@ -19,6 +19,10 @@ export default function HelpFaqs ()  {
       console.log(error, "ddd");
     }
   };
+  useEffect(() => {
+    getHelpFaqsData();
+    window.scrollTo(0, 0); // 👈 Scroll to top when component mounts
+  }, []);
 
   useEffect(() => {
     getHelpFaqsData();

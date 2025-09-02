@@ -22,6 +22,7 @@ export default function PrivacyPolicy  ()  {
 
   useEffect(() => {
     getPrivacyPolicyData();
+    window.scrollTo(0, 0);
   }, []);
 
   return (

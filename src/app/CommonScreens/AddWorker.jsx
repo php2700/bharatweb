@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 
@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddWorkerDetails() {
  const [images, setImage] = useState(); // initially null rakho
+ useEffect(() => {
+    window.scrollTo(0, 0); // 👈 force scroll to top when component mounts
+  }, []);
 
 const handleImageChange = (e) => {
   const file = e.target.files[0];
