@@ -7,13 +7,15 @@ import Footer from "../../component/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
 import { Pencil } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function EditProfile() {
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
-
   const location = useLocation();
   const { activeTab } = location.state || { activeTab: "user" };
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -25,14 +27,15 @@ export default function EditProfile() {
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const fileInputRef = useRef(null);
+  const [documentPreview, setDocumentPreview] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
 
   // Fetch profile initially
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
- console.log(profile);
-  // Prefill formData when profile loads
+
+  // Prefill formData and document preview when profile loads
   useEffect(() => {
     if (profile && profile.data) {
       setFormData((prev) => ({
@@ -41,18 +44,23 @@ export default function EditProfile() {
         about: profile.data.skill || "",
         category: profile.data.category_id || "",
         subcategory: profile.data.subcategory_ids || [],
-       
-        
       }));
-      
-       
-   
-      
-      
-      
-     
 
-      // If category exists, fetch subcategories for prefill
+      // Document preview (single document)
+      if (profile.data.documents) {
+        if (Array.isArray(profile.data.documents)) {
+          setDocumentPreview(profile.data.documents[0].url || null);
+        } else {
+          setDocumentPreview(profile.data.documents);
+        }
+      }
+
+      // Profile picture
+      if (profile.data.profilePic) {
+        setProfilePic(profile.data.profilePic);
+      }
+
+      // Fetch subcategories for prefill
       if (profile.data.category_id) {
         const fetchSubcategories = async () => {
           try {
@@ -122,7 +130,6 @@ export default function EditProfile() {
     }
   };
 
-  // Handle subcategory select
   const handleSubcategoryChange = (selectedOptions) => {
     setFormData({
       ...formData,
@@ -133,12 +140,15 @@ export default function EditProfile() {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "document" && files[0]) {
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+    if (name === "document" && files && files[0]) {
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/png","image/avif","image/gif"];
       if (!allowedTypes.includes(files[0].type)) {
         alert("Only PDF or image files are allowed!");
         return;
       }
+      setFormData((prev) => ({ ...prev, document: files[0] }));
+      setDocumentPreview(URL.createObjectURL(files[0]));
+      return;
     }
 
     setFormData({ ...formData, [name]: files ? files[0] : value });
@@ -172,7 +182,7 @@ export default function EditProfile() {
       const data = await res.json();
       if (!res.ok) return alert(data.message || "Failed to update profile pic.");
 
-      alert("Profile picture updated successfully!");
+      toast.success("Profile picture updated successfully!");
       dispatch(fetchUserProfile());
     } catch (error) {
       console.error("Error updating profile pic:", error);
@@ -185,19 +195,16 @@ export default function EditProfile() {
     e.preventDefault();
 
     if (!formData.name.trim()) return alert("Name is required!");
-    if (!formData.about.trim() && activeTab !== "user")
-      return alert("Skill is required!");
+    if (!formData.about.trim() && activeTab !== "user") return alert("Skill is required!");
 
     try {
       const token = localStorage.getItem("bharat_token");
 
       if (activeTab === "vendor") {
         if (!formData.category) return alert("Category is required!");
-        if (!formData.subcategory.length)
-          return alert("Select at least one subcategory!");
-        if (!formData.document) return alert("Document required!");
+        if (!formData.subcategory.length) return alert("Select at least one subcategory!");
+        
 
-        // 1️⃣ updateUserDetails
         const fd = new FormData();
         fd.append("document", formData.document);
         fd.append("category_id", formData.category);
@@ -211,7 +218,7 @@ export default function EditProfile() {
         const data = await res.json();
         if (!res.ok) return alert(data.message || "Failed to update vendor profile.");
 
-        // 2️⃣ update name
+        // Update name
         const payload = { full_name: formData.name };
         const resName = await fetch(
           "https://api.thebharatworks.com/api/user/updateUserProfile",
@@ -225,14 +232,12 @@ export default function EditProfile() {
           }
         );
         const dataName = await resName.json();
-        if (!resName.ok)
-          return alert(dataName.message || "Failed to update name.");
+        if (!resName.ok) return alert(dataName.message || "Failed to update name.");
 
-        alert("Vendor profile updated successfully!");
+        toast.success("Vendor profile updated successfully!");
       }
 
       if (activeTab === "user") {
-        // Name update
         const namePayload = { full_name: formData.name };
         const resName = await fetch(
           "https://api.thebharatworks.com/api/user/updateUserProfile",
@@ -248,7 +253,6 @@ export default function EditProfile() {
         const dataName = await resName.json();
         if (!resName.ok) return alert(dataName.message || "Failed to update name.");
 
-        // Skill update
         const skillPayload = { skill: formData.about };
         const resSkill = await fetch(
           "https://api.thebharatworks.com/api/user/updateUserDetails",
@@ -264,7 +268,7 @@ export default function EditProfile() {
         const dataSkill = await resSkill.json();
         if (!resSkill.ok) return alert(dataSkill.message || "Failed to update skill.");
 
-        alert("User profile updated successfully!");
+        toast.success("User profile updated successfully!");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -275,13 +279,13 @@ export default function EditProfile() {
   return (
     <>
       <Header />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Update Your Profile
         </h2>
 
-        {/* Profile Image with Pencil */}
-        
+      
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
@@ -340,9 +344,15 @@ export default function EditProfile() {
                   />
                 </label>
                 <p className="text-sm text-gray-500 mt-1">Only PDF or image files allowed</p>
-         
+
+                {/* Document preview */}
+                {documentPreview && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Document Preview</h3>
+                    <img src={documentPreview} alt="Document Preview" className="w-32 h-32 object-cover mt-2" />
+                  </div>
+                )}
               </div>
-              <img src={Pencil} alt="" />
             </>
           )}
 
@@ -361,7 +371,7 @@ export default function EditProfile() {
 
           <button
             type="submit"
-            className="w-64 lg:w-72 mx-auto bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
+            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
           >
             Submit
           </button>

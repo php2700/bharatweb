@@ -37,18 +37,29 @@ export default function Details() {
   let full_name='N/A';
   let address='N/A';
   let images=image;
-  let skill='';
+  let skill='N/A';
   let category_name='N/A';
   let subcategory_names='N/A';
+  let document='N/A';
+  let status=false;
+  let verified;
    if(profile && profile.data){
     full_name=profile.data.full_name ?profile.data.full_name:'N/A' ;
     address=profile.data.location.address ?profile.data.location.address:'N/A' ;
-    images=profile.data.profilePic;
-    skill=profile.data.skill;
-    category_name=profile.data.category_name;
-    subcategory_names=profile.data.subcategory_names;
+    images=profile.data.profilePic?profile.data.profilePic:'N/A';
+    skill=profile.data.skill?profile.data.skill:'N/A';
+    category_name=profile.data.category_name?profile.data.category_name:'N/A';
+    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'N/A';
+    document=profile.data.documents?profile.data.documents:'N/A';
+    status=profile.data.verified?profile.data.verified:false;
    }
-   console.log(subcategory_names);
+   if(status==true){
+       verified="Verified by Admin";
+   }
+   else{
+     verified="Pending";
+   }
+   console.log(verified);
   
  
  
@@ -252,19 +263,28 @@ const navigate = useNavigate();
         {activeTab === "vendor" && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-              <div className="relative">
-                <img
-                  src={images}
-                  alt="Vendor Profile"
-                  className="w-full h-[550px] object-cover rounded-2xl shadow-md"
-                />
-                <button
-                  className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
-                  aria-label="Edit Vendor Profile Image"
-                >
-                  <img src={Edit} alt="Edit icon" className="w-6 h-6" />
-                </button>
-              </div>
+                  <div className="relative">
+      <img
+        src={images}
+        alt="User Profile"
+        className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+      />
+      <button
+        className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
+        aria-label="Edit Profile Image"
+        onClick={handleEditClick} // 🔹 click triggers file input
+      >
+        <img src={Edit} alt="Edit icon" className="w-7 h-7" />
+      </button>
+      {/* Hidden file input */}
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+      />
+    </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
@@ -418,7 +438,7 @@ const navigate = useNavigate();
                 <div className="flex justify-between items-start">
                   <h2 className="text-xl font-bold">Document</h2>
                   <span className="bg-green-100 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
-                    Verified by Admin
+                    {verified}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-4">
@@ -433,7 +453,7 @@ const navigate = useNavigate();
                     <p className="font-medium">Aadhar card</p>
                   </div>
                   <img
-                    src={Sample2}
+                    src={document}
                     alt="Document Preview"
                     className="w-40 h-24 object-cover rounded-md shadow"
                   />
