@@ -14,17 +14,7 @@ import {  Navigate,useNavigate } from "react-router-dom";
 
 export default function Header() {
   const navigate = useNavigate();
-const logoutdestroy = () => {
- localStorage.removeItem("bharat_token");
 
-  // 🔹 Optional: remove other user-related data
-  localStorage.removeItem("isProfileComplete");
-  localStorage.removeItem("role");
-  localStorage.removeItem("otp");
-
-  // 🔹 Redirect to login page using window.location
-  navigate('/login');
-};
 
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,11 +41,25 @@ const logoutdestroy = () => {
   }, [dispatch]);
 
   // ✅ Safe name check
- const fullName =
+ let fullName =
     profile && profile.data && profile.data.full_name
       ? profile.data.full_name
       : null;
+      if(!localStorage.getItem('bharat_token')){
+        fullName=null;
+      }
+const logoutdestroy = () => {
+ localStorage.removeItem("bharat_token");
 
+  // 🔹 Optional: remove other user-related data
+  localStorage.removeItem("isProfileComplete");
+  localStorage.removeItem("role");
+  localStorage.removeItem("otp");
+  navigate('/login');
+
+  
+  
+};
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
