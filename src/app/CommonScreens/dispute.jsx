@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import banner from "../../assets/profile/banner.png";
 import axios from "axios";
-
+import Swal from "sweetalert2";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dispute() {
@@ -16,7 +16,7 @@ export default function Dispute() {
   const [images, setImages] = useState([]); // changed to array
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   // Handle multiple image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
@@ -95,8 +95,8 @@ export default function Dispute() {
         }
       );
 
-      console.log("Dispute Response:", response.data);
-      alert("Dispute submitted successfully ✅");
+      Swal.fire("Dispute submitted successfully");
+      navigate(-1);
       // Reset form
       setAmount("");
       setDescription("");
@@ -107,7 +107,7 @@ export default function Dispute() {
         "Error submitting dispute:",
         error.response?.data || error.message
       );
-      alert(
+      Swal.fire(
         "Failed to submit dispute ❌\n" +
           JSON.stringify(error.response?.data || error.message)
       );
