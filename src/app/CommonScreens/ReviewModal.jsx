@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function RateVendorModal({ show, onClose, orderId }) {
+export default function ReviewModal({ show, onClose, orderId }) {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [images, setImages] = useState([]);

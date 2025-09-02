@@ -25,30 +25,33 @@ export default function EmergencyTasks() {
 
       setLoading(true);
       try {
-        const response = await fetch(`${BASE_URL}/emergency-order/filtered-emergency-orders`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `${BASE_URL}/emergency-order/filtered-emergency-orders`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);
         }
 
         const data = await response.json();
-console.log("Fetched tasks:", data);
-        // Assuming API response is an array of tasks with fields like:
-        // { id, title, description, posted_date, completion_date, price, location }
+        console.log("Fetched tasks:", data);
         const transformedData = data.data.map((item) => ({
           id: item._id,
-					project_id: item.project_id,
+          project_id: item.project_id,
           name: item.category_id.name,
           image: item.image_urls[0] || "https://via.placeholder.com/150",
           date: new Date(item.createdAt).toLocaleDateString("en-GB"),
           completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
-          price: item.platform_fee ? `₹${item.platform_fee.toLocaleString()}` : "₹0",
+          price: item.platform_fee
+            ? `₹${item.platform_fee.toLocaleString()}`
+            : "₹0",
           skills: item.sub_category_ids.map((sub) => sub.name).join(", "),
           location: item.google_address || "Unknown Location",
         }));
@@ -82,13 +85,12 @@ console.log("Fetched tasks:", data);
 
       {/* Top Banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                <img
-                  src={banner}
-                  alt="Gardening illustration"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
@@ -162,9 +164,7 @@ console.log("Fetched tasks:", data);
                       </span>
                       <button
                         className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
-                         onClick={() =>
-                          navigate(`/emergency/worker/${task.id}`)
-                        }
+                        onClick={() => navigate(`/emergency/worker/${task.id}`)}
                       >
                         View Details
                       </button>
@@ -182,13 +182,12 @@ console.log("Fetched tasks:", data);
           </button>
         </div>
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-                  <img
-                    src={banner}
-                    alt="Gardening illustration"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                </div>
-
+          <img
+            src={banner}
+            alt="Gardening illustration"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       <Footer />
