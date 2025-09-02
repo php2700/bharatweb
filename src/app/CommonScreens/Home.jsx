@@ -208,6 +208,23 @@ export default function Home() {
   const [workerStartX, setWorkerStartX] = useState(0);
   const [workerScrollLeft, setWorkerScrollLeft] = useState(0);
 
+  const handleClick = (e) => {
+    const img = e.target;
+    const clickX = e.nativeEvent.offsetX;
+    const imgWidth = img.offsetWidth;
+
+    if (clickX < imgWidth / 3) {
+      // Left 1/3
+      navigate("/ourservices");
+    } else if (clickX < (2 / 3) * imgWidth) {
+      // Middle 1/3
+      navigate("/bidding/newtask");
+    } else {
+      // Right 1/3
+      navigate("/emergency/userpost");
+    }
+  };
+
   const handleMouseDown = (e) => {
     setIsDown(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
@@ -357,12 +374,13 @@ export default function Home() {
 
       {/* Center Image Section */}
       <div className="flex justify-center items-center mt-8 md:mt-12">
-        <img
-          src={Image}
-          alt="Centered"
-          className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain"
-        />
-      </div>
+      <img
+        src={Image}
+        alt="Centered"
+        onClick={handleClick}
+        className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain cursor-pointer"
+      />
+    </div>
 
       {/* Recent Posted Work & Feature Workers */}
       <div className="bg-[#EDFFF3] py-8 md:py-16">
@@ -478,7 +496,7 @@ export default function Home() {
             </h2>
             <div className="space-y-6 md:space-y-8 mt-6 md:mt-10">
               <div className="flex items-start">
-                <div className="bg-[#382C28] text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 text-base">
+                <div className="bg-[#382C28] text-white rounded-full w-15 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   1
                 </div>
                 <div>
@@ -494,7 +512,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="bg-[#382C28] text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 text-base">
+                <div className="bg-[#382C28] text-white rounded-full w-19 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   2
                 </div>
                 <div>
@@ -510,7 +528,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="bg-[#382C28] text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 text-base">
+                <div className="bg-[#382C28] text-white rounded-full w-25 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   3
                 </div>
                 <div>
@@ -603,7 +621,7 @@ export default function Home() {
       </div>
 
       {/* Pricing Section */}
-      <div className="w-full bg-[#382C28] py-8 md:py-16 px-4 text-center">
+      <div className="w-full bg-[#382C28] py-8 md:py-16 px-4 text-center mt-15">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
           Transparent & Flexible Pricing <br />
           to Match Your Needs & Budget
@@ -611,8 +629,8 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col md:flex-row md:justify-center md:gap-5 max-w-[90%] lg:max-w-[70%]">
           {[
             {
-              title: "Standard",
-              price: "$10",
+              title: "₹999",
+              price: "(₹333/month)",
               features: [
                 "Affordable rates suitable for routine cleaning needs.",
                 "Includes basic cleaning tasks such as dusting, vacuuming, and bathroom cleaning.",
@@ -620,8 +638,8 @@ export default function Home() {
               ],
             },
             {
-              title: "Premium",
-              price: "$25",
+              title: "₹2499",
+              price: "(₹416/month)",
               features: [
                 "Competitive pricing for a more thorough and comprehensive clean.",
                 "Covers deep cleaning tasks like baseboard cleaning, appliance detailing, and interior window cleaning.",
@@ -629,8 +647,8 @@ export default function Home() {
               ],
             },
             {
-              title: "Customized",
-              price: "$$",
+              title: "₹4499",
+              price: "(₹374/month)",
               features: [
                 "Tailored pricing based on your unique cleaning requirements.",
                 "Allows you to select specific services and create a cleaning package that suits your preferences.",
@@ -640,15 +658,15 @@ export default function Home() {
           ].map((plan, index) => (
             <div
               key={index}
-              className="group bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center transition-all duration-300 flex flex-col justify-between mb-6 md:mb-0 flex-1"
+              className="group bg-white p-2 sm:p-6 rounded-lg shadow-lg text-center transition-all duration-300 flex flex-col justify-between mb-6 md:mb-0 flex-1"
             >
               <div>
                 <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382C28] group-hover:text-[#228B22] mb-4 transition">
                   {plan.title}
                 </h3>
-                <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-6 md:mt-10 transition">
+                <p className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-6 md:mt-10 transition">
                   {plan.price}
-                  <span className="text-sm sm:text-base md:text-lg font-medium">/yr.</span>
+                  <span className="text-sm sm:text-base md:text-xl font-medium">/yr.</span>
                 </p>
                 <ul className="mt-6 md:mt-10 space-y-2 flex flex-col items-start w-full text-left px-2 sm:px-4">
                   {plan.features.map((feature, i) => (

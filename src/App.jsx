@@ -17,6 +17,7 @@ import Referral from "./app/CommonScreens/Referral";
 import SendMoney from "./app/CommonScreens/SendMoney";
 import ProcessingPayment from "./app/CommonScreens/ProcessingPayment";
 import Details from "./app/CommonScreens/Details";
+import FilterWorker from "./app/directHiring/User/FilterWorker";
 
 // Protected Screens
 import ServiceProviderHome from "./app/CommonScreens/Home-service_provider";
@@ -96,6 +97,7 @@ export default function App() {
       <Route path="/add-worker" element={<AddWorkerDetails />} />
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
       <Route path="/editprofile" element={<EditProfile />} />
+      <Route path="/filter-worker" element={<FilterWorker />} />
 
       {/* Service Provider Routes */}
       <Route
@@ -127,7 +129,8 @@ export default function App() {
         path="/service-provider-hire-detail"
         element={<ServiceProviderHireDetail />}
       />
-      <Route path="/direct-hiring/:workerId" element={<DirectHiring />} />
+      <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path="/emergency/worker/assign-work" element={<AssignWork />} />
       <Route path="/dispute/:orderId/:type" element={<Dispute />} />
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
       <Route path="/mywork" element={<MyWork />} />

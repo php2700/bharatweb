@@ -50,8 +50,10 @@ export default function Header() {
         {/* Left Section - Logo */}
         <div className="flex items-center gap-4 flex-1">
           <div className="flex-shrink-0">
-            <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
-          </div>
+  <Link to="/">
+    <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
+  </Link>
+</div>
         </div>
 
         {/* Desktop Navigation - hidden on mobile */}

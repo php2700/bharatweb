@@ -113,7 +113,7 @@ export default function WorkCategories() {
                   key={index}
                   className="flex flex-col items-center p-4 sm:p-6 rounded-lg w-28 sm:w-32 
              transition transform hover:scale-120 hover:shadow-lg cursor-pointer"
-                  onClick={() => OurSubCategories(cat._id)}
+                  onClick={() => OurSubCategories(cat)}
                 >
                   <div className="w-12 h-12 flex items-center justify-center rounded-full bg-[#D3E8D3]">
                     <img

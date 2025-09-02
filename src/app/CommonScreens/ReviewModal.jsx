@@ -1,22 +1,37 @@
 // RateVendorModal.jsx
 import React, { useState } from "react";
 import axios from "axios";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import Swal from "sweetalert2";
 
-export default function ReviewModal({ show, onClose, orderId }) {
+export default function ReviewModal({
+  show,
+  onClose,
+  orderId,
+  service_provider_id,
+  type,
+}) {
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [images, setImages] = useState([]);
-
+  console.log("ReviewModal props:", {
+    show,
+    onClose,
+    orderId,
+    service_provider_id,
+    type,
+  });
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
       const formData = new FormData();
-      formData.append("serviceProviderId", service_provider_id);
-      formData.append("review", review);
+      formData.append("serviceProviderId", service_provider_id); // ✅ correct key for backend
+      formData.append("review", feedback);
       formData.append("rating", rating);
+
       if (orderId) formData.append("orderId", orderId);
       if (type) formData.append("type", type);
-      images.forEach((img) => formData.append("images[]", img));
+      images.forEach((img) => formData.append("images", img));
 
       await axios.post(`${BASE_URL}/user/add-review`, formData, {
         headers: {
@@ -25,16 +40,29 @@ export default function ReviewModal({ show, onClose, orderId }) {
         },
       });
 
-      alert("Thank you for rating the vendor!");
+      Swal.fire({
+      title: "Success!",
+      text: "Thank you for rating the vendor!",
+      icon: "success",
+      confirmButtonColor: "#228B22",
+    }).then(() => {
       setRating(0);
       setFeedback("");
       setImages([]);
-      onClose(); // close modal
-    } catch (err) {
-      console.error(err);
-      alert("Failed to submit rating. Please try again.");
-    }
-  };
+      onClose();
+    });
+  } catch (err) {
+    console.error(err);
+
+    // ❌ Error SweetAlert
+    Swal.fire({
+      title: "Error!",
+      text: "Failed to submit rating. Please try again.",
+      icon: "error",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
 
   if (!show) return null;
 

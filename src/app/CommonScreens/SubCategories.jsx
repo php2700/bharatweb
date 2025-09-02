@@ -3,8 +3,10 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import banner from "../../assets/profile/banner.png";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function OurSubCategories() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { service } = location.state || {};
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -37,7 +39,7 @@ export default function OurSubCategories() {
         });
 
         const data = await res.json();
-            
+
         if (res.ok && data.status) {
           setSubcategories(data.data || []);
         } else {
@@ -62,6 +64,23 @@ export default function OurSubCategories() {
       </>
     );
   }
+
+  const handleHire = () => {
+    // Pick selected subcategory IDs
+    const selectedSubIds = selectedIndexes.map((i) => subcategories[i]._id);
+
+    if (selectedSubIds.length === 0) {
+      alert("Please select at least one subcategory!");
+      return;
+    }
+
+    navigate("/service-provider-list", {
+      state: {
+        category_id: service._id,   // 👈 from WorkCategories
+        subcategory_id: selectedSubIds[0], // 👈 for now picking the first
+      },
+    });
+  };
 
   return (
     <>
@@ -92,34 +111,49 @@ export default function OurSubCategories() {
                 >
                   <div className="flex justify-center mb-4">
                     <div className="w-15 h-15 flex items-center justify-center rounded-full bg-[#D3E8D3]">
-                                          <img
-  src={sub.image ? sub.image : "/src/assets/workcategory/default.png"}
-  alt={sub.name}
-  className="w-[39px] h-[39px] filter brightness-0 sepia saturate-100 hue-rotate-100"
-  style={{
-    filter:
-      "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
-  }}
-/>
+                      <img
+                        src={
+                          sub.image
+                            ? sub.image
+                            : "/src/assets/workcategory/default.png"
+                        }
+                        alt={sub.name}
+                        className="w-[39px] h-[39px] filter brightness-0 sepia saturate-100 hue-rotate-100"
+                        style={{
+                          filter:
+                            "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
+                        }}
+                      />
                     </div>
                   </div>
                   <h3 className="text-[23px] font-[500] text-center mb-2 text-[#000000]">
                     {sub.name}
                   </h3>
-                  <p className="text-[#777777] text-[17px] text-center">{sub.desc}</p>
+                  <p className="text-[#777777] text-[17px] text-center">
+                    {sub.desc}
+                  </p>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+      <div className="flex justify-center mt-10 mb-6">
+        <button
+          onClick={handleHire}
+          className="bg-[#228B22] text-white px-10 py-3 rounded-md text-lg font-semibold shadow-md hover:bg-green-700 transition"
+        >
+          Hire
+        </button>
+      </div>
+
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       <div className="mt-[50px]">
         <Footer />

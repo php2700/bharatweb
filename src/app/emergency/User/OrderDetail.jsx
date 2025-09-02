@@ -355,10 +355,11 @@ export default function ViewProfile() {
   <ReviewModal
   show={showCompletedModal}
   onClose={() => setShowCompletedModal(false)}
-  serviceProviderId={orderData?.service_provider_id} // pass the vendor ID
-  orderId={id} // optional if backend needs it
-  type="emergency" // optional if backend requires type
+  service_provider_id={orderData?.service_provider_id._id}
+  orderId={id}
+  type="emergency"
 />
+
 </>
           <Link to={`/dispute/${id}/emergency`}>
   <button
