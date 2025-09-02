@@ -33,25 +33,36 @@ export default function Details() {
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
-  console.log(profile);
+  
+  
+   let element;
+   let testimage;
   let full_name='N/A';
   let address='N/A';
-  let images=image;
-  let skill='N/A';
-  let category_name='N/A';
-  let subcategory_names='N/A';
-  let document='N/A';
+  let images='';
+  let skill='Not Available';
+  let category_name='Not Available';
+  let subcategory_names='Not Available';
+  let document='Not Available';
   let status=false;
   let verified;
    if(profile && profile.data){
-    full_name=profile.data.full_name ?profile.data.full_name:'N/A' ;
-    address=profile.data.location.address ?profile.data.location.address:'N/A' ;
-    images=profile.data.profilePic?profile.data.profilePic:'N/A';
-    skill=profile.data.skill?profile.data.skill:'N/A';
-    category_name=profile.data.category_name?profile.data.category_name:'N/A';
-    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'N/A';
-    document=profile.data.documents?profile.data.documents:'N/A';
+    full_name=profile.data.full_name ?profile.data.full_name:'Not Available' ;
+    address=profile.data.full_address[0].address ?profile.data.full_address[0].address:'Not Available' ;
+    images=profile.data.profilePic?profile.data.profilePic:'Not Available';
+    skill=profile.data.skill?profile.data.skill:'Not Available';
+    category_name=profile.data.category_name?profile.data.category_name:'Not Available';
+    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'Not Available';
+    document=profile.data.documents?profile.data.documents:'Not Available';
     status=profile.data.verified?profile.data.verified:false;
+    
+   if (profile.data.documents) {
+  element = <img src={document} alt="Image not uploaded" className="w-40 h-24 object-cover rounded-md shadow" />;
+} else {
+  element = <div className="w-40 h-24 flex items-center justify-center bg-gray-200 rounded-md shadow text-gray-700">No Uploaded</div>;
+}
+testimage = profile.data.profilePic && profile.data.profilePic !== "";
+
    }
    if(status==true){
        verified="Verified by Admin";
@@ -59,7 +70,11 @@ export default function Details() {
    else{
      verified="Pending";
    }
-   console.log(verified);
+  
+
+
+
+  
   
  
  
@@ -123,7 +138,12 @@ const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
 
-  const workImages = [Sample, Sample2];
+  let workImages = [];
+  if(profile && profile.data){
+    workImages=profile.data.hiswork?profile.data.hiswork:'Not Avaialable';
+    
+  }
+  
   const reviewImages = [Sample2, Sample];
  const Editpage=()=>{
   navigate('/editprofile', { state: { activeTab } });
@@ -145,6 +165,59 @@ const navigate = useNavigate();
   const handleToggle = () => {
     setIsEmergencyOn(!isEmergencyOn);
   };
+  const [isUploading, setIsUploading] = useState(false);
+  const hiddenFileInputRef = useRef(null);
+const handleGalleryEditClick = () => {
+    if (hiddenFileInputRef.current) hiddenFileInputRef.current.click();
+  };
+
+  // 🔹 File input change -> upload to API
+const handleGalleryFileChange = async (e) => {
+  const selectedFiles = Array.from(e.target.files);
+
+  if (selectedFiles.length === 0) return;
+  if (selectedFiles.length > 5) {
+    toast.error("You can upload maximum 5 images at once");
+    return;
+  }
+
+  const formPayload = new FormData();
+
+  // ✅ Append files with unique names and correct field name (hiswork[])
+  selectedFiles.forEach((file, index) => {
+    const uniqueFile = new File([file], `${Date.now()}_${index}_${file.name}`, {
+      type: file.type,
+    });
+    formPayload.append("hiswork", uniqueFile); // <-- note the []
+  });
+
+  const authToken = localStorage.getItem("bharat_token");
+
+  try {
+    setIsUploading(true);
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/updateHisWork`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${authToken}` },
+      body: formPayload, // ✅ no JSON header, keep as multipart/form-data
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast.success("Images updated successfully!");
+      setGalleryImages(data.updatedImages || []);
+    } else {
+      toast.error(data.message || "Failed to update images");
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    
+  } finally {
+    setIsUploading(false);
+    e.target.value = null; // Reset input
+  }
+};
+
 
   return (
     <>
@@ -197,45 +270,57 @@ const navigate = useNavigate();
       </div>
 
       <div className="container mx-auto px-6 py-6">
-          <button
-          onClick={()=>Editpage()}
+        <button
+  onClick={() => Editpage()}
   type="button"
   className="flex items-center gap-2 text-white bg-[#228B22] 
-             hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 
-             dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
-             me-2 mb-2 float-right"
+             hover:bg-[#0254c6] 
+             focus:ring-4 focus:outline-none focus:ring-green-300 
+             dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+             me-2 mb-2 float-right transition-colors duration-300"
 >
   <img src={edit} alt="Edit" width="20px" />
   Edit Profile
 </button>
+
+
 
         {activeTab === "user" && (
           
           <div className="p-6">
           
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-              <div className="relative">
-      <img
-        src={images}
-        alt="User Profile"
-        className="w-full h-[550px] object-cover rounded-2xl shadow-md"
-      />
-      <button
-        className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
-        aria-label="Edit Profile Image"
-        onClick={handleEditClick} // 🔹 click triggers file input
-      >
-        <img src={Edit} alt="Edit icon" className="w-7 h-7" />
-      </button>
-      {/* Hidden file input */}
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-      />
+          <div className="relative">
+  {testimage ? (
+    <img
+      src={images}
+      alt="User Profile"
+      className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+    />
+  ) : (
+    <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
+      Not available
     </div>
+  )}
+
+  <button
+    className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
+    aria-label="Edit Profile Image"
+    onClick={handleEditClick} // 🔹 click triggers file input
+  >
+    <img src={Edit} alt="Edit icon" className="w-7 h-7" />
+  </button>
+
+  {/* Hidden file input */}
+  <input
+    type="file"
+    accept="image/*"
+    className="hidden"
+    ref={fileInputRef}
+    onChange={handleFileChange}
+  />
+</div>
+
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
@@ -245,16 +330,19 @@ const navigate = useNavigate();
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
                 </div>
-                <div className="p-4 shadow-xl mt-[70px] max-w-[600px]">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-xl">About My Skill</h3>
-                    
-                  </div>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                     {skill}
-                     
-                  </p>
-                </div>
+                <div
+  className={`p-4 shadow-xl  max-w-[600px] ${
+    skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+  }`}
+>
+  <div className="flex items-center justify-between">
+    <h3 className="font-semibold text-xl">About My Skill</h3>
+  </div>
+  <p className="text-gray-700 text-sm leading-relaxed">
+    {skill}
+  </p>
+</div>
+
               </div>
             </div>
           </div>
@@ -264,11 +352,17 @@ const navigate = useNavigate();
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
                   <div className="relative">
-      <img
-        src={images}
-        alt="User Profile"
-        className="w-full h-[550px] object-cover rounded-2xl shadow-md"
-      />
+     {testimage ? (
+    <img
+      src={images}
+      alt="User Profile"
+      className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+    />
+  ) : (
+    <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
+      Not available
+    </div>
+  )}
       <button
         className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
         aria-label="Edit Profile Image"
@@ -307,32 +401,19 @@ const navigate = useNavigate();
   ))}
 </p>
 
-                <div className="p-4 shadow-md bg-white max-w-[600px]">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold">About My Skill</h3>
-                    
-                  </div>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {skill}
-                   
-                  </p>
-                </div>
-                <div className="flex gap-4 mt-4">
-                  <button
-                    className="flex items-center gap-2 px-4 py-2 border border-[#228B22] text-[#228B22] rounded-md shadow-md"
-                    aria-label="Send Message"
-                  >
-                    <img src={Chat} alt="Message icon" className="w-5 h-5" />
-                    Message
-                  </button>
-                  <button
-                    className="flex items-center gap-2 px-4 py-2 border border-[#228B22] text-[#228B22] rounded-md shadow-md"
-                    aria-label="Make a Call"
-                  >
-                    <img src={Call} alt="Call icon" className="w-5 h-5" />
-                    Call
-                  </button>
-                </div>
+                     <div
+  className={`p-4 shadow-xl  max-w-[600px] ${
+    skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+  }`}
+>
+  <div className="flex items-center justify-between">
+    <h3 className="font-semibold text-xl">About My Skill</h3>
+  </div>
+  <p className="text-gray-700 text-sm leading-relaxed">
+    {skill}
+  </p>
+</div>
+               
               </div>
             </div>
 
@@ -369,32 +450,80 @@ const navigate = useNavigate();
               </div>
 
               {vendorTab === "work" && (
+                
                 <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
-                  <div className="relative">
-                    <img
-                      src={workImages[currentIndex]}
-                      alt={`Work sample ${currentIndex + 1}`}
-                      className="w-[700px] rounded-md shadow-md"
-                    />
-                    <div className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md">
-                      <img src={Edit} alt="icon" className="w-6 h-6" />
-                    </div>
-                  </div>
+                 
+                 <div className="relative w-[700px] h-[400px]">
+  {workImages.length > 0 ? (
+    <>
+      <img
+        src={workImages[currentIndex]}
+        alt={`Work sample ${currentIndex + 1}`}
+        className="w-full h-full object-cover rounded-md shadow-md"
+      />
+      <div
+        className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+        onClick={handleGalleryEditClick}
+      >
+        <img src={edit} alt="Edit" className="w-6 h-6" />
+      </div>
+    </>
+  ) : (
+    <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+      Not available
+      <div
+        className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+        onClick={handleGalleryEditClick}
+      >
+        <img src={edit} alt="Edit" className="w-6 h-6" />
+      </div>
+    </div>
+    
+  )}
+
+  <input
+    type="file"
+    ref={hiddenFileInputRef}
+    accept="image/*"
+    multiple
+    onChange={handleGalleryFileChange}
+    className="hidden"
+  />
+
+  {isUploading && (
+    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white font-bold text-lg rounded-md">
+      Uploading...
+    </div>
+  )}
+</div>
+
+                 
                 </div>
               )}
 
               {vendorTab === "review" && (
                 <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
-                  <div className="relative">
-                    <img
-                      src={reviewImages[currentIndex]}
-                      alt={`Review ${currentIndex + 1}`}
-                      className="w-[700px] rounded-md shadow-md"
-                    />
-                    <div className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md">
-                      <img src={Edit} alt="icon" className="w-6 h-6" />
-                    </div>
-                  </div>
+                  <div className="relative w-[700px]">
+      <img
+        src={images[currentIndex]}
+        alt={`Review ${currentIndex + 1}`}
+        className="w-full rounded-md shadow-md"
+      />
+      <div
+        className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+        onClick={handleEditClick}
+      >
+        <img src={Edit} alt="please" className="w-6 h-6" />
+      </div>
+
+      {uploading && (
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white font-semibold rounded-md">
+          Uploading...
+        </div>
+      )}
+
+      <ToastContainer position="top-right" autoClose={3000} />
+    </div>
                 </div>
               )}
             </div>
@@ -452,11 +581,9 @@ const navigate = useNavigate();
                     </div>
                     <p className="font-medium">Aadhar card</p>
                   </div>
-                  <img
-                    src={document}
-                    alt="Document Preview"
-                    className="w-40 h-24 object-cover rounded-md shadow"
-                  />
+      {element}
+
+
                 </div>
               </div>
             </div>
