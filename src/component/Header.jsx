@@ -10,8 +10,13 @@ import bank from '../assets/login/bank.png'
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../redux/userSlice";
+import {  Navigate,useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
+
+
+
   const [isOpen, setIsOpen] = useState(false);
     const [isAccountOpen, setIsAccountOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -36,11 +41,25 @@ export default function Header() {
   }, [dispatch]);
 
   // ✅ Safe name check
- const fullName =
+ let fullName =
     profile && profile.data && profile.data.full_name
       ? profile.data.full_name
       : null;
+      if(!localStorage.getItem('bharat_token')){
+        fullName=null;
+      }
+const logoutdestroy = () => {
+ localStorage.removeItem("bharat_token");
 
+  // 🔹 Optional: remove other user-related data
+  localStorage.removeItem("isProfileComplete");
+  localStorage.removeItem("role");
+  localStorage.removeItem("otp");
+  navigate('/login');
+
+  
+  
+};
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -50,10 +69,8 @@ export default function Header() {
         {/* Left Section - Logo */}
         <div className="flex items-center gap-4 flex-1">
           <div className="flex-shrink-0">
-  <Link to="/">
-    <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
-  </Link>
-</div>
+            <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
+          </div>
         </div>
 
         {/* Desktop Navigation - hidden on mobile */}
@@ -140,7 +157,7 @@ export default function Header() {
 
   {/* Logout Item */}
   <button
-   
+   onClick={()=>logoutdestroy()}
     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
   >
     <img src={logout} alt="Logout" className="w-5 h-5" style={{color:'black'}} />

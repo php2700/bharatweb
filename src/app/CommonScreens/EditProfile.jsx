@@ -6,11 +6,13 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
+import {Navigate,useNavigate } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function EditProfile() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
   const location = useLocation();
@@ -194,15 +196,15 @@ export default function EditProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) return alert("Name is required!");
-    if (!formData.about.trim() && activeTab !== "user") return alert("Skill is required!");
+    if (!formData.name.trim()) return toast.error("Name is required!");
+    if (!formData.about.trim() && activeTab !== "user") return toast.error("Skill is required!");
 
     try {
       const token = localStorage.getItem("bharat_token");
 
       if (activeTab === "vendor") {
-        if (!formData.category) return alert("Category is required!");
-        if (!formData.subcategory.length) return alert("Select at least one subcategory!");
+        if (!formData.category) return toast.error("Category is required!");
+        if (!formData.subcategory.length) return toast.error("Select at least one subcategory!");
         
 
         const fd = new FormData();
@@ -235,6 +237,10 @@ export default function EditProfile() {
         if (!resName.ok) return alert(dataName.message || "Failed to update name.");
 
         toast.success("Vendor profile updated successfully!");
+        setTimeout(() => {
+  navigate("/details");
+}, 2000);
+
       }
 
       if (activeTab === "user") {
@@ -269,6 +275,11 @@ export default function EditProfile() {
         if (!resSkill.ok) return alert(dataSkill.message || "Failed to update skill.");
 
         toast.success("User profile updated successfully!");
+
+setTimeout(() => {
+  navigate("/details");
+}, 3000); // ✅ 3 sec baad navigate hoga
+
       }
     } catch (error) {
       console.error("Error:", error);
@@ -358,16 +369,23 @@ export default function EditProfile() {
 
           {/* About Skill */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">About My Skill</label>
-            <textarea
-              name="about"
-              value={formData.about}
-              onChange={handleChange}
-              placeholder="Describe your skill..."
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
-              rows="4"
-            ></textarea>
-          </div>
+  <label className="block mb-2 font-semibold text-gray-700">About My Skill</label>
+  <textarea
+    name="about"
+    value={formData.about}
+    onChange={handleChange}
+    placeholder="Describe your skill..."
+    maxLength={300}   // ✅ sirf 150 character tak hi allow
+    className="w-full px-4 py-2 rounded-lg border border-gray-300 
+               focus:outline-none focus:ring-2 focus:ring-blue-400 
+               focus:border-transparent transition resize-none"
+    rows="4"
+  ></textarea>
+  <p className="text-sm text-gray-500 mt-1">
+    {formData.about.length}/300 characters
+  </p>
+</div>
+
 
           <button
             type="submit"
