@@ -64,40 +64,6 @@ export default function RoleSelection() {
 
           {/* Role Options */}
           <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 mt-6">
-            {/* Business */}
-            <div
-              onClick={() => dispatch(selectRole("service_provider"))}
-              className={`flex flex-col items-center cursor-pointer transition-transform ${
-                selectedRole === "business" ? "scale-105" : ""
-              }`}
-            >
-              <div className="relative">
-                <div
-                  className={`w-24 h-24 sm:w-36 sm:h-36 rounded-full flex items-center justify-center border-4 bg-white shadow-[0px_2px_1px_1px_#bab1b1] ${
-                    selectedRole === "service_provider"
-                      ? "border-green-600"
-                      : "border-transparent"
-                  }`}
-                >
-                  <img
-                    src={business}
-                    alt="Business"
-                    className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-[82px]"
-                  />
-                </div>
-
-                {selectedRole === "service_provider" && (
-                  <CheckCircle
-                    size={20}
-                    className="absolute bottom-1 right-7 rounded-full p-[3px] bg-[#228B22] stroke-white"
-                  />
-                )}
-              </div>
-              <p className="mt-2 font-medium text-lg sm:text-xl text-black drop-shadow-[2px_4px_6px_rgba(0,0,0,0.3)]">
-                Business
-              </p>
-            </div>
-
             {/* Customer */}
             <div
               onClick={() => dispatch(selectRole("user"))}
@@ -113,9 +79,9 @@ export default function RoleSelection() {
                       : "border-transparent"
                   }`}
                 >
-                  <img
-                    src={customer}
-                    alt="Customer"
+                   <img
+                    src={business}
+                    alt="Business"
                     className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-[82px]"
                   />
                 </div>
@@ -131,6 +97,42 @@ export default function RoleSelection() {
                 Customer
               </p>
             </div>
+            {/* Business */}
+            <div
+              onClick={() => dispatch(selectRole("service_provider"))}
+              className={`flex flex-col items-center cursor-pointer transition-transform ${
+                selectedRole === "business" ? "scale-105" : ""
+              }`}
+            >
+              <div className="relative">
+                <div
+                  className={`w-24 h-24 sm:w-36 sm:h-36 rounded-full flex items-center justify-center border-4 bg-white shadow-[0px_2px_1px_1px_#bab1b1] ${
+                    selectedRole === "service_provider"
+                      ? "border-green-600"
+                      : "border-transparent"
+                  }`}
+                >
+                   <img
+                    src={customer}
+                    alt="Customer"
+                    className="w-24 h-24 sm:w-32 sm:h-32 object-contain rounded-[82px]"
+                  />
+                 
+                </div>
+
+                {selectedRole === "service_provider" && (
+                  <CheckCircle
+                    size={20}
+                    className="absolute bottom-1 right-7 rounded-full p-[3px] bg-[#228B22] stroke-white"
+                  />
+                )}
+              </div>
+              <p className="mt-2 font-medium text-lg sm:text-xl text-black drop-shadow-[2px_4px_6px_rgba(0,0,0,0.3)]">
+                Business
+              </p>
+            </div>
+
+            
           </div>
 
           {/* Sub Text */}

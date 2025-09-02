@@ -6,10 +6,9 @@ import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import banner from "../../assets/profile/banner.png";
-import image from '../../assets/login/img.png';
+import image from "../../assets/login/img.png";
 import logo from "../../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
-
 
 export default function OtpVerification() {
   const dispatch = useDispatch();
@@ -20,7 +19,7 @@ export default function OtpVerification() {
 
   const mobile = localStorage.getItem("mobileNumber");
 
-  // ✅ Verify OTP
+  // ✅ Verify OTP (form submit)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const enteredOtp = otp.join("");
@@ -44,14 +43,12 @@ export default function OtpVerification() {
 
       if (res.ok) {
         localStorage.setItem("bharat_token", data.token);
-        localStorage.setItem('role',data.role);
-        localStorage.setItem('isProfileComplete',data.isProfileComplete);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("isProfileComplete", data.isProfileComplete);
         toast.success("OTP verified successfully!");
-        
 
-    
         localStorage.removeItem("mobileNumber");
-         
+
         setTimeout(() => {
           navigate("/select-role");
         }, 2000);
@@ -77,7 +74,7 @@ export default function OtpVerification() {
 
       if (res.ok) {
         localStorage.setItem("otp", data.temp_otp);
-        toast.success("OTP resent successfully!");
+        toast.success("OTP resend successfully!");
       } else {
         toast.error(data.message || "Failed to resend OTP");
       }
@@ -86,29 +83,37 @@ export default function OtpVerification() {
       toast.error("Something went wrong while resending OTP");
     }
   };
-const otpv=localStorage.getItem('otp');
+
+  const otpv = localStorage.getItem("otp");
+
   return (
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen flex items-center justify-center bg-white mt-[50px]">
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
+          {/* Left Image */}
           <div className="md:block md:w-1/2">
-                      <img
-                        src={image}
-                        alt="Plumber working"
-                        className="w-full h-full object-cover [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
-                      />
-                    </div>
+            <img
+              src={image}
+              alt="Plumber working"
+              className="w-full h-full object-cover [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
+            />
+          </div>
 
+          {/* Right Section */}
           <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16">
-            <div className="flex flex-col items-center space-y-6">
+            {/* ✅ Wrapped everything in a form */}
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col items-center space-y-6"
+            >
               <img
                 src={logo}
                 alt="The Bharat Works"
                 className="w-[200px] md:w-[286px] h-auto object-contain mb-24"
               />
-                <h1 className="text-[#ff2108] text-[20px]">Otp is : {otpv}</h1>
+              <h1 className="text-[#ff2108] text-[20px]">Otp is : {otpv}</h1>
               <h2 className="text-2xl font-bold text-gray-900 relative top-[18px]">
                 Verify OTP
               </h2>
@@ -119,6 +124,7 @@ const otpv=localStorage.getItem('otp');
                 </span>
               </p>
 
+              {/* OTP Inputs */}
               <div className="flex space-x-3">
                 {otp.map((digit, index) => (
                   <input
@@ -155,36 +161,38 @@ const otpv=localStorage.getItem('otp');
                 ))}
               </div>
 
+              {/* Resend OTP */}
               <p className="text-[#334247] text-[16px] font-semibold text-center">
-                Didn’t get OTP Code ? <br />
+                Didn’t get OTP Code? <br />
                 <button
                   type="button"
-                  onClick={handleResendOtp} // ✅ API call binded here
+                  onClick={handleResendOtp}
                   className="text-green-600 font-semibold hover:underline mt-1"
                 >
                   Resend Code
                 </button>
               </p>
 
+              {/* Verify Button (submit type) */}
               <button
-                onClick={handleSubmit}
+                type="submit"
                 className="w-full sm:w-[300px] md:w-[330px] lg:w-[390px] bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-xl text-[18px]"
               >
                 Verify
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>
 
+      {/* Banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-
+        <img
+          src={banner}
+          alt="Gardening illustration"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
 
       <div className="mt-[50px]">
         <Footer />

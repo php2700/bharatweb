@@ -27,8 +27,7 @@ useEffect(() => {
   } else if (Notification.permission === "granted") {
     setPermissionGranted(true);
   } else {
-    // User blocked
-    toast.info("Please enable notifications!");
+    
   }
 }, []);
 

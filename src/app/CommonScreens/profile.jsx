@@ -144,7 +144,7 @@ export default function Profile() {
     else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100)
       newErrors.age = "Enter a valid age between 1 and 100";
     if (!formData.gender.trim()) newErrors.gender = "Gender is required";
-    if (!formData.location.trim()) newErrors.location = "Please select your location";
+    // if (!formData.location.trim()) newErrors.location = "Please select your location";
     if (!formData.address.trim()) newErrors.address = "Address is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -161,11 +161,11 @@ export default function Profile() {
         role,
         gender: formData.gender,
         age: Number(formData.age),
-        location: {
-          latitude: markerLocationGPS?.lat || 0,
-          longitude: markerLocationGPS?.lng || 0,
-          address: formData.location,
-        },
+        // location: {
+        //   latitude: markerLocationGPS?.lat || 0,
+        //   longitude: markerLocationGPS?.lng || 0,
+        //   address: formData.location,
+        // },
         full_address: [
           {
             latitude: markerLocationAddress?.lat || 0,
@@ -229,18 +229,23 @@ export default function Profile() {
             </div>
 
             {/* Age */}
-            <div>
-              <label className="font-[700] block text-center">Your Age</label>
-              <input
-                type="number"
-                name="age"
-                placeholder="Enter Your Age"
-                value={formData.age}
-                onChange={handleChange}
-                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
-              />
-              {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
-            </div>
+             <div>
+  <label className="font-[700] block text-center">Your Age</label>
+  <input
+    type="text"   // ✅ ab text hi hai
+    name="age"
+    placeholder="Enter Your Age"
+    value={formData.age}
+    onChange={(e) => {
+      let value = e.target.value;
+      // ✅ sirf number hi allow + max 2 digit
+      value = value.replace(/[^0-9]/g, "").slice(0, 2);
+      handleChange({ target: { name: "age", value } });
+    }}
+    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
+  />
+  {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
+</div>
 
             {/* Gender */}
             <div>
@@ -259,8 +264,8 @@ export default function Profile() {
               {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
             </div>
 
-            {/* Location */}
-            <div>
+            {/* Location Gps */}
+            {/* <div>
               <label className="font-[700] block text-center">Location (GPS)</label>
               <input
                 type="text"
@@ -274,7 +279,7 @@ export default function Profile() {
                 className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
               />
               {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
-            </div>
+            </div> */}
 
             {/* Full Address */}
             <div>

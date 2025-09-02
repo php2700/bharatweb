@@ -10,8 +10,23 @@ import bank from '../assets/login/bank.png'
 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../redux/userSlice";
+import {  Navigate,useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
+const logoutdestroy = () => {
+ localStorage.removeItem("bharat_token");
+
+  // 🔹 Optional: remove other user-related data
+  localStorage.removeItem("isProfileComplete");
+  localStorage.removeItem("role");
+  localStorage.removeItem("otp");
+
+  // 🔹 Redirect to login page using window.location
+  navigate('/login');
+};
+
+
   const [isOpen, setIsOpen] = useState(false);
     const [isAccountOpen, setIsAccountOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -140,7 +155,7 @@ export default function Header() {
 
   {/* Logout Item */}
   <button
-   
+   onClick={()=>logoutdestroy()}
     className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
   >
     <img src={logout} alt="Logout" className="w-5 h-5" style={{color:'black'}} />
