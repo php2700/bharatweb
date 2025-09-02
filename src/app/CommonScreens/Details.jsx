@@ -23,6 +23,7 @@ import EditProfile from "./EditProfile";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { spread } from "axios";
 export default function Details() {
   const [image, setImage] = useState(User); // image state
   const fileInputRef = useRef(null); // ref for hidden input
@@ -35,31 +36,34 @@ export default function Details() {
   }, [dispatch]);
   
   
+  
    let element;
    let testimage;
   let full_name='N/A';
   let address='N/A';
   let images='';
-  let skill='Not Available';
-  let category_name='Not Available';
-  let subcategory_names='Not Available';
+  let skill='No Any Skill Available';
+  let category_name='No Any Category Available';
+  let subcategory_names='No Any Sub Category Available';
   let document='Not Available';
   let status=false;
   let verified;
+  let rateAndReviews=[];
    if(profile && profile.data){
     full_name=profile.data.full_name ?profile.data.full_name:'Not Available' ;
     address=profile.data.full_address[0].address ?profile.data.full_address[0].address:'Not Available' ;
     images=profile.data.profilePic?profile.data.profilePic:'Not Available';
-    skill=profile.data.skill?profile.data.skill:'Not Available';
-    category_name=profile.data.category_name?profile.data.category_name:'Not Available';
-    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'Not Available';
+    skill=profile.data.skill?profile.data.skill:'No Any Skill Available';
+    category_name=profile.data.category_name?profile.data.category_name:<span className="text-[13px]">No Any  Category Available</span>;
+    subcategory_names=profile.data.subcategory_names?profile.data.subcategory_names:'No Any Sub Category Available';
     document=profile.data.documents?profile.data.documents:'Not Available';
+    rateAndReviews=profile.data.rateAndReviews?profile.data.rateAndReviews:[];
     status=profile.data.verified?profile.data.verified:false;
     
    if (profile.data.documents) {
   element = <img src={document} alt="Image not uploaded" className="w-40 h-24 object-cover rounded-md shadow" />;
 } else {
-  element = <div className="w-40 h-24 flex items-center justify-center bg-gray-200 rounded-md shadow text-gray-700">No Uploaded</div>;
+  element = <div className="w-40 h-24 flex items-center justify-center bg-gray-200 rounded-md shadow text-gray-700 p-[23px]">No Adhaar Card Available</div>;
 }
 testimage = profile.data.profilePic && profile.data.profilePic !== "";
 
@@ -299,7 +303,7 @@ const handleGalleryFileChange = async (e) => {
     />
   ) : (
     <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-      Not available
+      No Profile Available
     </div>
   )}
 
@@ -332,7 +336,7 @@ const handleGalleryFileChange = async (e) => {
                 </div>
                 <div
   className={`p-4 shadow-xl  max-w-[600px] ${
-    skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+    skill === "No Any Skill Available" ? "h-[444px]" : "h-[444px]"
   }`}
 >
   <div className="flex items-center justify-between">
@@ -360,7 +364,7 @@ const handleGalleryFileChange = async (e) => {
     />
   ) : (
     <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-      Not available
+      No Profile Available
     </div>
   )}
       <button
@@ -392,18 +396,21 @@ const handleGalleryFileChange = async (e) => {
                   <span className="font-bold text-[#228B22]">Category-</span>{" "}
                   {category_name}
                 </p>
-                <p className="text-base -mt-4">
+   <p className="text-base -mt-4">
   <span className="font-bold text-[#228B22]">Sub-Categories-</span>{" "}
-  {subcategory_names.map((name, index) => (
-    <span key={index}>
-      {name}{index !== subcategory_names.length - 1 ? ", " : ""}
-    </span>
-  ))}
+  {subcategory_names.length > 0 && subcategory_names.some(name => name.trim() !== "")
+    ? subcategory_names.map((name, index) => (
+        <span key={index}>
+          {name}{index !== subcategory_names.length - 1 ? ", " : ""}
+        </span>
+      ))
+    : <span className="text-[13px]">No Any Subcategory Available</span>}
 </p>
+
 
                      <div
   className={`p-4 shadow-xl  max-w-[600px] ${
-    skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+    skill === "Not Available" ? "h-[377px]" : "h-[377px]"
   }`}
 >
   <div className="flex items-center justify-between">
@@ -470,7 +477,7 @@ const handleGalleryFileChange = async (e) => {
     </>
   ) : (
     <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-      Not available
+      No Any Hisworks available
       <div
         className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
         onClick={handleGalleryEditClick}
@@ -490,11 +497,7 @@ const handleGalleryFileChange = async (e) => {
     className="hidden"
   />
 
-  {isUploading && (
-    <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white font-bold text-lg rounded-md">
-      Uploading...
-    </div>
-  )}
+  
 </div>
 
                  
@@ -503,9 +506,9 @@ const handleGalleryFileChange = async (e) => {
 
               {vendorTab === "review" && (
                 <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
-                  <div className="relative w-[700px]">
+                  {/* <div className="relative w-[700px]">
       <img
-        src={images[currentIndex]}
+        src={workImages[currentIndex]}
         alt={`Review ${currentIndex + 1}`}
         className="w-full rounded-md shadow-md"
       />
@@ -516,14 +519,49 @@ const handleGalleryFileChange = async (e) => {
         <img src={Edit} alt="please" className="w-6 h-6" />
       </div>
 
-      {uploading && (
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white font-semibold rounded-md">
-          Uploading...
-        </div>
-      )}
+      
 
       <ToastContainer position="top-right" autoClose={3000} />
+    </div> */}
+               <div className="relative w-[700px] h-[400px]">
+  {workImages.length > 0 ? (
+    <>
+      <img
+        src={workImages[currentIndex]}
+        alt={`Work sample ${currentIndex + 1}`}
+        className="w-full h-full object-cover rounded-md shadow-md"
+      />
+      <div
+        className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+        onClick={handleGalleryEditClick}
+      >
+        <img src={edit} alt="Edit" className="w-6 h-6" />
+      </div>
+    </>
+  ) : (
+    <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+      No Any Customer Review available
+      <div
+        className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
+        onClick={handleGalleryEditClick}
+      >
+        <img src={edit} alt="Edit" className="w-6 h-6" />
+      </div>
     </div>
+    
+  )}
+
+  <input
+    type="file"
+    ref={hiddenFileInputRef}
+    accept="image/*"
+    multiple
+    onChange={handleGalleryFileChange}
+    className="hidden"
+  />
+
+  
+</div>
                 </div>
               )}
             </div>
@@ -589,49 +627,53 @@ const handleGalleryFileChange = async (e) => {
             </div>
 
             {/* Rate & Reviews Section */}
-            <div className="container mx-auto max-w-[750px] px-6 py-6">
-              <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
+           <div className="container mx-auto max-w-[750px] px-6 py-6">
+  <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
 
-              {/* Review Card */}
-              {[1, 2].map((item, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
-                  {/* Star Rating */}
-                  <div className="flex gap-1 mb-2">
-                    {[1, 2, 3, 4, 5].map((star, i) => (
-                      <span key={i} className={i < 4 ? "text-yellow-400" : "text-gray-300"}>
-                        ★
-                      </span>
-                    ))}
-                  </div>
+  {rateAndReviews && rateAndReviews.length > 0 ? (
+    rateAndReviews.map((item, index) => (
+      <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
+        {/* Star Rating */}
+        <div className="flex gap-1 mb-2">
+          {[1, 2, 3, 4, 5].map((star, i) => (
+            <span key={i} className={i < item.rating ? "text-yellow-400" : "text-gray-300"}>
+              ★
+            </span>
+          ))}
+        </div>
 
-                  {/* Review Content */}
-                  <h3 className="font-semibold">Made a computer table</h3>
-                  <p className="text-gray-600 text-sm">
-                    It is a long established fact that a reader will be distracted by the readable
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">14 Apr, 2023</p>
+        {/* Review Content */}
+        <h3 className="font-semibold">{item.title}</h3>
+        <p className="text-gray-600 text-sm">{item.comment}</p>
+        <p className="text-xs text-gray-400 mt-2">{item.date}</p>
 
-                  {/* Reviewer Images */}
-                  <div className="flex mt-3">
-                    {[1, 2, 3, 4].map((img) => (
-                      <img
-                        key={img}
-                        src={User}
-                        alt="Reviewer"
-                        className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+        {/* Reviewer Images */}
+        <div className="flex mt-3">
+          {item.reviewers?.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              alt="Reviewer"
+              className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
+            />
+          ))}
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-500 text-center">No Ratings Available</p>
+  )}
 
-              {/* See All Review Button */}
-              <div className="text-center mt-4">
-                <button className="text-[#228B22] font-semibold hover:underline">
-                  See All Review
-                </button>
-              </div>
-            </div>
+  {/* See All Review Button */}
+  {rateAndReviews && rateAndReviews.length > 0 && (
+    <div className="text-center mt-4">
+      <button className="text-[#228B22] font-semibold hover:underline">
+        See All Review
+      </button>
+    </div>
+  )}
+</div>
+
 
             {/* Add Workers Button */}
             <div className="container mx-auto max-w-[550px] px-6 py-6">
