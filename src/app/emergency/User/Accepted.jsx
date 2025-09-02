@@ -323,7 +323,7 @@ export default function Accepted({
           {paymentHistory.map((payment, index) => (
             <div
               key={payment._id}
-              className="flex items-center justify-between bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
+              className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
             >
               <div className="flex items-center space-x-5">
                 <span className="font-semibold">{index + 1}.</span>

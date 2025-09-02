@@ -237,11 +237,13 @@ export default function ViewProfile() {
                     orderData?.hire_status === "pending") && (
                     <div className="flex space-x-4">
                       {/* Red button (Cancel Task) */}
-                      <Link to={`/disputeg/${orderData?._id}`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          Cancel Task and Create Dispute
-                        </button>
-                      </Link>
+                      	<Link to={`/dispute/${id}/emergency`}>
+												<button
+													className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+												>
+													Cancel Task and Create Dispute
+												</button>
+											</Link>
                     </div>
                   )}
                 </div>
