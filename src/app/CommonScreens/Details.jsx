@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
+import { selectRole } from "../../redux/roleSlice";
 import Footer from "../../component/footer";
 import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
@@ -27,7 +28,10 @@ export default function Details() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { profile, loading } = useSelector((state) => state.user);
-  const [activeTab, setActiveTab] = useState("user");
+   const savedRole = localStorage.getItem("role"); // "user" or "service_provider"
+  const [activeTab, setActiveTab] = useState(
+    savedRole === "user" ? "user" : "vendor" // service_provider is vendor
+  )
   const [vendorTab, setVendorTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
@@ -35,6 +39,13 @@ export default function Details() {
 
   const selectedRole = useSelector((state) => state.role.selectedRole);
   console.log("Selected Role from Redux:", selectedRole);
+  let verification=false;
+ if (profile && profile.data) {
+verification=profile.data.verified;
+
+ }
+ 
+
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -53,18 +64,21 @@ export default function Details() {
   let workImages = [];
   let verified = "Pending";
   let element;
-
+  let rateAndReviews;
+console.log(profile);
   if (profile && profile.data) {
     full_name = profile.data.full_name || "Not Available";
     address = profile.data.full_address[0]?.address || "Not Available";
     images = profile.data.profilePic || "Not Available";
-    skill = profile.data.skill || "Not Available";
+    skill = profile.data.skill || "No Skill Available";
     category_name = profile.data.category_name || "Not Available";
     subcategory_names = profile.data.subcategory_names || "Not Available";
     document = profile.data.documents || "Not Available";
+    rateAndReviews = profile.data.rateAndReviews || "Not Available";
     status = profile.data.verified || false;
     workImages = profile.data.hiswork || [];
     verified = status ? "Verified by Admin" : "Pending";
+
 
     element =
       document !== "Not Available" ? (
@@ -275,6 +289,8 @@ const handleTabSwitch = (newTab) => {
     }).then((result) => {
       if (result.isConfirmed) {
         setActiveTab("user");
+      dispatch(selectRole("user"))
+      localStorage.setItem("role", 'user');
         Swal.fire(
           "Switched!",
           "You are now viewing the User Profile.",
@@ -295,6 +311,8 @@ const handleTabSwitch = (newTab) => {
       if (result.isConfirmed) {
         if (profile?.data?.verified) {
           setActiveTab("vendor");
+          dispatch(selectRole("service_provider"))
+          localStorage.setItem("role", 'service_provider');
           Swal.fire(
             "Switched!",
             "You are now viewing the Vendor Profile.",
@@ -310,7 +328,7 @@ const handleTabSwitch = (newTab) => {
           }).then(() => {
             navigate("/editprofile", { state: { activeTab: "vendor" } });
           });
-        } else if (selectedRole === "user") {
+        } else if (selectedRole === "user" || verification===false) {
           // Only call role upgrade API if the current role is "user"
           await requestRoleUpgrade();
           Swal.fire({
@@ -404,7 +422,7 @@ const handleTabSwitch = (newTab) => {
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-                    Not available
+                    No Profile Picture available
                   </div>
                 )}
                 <button
@@ -432,7 +450,7 @@ const handleTabSwitch = (newTab) => {
                 </div>
                 <div
                   className={`p-4 shadow-xl max-w-[600px] mt-10 ${
-                    skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+                    skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -458,7 +476,7 @@ const handleTabSwitch = (newTab) => {
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-                    Not available
+                    No Profile Picture available
                   </div>
                 )}
                 <button
@@ -566,7 +584,7 @@ const handleTabSwitch = (newTab) => {
                       </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                        Not available
+                        No His work available
                         <div
                           className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
@@ -672,46 +690,51 @@ const handleTabSwitch = (newTab) => {
             </div>
             {/* Rate & Reviews Section */}
             <div className="container mx-auto max-w-[750px] px-6 py-6">
-              <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
-              {[1, 2].map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl shadow-md p-6 mb-4"
-                >
-                  <div className="flex gap-1 mb-2">
-                    {[1, 2, 3, 4, 5].map((star, i) => (
-                      <span
-                        key={i}
-                        className={i < 4 ? "text-yellow-400" : "text-gray-300"}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <h3 className="font-semibold">Made a computer table</h3>
-                  <p className="text-gray-600 text-sm">
-                    It is a long established fact that a reader will be
-                    distracted by the readable
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">14 Apr, 2023</p>
-                  <div className="flex mt-3">
-                    {[1, 2, 3, 4].map((img) => (
-                      <img
-                        key={img}
-                        src={User}
-                        alt="Reviewer"
-                        className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <div className="text-center mt-4">
-                <button className="text-[#228B22] font-semibold hover:underline">
-                  See All Review
-                </button>
-              </div>
-            </div>
+  <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
+
+  {rateAndReviews && rateAndReviews.length > 0 ? (
+    rateAndReviews.map((item, index) => (
+      <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
+        {/* Star Rating */}
+        <div className="flex gap-1 mb-2">
+          {[1, 2, 3, 4, 5].map((star, i) => (
+            <span key={i} className={i < item.rating ? "text-yellow-400" : "text-gray-300"}>
+              ★
+            </span>
+          ))}
+        </div>
+
+        {/* Review Content */}
+        <h3 className="font-semibold">{item.title}</h3>
+        <p className="text-gray-600 text-sm">{item.comment}</p>
+        <p className="text-xs text-gray-400 mt-2">{item.date}</p>
+
+        {/* Reviewer Images */}
+        <div className="flex mt-3">
+          {item.reviewers?.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              alt="Reviewer"
+              className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
+            />
+          ))}
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-500 text-center">No Ratings Available</p>
+  )}
+
+  {/* See All Review Button */}
+  {rateAndReviews && rateAndReviews.length > 0 && (
+    <div className="text-center mt-4">
+      <button className="text-[#228B22] font-semibold hover:underline">
+        See All Review
+      </button>
+    </div>
+  )}
+</div>
             {/* Add Workers Button */}
             <div className="container mx-auto max-w-[550px] px-6 py-6">
               <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">
