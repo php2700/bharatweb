@@ -29,9 +29,8 @@ export default function OurSubCategories() {
   useEffect(() => {
     const fetchSubCategories = async () => {
       if (!service) return;
-
       try {
-        const res = await fetch(`${BASE_URL}/subcategories/${service}`, {
+        const res = await fetch(`${BASE_URL}/subcategories/${service._id}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -66,21 +65,22 @@ export default function OurSubCategories() {
   }
 
   const handleHire = () => {
-    // Pick selected subcategory IDs
-    const selectedSubIds = selectedIndexes.map((i) => subcategories[i]._id);
+  // Pick selected subcategory IDs
+  const selectedSubIds = selectedIndexes.map((i) => subcategories[i]._id);
 
-    if (selectedSubIds.length === 0) {
-      alert("Please select at least one subcategory!");
-      return;
-    }
+  if (selectedSubIds.length === 0) {
+    alert("Please select at least one subcategory!");
+    return;
+  }
 
-    navigate("/service-provider-list", {
-      state: {
-        category_id: service._id,   // 👈 from WorkCategories
-        subcategory_id: selectedSubIds[0], // 👈 for now picking the first
-      },
-    });
-  };
+  navigate("/service-provider-list", {
+    state: {
+      category_id: service._id,       // 👈 from WorkCategories
+      subcategory_ids: selectedSubIds // 👈 send all selected subcategory IDs
+    },
+  });
+};
+
 
   return (
     <>

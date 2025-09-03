@@ -11,14 +11,14 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ServiceProviderList() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { category_id, subcategory_id } = location.state || {}; // 👈 coming from navigate
-
+  const { category_id, subcategory_ids } = location.state || {}; // 👈 coming from navigate
+console.log(category_id, subcategory_ids)
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchWorkers = async () => {
-      if (!category_id || !subcategory_id) {
+      if (!category_id || !subcategory_ids) {
         console.error("Missing category or subcategory ID");
         setLoading(false);
         return;
@@ -31,7 +31,7 @@ export default function ServiceProviderList() {
           `${BASE_URL}/user/getServiceProviders`,
           {
             category_id,
-            subcategory_id,
+            subcategory_ids,
           },
           {
             headers: {
@@ -54,16 +54,17 @@ export default function ServiceProviderList() {
     };
 
     fetchWorkers();
-  }, [category_id, subcategory_id]);
+  }, [category_id, subcategory_ids]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const handleHire = () => {
-    navigate("/direct-hiring");
+  const handleHire = (serviceProviderId) => {
+    navigate(`/direct-hiring/${serviceProviderId}`);
   };
 
+	console.log("workers",workers)
   return (
     <>
       <Header />
@@ -114,8 +115,8 @@ export default function ServiceProviderList() {
                   {/* Worker image */}
                   <div className="relative col-span-4">
                     <img
-                      src={worker.image || "/default.png"}
-                      alt={worker.name}
+                      src={worker.profile_pic || "/default.png"}
+                      alt={worker.full_name}
                       className="h-full w-full rounded-lg object-cover"
                     />
                     <span className="absolute bottom-2 left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2 text-center">
@@ -127,32 +128,29 @@ export default function ServiceProviderList() {
                   <div className="col-span-8 p-4">
                     <div className="flex justify-between">
                       <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
-                        {worker.name}
+                        {worker.full_name}
                       </h2>
                       <div className="flex gap-1 items-center">
                         <img className="h-6 w-6" src={ratingImg} />
-                        <div>{worker?.rating || "N/A"}</div>
+                        <div>{worker?.averageRating || "N/A"}</div>
                       </div>
                     </div>
-                    <p className="text-sm lg:text-[17px] text-gray-500">
-                      &#8377;{worker.amount || "0"}
-                    </p>
                     <div className="font-semibold text-lg text-gray-800">
                       About My Skill
                     </div>
-                    <div className="leading-tight">{worker?.skills}</div>
+                    <div className="leading-tight">{worker?.skill}</div>
 
                     {/* Location & buttons */}
                     <div className="flex justify-between items-center my-4">
-                      <div className="text-white bg-red-500 text-sm px-8 rounded-full">
-                        {worker?.location || "Unknown"}
+                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full">
+                        {worker?.location.address || "Unknown"}
                       </div>
                       <div className="flex gap-4">
                         <button className="text-[#228B22] py-1 px-4 border rounded-lg">
                           View Profile
                         </button>
                         <button
-                          onClick={handleHire}
+                          onClick={()=>handleHire(worker._id)}
                           className="text-white bg-[#228B22] py-1 px-10 rounded-lg"
                         >
                           Hire

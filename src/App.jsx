@@ -129,7 +129,7 @@ export default function App() {
         path="/service-provider-hire-detail"
         element={<ServiceProviderHireDetail />}
       />
-      <Route path="/direct-hiring" element={<DirectHiring />} />
+      <Route path="/direct-hiring/:id" element={<DirectHiring />} />
       <Route path="/emergency/worker/assign-work" element={<AssignWork />} />
       <Route path="/dispute/:orderId/:type" element={<Dispute />} />
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />

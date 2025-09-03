@@ -119,7 +119,7 @@ export default function Accepted({
     };
 
     const response = await fetch(
-      `http://localhost:5001/api/emergency-order/addPaymentStage/${orderId}`,
+      `${BASE_URL}/emergency-order/addPaymentStage/${orderId}`,
       {
         method: "POST",
         headers: {
