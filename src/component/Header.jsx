@@ -13,6 +13,15 @@ import { fetchUserProfile } from "../redux/userSlice";
 import {  Navigate,useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const role = localStorage.getItem("role");
+
+  // Decide route based on role
+  let homeLink;
+  if (role === "service_provider") {
+    homeLink = "/homeservice";
+  } else if (role === "user") {
+    homeLink = "/homeuser";
+  }
   const navigate = useNavigate();
 
 
@@ -75,7 +84,7 @@ const logoutdestroy = () => {
 
         {/* Desktop Navigation - hidden on mobile */}
         <nav className="flex-1 hidden max-md:!hidden md:flex justify-center gap-8 text-[#969696] text-base font-medium">
-          <Link to="/" className="hover:text-black">
+          <Link to={homeLink} className="hover:text-black">
             Home
           </Link>
           <Link to="/aboutus" className="hover:text-black">

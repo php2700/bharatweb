@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -9,86 +9,58 @@ import Search from "../../../assets/search-normal.svg";
 
 export default function MyHireBidding() {
   const [activeTab, setActiveTab] = useState("Bidding Task");
+  const [Biddingorders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false); // 🔹 Show all state
   const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const work = [
-    {
-      id: 1,
-      name: "Make a chair",
-      image: Work,
-      date: "21/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹1,500",
-      location: "Indore M.P.",
-      status: null,
-      showStatus: false, // Status dikhega
-    },
-    {
-      id: 2,
-      name: "Make a table",
-      image: Work,
-      date: "22/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹2,000",
-      location: "Indore M.P.",
-      status: "Cancelled", // Status nahi dikhayenge
-      showStatus: true,
-    },
-    {
-      id: 3,
-      name: "Paint wall",
-      image: Work,
-      date: "23/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹1,200",
-      location: "Indore M.P.",
-      status: "Accepted",
-      showStatus: true, // Status dikhega
-    },
-    {
-      id: 4,
-      name: "Make a shelf",
-      image: Work,
-      date: "24/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹1,800",
-      location: "Indore M.P.",
-      status: "Completed",
-      showStatus: true, // Status nahi dikhega
-    },
-    {
-      id: 5,
-      name: "Make a shelf",
-      image: Work,
-      date: "24/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹1,800",
-      location: "Indore M.P.",
-      status: null,
-      showStatus: false, // Status nahi dikhega
-    },
-    {
-      id: 6,
-      name: "Make a shelf",
-      image: Work,
-      date: "24/02/25",
-      description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      price: "₹1,800",
-      location: "Indore M.P.",
-      status: "Cancelled", // Status nahi dikhayenge
-      showStatus: true, // Status nahi dikhega
-    },
-  ];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem("bharat_token"); // Token from localStorage
+        if (!token) {
+          console.error("No token found");
+          setLoading(false);
+          return;
+        }
 
-  const handleBack=()=>{
-    navigate(-1)
-  }
+        const res = await fetch(
+          `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setOrders(data.data || []); // assuming API returns { data: [...] }
+        } else {
+          console.error(data.message || "Failed to fetch orders");
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  // Limit orders to 7 if showAll is false
+  const visibleOrders = showAll ? Biddingorders : Biddingorders.slice(0, 5);
 
   return (
     <>
@@ -97,8 +69,8 @@ export default function MyHireBidding() {
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
         <div
-         onClick={handleBack}
-          className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
+          onClick={handleBack}
+          className="flex items-center text-[#008000] hover:text-green-800 font-semibold cursor-pointer"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
@@ -147,20 +119,24 @@ export default function MyHireBidding() {
         {/* Work Cards */}
         <div className="space-y-6 max-w-5xl justify-center mx-auto px-4">
           {activeTab === "Bidding Task" &&
-            work.map((work) => (
+            visibleOrders.map((order) => (
               <div
-                key={work.id}
+                key={order.id}
                 className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Left Image */}
                 <div className="relative w-full sm:w-1/3 h-64 sm:h-auto">
                   <img
-                    src={work.image}
-                    alt={work.name}
-                    className="h-full w-full object-cover"
+                    src={
+                      order.image_url && order.image_url.length > 0
+                        ? `https://api.thebharatworks.com/${order.image_url[0]}`
+                        : Work
+                    }
+                    alt={order.title}
+                    className="h-85 w-85 object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-17 py-3 rounded-full">
-                    #ewe2323
+                    {order.project_id}
                   </span>
                 </div>
 
@@ -168,16 +144,21 @@ export default function MyHireBidding() {
                 <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {work.name}
+                      {order.title}
                     </h2>
                     <p className="text-[17px] text-[#008000] mt-2 font-[500]">
-                      {work.price}
+                      ₹{order.cost}
                     </p>
                     <p className="text-sm text-[#334247] mt-2 font-[400]">
-                      Date: {work.date}
+                      Date:{" "}
+                      {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "2-digit",
+                      })}
                     </p>
                     <p className="text-sm text-[#334247] mt-1 font-[400]">
-                      {work.description}
+                      {order.description}
                     </p>
                   </div>
 
@@ -185,30 +166,37 @@ export default function MyHireBidding() {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 gap-2">
                     {/* Location */}
                     <span className="bg-[#F27773] text-white py-1 px-7 rounded-full text-center sm:text-left">
-                      {work.location}
+                      {order.address}
                     </span>
 
                     {/* Status & Button */}
                     <div className="flex flex-col items-end gap-2">
                       {/* Status badge optional */}
-                      {work.showStatus && work.status && (
+                      {order.status && (
                         <span
                           className={`py-1 px-7 rounded-full text-white font-semibold ${
-                            work.status === "Cancelled"
+                            order.status === "Cancelled"
                               ? "bg-[#DB5757]"
-                              : work.status === "Completed"
+                              : order.status === "Completed"
                               ? "bg-[#56DB56]"
                               : "bg-[#56DB56]"
                           }`}
                         >
-                          {work.status}
+                          {order.status}
                         </span>
                       )}
 
                       {/* View Profile always */}
-                      <button className="text-white py-1 px-7 border border-[#228B22] rounded-lg bg-[#228B22]">
-                        View Profile
-                      </button>
+                      
+
+<Link
+  to={`/bidding/getworkdetail/${order._id}`}
+  className="text-white py-1 px-7 border border-[#228B22] rounded-lg bg-[#228B22] inline-block text-center"
+>
+  View Profile
+</Link>
+
+
                     </div>
                   </div>
                 </div>
@@ -216,12 +204,17 @@ export default function MyHireBidding() {
             ))}
         </div>
 
-        {/* See All */}
-        <div className="flex justify-center my-8">
-          <button className="py-2 px-8 text-white rounded-full bg-[#228B22]">
-            See All
-          </button>
-        </div>
+        {/* See All / Show Less */}
+        {Biddingorders.length > 5 && (
+          <div className="flex justify-center my-8">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="py-2 px-8 text-white rounded-full bg-[#228B22]"
+            >
+              {showAll ? "Show Less" : "See All"}
+            </button>
+          </div>
+        )}
 
         {/* Banner Image */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
