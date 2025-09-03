@@ -7,7 +7,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DirectHiring = () => {
   const navigate = useNavigate();
-  const { workerId } = useParams();
+  const { id } = useParams();
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
@@ -58,10 +58,10 @@ const DirectHiring = () => {
         setError("Please fill in all required fields.");
         return;
       }
-      if (!workerId) throw new Error("something went wrong");
+      if (!id) throw new Error("something went wrong");
 
       const formData = new FormData();
-      formData.append("first_provider_id", workerId);
+      formData.append("first_provider_id", id);
       formData.append("title", title);
       formData.append("address", address);
       formData.append("description", description);
