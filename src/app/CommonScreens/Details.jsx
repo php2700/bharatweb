@@ -39,12 +39,6 @@ export default function Details() {
   const [isUploading, setIsUploading] = useState(false);
 
   console.log("Selected Role from Redux:", selectedRole);
-<<<<<<< HEAD
-  let verification = false;
-  if (profile && profile.data) {
-    verification = profile.data.verified;
-  }
-=======
   let verification=false;
  if (profile && profile.data) {
 verification=profile.data.verified;
@@ -53,7 +47,6 @@ verification=profile.data.verified;
  console.log(profile);
  
 
->>>>>>> 9b7b4ceeb3ab4123178c4475eeca71fc69b5736a
 
   // Fetch user profile on mount
   useEffect(() => {
