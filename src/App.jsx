@@ -79,12 +79,8 @@ import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
 
-
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
-
-
-
 
 export default function App() {
   return (
@@ -92,20 +88,17 @@ export default function App() {
       {/* \-------------------------------------------------------------------------------------------------------/
            \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
             \-------------------------------------------------------------------------------------------------- /  */}
-
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/ourservices" element={<OurServices />} />
       <Route path="/subcategories" element={<OurSubCategories />} />
       <Route path="/aboutus" element={<AboutUs />} />
-
       {/* Worker-Related Routes */}
       <Route path="/workerlist" element={<WorkerList />} />
       <Route path="/add-worker" element={<AddWorkerDetails />} />
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
       <Route path="/editprofile" element={<EditProfile />} />
       <Route path="/filter-worker" element={<FilterWorker />} />
-
       {/* Service Provider Routes */}
       <Route
         path="/homeservice"
@@ -120,7 +113,6 @@ export default function App() {
       <Route path="/send-money" element={<SendMoney />} />
       <Route path="/processing-payment" element={<ProcessingPayment />} />
       <Route path="/bank-details" element={<BankDetails />} />
-
       {/* Informational Routes */}
       <Route path="/customer-reviews" element={<CustomerReview />} />
       <Route path="/his-work" element={<Hiswork />} />
@@ -128,8 +120,6 @@ export default function App() {
       <Route path="/help-faq" element={<HelpFaqs />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/customer-care" element={<CustomerCare />} />
-
-
       {/* Direct Hiring Route */}
       <Route path="/service-provider-list" element={<ServiceProviderList />} />
       <Route
@@ -145,33 +135,28 @@ export default function App() {
       <Route path="/worker-detail" element={<WorkerDetail />} />
       <Route path="/my-hire" element={<MyHire />} />
       <Route path="/directhiring/workdetail" element={<WorkerDetail />} />
-
       {/* Bidding Worker */}
       <Route path="/bidding/task-list" element={<Tasklist />} />
       <Route path="/bidding/recent-post" element={<RecentPost />} />
       <Route path="/bidding/bid" element={<Bid />} />
       <Route path="/bidding/edit-bid" element={<EditBid />} />
-
       <Route path="/details" element={<Details />} />
-
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
-
       <Route path="/bidding/hiredetail" element={<HireDetail />} />
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
-
-      <Route path="/review" element={<PrivateRoute element={<ReviewModal />} />} />
-
+      <Route
+        path="/review"
+        element={<PrivateRoute element={<ReviewModal />} />}
+      />
       {/* \------------------------------------------------------------------------------------------------------------------------------/
            \                  ╔════════════════════════════════ Public Routes End ═══════════════════════════╗                          /
             \--------------------------------------------------------------------------------------------------------------------------/    */}
-
       {/*  \-----------------------------------------------------------------------------------------------------------------------------/
             \                 ╔════════════════════════════════ Protected Routes Start ═══════════════════════════╗                      /
              \--------------------------------------------------------------------------------------------------------------------------/    */}
-
       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
       <Route
         path="/verify-otp"
@@ -185,30 +170,22 @@ export default function App() {
         path="/select-role"
         element={<PrivateRoute element={<RoleSelection />} />}
       />
-
       <Route
         path="/homeuser"
         element={<PrivateRoute element={<WorkCategory />} />}
       />
-      
-
       {/* \---------------------------------------------------------------------------------------------------------------------------------/
            \                ╔════════════════════════════════ Protected Routes End ═══════════════════════════╗                            /
             \-----------------------------------------------------------------------------------------------------------------------------/ */}
-
       {/* common page for user's worker list */}
       <Route path="/user/work-list/:task" element={<UserWorklist />} />
       <Route path="/worker/work-list/:task" element={<WorkerWorklist />} />
-
-
-
       {/* // Emergency Routes- User */}
       <Route path="/emergency/userpost" element={<Post />} />
       <Route
         path="/emergency/order-detail/:id"
         element={<EmergencyOrderDetails />}
       />
-
       {/* // Emergency Routes- Worker */}
       <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
       <Route
@@ -222,20 +199,15 @@ export default function App() {
       <Route path="/emergency/choose-worker" element={<ChooseWorker />} />
       <Route path="/emergency/tasks" element={<EmergencyTasks />} />
       <Route path="/assign-work/:orderId/:type" element={<AssignWorker />} />
-			<Route path="/view-worker/:id" element={<ViewWorker />} />
-
-{/**Direct hiring  Routing */}
-
-{/**User */}
-my-hire/order-detail
-<Route
+      <Route path="/view-worker/:id" element={<ViewWorker />} />
+      {/**Direct hiring  Routing */}
+      {/**User */}
+      my-hire/order-detail
+      <Route
         path="/my-hire/order-detail/:id"
         element={<MyHireOrderDetails />}
       />
-
-{/**Provider */}
-
-
+      {/**Provider */}
     </Routes>
   );
 }

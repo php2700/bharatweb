@@ -1,74 +1,86 @@
+import { useState, useEffect } from "react";
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
 import banner from "../../../assets/profile/banner.png";
 import filterIcon from "../../../assets/directHiring/filter-square.png";
 import { SearchIcon } from "lucide-react";
 import image from "../../../assets/workcategory/image.png";
+import Arrow from "../../../assets/profile/arrow_back.svg";
+
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function RecentPost() {
-  const workers = [
-    {
-      id: 1,
-      workName: "Chair work",
-      location: "Indore MP",
-      status: "#ewe2323",
-      image: image,
-      amount: "1500",
-      date: `21/02/2`,
-      completionDate: `21/02/2`,
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime",
-    },
-    {
-      id: 2,
-      workName: "Chair work",
-      location: "Indore MP",
-      status: "#ewe2323",
-      image: image,
-      amount: "1500",
-      date: `21/02/2`,
-      completionDate: `21/02/2`,
+  const [workers, setWorkers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-    {
-      id: 3,
-      workName: "Chair work",
-      location: "Indore MP",
-      status: "#ewe2323",
-      image: image,
-      amount: "1500",
-      date: `21/02/2`,
-      completionDate: `21/02/2`,
+  useEffect(() => {
+    const fetchBiddingOrders = async () => {
+      try {
+         const token = localStorage.getItem("bharat_token"); // token from localStorage
+        setLoading(true);
+        
+        const orderIds = [1, 2, 3, 4];
+        const requests = orderIds.map((id) =>
+          fetch(`${BASE_URL}/bidding-order/getBiddingOrderById/${id}`, {
+            method: "GET",
+            headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            },
+          }).then((res) => res.json())
+        );
 
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-    {
-      id: 4,
-      workName: "Chair work",
-      location: "Indore MP",
-      status: "#ewe2323",
-      image: image,
-      amount: "1500",
-      date: `21/02/2`,
-      completionDate: `21/02/2`,
+        const responses = await Promise.all(requests);
+        // Map API response to match the expected worker structure
+        const fetchedWorkers = responses.map((data, index) => ({
+          id: orderIds[index],
+          workName: data.workName || "Chair work",
+          location: data.location || "Indore MP",
+          status: data.status || "#ewe2323",
+          image: data.image || image, // Fallback to default image if API doesn't provide one
+          amount: data.amount || "1500",
+          date: data.date || "21/02/2",
+          completionDate: data.completionDate || "21/02/2",
+          skills:
+            data.skills ||
+            "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime",
+        }));
 
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-  ];
+        setWorkers(fetchedWorkers);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch bidding orders");
+        setLoading(false);
+      }
+    };
+
+    fetchBiddingOrders();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   return (
     <>
       <Header />
       <div className="min-h-screen py-4 sm:py-6 bg-gray-50">
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-green-600 text-sm hover:underline">
-            &lt; Back
-          </button>
-        </div>
-        <div className="w-full  mx-auto  overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+        <div className="container mx-auto px-4 py-4">
+                <button
+                  className="flex items-center text-green-600 hover:text-green-800 font-semibold"
+                  onClick={() => navigate(-1)}
+                >
+                  <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
+                  Back
+                </button>
+              </div>
+        <div className="w-full mx-auto overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
           <img
             src={banner}
             alt="Gardening"
@@ -81,7 +93,7 @@ export default function RecentPost() {
               Recent Posted Work
             </div>
             <div className="flex gap-4">
-              <div className="relative w-full ">
+              <div className="relative w-full">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="search"
@@ -89,7 +101,7 @@ export default function RecentPost() {
                   className="w-full pl-9 pr-3 py-2 bg-[#F5F5F5] rounded-lg"
                 />
               </div>
-              <img src={filterIcon} />
+              <img src={filterIcon} alt="Filter" />
             </div>
             <div className="w-full rounded-xl my-4 space-y-4">
               {workers.map((worker) => (
@@ -97,42 +109,37 @@ export default function RecentPost() {
                   key={worker.id}
                   className="grid grid-cols-12 items-center bg-white rounded-lg shadow-lg p-4 gap-8"
                 >
-                  <div className="relative col-span-12  md:col-span-4">
+                  <div className="relative col-span-12 md:col-span-4">
                     <img
                       src={worker.image}
-                      alt={worker.work}
-                      className="h-full w-full  rounded-lg object-cover"
+                      alt={worker.workName}
+                      className="h-full w-full rounded-lg object-cover"
                     />
-                    <span className="absolute bottom-0 rounded-full left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2  text-center">
-                      {worker?.status}
+                    <span className="absolute bottom-0 rounded-full left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2 text-center">
+                      {worker.status}
                     </span>
                   </div>
-
                   <div className="md:col-span-8 p-4 col-span-12 space-y-2">
-                    <div className="flex justify-between ">
+                    <div className="flex justify-between">
                       <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
                         {worker.workName}
                       </h2>
-                      <div className="flex gap-1  items-center">
+                      <div className="flex gap-1 items-center">
                         <div className="font-semibold">
-                          {" "}
-                          Posted Date:{worker?.date}
+                          Posted Date: {worker.date}
                         </div>
                       </div>
                     </div>
-
-                    <div className="leading-tight text-lg">
-                      {worker?.skills}
-                    </div>
-                    <p className="text-sm  font-semibold lg:text-[17px] text-[#008000] my-2">
+                    <div className="leading-tight text-lg">{worker.skills}</div>
+                    <p className="text-sm font-semibold lg:text-[17px] text-[#008000] my-2">
                       &#8377;{worker.amount}
                     </p>
-                    <div className="font-semibold text-lg text-gray-800 ">
-                      Completion Date:{worker?.completionDate}
+                    <div className="font-semibold text-lg text-gray-800">
+                      Completion Date: {worker.completionDate}
                     </div>
                     <div className="flex justify-between items-center my-4">
                       <div className="text-white bg-red-500 text-sm py-1 px-8 rounded-full">
-                        {worker?.location}
+                        {worker.location}
                       </div>
                       <div>
                         <button className="text-[#228B22] py-1 px-4 border rounded-lg">
@@ -144,12 +151,12 @@ export default function RecentPost() {
                 </div>
               ))}
             </div>
-            <div className="text-center mx-auto my-6 px-4 py-2 bg-[#228B22] text-white font-semibold w-1/4 rounded-full ">
+            <div className="text-center mx-auto my-6 px-4 py-2 bg-[#228B22] text-white font-semibold w-1/4 rounded-full">
               See All
             </div>
           </div>
         </div>
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
+        <div className="w-full mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
           <img
             src={banner}
             alt="Gardening"
