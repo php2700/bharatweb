@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const ContactCall = () => {
   const [formData, setFormData] = useState({
@@ -52,7 +53,7 @@ export const ContactCall = () => {
       };
 
       const response = await fetch(
-        "https://api.thebharatworks.com/api/CompanyDetails/contact/mobile",
+        `${BASE_URL}/CompanyDetails/contact/mobile`,
         {
           method: "POST",
           headers: {

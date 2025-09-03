@@ -119,13 +119,13 @@ export default function WorkerList() {
     <>
       <Header />
       <div className="container mx-auto px-4 py-4">
-        <Link
-          to="/"
+        <button
+          onClick={() => navigate(-1)}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold text-xl"
         >
           <img src={Arrow} className="w-9 h-9 mr-2" alt="Back arrow" />
           Back
-        </Link>
+        </button>
       </div>
 
       {/* Title + Add Worker */}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const ContactEmail = () => {
   const [formData, setFormData] = useState({
@@ -55,7 +55,7 @@ export const ContactEmail = () => {
       };
 
       const response = await fetch(
-        "https://api.thebharatworks.com/api/CompanyDetails/contact/email",
+        `${BASE_URL}/CompanyDetails/contact/email`,
         {
           method: "POST",
           headers: {

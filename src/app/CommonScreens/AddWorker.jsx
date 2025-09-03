@@ -13,15 +13,15 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 export default function AddWorkerDetails() {
- const [images, setImage] = useState(); // initially null rakho
+ const [images, setImage] = useState();
  useEffect(() => {
-    window.scrollTo(0, 0); // 👈 force scroll to top when component mounts
+    window.scrollTo(0, 0);
   }, []);
 
 const handleImageChange = (e) => {
   const file = e.target.files[0];
   if (file) {
-    setImage(file); // yaha file object save karo
+    setImage(file);
   }
 };
   const navigate = useNavigate();

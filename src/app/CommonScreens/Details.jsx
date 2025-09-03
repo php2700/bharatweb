@@ -355,7 +355,7 @@ const handleTabSwitch = (newTab) => {
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
-      <div className="w-full bg-[#D9D9D9] py-6">
+      <div className="w-full bg-[#D9D9D9] py-6 mt-10">
         <div className="flex justify-center gap-10 mt-6">
           {/* User Profile Button */}
           <button
@@ -400,7 +400,7 @@ const handleTabSwitch = (newTab) => {
                   <img
                     src={images}
                     alt="User Profile"
-                    className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                    className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
@@ -454,7 +454,7 @@ const handleTabSwitch = (newTab) => {
                   <img
                     src={images}
                     alt="User Profile"
-                    className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                    className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">

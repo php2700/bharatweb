@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function EditWorker() {
   const { id } = useParams(); // URL se id
   const navigate = useNavigate();
+  
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const [images, setImage] = useState(null); // Profile image (File or URL)
