@@ -44,6 +44,7 @@ export default function Details() {
 verification=profile.data.verified;
 
  }
+ console.log(profile);
  
 
 

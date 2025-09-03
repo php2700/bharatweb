@@ -61,6 +61,7 @@ import BiddingWorkerDetail from "./app/Bidding/User/WorkDetail";
 import MyHireBidding from "./app/Bidding/User/MyHire";
 import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/CommonScreens/dispute";
+import BiddinggetWorkDetail from "./app/Bidding/User/getworkdetails";
 
 import OrderDetails from "./app/emergency/Worker/AcceptReject";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
@@ -150,6 +151,7 @@ export default function App() {
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
+      <Route path="/bidding/getworkdetail/:id" element={<BiddinggetWorkDetail />} />
 
       <Route path="/bidding/hiredetail" element={<HireDetail />} />
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />

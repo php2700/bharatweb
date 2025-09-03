@@ -187,13 +187,48 @@ export default function BiddingNewTask() {
  const handleSubmit = async (e) => {
   e.preventDefault();
 
+  // Frontend Validation
+  if (!formData.title.trim()) {
+    return toast.error("Title is required");
+  }
+
+  if (!formData.category) {
+    return toast.error("Category is required");
+  }
+
+  if (!formData.subCategories || formData.subCategories.length === 0) {
+    return toast.error("Please select at least one sub-category");
+  }
+
+  if (!formData.googleAddress.trim()) {
+    return toast.error("Address is required");
+  }
+
+  if (!formData.description.trim()) {
+    return toast.error("Description is required");
+  }
+
+  if (!formData.cost || isNaN(formData.cost)) {
+    return toast.error("Valid cost is required");
+  }
+
+  if (!formData.deadline) {
+    return toast.error("Deadline is required");
+  } else if (isNaN(new Date(formData.deadline).getTime())) {
+    return toast.error("Please provide a valid deadline date");
+  }
+
+  if (!formData.images || formData.images.length === 0) {
+    return toast.error("Please upload at least one image");
+  }
+
   try {
     const token = localStorage.getItem("bharat_token");
     const data = new FormData();
 
     data.append("title", formData.title);
     data.append("category_id", formData.category);
-    data.append("sub_category_ids", formData.subCategories.join(",")); // append once
+    data.append("sub_category_ids", formData.subCategories.join(","));
     data.append("address", formData.googleAddress);
     data.append("google_address", formData.googleAddress);
     data.append("description", formData.description);
@@ -201,7 +236,7 @@ export default function BiddingNewTask() {
     data.append("deadline", formData.deadline);
 
     formData.images.forEach((file) => {
-      data.append("images", file); // append each image
+      data.append("images", file);
     });
 
     const res = await fetch(
@@ -216,8 +251,10 @@ export default function BiddingNewTask() {
     const resData = await res.json();
 
     if (res.ok) {
-      toast.success("Bidding Task posted successfully ✅");
-      
+      toast.success("Bidding Task posted successfully");
+       setTimeout(() => {
+    navigate("/bidding/myhire");
+  }, 2000);
     } else {
       toast.error(resData.message || "Something went wrong");
     }
@@ -226,6 +263,7 @@ export default function BiddingNewTask() {
     toast.error("Server error, please try again later");
   }
 };
+
 
 
 

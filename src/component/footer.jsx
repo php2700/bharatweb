@@ -4,6 +4,15 @@ import { Link } from "react-router-dom";
 
 
 export default function Footer() {
+   const role = localStorage.getItem("role");
+
+  // Decide route based on role
+  let homeLink;
+  if (role === "service_provider") {
+    homeLink = "/homeservice";
+  } else if (role === "user") {
+    homeLink = "/homeuser";
+  }
   return (
     <footer className="bg-[#1B1514] text-white py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 
@@ -29,7 +38,7 @@ export default function Footer() {
           <div className="text-center md:text-left">
             <h3 className="font-semibold mb-3 text-sm sm:text-base md:text-lg">Navigation</h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
-              <li><Link to="/" className="hover:text-white">Home</Link></li>
+              <li><Link to={homeLink} className="hover:text-white">Home</Link></li>
               <li><Link to="/aboutus" className="hover:text-white">About Us</Link></li>
               <li><Link to="/ourservices" className="hover:text-white">Services</Link></li>
               <li><Link to="/subscription" className="hover:text-white">Pricing</Link></li>
