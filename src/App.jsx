@@ -79,6 +79,13 @@ import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
 
+
+//Directing
+import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
+
+
+
+
 export default function App() {
   return (
     <Routes>
@@ -191,10 +198,12 @@ export default function App() {
 
       {/* common page for user's worker list */}
       <Route path="/user/work-list/:task" element={<UserWorklist />} />
+      <Route path="/worker/work-list/:task" element={<WorkerWorklist />} />
+
+
 
       {/* // Emergency Routes- User */}
       <Route path="/emergency/userpost" element={<Post />} />
-      <Route path="/emergency/user/work-list" element={<UserWorklist />} />
       <Route
         path="/emergency/order-detail/:id"
         element={<EmergencyOrderDetails />}
@@ -214,6 +223,19 @@ export default function App() {
       <Route path="/emergency/tasks" element={<EmergencyTasks />} />
       <Route path="/assign-work/:orderId/:type" element={<AssignWorker />} />
 			<Route path="/view-worker/:id" element={<ViewWorker />} />
+
+{/**Direct hiring  Routing */}
+
+{/**User */}
+my-hire/order-detail
+<Route
+        path="/my-hire/order-detail/:id"
+        element={<MyHireOrderDetails />}
+      />
+
+{/**Provider */}
+
+
     </Routes>
   );
 }

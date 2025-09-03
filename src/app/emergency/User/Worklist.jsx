@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -7,69 +7,120 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/profile/banner.png";
 import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
-  const { task } = useParams();
-  const [activeTab, setActiveTab] = useState();
+  const { task } = useParams(); // e.g., "My%20Bidding"
+  const [activeTab, setActiveTab] = useState(task); // Default tab
   const [taskData, setTaskData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
-
+  // Set activeTab based on route parameter
   useEffect(() => {
-    if (!task) return;
-    setActiveTab(task);
-  }, [task]);
+    if (task) {
+      // Decode URL parameter (e.g., "My%20Bidding" to "My Bidding")
+      const decodedTask = decodeURIComponent(task);
+      const validTabs = ["My Bidding", "My Hire", "Emergency Tasks"];
+      if (validTabs.includes(decodedTask)) {
+        setActiveTab(decodedTask);
+      } else {
+        setActiveTab("Emergency Tasks"); // Fallback to default tab
+        navigate("/user/work-list/Emergency%20Tasks"); // Redirect to default
+      }
+    }
+  }, [task, navigate]);
 
+  // Fetch tasks based on activeTab
   useEffect(() => {
-    if (!activeTab) return;
+    if (!activeTab || !token) return;
 
     const fetchTasks = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        let endpoint;
+        switch (activeTab) {
+          case "My Bidding":
+            endpoint = `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`;
+            break;
+          case "My Hire":
+            endpoint = `${BASE_URL}/direct-order/apiGetAllDirectOrders`;
+            break;
+          case "Emergency Tasks":
+            endpoint = `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`;
+            break;
+          default:
+            throw new Error("Invalid tab selected");
+        }
+
+        const response = await axios.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         // Map API response to the expected structure
         const mappedTasks = response.data.data.map((task) => ({
           id: task._id,
-          project_id: task.project_id,
-          image: task.image_urls?.[0] || Work, // Use first image or fallback
-          name: task.category_id?.name || "Unnamed Task",
-          date: new Date(task.createdAt).toLocaleDateString(), // Format date
+          project_id: task.project_id || "N/A",
+          image: task.image_urls?.[0] || task.image || Work, // Fallback to Work image
+          name: task.category_id?.name || task.title || "Unnamed Task",
+          date: task.createdAt
+            ? new Date(task.createdAt).toLocaleDateString()
+            : "Unknown Date",
           skills:
             task.sub_category_ids?.map((sub) => sub.name).join(", ") ||
+            task.skills?.join(", ") ||  task.description ||
             "No skills listed",
           price: task.service_payment?.amount
             ? `₹${task.service_payment.amount}`
+            : task.price
+            ? `₹${task.price}`
             : "Price TBD",
           completiondate: task.deadline
             ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
-          location: task.google_address || "Unknown Location",
+          location: task.google_address || task.location || task.address || "Unknown Location",
         }));
 
         setTaskData(mappedTasks);
         setError(null);
       } catch (err) {
         console.error(err);
-        setError(`Failed to fetch ${activeTab}. Please try again later.`);
+        setError(`Failed to fetch ${activeTab} data. Please try again later.`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTasks();
-  }, [activeTab]);
+  }, [activeTab, token]);
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Filter tasks based on search query
+  const filteredTasks = taskData.filter(
+    (task) =>
+      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.skills.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			 task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			  task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Handle tab click and update URL
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    const formattedTab = encodeURIComponent(tab); // e.g., "My Bidding" to "My%20Bidding"
+    navigate(`/user/work-list/${formattedTab}`);
+  };
 
   return (
     <>
@@ -101,36 +152,19 @@ export default function Worklist() {
         </div>
         {/* Tabs */}
         <div className="flex justify-center gap-[200px] bg-gray-100 p-2 mb-6">
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Bidding"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Bidding")}
-          >
-            My Bidding
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "My Hire"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("My Hire")}
-          >
-            My Hire
-          </button>
-          <button
-            className={`px-9 py-1 rounded-full font-semibold ${
-              activeTab === "Emergency Tasks"
-                ? "bg-[#228B22] text-white"
-                : "text-[#228B22] border border-[#228b22]"
-            }`}
-            onClick={() => setActiveTab("Emergency Tasks")}
-          >
-            Emergency Tasks
-          </button>
+          {["My Bidding", "My Hire", "Emergency Tasks"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-9 py-1 rounded-full font-semibold ${
+                activeTab === tab
+                  ? "bg-[#228B22] text-white"
+                  : "text-[#228B22] border border-[#228b22]"
+              }`}
+              onClick={() => handleTabClick(tab)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
         {/* Search */}
@@ -145,6 +179,8 @@ export default function Worklist() {
               className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none"
               type="search"
               placeholder="Search for services"
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
@@ -155,10 +191,10 @@ export default function Worklist() {
             <div className="text-center">Loading...</div>
           ) : error ? (
             <div className="text-center text-red-500">{error}</div>
-          ) : taskData.length === 0 ? (
+          ) : filteredTasks.length === 0 ? (
             <div className="text-center">No {activeTab} available.</div>
           ) : (
-            taskData.map((task) => (
+            filteredTasks.map((task) => (
               <div
                 key={task.id}
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
@@ -199,7 +235,13 @@ export default function Worklist() {
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
-                        navigate(`/emergency/order-detail/${task.id}`)
+                        navigate(
+                          `/${
+                            activeTab === "Emergency Tasks"
+                              ? "emergency"
+                              : activeTab.toLowerCase().replace(" ", "-")
+                          }/order-detail/${task.id}`
+                        )
                       }
                     >
                       View Details
