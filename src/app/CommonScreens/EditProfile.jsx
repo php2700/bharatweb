@@ -6,10 +6,10 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
-import {Navigate,useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -68,13 +68,16 @@ export default function EditProfile() {
           try {
             const token = localStorage.getItem("bharat_token");
             const res = await fetch(
-              `https://api.thebharatworks.com/api/subcategories/${profile.data.category_id}`,
+              `${BASE_URL}/subcategories/${profile.data.category_id}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             const data = await res.json();
             if (res.ok) {
               setSubcategories(
-                (data.data || []).map((sub) => ({ value: sub._id, label: sub.name }))
+                (data.data || []).map((sub) => ({
+                  value: sub._id,
+                  label: sub.name,
+                }))
               );
             }
           } catch (error) {
@@ -91,13 +94,16 @@ export default function EditProfile() {
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
-        const res = await fetch("https://api.thebharatworks.com/api/work-category", {
+        const res = await fetch(`${BASE_URL}/work-category`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
         if (res.ok) {
           setCategories(
-            (data.data || []).map((cat) => ({ value: cat._id, label: cat.name }))
+            (data.data || []).map((cat) => ({
+              value: cat._id,
+              label: cat.name,
+            }))
           );
         }
       } catch (error) {
@@ -116,10 +122,9 @@ export default function EditProfile() {
 
     try {
       const token = localStorage.getItem("bharat_token");
-      const res = await fetch(
-        `https://api.thebharatworks.com/api/subcategories/${selectedCatId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await fetch(`${BASE_URL}/subcategories/${selectedCatId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (res.ok) {
         setSubcategories(
@@ -143,7 +148,13 @@ export default function EditProfile() {
     const { name, value, files } = e.target;
 
     if (name === "document" && files && files[0]) {
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png","image/avif","image/gif"];
+      const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/avif",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(files[0].type)) {
         alert("Only PDF or image files are allowed!");
         return;
@@ -177,12 +188,14 @@ export default function EditProfile() {
       const fd = new FormData();
       fd.append("profilePic", file);
 
-      const res = await fetch(
-        "https://api.thebharatworks.com/api/user/updateProfilePic",
-        { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: fd }
-      );
+      const res = await fetch(`${BASE_URL}/user/updateProfilePic`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
       const data = await res.json();
-      if (!res.ok) return alert(data.message || "Failed to update profile pic.");
+      if (!res.ok)
+        return alert(data.message || "Failed to update profile pic.");
 
       toast.success("Profile picture updated successfully!");
       dispatch(fetchUserProfile());
@@ -197,89 +210,86 @@ export default function EditProfile() {
     e.preventDefault();
 
     if (!formData.name.trim()) return toast.error("Name is required!");
-    if (!formData.about.trim() && activeTab !== "user") return toast.error("Skill is required!");
+    if (!formData.about.trim() && activeTab !== "user")
+      return toast.error("Skill is required!");
 
     try {
       const token = localStorage.getItem("bharat_token");
 
       if (activeTab === "vendor") {
         if (!formData.category) return toast.error("Category is required!");
-        if (!formData.subcategory.length) return toast.error("Select at least one subcategory!");
-        
+        if (!formData.subcategory.length)
+          return toast.error("Select at least one subcategory!");
 
         const fd = new FormData();
         fd.append("document", formData.document);
         fd.append("category_id", formData.category);
-        formData.subcategory.forEach((sub) => fd.append("subcategory_ids[]", sub));
+        formData.subcategory.forEach((sub) =>
+          fd.append("subcategory_ids[]", sub)
+        );
         fd.append("skill", formData.about);
 
-        const res = await fetch(
-          "https://api.thebharatworks.com/api/user/updateUserDetails",
-          { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: fd }
-        );
+        const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
         const data = await res.json();
-        if (!res.ok) return alert(data.message || "Failed to update vendor profile.");
+        if (!res.ok)
+          return alert(data.message || "Failed to update vendor profile.");
 
         // Update name
         const payload = { full_name: formData.name };
-        const resName = await fetch(
-          "https://api.thebharatworks.com/api/user/updateUserProfile",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(payload),
-          }
-        );
+        const resName = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
         const dataName = await resName.json();
-        if (!resName.ok) return alert(dataName.message || "Failed to update name.");
+        if (!resName.ok)
+          return alert(dataName.message || "Failed to update name.");
 
         toast.success("Vendor profile updated successfully!");
         setTimeout(() => {
-  navigate("/details");
-}, 2000);
-
+          navigate("/details");
+        }, 2000);
       }
 
       if (activeTab === "user") {
         const namePayload = { full_name: formData.name };
-        const resName = await fetch(
-          "https://api.thebharatworks.com/api/user/updateUserProfile",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(namePayload),
-          }
-        );
+        const resName = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(namePayload),
+        });
         const dataName = await resName.json();
-        if (!resName.ok) return alert(dataName.message || "Failed to update name.");
+        if (!resName.ok)
+          return alert(dataName.message || "Failed to update name.");
 
         const skillPayload = { skill: formData.about };
-        const resSkill = await fetch(
-          "https://api.thebharatworks.com/api/user/updateUserDetails",
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(skillPayload),
-          }
-        );
+        const resSkill = await fetch(`${BASE_URL}/user/updateUserDetails`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(skillPayload),
+        });
         const dataSkill = await resSkill.json();
-        if (!resSkill.ok) return alert(dataSkill.message || "Failed to update skill.");
+        if (!resSkill.ok)
+          return alert(dataSkill.message || "Failed to update skill.");
 
         toast.success("User profile updated successfully!");
 
-setTimeout(() => {
-  navigate("/details");
-}, 3000); // ✅ 3 sec baad navigate hoga
-
+        setTimeout(() => {
+          navigate("/details");
+        }, 3000); // ✅ 3 sec baad navigate hoga
       }
     } catch (error) {
       console.error("Error:", error);
@@ -296,12 +306,12 @@ setTimeout(() => {
           Update Your Profile
         </h2>
 
-      
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">Name</label>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -317,7 +327,9 @@ setTimeout(() => {
           {activeTab === "vendor" && (
             <>
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Category</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Category
+                </label>
                 <Select
                   options={categories}
                   value={categories.find((c) => c.value === formData.category)}
@@ -328,7 +340,9 @@ setTimeout(() => {
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Subcategory</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Subcategory
+                </label>
                 <Select
                   options={subcategories}
                   value={subcategories.filter((s) =>
@@ -342,10 +356,14 @@ setTimeout(() => {
               </div>
 
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Upload Document</label>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Upload Document
+                </label>
                 <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
                   <span className="text-gray-700">
-                    {formData.document ? formData.document.name : "Choose a file"}
+                    {formData.document
+                      ? formData.document.name
+                      : "Choose a file"}
                   </span>
                   <input
                     type="file"
@@ -354,13 +372,21 @@ setTimeout(() => {
                     className="hidden"
                   />
                 </label>
-                <p className="text-sm text-gray-500 mt-1">Only PDF or image files allowed</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Only PDF or image files allowed
+                </p>
 
                 {/* Document preview */}
                 {documentPreview && (
                   <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Document Preview</h3>
-                    <img src={documentPreview} alt="Document Preview" className="w-32 h-32 object-cover mt-2" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Document Preview
+                    </h3>
+                    <img
+                      src={documentPreview}
+                      alt="Document Preview"
+                      className="w-32 h-32 object-cover mt-2"
+                    />
                   </div>
                 )}
               </div>
@@ -369,23 +395,24 @@ setTimeout(() => {
 
           {/* About Skill */}
           <div>
-  <label className="block mb-2 font-semibold text-gray-700">About My Skill</label>
-  <textarea
-    name="about"
-    value={formData.about}
-    onChange={handleChange}
-    placeholder="Describe your skill..."
-    maxLength={300}   // ✅ sirf 150 character tak hi allow
-    className="w-full px-4 py-2 rounded-lg border border-gray-300 
+            <label className="block mb-2 font-semibold text-gray-700">
+              About My Skill
+            </label>
+            <textarea
+              name="about"
+              value={formData.about}
+              onChange={handleChange}
+              placeholder="Describe your skill..."
+              maxLength={500}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 
                focus:outline-none focus:ring-2 focus:ring-blue-400 
                focus:border-transparent transition resize-none"
-    rows="4"
-  ></textarea>
-  <p className="text-sm text-gray-500 mt-1">
-    {formData.about.length}/300 characters
-  </p>
-</div>
-
+              rows="4"
+            ></textarea>
+            <p className="text-sm text-gray-500 mt-1">
+              {formData.about.length}/500 characters
+            </p>
+          </div>
 
           <button
             type="submit"

@@ -1,6 +1,6 @@
 // redux/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // ✅ Async thunk for fetching profile
 export const fetchUserProfile = createAsyncThunk(
   "user/fetchUserProfile",
@@ -9,7 +9,7 @@ export const fetchUserProfile = createAsyncThunk(
       const token = localStorage.getItem("bharat_token");
       if (!token) return rejectWithValue("No token found");
 
-      const res = await fetch("https://api.thebharatworks.com/api/user/getUserProfileData", {
+      const res = await fetch(`${BASE_URL}/user/getUserProfileData`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
