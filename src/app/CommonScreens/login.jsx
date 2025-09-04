@@ -117,13 +117,15 @@ useEffect(() => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-                  <input
-                    type="tel"
-                    placeholder="Mobile Number"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    className="w-full py-2 px-2 text-gray-700 focus:outline-none"
-                  />
+               <input
+  type="tel"
+  placeholder="Mobile Number"
+  value={mobile}
+  onChange={(e) => setMobile(e.target.value)}
+  maxLength={10} // 🔴 Max 10 digits allowed
+  className="w-full py-2 px-2 text-gray-700 focus:outline-none"
+/>
+
                 </div>
 
                 <button

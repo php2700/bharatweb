@@ -161,11 +161,11 @@ export default function Profile() {
         role,
         gender: formData.gender,
         age: Number(formData.age),
-        // location: {
-        //   latitude: markerLocationGPS?.lat || 0,
-        //   longitude: markerLocationGPS?.lng || 0,
-        //   address: formData.location,
-        // },
+        location: {
+          latitude: markerLocationAddress?.lat || 0,
+          longitude: markerLocationAddress?.lng || 0,
+          address: formData.address,
+        },
         full_address: [
           {
             latitude: markerLocationAddress?.lat || 0,

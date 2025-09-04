@@ -79,6 +79,7 @@ import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
 import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
+import BiddingEditTask from "./app/Bidding/User/EditTask";
 
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
@@ -139,7 +140,7 @@ export default function App() {
       {/* Bidding Worker */}
       <Route path="/bidding/task-list" element={<Tasklist />} />
       <Route path="/bidding/recent-post" element={<RecentPost />} />
-      <Route path="/bidding/bid" element={<Bid />} />
+      <Route path="/bidding/bid/:id" element={<Bid />} />
       <Route path="/bidding/edit-bid" element={<EditBid />} />
       <Route path="/details" element={<Details />} />
       {/* Bidding Route Of user */}
@@ -150,6 +151,7 @@ export default function App() {
       <Route path="/bidding/hiredetail" element={<HireDetail />} />
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
+      <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
       <Route
         path="/review"
         element={<PrivateRoute element={<ReviewModal />} />}
