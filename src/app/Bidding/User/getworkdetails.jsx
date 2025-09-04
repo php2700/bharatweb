@@ -11,7 +11,7 @@ import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
 import edit from "../../../assets/bidding/edit.png"
 import cancel from "../../../assets/bidding/cancel.png"
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 
 import { SearchIcon } from "lucide-react";
@@ -55,7 +55,30 @@ useEffect(() => {
 
   fetchOrder();
 }, [id]);
-console.log(orderDetail);
+let title;
+let address;
+let description;
+let createdAt;
+let deadline;
+let project_id;
+if (orderDetail) { // checks if orderDetail is not null or undefined
+  title = orderDetail.title;
+  address = orderDetail.address;
+  description = orderDetail.description;
+  project_id = orderDetail.project_id;
+  createdAt = new Date(orderDetail.createdAt).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
+
+  deadline = new Date(orderDetail.deadline).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
+}
+
   const workers = [
     {
       id: 1,
@@ -120,22 +143,22 @@ console.log(orderDetail);
           <div className=" py-6 space-y-4">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-semibold">{orderDetail.title}</h2>
-                {/* <p className="text-lg font-semibold">{orderDetail.address}</p> */}
+                <h2 className="text-lg font-semibold">{title}</h2>
+                <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
                 <span className="inline-block bg-red-500 text-white text-lg font-semibold px-3  rounded-full mt-2">
-                  {orderDetail.address}
+                  {address}
                 </span>
               </div>
               <div className="text-right">
                 <p className="bg-black text-white text-md px-4 rounded-full inline-block">
-                  #asa1212
+                  {project_id}
                 </p>
                 <p className="text-md mt-2">
-                  <span className="font-semibold">Posted Date: 12/2/25</span>
+                  <span className="font-semibold">Posted Date: {createdAt}</span>
                 </p>
                 <p className="text-md">
                   <span className="font-semibold">
-                    Completion Date: 12/2/26
+                    Completion Date: {deadline}
                   </span>
                 </p>
               </div>
@@ -145,20 +168,9 @@ console.log(orderDetail);
 
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s...
+                {description}
               </p>
-              <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s...
-              </p>
-              <p>
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s...
-              </p>
+              
             </div>
 
             {/* default ui we show */}
@@ -174,10 +186,10 @@ console.log(orderDetail);
                     
             
                     <div className="flex justify-center gap-6">
-  <button className="flex items-center gap-2 text-[#228B22] px-6 py-3 rounded-lg font-medium border-2">
+  <Link to={`/bidding/edittask/${id}`} className="flex items-center gap-2 text-[#228B22] px-6 py-3 rounded-lg font-medium border-2">
     <img src={edit} alt="Edit" className="w-5 h-5" />
     Edit
-  </button>
+  </Link>
   <button className="flex items-center gap-2 bg-red-500 text-white px-6 py-3 rounded-lg font-medium">
     <img src={cancel} alt="Cancel" className="w-5 h-5" />
     Cancel Task
