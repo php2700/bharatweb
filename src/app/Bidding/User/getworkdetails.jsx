@@ -12,9 +12,13 @@ import messageIcon from "../../../assets/directHiring/message.png";
 import edit from "../../../assets/bidding/edit.png";
 import cancel from "../../../assets/bidding/cancel.png";
 import { Link, useParams } from "react-router-dom";
+import { SlidersHorizontal } from "lucide-react";
 import { Search } from "lucide-react";
 import norelatedwork from "../../../assets/bidding/no_related_work.png";
 import Swal from "sweetalert2";
+import Nowork from "../../../assets/bidding/no_related_work.png";
+import call from "../../../assets/bidding/call.png";
+import msg from "../../../assets/bidding/msg.png";
 
 import { SearchIcon } from "lucide-react";
 // import FilterWorker from "./FilterWorker";
@@ -25,10 +29,55 @@ import { useEffect, useState } from "react";
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
   const [isCancelled, setIsCancelled] = useState(false);
-  const [orderDetail, setOrderDetail] = useState(null);
+    const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tab, setTab] = useState("bidder");
+  const [orderDetail, setOrderDetail] = useState(null);
+  
   const [activeTab, setActiveTab] = useState("Bidder");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  
+   useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        // ✅ Get token from localStorage
+        const token = localStorage.getItem("bharat_token");
+
+        if (!token) {
+          setError("No token found. Please login again.");
+          setLoading(false);
+          return;
+        }
+
+        // ✅ API call using fetch
+        const response = await fetch(
+          "https://api.thebharatworks.com/api/bidding-order/getBiddingOffers/68b2b338b10d145e3ba49a0d",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch offers");
+        }
+
+        const data = await response.json();
+        setOffers(data); // 👈 adjust if response has {data: ...}
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
+  console.log(offers);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -260,107 +309,101 @@ const canceltask = () => {
 
           </div>
         </div>
-        <div className="flex justify-center items-center bg-white">
-      <div className="w-full max-w-4xl border border-green-200 rounded-2xl shadow-sm p-4">
-        {/* Tabs */}
-        <div className="flex justify-center mb-4 bg-[#D9D9D9] rounded-full p-1">
-          <button
-            className={`px-8 py-2 rounded-full transition-all ${
-              activeTab === "Bidder"
-                ? "bg-[#228B22] text-white"
-                : "bg-white text-green-600"
-            }`}
-            onClick={() => setActiveTab("Bidder")}
-          >
-            Bidder
-          </button>
-          <button
-            className={`ml-2 px-8 py-2 rounded-full transition-all ${
-              activeTab === "Related worker"
-                ? "bg-[#228B22] text-white"
-                : "bg-white text-green-600"
-            }`}
-            onClick={() => setActiveTab("Related worker")}
-          >
-            Related worker
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <input
-            type="text"
-            placeholder="Search for services"
-            className="w-full border rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <Search
-            className="absolute left-3 top-2.5 text-gray-400"
-            size={20}
-          />
-        </div>
-
-        {activeTab === "Bidder" ? (
-          <div className="space-y-4">
-            {bidders.map((bidder) => (
-              <div
-                key={bidder.id}
-                className="flex items-center justify-between bg-white rounded-xl shadow-md p-4"
-              >
-                {/* Left side (image + info) */}
-                <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-20 rounded-lg overflow-hidden">
-                    <img
-                      src={bidder.image}
-                      alt={bidder.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {bidder.viewed && (
-                      <span className="absolute top-1 left-1 bg-black text-white text-xs px-2 rounded">
-                        Viewed
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <h2 className="font-semibold text-lg">{bidder.name}</h2>
-                    <p className="text-sm text-gray-500">{bidder.skills}</p>
-                    <span className="inline-block bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-full mt-2">
-                      {bidder.location}
-                    </span>
-                    <p className="text-sm text-green-600 font-medium mt-1 cursor-pointer">
-                      View Profile
-                    </p>
-                  </div>
-                </div>
-
-                {/* Right side (amount + actions) */}
-                <div className="flex flex-col items-end">
-                  <p className="text-lg font-semibold text-gray-800">
-                    ₹{bidder.amount}.00
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button className="w-8 h-8 bg-green-100 rounded-full"></button>
-                    <button className="w-8 h-8 bg-green-100 rounded-full"></button>
-                  </div>
-                  <button className="mt-3 bg-[#228B22] text-white px-4 py-1 rounded-lg hover:bg-green-700">
-                    Invite
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          /* Empty state for Related worker */
-          <div className="flex flex-col justify-center items-center text-center py-10">
-            <img
-              src={norelatedwork}
-              alt="Illustration"
-              className="w-60 h-auto mb-4"
-            />
-            <p className="text-gray-500">No related workers found</p>
-          </div>
-        )}
-      </div>
+      <div className="flex justify-center items-center w-full">
+  <div className="bg-white rounded-[42px] shadow-[0px_4px_4px_0px_#00000040] p-4 max-w-3xl w-full">
+    {/* Tabs */}
+    <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
+      <button
+        onClick={() => setTab("bidder")}
+        className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
+          tab === "bidder"
+            ? "bg-[#228B22] text-white border-3"
+            : "bg-gray-100 text-[#228B22]"
+        }`}
+      >
+        Bidder
+      </button>
+      <button
+        onClick={() => setTab("related")}
+        className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
+          tab === "related"
+            ? "bg-[#228B22] text-white border-3"
+            : "bg-gray-100 text-[#228B22]"
+        }`}
+      >
+        Related Worker
+      </button>
     </div>
+
+    {/* Search Box */}
+    <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+      <Search className="w-5 h-5 text-gray-400" />
+      <input
+        type="text"
+        placeholder="Search for services"
+        className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+      />
+      <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
+    </div>
+
+    {/* Conditional Rendering */}
+    {tab === "related" ? (
+      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+        <img
+          src={Nowork}
+          alt="No worker"
+          className="w-48 sm:w-72 md:w-96 mb-4"
+        />
+      </div>
+    ) : (
+      <div className="mt-6 space-y-4">
+        {[1, 2, 3, 4].map((id) => (
+          <div
+            key={id}
+            className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
+          >
+            {/* Worker Image */}
+            <img
+              src={images}
+              alt="Worker"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+            />
+
+            {/* Worker Details */}
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-[17px] font-bold text-[#303030]">
+                Dipak Sharma
+              </h3>
+              <p className="text-sm text-gray-500">"Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime </p>
+              <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
+                Indore M.P.
+              </span>
+              <div>
+                <button className="text-green-600 font-medium text-sm mt-1">
+                  View Profile
+                </button>
+              </div>
+            </div>
+
+            {/* Status + Invite */}
+            <div className="flex items-center justify-center sm:justify-end gap-4 sm:gap-7 w-full sm:w-auto mt-3 sm:mt-0">
+              <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                <img src={call} alt="" className="w-[18px] sm:w-[23px]" />
+              </span>
+              <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                <img src={msg} alt="" className="w-[18px] sm:w-[23px]" />
+              </span>
+              <button className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700">
+                Invite
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
 
         {/* filter data getting  */}
         {/* <FilterWorker /> */}

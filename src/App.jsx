@@ -49,6 +49,7 @@ import ServiceProviderList from "./app/directHiring/User/ServiceProviderList";
 import ServiceProviderHireDetail from "./app/directHiring/User/ServiceProviderHireDetail";
 import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
+import Biddercheck from "./app/Bidding/User/checknow";
 
 import MyHire from "./app/directHiring/User/MyHire";
 
@@ -152,6 +153,7 @@ export default function App() {
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
       <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
+      <Route path="/bidding/checknow" element={<Biddercheck />} />
       <Route
         path="/review"
         element={<PrivateRoute element={<ReviewModal />} />}
