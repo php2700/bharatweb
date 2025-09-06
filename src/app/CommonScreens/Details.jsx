@@ -28,16 +28,16 @@ export default function Details() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { profile, loading } = useSelector((state) => state.user);
-   const savedRole = localStorage.getItem("role"); // "user" or "service_provider"
+  const selectedRole = useSelector((state) => state.role.selectedRole);
+  const savedRole = localStorage.getItem("role"); // "user" or "service_provider"
   const [activeTab, setActiveTab] = useState(
-    savedRole === "user" ? "user" : "vendor" // service_provider is vendor
-  )
+    selectedRole === "service_provider" ? "vendor" : "user" // Initialize based on selectedRole
+  );
   const [vendorTab, setVendorTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEmergencyOn, setIsEmergencyOn] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const selectedRole = useSelector((state) => state.role.selectedRole);
   console.log("Selected Role from Redux:", selectedRole);
   let verification=false;
  if (profile && profile.data) {
@@ -53,6 +53,23 @@ verification=profile.data.verified;
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
+  // Check vendor profile completeness on mount if selectedRole is service_provider
+  useEffect(() => {
+    if (selectedRole === "service_provider" && activeTab === "vendor") {
+      if (!validateVendorProfile()) {
+        Swal.fire({
+          title: "Incomplete Profile",
+          text: "Your vendor profile is incomplete, please complete your profile first.",
+          icon: "warning",
+          confirmButtonColor: "#228B22",
+          confirmButtonText: "Go to Edit Profile",
+        }).then(() => {
+          navigate("/editprofile", { state: { activeTab: "vendor" } });
+        });
+      }
+    }
+  }, [selectedRole, activeTab, profile, navigate]);
+
   // Profile data initialization
   let full_name = "N/A";
   let address = "N/A";
@@ -66,7 +83,7 @@ verification=profile.data.verified;
   let verified = "Pending";
   let element;
   let rateAndReviews;
-console.log(profile);
+  console.log(profile);
   if (profile && profile.data) {
     full_name = profile.data.full_name || "Not Available";
     address = profile.data.full_address[0]?.address || "Not Available";
@@ -79,7 +96,6 @@ console.log(profile);
     status = profile.data.verified || false;
     workImages = profile.data.hiswork || [];
     verified = status ? "Verified by Admin" : "Pending";
-
 
     element =
       document !== "Not Available" ? (
@@ -143,16 +159,13 @@ console.log(profile);
       const formData = new FormData();
       formData.append("profilePic", file);
 
-      const res = await fetch(
-        `${BASE_URL}/user/updateProfilePic`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const res = await fetch(`${BASE_URL}/user/updateProfilePic`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       const data = await res.json();
       if (res.ok) {
@@ -196,16 +209,13 @@ console.log(profile);
     const authToken = localStorage.getItem("bharat_token");
     try {
       setIsUploading(true);
-      const response = await fetch(
-        `${BASE_URL}/user/updateHisWork`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: formPayload,
-        }
-      );
+      const response = await fetch(`${BASE_URL}/user/updateHisWork`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formPayload,
+      });
 
       const data = await response.json();
       if (response.ok) {
@@ -233,6 +243,21 @@ console.log(profile);
     navigate("/editprofile", { state: { activeTab } });
   };
 
+  // Validate user profile fields
+  const validateUserProfile = () => {
+    if (
+      !profile?.data?.full_name ||
+      profile.data.full_name === "Not Available" ||
+      !profile?.data?.full_address?.[0]?.address ||
+      profile.data.full_address[0]?.address === "Not Available" ||
+      !profile?.data?.skill ||
+      profile.data.skill === "No Skill Available"
+    ) {
+      return false;
+    }
+    return true;
+  };
+
   // Validate vendor profile fields
   const validateVendorProfile = () => {
     if (
@@ -251,15 +276,12 @@ console.log(profile);
   const requestRoleUpgrade = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
-      const res = await fetch(
-        `${BASE_URL}/user/request-role-upgrade`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/user/request-role-upgrade`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await res.json();
       if (res.ok) {
@@ -274,85 +296,97 @@ console.log(profile);
     }
   };
 
-  // Handle tab switch with validation for vendor
-const handleTabSwitch = (newTab) => {
-  if (newTab === activeTab) return;
+  // Handle tab switch with validation for user and vendor
+  const handleTabSwitch = (newTab) => {
+    if (newTab === activeTab) return;
 
-  if (newTab === "user") {
-    Swal.fire({
-      title: "Switch Profile",
-      text: "Switching your profile from Vendor to User",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonColor: "#228B22",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Switch",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setActiveTab("user");
-      dispatch(selectRole("user"))
-      localStorage.setItem("role", 'user');
-        Swal.fire(
-          "Switched!",
-          "You are now viewing the User Profile.",
-          "success"
-        );
-      }
-    });
-  } else if (newTab === "vendor") {
-    Swal.fire({
-      title: "Switch Profile",
-      text: "Switching your profile from User to Vendor",
-      icon: "info",
-      showCancelButton: true,
-      confirmButtonColor: "#228B22",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, Switch",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        if (profile?.data?.verified) {
-          setActiveTab("vendor");
-          dispatch(selectRole("service_provider"))
-          localStorage.setItem("role", 'service_provider');
-          Swal.fire(
-            "Switched!",
-            "You are now viewing the Vendor Profile.",
-            "success"
-          );
-        } else if (!validateVendorProfile()) {
-          Swal.fire({
-            title: "Incomplete Profile",
-            text: "Your profile is incomplete, complete your profile first.",
-            icon: "warning",
-            confirmButtonColor: "#228B22",
-            confirmButtonText: "Go to Edit Profile",
-          }).then(() => {
-            navigate("/editprofile", { state: { activeTab: "vendor" } });
-          });
-        } else if (selectedRole === "user" || verification===false) {
-          // Only call role upgrade API if the current role is "user"
-          await requestRoleUpgrade();
-          Swal.fire({
-            title: "Profile Submitted",
-            text: "Profile completed, wait for admin's approval, it will take 2-3 days for verification.",
-            icon: "info",
-            confirmButtonColor: "#228B22",
-            confirmButtonText: "OK",
-          });
-        } else {
-          // If role is "vendor", show a message or skip
-          Swal.fire({
-            title: "Already a Vendor",
-            text: "You are already a vendor, no need to request a role upgrade.",
-            icon: "info",
-            confirmButtonColor: "#228B22",
-            confirmButtonText: "OK",
-          });
+    if (newTab === "user") {
+      Swal.fire({
+        title: "Switch Profile",
+        text: "Switching your profile from Vendor to User",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#228B22",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Switch",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (!validateUserProfile()) {
+            Swal.fire({
+              title: "Incomplete Profile",
+              text: "Your user profile is incomplete, please complete your profile first.",
+              icon: "warning",
+              confirmButtonColor: "#228B22",
+              confirmButtonText: "Go to Edit Profile",
+            }).then(() => {
+              navigate("/editprofile", { state: { activeTab: "user" } });
+            });
+          } else {
+            setActiveTab("user");
+            dispatch(selectRole("user"));
+            localStorage.setItem("role", "user");
+            Swal.fire(
+              "Switched!",
+              "You are now viewing the User Profile.",
+              "success"
+            );
+          }
         }
-      }
-    });
-  }
-};
+      });
+    } else if (newTab === "vendor") {
+      Swal.fire({
+        title: "Switch Profile",
+        text: "Switching your profile from User to Vendor",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#228B22",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Switch",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          if (profile?.data?.verified) {
+            setActiveTab("vendor");
+            dispatch(selectRole("service_provider"));
+            localStorage.setItem("role", "service_provider");
+            Swal.fire(
+              "Switched!",
+              "You are now viewing the Vendor Profile.",
+              "success"
+            );
+          } else if (!validateVendorProfile()) {
+            Swal.fire({
+              title: "Incomplete Profile",
+              text: "Your vendor profile is incomplete, please complete your profile first.",
+              icon: "warning",
+              confirmButtonColor: "#228B22",
+              confirmButtonText: "Go to Edit Profile",
+            }).then(() => {
+              navigate("/editprofile", { state: { activeTab: "vendor" } });
+            });
+          } else if (selectedRole === "user" || verification === false) {
+            // Only call role upgrade API if the current role is "user"
+            await requestRoleUpgrade();
+            Swal.fire({
+              title: "Profile Submitted",
+              text: "Profile completed, wait for admin's approval, it will take 2-3 days for verification.",
+              icon: "info",
+              confirmButtonColor: "#228B22",
+              confirmButtonText: "OK",
+            });
+          } else {
+            // If role is "vendor", show a message or skip
+            Swal.fire({
+              title: "Already a Vendor",
+              text: "You are already a vendor, no need to request a role upgrade.",
+              icon: "info",
+              confirmButtonColor: "#228B22",
+              confirmButtonText: "OK",
+            });
+          }
+        }
+      });
+    }
+  };
 
   return (
     <>
@@ -374,7 +408,7 @@ const handleTabSwitch = (newTab) => {
           className="absolute inset-0 w-full h-full object-cover"
         />
       </div>
-      <div className="w-full bg-[#D9D9D9] py-6">
+      <div className="w-full bg-[#D9D9D9] py-6 mt-10">
         <div className="flex justify-center gap-10 mt-6">
           {/* User Profile Button */}
           <button
@@ -419,7 +453,7 @@ const handleTabSwitch = (newTab) => {
                   <img
                     src={images}
                     alt="User Profile"
-                    className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                    className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
@@ -473,7 +507,7 @@ const handleTabSwitch = (newTab) => {
                   <img
                     src={images}
                     alt="User Profile"
-                    className="w-full h-[550px] object-cover rounded-2xl shadow-md"
+                    className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
                   <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
@@ -504,7 +538,9 @@ const handleTabSwitch = (newTab) => {
                   <span>{address}</span>
                 </div>
                 <p className="text-base">
-                  <span className="font-semibold text-[#228B22]">Category-</span>{" "}
+                  <span className="font-semibold text-[#228B22]">
+                    Category-
+                  </span>{" "}
                   {category_name}
                 </p>
                 <p className="text-base -mt-4">
@@ -691,51 +727,63 @@ const handleTabSwitch = (newTab) => {
             </div>
             {/* Rate & Reviews Section */}
             <div className="container mx-auto max-w-[750px] px-6 py-6">
-  <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
+              <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
 
-  {rateAndReviews && rateAndReviews.length > 0 ? (
-    rateAndReviews.map((item, index) => (
-      <div key={index} className="bg-white rounded-xl shadow-md p-6 mb-4">
-        {/* Star Rating */}
-        <div className="flex gap-1 mb-2">
-          {[1, 2, 3, 4, 5].map((star, i) => (
-            <span key={i} className={i < item.rating ? "text-yellow-400" : "text-gray-300"}>
-              ★
-            </span>
-          ))}
-        </div>
+              {rateAndReviews && rateAndReviews.length > 0 ? (
+                rateAndReviews.map((item, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-md p-6 mb-4"
+                  >
+                    {/* Star Rating */}
+                    <div className="flex gap-1 mb-2">
+                      {[1, 2, 3, 4, 5].map((star, i) => (
+                        <span
+                          key={i}
+                          className={
+                            i < item.rating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                          }
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
 
-        {/* Review Content */}
-        <h3 className="font-semibold">{item.title}</h3>
-        <p className="text-gray-600 text-sm">{item.comment}</p>
-        <p className="text-xs text-gray-400 mt-2">{item.date}</p>
+                    {/* Review Content */}
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-gray-600 text-sm">{item.comment}</p>
+                    <p className="text-xs text-gray-400 mt-2">{item.date}</p>
 
-        {/* Reviewer Images */}
-        <div className="flex mt-3">
-          {item.reviewers?.map((img, i) => (
-            <img
-              key={i}
-              src={img}
-              alt="Reviewer"
-              className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
-            />
-          ))}
-        </div>
-      </div>
-    ))
-  ) : (
-    <p className="text-gray-500 text-center">No Ratings Available</p>
-  )}
+                    {/* Reviewer Images */}
+                    <div className="flex mt-3">
+                      {item.reviewers?.map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          alt="Reviewer"
+                          className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center">
+                  No Ratings Available
+                </p>
+              )}
 
-  {/* See All Review Button */}
-  {rateAndReviews && rateAndReviews.length > 0 && (
-    <div className="text-center mt-4">
-      <button className="text-[#228B22] font-semibold hover:underline">
-        See All Review
-      </button>
-    </div>
-  )}
-</div>
+              {/* See All Review Button */}
+              {rateAndReviews && rateAndReviews.length > 0 && (
+                <div className="text-center mt-4">
+                  <button className="text-[#228B22] font-semibold hover:underline">
+                    See All Review
+                  </button>
+                </div>
+              )}
+            </div>
             {/* Add Workers Button */}
             <div className="container mx-auto max-w-[550px] px-6 py-6">
               <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">

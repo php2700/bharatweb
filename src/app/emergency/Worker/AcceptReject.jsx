@@ -55,7 +55,7 @@ export default function WokerAcceptReject() {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Accept response:", response.data);
-       navigate("/emergency/worker/work-list")
+       navigate("/worker/work-list/Emergency task")
     } catch (err) {
       console.error("Accept error:", err);
       setError(err.message);

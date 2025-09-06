@@ -16,6 +16,7 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 
+
 const libraries = ["places"];
 
 export default function BiddingEditTask() {
@@ -83,6 +84,7 @@ export default function BiddingEditTask() {
   }, []);
 
   // 🔹 Fetch task details by ID and autopopulate
+ 
   useEffect(() => {
     const fetchTaskById = async () => {
       try {
@@ -94,6 +96,7 @@ export default function BiddingEditTask() {
         const data = await res.json();
         if (res.ok && data.status) {
           const task = data.data;
+          
 
           // Set form fields
           setFormData((prev) => ({
@@ -106,8 +109,8 @@ export default function BiddingEditTask() {
             description: task.description || "",
             cost: task.cost || "",
             deadline: task.deadline ? task.deadline.split("T")[0] : "",
-            images: [], // New uploads
-            existingImages: task.images || [], // Existing uploaded images
+            images:  [], // New uploads
+            existingImages: task.image_url || [], // Existing uploaded images
           }));
 
           // Set map marker
@@ -285,8 +288,9 @@ export default function BiddingEditTask() {
     try {
       const token = localStorage.getItem("bharat_token");
       const data = new FormData();
-
+      
       data.append("title", formData.title);
+      data.append("order_id",id);
       data.append("category_id", formData.category);
       data.append("sub_category_ids", formData.subCategories.join(","));
       data.append("address", formData.googleAddress);
@@ -304,9 +308,9 @@ export default function BiddingEditTask() {
       data.append("existing_images", JSON.stringify(formData.existingImages));
 
       const res = await fetch(
-        `https://api.thebharatworks.com/api/bidding-order/update/${id}`,
+        `https://api.thebharatworks.com/api/bidding-order/edit`,
         {
-          method: "POST",
+          method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
           body: data,
         }
@@ -491,7 +495,12 @@ export default function BiddingEditTask() {
               </label>
 
               {/* Preview Existing Images */}
-              {formData.existingImages.length > 0 && (
+              
+
+              {/* Preview New Images */}
+              
+            </div>
+{formData.existingImages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3 justify-center">
                   {formData.existingImages.map((img, index) => (
                     <div key={index} className="relative">
@@ -518,12 +527,14 @@ export default function BiddingEditTask() {
                   ))}
                 </div>
               )}
-
-              {/* Preview New Images */}
-              {formData.images.length > 0 && (
+               {formData.images.length > 0 && (
+                
                 <div className="flex flex-wrap gap-2 mt-3 justify-center">
+                    <span className="text-center">New Images</span>
                   {formData.images.map((img, index) => (
+                    
                     <div key={index} className="relative">
+                        
                       <img
                         src={URL.createObjectURL(img)}
                         alt="preview"
@@ -545,8 +556,6 @@ export default function BiddingEditTask() {
                   ))}
                 </div>
               )}
-            </div>
-
             {/* Submit */}
             <div className="mt-6">
               <button
@@ -564,7 +573,7 @@ export default function BiddingEditTask() {
       {/* ===== MAP MODAL ===== */}
       {isMapOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg w-[90%] h-[80%] p-4 relative">
+          <div>
             <button
               onClick={() => setIsMapOpen(false)}
               className="absolute top-2 right-2 text-red-600 font-bold text-xl"
@@ -572,30 +581,59 @@ export default function BiddingEditTask() {
               &times;
             </button>
             {isLoaded && (
-              <GoogleMap
-                center={defaultCenter}
-                zoom={15}
-                mapContainerStyle={{ width: "100%", height: "100%" }}
-                onClick={handleMapClick}
-                onLoad={(mapInstance) => setMap(mapInstance)}
-              >
-                {markerLocationGPS && <Marker position={markerLocationGPS} />}
-              </GoogleMap>
-            )}
-            <div className="mt-2 flex justify-between">
+              <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
+            <div className="flex justify-between mb-2">
+              <h1 className="text-black text-[20px] font-semibold">Select Location</h1>
+              
+              <button onClick={() => setIsMapOpen(false)} className="text-red-500 font-bold">
+                X
+              </button>
+            </div>
+{tempAddress.address && (
+  <p className="mb-2 text-sm text-gray-700">
+   <span className="font-semibold">{tempAddress.address}</span>
+  </p>
+)}
+
+            <Autocomplete
+              onLoad={(ref) => (autoCompleteRef.current = ref)}
+              onPlaceChanged={handlePlaceChanged}
+            >
+              <input
+                type="text"
+                placeholder="Search location"
+                className="w-full border-2 border-gray-300 rounded-lg p-2 mb-2"
+              />
+            </Autocomplete>
+
+            <GoogleMap
+              mapContainerStyle={{ height: "350px", width: "100%" }}
+              center={defaultCenter}
+              zoom={15}
+              onLoad={(map) => setMap(map)}
+              onClick={handleMapClick}
+            >
+              {markerLocationGPS && <Marker position={markerLocationGPS} />}
+              {markerLocationAddress && <Marker position={markerLocationAddress} />}
+            </GoogleMap>
+
+            <div className="flex mt-2 gap-2 justify-center">
               <button
                 onClick={handleCurrentLocation}
-                className="bg-green-600 text-white px-4 py-2 rounded"
+                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
               >
                 Current Location
               </button>
               <button
                 onClick={() => setIsMapOpen(false)}
-                className="bg-gray-600 text-white px-4 py-2 rounded"
+                className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg"
               >
-                Done
+                Confirm Location
               </button>
             </div>
+          </div>
+            )}
+           
           </div>
         </div>
       )}

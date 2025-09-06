@@ -9,6 +9,7 @@ import { fetchUserProfile } from "../../redux/userSlice";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Arrow from "../../assets/profile/arrow_back.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditProfile() {
@@ -300,6 +301,15 @@ export default function EditProfile() {
   return (
     <>
       <Header />
+      <div className="mt-5">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-green-700 mb-4 hover:underline"
+        >
+          <img src={Arrow} className="w-6 h-6 ml-10" alt="Back arrow" />
+          Back
+        </button>
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">

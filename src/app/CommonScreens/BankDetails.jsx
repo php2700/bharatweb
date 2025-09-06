@@ -4,6 +4,8 @@ import Footer from "../../component/footer";
 import Header from "../../component/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function BankDetails() {
   const [formData, setFormData] = useState({
     bankName: "",
@@ -52,7 +54,7 @@ export default function BankDetails() {
         const token = localStorage.getItem("bharat_token"); // token yaha se milega
 
         const response = await fetch(
-          "https://api.thebharatworks.com/api/user/updateBankDetails",
+          `${BASE_URL}/user/updateBankDetails`,
           {
             method: "PUT",
             headers: {
