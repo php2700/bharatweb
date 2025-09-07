@@ -436,7 +436,7 @@ export default function Profile() {
               className="mx-auto mb-4 w-[244px] h-[185px]"
             />
             <p className="text-[22px] font-[400] text-[#363636] mb-4">
-              Registration has been completed.
+              You have successfully completed your registration!
             </p>
             <button
              onClick={() => ProfileComplete()}

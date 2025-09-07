@@ -2,7 +2,6 @@ import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
 import image from "../../../assets/workcategory/image.png";
 import banner from "../../../assets/profile/banner.png";
-import { Phone, MessageSquare } from "lucide-react";
 import HireCard from "./HireCard";
 
 export default function MyHire() {

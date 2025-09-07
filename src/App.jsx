@@ -64,7 +64,6 @@ import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/CommonScreens/dispute";
 import BiddinggetWorkDetail from "./app/Bidding/User/getworkdetails";
 
-import OrderDetails from "./app/emergency/Worker/AcceptReject";
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
 import Tasklist from "./app/Bidding/Worker/Tasklist";
 import Bid from "./app/Bidding/Worker/Bid";

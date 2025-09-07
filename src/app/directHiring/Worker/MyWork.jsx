@@ -25,9 +25,7 @@ export default function MyWork() {
     navigate("/login");
   };
 
-  // Fetch data based on active tab
   useEffect(() => {
-    // Redirect to login if token is missing
     if (!token) {
       setError("Please log in to view your work");
       navigate("/login");
@@ -45,10 +43,10 @@ export default function MyWork() {
             endpoint = `${BASE_URL}/direct-order/apiGetAllDirectOrders`;
             break;
           case "My Bidding":
-            endpoint = `${BASE_URL}/direct-order/apiGetAllBiddingOrders`; // Replace with actual endpoint
+            endpoint = `${BASE_URL}/direct-order/apiGetAllBiddingOrders`; 
             break;
           case "Emergency Tasks":
-            endpoint = `${BASE_URL}/direct-order/apiGetAllEmergencyTasks`; // Replace with actual endpoint
+            endpoint = `${BASE_URL}/direct-order/apiGetAllEmergencyTasks`;
             break;
           default:
             endpoint = `${BASE_URL}/direct-order/apiGetAllDirectOrders`;
@@ -78,13 +76,12 @@ export default function MyWork() {
           }
         }
 
-        // Handle wrapped response (e.g., { data: [...] }) or direct array
         const workData = Array.isArray(data) ? data : data.data || [];
-        // Transform data (adjust based on actual API response)
+        
         const transformedData = workData.map((item) => ({
           id: item.id || item.orderId,
           name: item.name || item.title || "Untitled",
-          image: item.image ? `${BASE_URL}/${item.image}` : Work, // Prepend BASE_URL if image is a path
+          image: item.image ? `${BASE_URL}/${item.image}` : Work,
           skills: item.skills || item.description || "No description available",
           date: item.date || item.postedDate || "Unknown date",
           location: item.location || "Unknown Location",

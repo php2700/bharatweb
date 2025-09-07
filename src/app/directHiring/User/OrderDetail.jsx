@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -28,6 +28,7 @@ export default function ViewProfile() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isHired, setIsHired] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const acceptedSectionRef = useRef(null); // Ref for scrolling to Accepted section
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,15 +70,14 @@ export default function ViewProfile() {
     fetchData();
   }, [id]);
 
-
-
   const handleHire = async (providerId) => {
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await axios.post(
-        `${BASE_URL}/direct-order/assignDirectOrder/${id}`,
+        `${BASE_URL}/direct-order/send-next-offer`,
         {
-          service_provider_id: providerId,
+          next_provider_id: providerId,
+          order_id: id,
         },
         {
           headers: {
@@ -87,9 +87,27 @@ export default function ViewProfile() {
         }
       );
       console.log("Hire Response:", response.data);
-      setIsHired(true);
-      setServiceProviders([]);
-      // Refresh order data after hiring
+
+      // Update orderData to reflect the new hire_status immediately
+      setOrderData((prev) => ({
+        ...prev,
+        hire_status: "assigned",
+      }));
+      setIsHired(true); // Prevent search section from showing
+      setServiceProviders([]); // Clear service providers list
+
+      // Show success notification
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Provider hired successfully!",
+        confirmButtonColor: "#228B22",
+      });
+
+      // Scroll to the Accepted section
+      acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+
+      // Fetch updated order data to ensure consistency
       const orderResponse = await axios.get(
         `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
         {
@@ -104,6 +122,12 @@ export default function ViewProfile() {
     } catch (err) {
       setError("Failed to hire provider. Please try again later.");
       console.error("Error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to hire provider. Please try again.",
+        confirmButtonColor: "#FF0000",
+      });
     }
   };
 
@@ -141,8 +165,8 @@ export default function ViewProfile() {
     setShowModal(false);
     try {
       const token = localStorage.getItem("bharat_token");
-      await axios.post(
-        `${BASE_URL}/direct-order/cancel`,
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/cancelOrderByUser`,
         {
           order_id: id,
         },
@@ -153,9 +177,28 @@ export default function ViewProfile() {
           },
         }
       );
-      navigate("/direct/user/work-list");
+      console.log("Cancel Response:", response.data);
+      setOrderData((prev) => ({
+        ...prev,
+        hire_status: "cancelled task",
+      }));
+      setIsHired(true); // Prevent search section from showing
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Order cancelled successfully!",
+        confirmButtonColor: "#228B22",
+      }).then(() => {
+        navigate("/direct/user/work-list");
+      });
     } catch (err) {
       setError("Failed to cancel order. Please try again later.");
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to cancel order. Please try again.",
+        confirmButtonColor: "#FF0000",
+      });
     }
   };
 
@@ -229,8 +272,7 @@ export default function ViewProfile() {
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <span>
                   Category :-{" "}
-                  {orderData?.title ||
-                    "Unknown Title"}
+                  {orderData?.title || "Unknown Title"}
                 </span>
                 <div>
                   Detailed Address :- {orderData?.address || "No Address Provided"}
@@ -255,6 +297,7 @@ export default function ViewProfile() {
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
                       ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
                       ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
+                      ${orderData?.hire_status === "cancelled task" ? "bg-[#FF0000]" : ""}
                       ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
                       ${orderData?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
                       ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
@@ -280,9 +323,9 @@ export default function ViewProfile() {
             </div>
 
             <div className="text-center mb-6">
-              {orderData?.hire_status === "cancelled" ? (
+              {orderData?.hire_status === "cancelled" || orderData?.hire_status === "cancelled task" ? (
                 <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled by User
+                  Cancelled Task
                 </span>
               ) : orderData?.hire_status === "completed" ? (
                 <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
@@ -300,9 +343,9 @@ export default function ViewProfile() {
 
             {(orderData?.hire_status === "assigned" ||
               orderData?.hire_status === "completed") && (
-              <>
+              <div ref={acceptedSectionRef}>
                 <Accepted
-                  serviceProvider={service_provider_id}
+                  serviceProvider={orderData?.service_provider_id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
                   orderId={id}
@@ -339,7 +382,7 @@ export default function ViewProfile() {
                       <ReviewModal
                         show={showCompletedModal}
                         onClose={() => setShowCompletedModal(false)}
-                        service_provider_id={service_provider_id._id}
+                        service_provider_id={orderData?.service_provider_id?._id}
                         orderId={id}
                         type="direct"
                       />
@@ -351,14 +394,15 @@ export default function ViewProfile() {
                     </div>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {!isHired && orderData?.hire_status !== "cancelled" && (
+      {orderData?.hire_status !== "cancelled" && orderData?.hire_status !== "cancelled task" && !isHired && (
         <div className="container mx-auto px-4 py-6 max-w-4xl">
+          <h2 className="text-2xl font-semibold text-black mb-4">Related Workers</h2>
           <div className="relative mb-4">
             <input
               type="text"
@@ -388,7 +432,7 @@ export default function ViewProfile() {
                     <p className="text-lg font-semibold">
                       {provider.provider_id.full_name || "Unknown Provider"}
                     </p>
-                    <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                       {provider.provider_id?.location?.address ||
                         "No Address Provided"}
                     </p>
@@ -403,7 +447,7 @@ export default function ViewProfile() {
                     className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
                     onClick={() => handleHire(provider.provider_id._id)}
                   >
-                    Hire
+                    Send Offer
                   </button>
                 </div>
               ))}
@@ -436,7 +480,7 @@ export default function ViewProfile() {
             <h2 id="modal-title" className="text-lg font-bold mb-4">
               Confirm Cancellation
             </h2>
-            <p>Are you sure you want to cancel this order?</p>
+            <p>Are you sure you want to cancel this task?</p>
             <div className="flex justify-end space-x-4 mt-4">
               <button
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
