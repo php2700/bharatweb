@@ -11,7 +11,7 @@ import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
 import edit from "../../../assets/bidding/edit.png";
 import cancel from "../../../assets/bidding/cancel.png";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { SlidersHorizontal } from "lucide-react";
 import { Search } from "lucide-react";
 import norelatedwork from "../../../assets/bidding/no_related_work.png";
@@ -40,15 +40,18 @@ export default function BiddinggetWorkDetail() {
   const [categoryId, setCategoryId] = useState(null);
 const [subCategoryIds, setSubCategoryIds] = useState([]);
 const [providers, setProviders] = useState([]);
-
+const navigate=useNavigate();
   const [tab, setTab] = useState("bidder");
   const [orderDetail, setOrderDetail] = useState(null);
   
   const [activeTab, setActiveTab] = useState("Bidder");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-   const handleView = (msg) => {
-  alert(msg);
+  const handleView = (serviceproviderid, bidding_offer_id, order_id) => {
+  navigate(`/bidding/hiredetail/${serviceproviderid}`, {
+    state: { bidding_offer_id, order_id }
+  });
 };
+
   const InviteSendWorker = async (workerid) => {
   const order_id = id; // assuming you have `id` already in scope
   const token = localStorage.getItem("bharat_token"); // if you need auth token
@@ -501,7 +504,7 @@ console.log(providers);
           </span>
           <div>
            <button
-  onClick={() => handleView(offer.provider_id.id)}
+  onClick={() => handleView(offer.provider_id.id,offer._id,offer.order_id)}
   className="text-green-600 font-medium text-sm mt-1 underline"
 >
   View Profile
@@ -515,6 +518,10 @@ console.log(providers);
           <span className="text-lg font-semibold text-gray-800 mb-2">
             ₹{offer.bid_amount}
           </span>
+            <button 
+            className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700">
+              Accept
+            </button>
           {/* <div className="flex items-center gap-4 sm:gap-7">
             <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
               <img src={call} alt="call" className="w-[18px] sm:w-[23px]" />

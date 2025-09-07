@@ -26,6 +26,8 @@ export default function EditProfile() {
     subcategory: [],
     about: "",
     document: null,
+    age: '',
+    gender: '',
   });
 
   const [categories, setCategories] = useState([]);
@@ -47,6 +49,8 @@ export default function EditProfile() {
         about: profile.data.skill || "",
         category: profile.data.category_id || "",
         subcategory: profile.data.subcategory_ids || [],
+        age: profile.data.age || '',
+        gender: profile.data.gender || '',
       }));
 
       // Document preview (single document)
@@ -312,126 +316,156 @@ export default function EditProfile() {
       </div>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          Update Your Profile
-        </h2>
+  <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+    Update Your Profile
+  </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name */}
-          <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              Name
-            </label>
+  <form onSubmit={handleSubmit} className="space-y-6">
+    {/* Name */}
+    <div>
+      <label className="block mb-2 font-semibold text-gray-700">Name</label>
+      <input
+        type="text"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Enter your name"
+        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+        required
+      />
+    </div>
+
+    {/* 🔹 Age (Auto-filled) */}
+    <div>
+  <label className="block mb-2 font-semibold text-gray-700">Age</label>
+  <input
+    type="number"
+    name="age"
+    value={formData.age || ""}
+    onChange={handleChange}   // ✅ ye add karo
+    className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-100"
+  />
+</div>
+
+
+    {/* 🔹 Gender (Auto-filled) */}
+  <div>
+  <label className="block mb-2 font-semibold text-gray-700">Gender</label>
+  <select
+    name="gender"
+    value={formData.gender || ""} // pehle se selected value
+    onChange={handleChange}       // agar change karne dena hai
+    className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    <option value="" disabled>
+      Select Gender
+    </option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
+
+
+    {/* Vendor Fields */}
+    {activeTab === "vendor" && (
+      <>
+        <div>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Category
+          </label>
+          <Select
+            options={categories}
+            value={categories.find((c) => c.value === formData.category)}
+            onChange={handleCategoryChange}
+            placeholder="Search or select category..."
+            isClearable
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Subcategory
+          </label>
+          <Select
+            options={subcategories}
+            value={subcategories.filter((s) =>
+              formData.subcategory.includes(s.value)
+            )}
+            onChange={handleSubcategoryChange}
+            isMulti
+            placeholder="Search or select subcategories..."
+            isDisabled={!formData.category}
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Upload Document
+          </label>
+          <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+            <span className="text-gray-700">
+              {formData.document ? formData.document.name : "Choose a file"}
+            </span>
             <input
-              type="text"
-              name="name"
-              value={formData.name}
+              type="file"
+              name="document"
               onChange={handleChange}
-              placeholder="Enter your name"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-              required
+              className="hidden"
             />
-          </div>
+          </label>
+          <p className="text-sm text-red-500 mt-1">
+            Allowed Documents: Driving License, PAN Card, Aadhaar, Passport, or
+            any Govt. ID (PDF / Image)
+          </p>
 
-          {/* Vendor Fields */}
-          {activeTab === "vendor" && (
-            <>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700">
-                  Category
-                </label>
-                <Select
-                  options={categories}
-                  value={categories.find((c) => c.value === formData.category)}
-                  onChange={handleCategoryChange}
-                  placeholder="Search or select category..."
-                  isClearable
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700">
-                  Subcategory
-                </label>
-                <Select
-                  options={subcategories}
-                  value={subcategories.filter((s) =>
-                    formData.subcategory.includes(s.value)
-                  )}
-                  onChange={handleSubcategoryChange}
-                  isMulti
-                  placeholder="Search or select subcategories..."
-                  isDisabled={!formData.category}
-                />
-              </div>
-
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700">
-                  Upload Document
-                </label>
-                <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
-                  <span className="text-gray-700">
-                    {formData.document
-                      ? formData.document.name
-                      : "Choose a file"}
-                  </span>
-                  <input
-                    type="file"
-                    name="document"
-                    onChange={handleChange}
-                    className="hidden"
-                  />
-                </label>
-                <p className="text-sm text-gray-500 mt-1">
-                  Only PDF or image files allowed
-                </p>
-
-                {/* Document preview */}
-                {documentPreview && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Document Preview
-                    </h3>
-                    <img
-                      src={documentPreview}
-                      alt="Document Preview"
-                      className="w-32 h-32 object-cover mt-2"
-                    />
-                  </div>
-                )}
-              </div>
-            </>
+          {/* Document preview */}
+          {documentPreview && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Document Preview
+              </h3>
+              <img
+                src={documentPreview}
+                alt="Document Preview"
+                className="w-32 h-32 object-cover mt-2"
+              />
+            </div>
           )}
+        </div>
+      </>
+    )}
 
-          {/* About Skill */}
-          <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              About My Skill
-            </label>
-            <textarea
-              name="about"
-              value={formData.about}
-              onChange={handleChange}
-              placeholder="Describe your skill..."
-              maxLength={500}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 
-               focus:outline-none focus:ring-2 focus:ring-blue-400 
-               focus:border-transparent transition resize-none"
-              rows="4"
-            ></textarea>
-            <p className="text-sm text-gray-500 mt-1">
-              {formData.about.length}/500 characters
-            </p>
-          </div>
+    {/* About Skill */}
+    <div>
+      <label className="block mb-2 font-semibold text-gray-700">
+        About My Skill
+      </label>
+      <textarea
+        name="about"
+        value={formData.about}
+        onChange={handleChange}
+        placeholder="Describe your skill..."
+        maxLength={500}
+        className="w-full px-4 py-2 rounded-lg border border-gray-300 
+         focus:outline-none focus:ring-2 focus:ring-blue-400 
+         focus:border-transparent transition resize-none"
+        rows="4"
+      ></textarea>
+      <p className="text-sm text-gray-500 mt-1">
+        {formData.about.length}/500 characters
+      </p>
+    </div>
 
-          <button
-            type="submit"
-            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
-          >
-            Submit
-          </button>
-        </form>
-      </div>
+    <button
+      type="submit"
+      className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
+    >
+      Submit
+    </button>
+  </form>
+</div>
+
       <Footer />
     </>
   );

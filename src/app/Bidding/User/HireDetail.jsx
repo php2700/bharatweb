@@ -8,14 +8,19 @@ import locationIcon from "../../../assets/directHiring/location-icon.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { fetchUserProfile } from "../../../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function HireDetail() {
   const { id } = useParams();
+  const location=useLocation();
+    const { bidding_offer_id, order_id } = location.state || {};
+    
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [providerDetail, setProviderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -92,10 +97,51 @@ export default function HireDetail() {
   if (!providerDetail) {
     return <div className="text-center py-10">No Provider Found</div>;
   }
+  const handleNagotiation=async(offer)=>{
+    const userId = localStorage.getItem("user_id"); // user id from localStorage
+    const token = localStorage.getItem("bharat_token"); // bearer token from localStorage
+
+    if (!offer) {
+      toast.error("Please enter offer amount ❗");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/negotiations/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // bearer token
+        },
+        body: JSON.stringify({
+          order_id, // from location.state
+          bidding_offer_id, // from location.state
+          service_provider: id, // from URL
+          user: userId, // from localStorage
+          initiator: "user", // fixed
+          offer_amount: Number(offer), // from parameter
+          message: `Can you do it for ${offer}?`, // dynamic with offer
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Negotiation API Response:", data);
+
+      if (response.ok) {
+        toast.success(`You sent ₹${offer} Amount For Negotiation`);
+      } else {
+        alert(`Error: ${data.message || "Something went wrong"}`);
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("Failed to start negotiation ❌");
+    }
+  }
 
   return (
     <>
       <Header />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen bg-gray-50">
         {/* Banner */}
         <div className="w-full mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
@@ -288,22 +334,33 @@ export default function HireDetail() {
             </div>
 
             {!isOfferActive && (
-              <input
-                type="number"
-                placeholder="Enter your offer amount"
-                value={offer}
-                onChange={(e) => setOffer(e.target.value)}
-                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-              />
-            )}
-          </div>
+  <input
+    type="number"
+    placeholder="Enter your offer amount"
+    value={offer}
+    onChange={(e) => setOffer(e.target.value)}
+    className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+  />
+)}
 
-          {/* Accept / Send Request */}
-          <div className="text-center">
-            <button className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold">
-              {isOfferActive ? "Accept Request" : "Send Request"}
-            </button>
-          </div>
+</div>
+
+{/* Accept / Send Request */}
+<div className="text-center">
+  <button
+    className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
+    onClick={() => {
+      if (isOfferActive) {
+        alert("Request Accepted ✅");
+      } else {
+        handleNagotiation(offer);
+      }
+    }}
+  >
+    {isOfferActive ? "Accept Request" : "Send Request"}
+  </button>
+</div>
+
         </div>
       </div>
       <Footer />

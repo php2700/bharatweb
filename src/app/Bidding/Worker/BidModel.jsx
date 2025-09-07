@@ -39,7 +39,7 @@ export default function BidModal({ isOpen, onClose, orderId }) {
 
       if (response.ok) {
         toast.success("Bid placed successfully ✅");
-        onClose(); // close modal after success
+        
       } else {
         toast.error(data.message || "Failed to place bid ❌");
       }
