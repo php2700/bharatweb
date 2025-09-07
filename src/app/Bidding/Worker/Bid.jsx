@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // agar aapko id URL se lena hai
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
-import image from "../../../assets/workcategory/image.png";
-import banner from "../../../assets/profile/banner.png";
+
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
-import filterIcon from "../../../assets/directHiring/filter-square.png";
+
 import { Search } from "lucide-react";
-import biiderImg from "../../../assets/directHiring/bidder.png";
+
 import BidModel from "./BidModel";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -83,6 +82,7 @@ console.log(worker);
   return (
     <>
       <Header />
+      
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>

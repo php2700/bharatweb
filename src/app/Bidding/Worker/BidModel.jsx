@@ -1,5 +1,7 @@
 import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function BidModal({ isOpen, onClose, orderId }) {
   console.log("Order ID in BidModel:", orderId); // 👈 check if orderId is received
@@ -36,10 +38,10 @@ export default function BidModal({ isOpen, onClose, orderId }) {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Bid placed successfully ✅");
-        onClose(); // close modal after success
+        toast.success("Bid placed successfully ✅");
+        
       } else {
-        alert(data.message || "Failed to place bid ❌");
+        toast.error(data.message || "Failed to place bid ❌");
       }
     } catch (error) {
       console.error("Error placing bid:", error);
@@ -48,7 +50,9 @@ export default function BidModal({ isOpen, onClose, orderId }) {
   };
 
   return (
+    
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-50">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-2xl px-6 py-8">
         <h2 className="text-center font-bold text-xl">Bid</h2>
 

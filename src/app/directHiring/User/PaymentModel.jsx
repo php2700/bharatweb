@@ -1,7 +1,7 @@
 import paymentProcess from "../../../assets/directHiring/paymentprocess.png";
 
-export default function PaymentModel({ open, close }) {
-  if (!open) return null;
+export default function PaymentModel({  }) {
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/10 backdrop-blur-[1px] z-50">

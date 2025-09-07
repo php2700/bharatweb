@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Header from "../../component/Header";
-import Footer from "../../component/footer";
+// import Header from "../../component/Header";
+// import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import Cartoon from "../../assets/Referral/cartoon.svg";
 import banner from "../../assets/profile/banner.png";
@@ -24,10 +24,10 @@ export default function Referral() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
 
       {/* Back Button */}
-      <div className="container mx-auto px-4 py-4">
+      {/* <div className="container mx-auto px-4 py-4">
         <Link
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
@@ -35,7 +35,7 @@ export default function Referral() {
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
         </Link>
-      </div>
+      </div> */}
 
       {/* Card Layout */}
       <div className="max-w-4xl h-[800px] mx-auto bg-white rounded-lg shadow-md p-6 text-center">
@@ -95,18 +95,18 @@ export default function Referral() {
       </div>
 
       {/* Bottom Image Section */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+      {/* <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}
             alt="Gardening illustration"
             className="absolute inset-0 w-full h-full object-cover"
           />
-        </div>
+        </div> */}
 
 
-      <div className="mt-10">
+      {/* <div className="mt-10">
         <Footer />
-      </div>
+      </div> */}
     </>
   );
 }

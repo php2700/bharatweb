@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Header from "../../component/Header";
-import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import CheckIcon from "../../assets/Subscription/tick.svg";
 import banner from "../../assets/profile/banner.png";
@@ -35,8 +33,8 @@ export default function Subscription() {
 
   return (
     <>
-      <Header />
-      <div className="container mx-auto px-4 py-4">
+      {/* Back Button */}
+      {/* <div className="container mx-auto px-4 py-4">
         <Link
           to="/homeservice"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
@@ -44,7 +42,7 @@ export default function Subscription() {
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
         </Link>
-      </div>
+      </div> */}
 
       {/* Premium Section */}
       <div className="text-center mt-6">
@@ -109,17 +107,8 @@ export default function Subscription() {
         </button>
         <p className="mt-3 text-gray-500 text-sm cursor-pointer">Not Now</p>
       </div>
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
 
-      <div className="mt-10">
-        <Footer />
-      </div>
+      
     </>
   );
 }

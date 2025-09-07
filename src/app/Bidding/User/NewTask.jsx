@@ -9,6 +9,8 @@ import Calender from "../../../assets/bidding/calender.png";
 import Select from "react-select";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "../../../redux/userSlice";
 import {
   GoogleMap,
   Marker,
@@ -20,9 +22,10 @@ const libraries = ["places"];
 
 export default function BiddingNewTask() {
   const navigate = useNavigate();
-
+const { profile, loading } = useSelector((state) => state.user);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -34,7 +37,12 @@ export default function BiddingNewTask() {
     deadline: "",
     images: [],
   });
-
+  let location="";
+if(profile && profile.data){
+  location=profile.data.full_address || "";
+}
+console.log(profile);
+console.log("User location from profile:", location);
   const [errors, setErrors] = useState({});
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [mapFor, setMapFor] = useState("location"); // "location" or "address"
@@ -339,8 +347,21 @@ export default function BiddingNewTask() {
             </div>
 
             {/* Google Address */}
+           {/* Location */}
+<div>
+  <label className="block text-[17px] font-[500] mb-1">Location</label>
+  <input
+    type="text"
+    placeholder="Location not available"
+    value={profile?.data?.full_address[0]?.address || ""}
+    readOnly
+    className="w-full border-2 rounded-lg px-3 py-2 cursor-pointer"
+  />
+</div>
+
             <div>
               <label className="block text-[17px] font-[500] mb-1">
+               
                 Google Address
               </label>
               <input

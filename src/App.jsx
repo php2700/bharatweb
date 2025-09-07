@@ -18,11 +18,12 @@ import SendMoney from "./app/CommonScreens/SendMoney";
 import ProcessingPayment from "./app/CommonScreens/ProcessingPayment";
 import Details from "./app/CommonScreens/Details";
 import FilterWorker from "./app/directHiring/User/FilterWorker";
-
+import Account from "./app/CommonScreens/Account";
 // Protected Screens
 import ServiceProviderHome from "./app/CommonScreens/Home-service_provider";
 import Profile from "./app/CommonScreens/profile";
 import OtpVerification from "./app/CommonScreens/OtpVerification";
+import Notifications from "./app/CommonScreens/Notification";
 
 // Informational Pages
 import CustomerReview from "./app/CommonScreens/Customer-review";
@@ -63,6 +64,7 @@ import MyHireBidding from "./app/Bidding/User/MyHire";
 import HireDetail from "./app/Bidding/User/HireDetail";
 import BiddingDispute from "./app/CommonScreens/dispute";
 import BiddinggetWorkDetail from "./app/Bidding/User/getworkdetails";
+import BiddingEditTask from "./app/Bidding/User/EditTask";
 
 import ChooseWorker from "./app/emergency/Worker/ChooseWorker";
 import Tasklist from "./app/Bidding/Worker/Tasklist";
@@ -79,7 +81,8 @@ import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
 import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
-import BiddingEditTask from "./app/Bidding/User/EditTask";
+import PaymentProceedModel from "./app/directHiring/User/PaymentProceedModel";
+
 
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
@@ -91,16 +94,20 @@ export default function App() {
            \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
             \-------------------------------------------------------------------------------------------------- /  */}
       <Route path="/" element={<Home />} />
+      
       <Route path="/login" element={<LoginPage />} />
       <Route path="/ourservices" element={<OurServices />} />
       <Route path="/subcategories" element={<OurSubCategories />} />
       <Route path="/aboutus" element={<AboutUs />} />
+      <Route path="/notifications" element={<Notifications />} />
       {/* Worker-Related Routes */}
       <Route path="/workerlist" element={<WorkerList />} />
       <Route path="/add-worker" element={<AddWorkerDetails />} />
       <Route path="/editworker/:id" element={<EditWorkerDetails />} />
       <Route path="/editprofile" element={<EditProfile />} />
       <Route path="/filter-worker" element={<FilterWorker />} />
+    
+
       {/* Service Provider Routes */}
       <Route
         path="/homeservice"
@@ -145,14 +152,17 @@ export default function App() {
       <Route path="/details" element={<Details />} />
       {/* Bidding Route Of user */}
       <Route path="/bidding/newtask" element={<BiddingNewTask />} />
+      <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
       <Route path="/bidding/myhire" element={<MyHireBidding />} />
       <Route path="/bidding/getworkdetail/:id" element={<BiddinggetWorkDetail />} />
-
-      <Route path="/bidding/hiredetail" element={<HireDetail />} />
+            
+      <Route path="/bidding/hiredetail/:id" element={<HireDetail />} />
       <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
       <Route path="/bidding/dispute" element={<BiddingDispute />} />
       <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
       <Route path="/bidding/checknow" element={<Biddercheck />} />
+      <Route path="/account" element={<Account />} />
+
       <Route
         path="/review"
         element={<PrivateRoute element={<ReviewModal />} />}

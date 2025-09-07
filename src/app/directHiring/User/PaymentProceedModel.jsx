@@ -1,8 +1,8 @@
 import paymentProceed from "../../../assets/directHiring/paymentProceed.png";
 import { X } from "lucide-react";
 
-export default function PaymentProceedModel({ open, close }) {
-  if (!open) return null;
+export default function PaymentProceedModel({}) {
+ 
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/10 backdrop-blur-[1px] z-50">

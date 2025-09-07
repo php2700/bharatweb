@@ -13,7 +13,7 @@ import PaymentProceedModel from "./PaymentProceedModel";
 
 export default function ServiceProviderHireDetail() {
   const [isHireModel, setIsHireModel] = useState(false);
-  const [isPaymentModelOpen, setIsPaymentModelOpen] = useState(false);
+  const [isPaymentModelOpen, setIsPaymentModelOpen] = useState(true);
   const [isPaymentProceedModelOpen, setIsPaymentProceedModelOpen] =
     useState(true);
 

@@ -15,7 +15,7 @@ import {
   useJsApiLoader,
   Autocomplete,
 } from "@react-google-maps/api";
-import { space } from "postcss/lib/list";
+
 
 const libraries = ["places"];
 

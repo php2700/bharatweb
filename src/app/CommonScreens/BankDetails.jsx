@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BankImg from "../../assets/bank/bank-account.png";
-import Footer from "../../component/footer";
-import Header from "../../component/Header";
+// import Footer from "../../component/footer";
+// import Header from "../../component/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -42,6 +42,14 @@ export default function BankDetails() {
     } else if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(formData.ifsc)) {
       newErrors.ifsc = "Invalid IFSC code format";
     }
+  
+// Inside validation function
+if (formData.upiId) {   // ✅ only validate if UPI ID is entered
+  if (!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(formData.upiId)) {
+    newErrors.upiId = "Enter a valid UPI ID";
+  }
+}
+
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -83,7 +91,7 @@ export default function BankDetails() {
 
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="p-10">
         <div className="p-10 container max-w-5xl mx-auto">
@@ -154,6 +162,23 @@ export default function BankDetails() {
                   <p className="text-red-500 text-sm">{errors.ifsc}</p>
                 )}
               </div>
+              {/* UPI ID */}
+{/* UPI ID (Optional) */}
+<div>
+  <input
+    className="py-2 px-4 w-full rounded-xl border"
+    type="text"
+    name="upiId"
+    placeholder="UPI ID (optional)"
+    value={formData.upiId}
+    onChange={handleChange}
+  />
+  {errors.upiId && (
+    <p className="text-red-500 text-sm">{errors.upiId}</p>
+  )}
+</div>
+
+
 
               {/* Submit */}
               <div className="flex justify-center w-full">
@@ -168,7 +193,7 @@ export default function BankDetails() {
           </div>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

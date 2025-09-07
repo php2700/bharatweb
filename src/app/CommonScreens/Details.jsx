@@ -83,6 +83,8 @@ verification=profile.data.verified;
   let verified = "Pending";
   let element;
   let rateAndReviews;
+  let age="N/A";
+  let gender="N/A";
   console.log(profile);
   if (profile && profile.data) {
     full_name = profile.data.full_name || "Not Available";
@@ -96,6 +98,8 @@ verification=profile.data.verified;
     status = profile.data.verified || false;
     workImages = profile.data.hiswork || [];
     verified = status ? "Verified by Admin" : "Pending";
+    age=profile.data.age || "N/A";
+    gender=profile.data.gender || "N/A";
 
     element =
       document !== "Not Available" ? (
@@ -482,7 +486,9 @@ verification=profile.data.verified;
                 <div className="flex items-center gap-2 text-gray-600 font-semibold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
+                 
                 </div>
+                <span>Age : {age} ,<span>Gender:{gender}</span></span>
                 <div
                   className={`p-4 shadow-xl max-w-[600px] mt-10 ${
                     skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
@@ -537,6 +543,7 @@ verification=profile.data.verified;
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
                 </div>
+                <span>Age : {age} ,<span>Gender:{gender}</span></span>
                 <p className="text-base">
                   <span className="font-semibold text-[#228B22]">
                     Category-

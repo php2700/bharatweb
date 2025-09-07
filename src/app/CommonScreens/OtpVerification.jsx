@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import { useDispatch } from "react-redux";
+
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,7 +11,7 @@ import logo from "../../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function OtpVerification() {
-  const dispatch = useDispatch();
+  
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
