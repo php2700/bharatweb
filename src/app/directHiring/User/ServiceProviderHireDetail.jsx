@@ -4,7 +4,6 @@ import Footer from "../../../component/footer";
 import serviceProviderImg from "../../../assets/directHiring/service-provider.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
-import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import { useEffect, useState } from "react";
 import ServiceProviderHisWork from "./ServiceProviderHisWork";
 import HireModel from "./HireModel";

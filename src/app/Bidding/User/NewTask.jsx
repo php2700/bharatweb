@@ -10,7 +10,6 @@ import Select from "react-select";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserProfile } from "../../../redux/userSlice";
 import {
   GoogleMap,
   Marker,
@@ -25,7 +24,7 @@ export default function BiddingNewTask() {
 const { profile, loading } = useSelector((state) => state.user);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -69,7 +68,7 @@ console.log("User location from profile:", location);
       try {
         const token = localStorage.getItem("bharat_token");
         const res = await fetch(
-          "https://api.thebharatworks.com/api/work-category",
+          `${BASE_URL}/work-category`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();
@@ -97,7 +96,7 @@ console.log("User location from profile:", location);
     try {
       const token = localStorage.getItem("bharat_token");
       const res = await fetch(
-        `https://api.thebharatworks.com/api/subcategories/${selectedCatId}`,
+        `${BASE_URL}/subcategories/${selectedCatId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();

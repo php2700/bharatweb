@@ -79,7 +79,7 @@ export default function Notifications() {
                   </div>
                 </div>
                 {/* View Button */}
-                <button className="text-green-600 text-sm font-medium hover:underline">
+                <button className="text-green-600 text-sm font-medium border border-green-600 px-3 py-1 rounded-lg">
                   View Details
                 </button>
               </div>

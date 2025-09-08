@@ -24,19 +24,6 @@ export default function Referral() {
 
   return (
     <>
-      {/* <Header /> */}
-
-      {/* Back Button */}
-      {/* <div className="container mx-auto px-4 py-4">
-        <Link
-          to="/"
-          className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
-        >
-          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
-          Back
-        </Link>
-      </div> */}
-
       {/* Card Layout */}
       <div className="max-w-4xl h-[800px] mx-auto bg-white rounded-lg shadow-md p-6 text-center">
         {/* Title */}
