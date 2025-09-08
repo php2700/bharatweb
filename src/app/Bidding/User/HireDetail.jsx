@@ -37,7 +37,30 @@ export default function HireDetail() {
     localStorage.setItem('user_id',profile.data._id);
   }
   
+useEffect(() => {
+    const token = localStorage.getItem("bharat_token");
+    
 
+    fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setData(data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  }, []);
   useEffect(() => {
     const fetchServiceProviderById = async () => {
       try {
