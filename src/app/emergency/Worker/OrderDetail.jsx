@@ -9,7 +9,6 @@ import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning 
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Search from "../../../assets/search-normal.svg";
 import Accepted from "./Accepted";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

@@ -138,7 +138,7 @@ console.log(category_id, subcategory_ids)
                     <div className="font-semibold text-lg text-gray-800">
                       About My Skill
                     </div>
-                    <div className="leading-tight">{worker?.skill}</div>
+                    <div className="leading-tight break-words whitespace-normal">{worker?.skill}</div>
 
                     {/* Location & buttons */}
                     <div className="flex justify-between items-center my-4">

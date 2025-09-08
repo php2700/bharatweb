@@ -36,9 +36,14 @@ export default function ViewProfile() {
   // Modal state
   const [showModal, setShowModal] = useState(false);
 
+  const handleCancelClick = () => {
+    setIsCancelled(true);
+    setShowModal(true);
+  };
+
   const handleConfirmCancel = () => {
     setShowModal(false);
-    navigate("/dispute");
+    // navigate("/dispute");
   };
 
   return (
@@ -101,7 +106,7 @@ export default function ViewProfile() {
           {/* Profile Section */}
           <div className="mt-6 border border-[#228B22] bg-[#F5F5F5] shadow-md rounded-lg p-4 mx-auto flex flex-col md:flex-row justify-between items-center max-w-[95%]">
             {isCancelled ? (
-              <>
+              <div className="flex flex-col md:flex-row justify-between items-center w-full">
                 <div className="flex items-center space-x-4">
                   <img
                     src={profile.image || Profile}
@@ -117,10 +122,10 @@ export default function ViewProfile() {
                     </p>
                   </div>
                 </div>
-                <button className="bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto">
+                <button className="bg-red-500 text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto mt-4 md:mt-0">
                   Cancelled by me
                 </button>
-              </>
+              </div>
             ) : isAccepted ? (
               <div className="flex flex-col md:flex-row justify-between items-center w-full gap-6">
                 {/* Left - Profile Info */}
@@ -202,7 +207,7 @@ export default function ViewProfile() {
                     Accept
                   </button>
                   <button
-                    onClick={() => setIsCancelled(true)}
+                    onClick={handleCancelClick}
                     className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 text-sm font-semibold w-full"
                   >
                     Cancel
@@ -325,7 +330,10 @@ export default function ViewProfile() {
             </p>
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setIsCancelled(false); // Revert cancellation if user goes back
+                }}
                 className="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
               >
                 No, Go Back

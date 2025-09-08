@@ -6,6 +6,7 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import banner from "../../../assets/profile/banner.png";
 import Warning from "../../../assets/ViewProfile/warning.svg";
+import ratingImg from "../../../assets/rating/ic_round-star.png";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -23,12 +24,51 @@ export default function ViewProfile() {
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [relatedWorkersLoading, setRelatedWorkersLoading] = useState(false);
   const [error, setError] = useState(null);
   const [serviceProviders, setServiceProviders] = useState([]);
+  const [relatedWorkers, setRelatedWorkers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isHired, setIsHired] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
-  const acceptedSectionRef = useRef(null); // Ref for scrolling to Accepted section
+  const [offerStatuses, setOfferStatuses] = useState({});
+  const acceptedSectionRef = useRef(null);
+
+  // Fetch related workers based on category and subcategory
+  const fetchRelatedWorkers = async (categoryId, subcategoryId) => {
+    try {
+      console.log("Fetching related workers with categoryId:", categoryId, "subcategoryId:", subcategoryId);
+      setRelatedWorkersLoading(true);
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+      const response = await axios.get(
+        `${BASE_URL}/user/getServiceProviders`,
+        {
+          params: { category_id:categoryId, subcategory_ids:subcategoryId },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Related workers response:", response.data);
+      // Ensure the response data is an array
+      const workers = Array.isArray(response.data.data) ? response.data.data : [];
+      setRelatedWorkers(workers);
+    } catch (err) {
+      console.error("Error fetching related workers:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to fetch related workers. Please try again.",
+        confirmButtonColor: "#FF0000",
+      });
+    } finally {
+      setRelatedWorkersLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,12 +93,30 @@ export default function ViewProfile() {
         console.log("Order Response:", orderResponse.data);
         setOrderData(orderResponse.data.data.order);
         setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-        setServiceProviders(
-          orderResponse.data.data.order.offer_history || []
-        );
-        setIsHired(
-          orderResponse.data.data.order.hire_status !== "pending"
-        );
+        setServiceProviders(orderResponse.data.data.order.offer_history || []);
+        setIsHired(orderResponse.data.data.order.hire_status !== "pending");
+
+        // Initialize offer statuses for service providers
+        const initialStatuses = {};
+        orderResponse.data.data.order.offer_history?.forEach((provider) => {
+          initialStatuses[provider.provider_id._id] = "sent";
+        });
+        setOfferStatuses(initialStatuses);
+
+        // Fetch related workers if category and subcategory IDs are available
+        console.log(orderResponse,"--------------------------")
+        if (
+          orderResponse.data.data.order.category_id &&
+          orderResponse.data.data.order.subcategory_id
+        ) {
+          await fetchRelatedWorkers(
+            orderResponse.data.data.order.category_id,
+            orderResponse.data.data.order.subcategory_id
+          );
+        } else {
+          console.warn("Category ID or Subcategory ID is missing");
+          setRelatedWorkers([]);
+        }
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
         console.error("Error:", err);
@@ -88,15 +146,14 @@ export default function ViewProfile() {
       );
       console.log("Hire Response:", response.data);
 
-      // Update orderData to reflect the new hire_status immediately
       setOrderData((prev) => ({
         ...prev,
         hire_status: "assigned",
       }));
-      setIsHired(true); // Prevent search section from showing
-      setServiceProviders([]); // Clear service providers list
+      setIsHired(true);
+      setServiceProviders([]);
+      setRelatedWorkers([]); // Clear related workers after hiring
 
-      // Show success notification
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -104,10 +161,8 @@ export default function ViewProfile() {
         confirmButtonColor: "#228B22",
       });
 
-      // Scroll to the Accepted section
       acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
 
-      // Fetch updated order data to ensure consistency
       const orderResponse = await axios.get(
         `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
         {
@@ -126,6 +181,45 @@ export default function ViewProfile() {
         icon: "error",
         title: "Oops!",
         text: "Failed to hire provider. Please try again.",
+        confirmButtonColor: "#FF0000",
+      });
+    }
+  };
+
+  const handleCancelOffer = async (providerId) => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/cancelOrderByUser`,
+        {
+          order_id: id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Cancel Offer Response:", response.data);
+
+      setOfferStatuses((prev) => ({
+        ...prev,
+        [providerId]: "pending",
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Offer cancelled successfully!",
+        confirmButtonColor: "#228B22",
+      });
+    } catch (err) {
+      console.error("Error cancelling offer:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to cancel offer. Please try again.",
         confirmButtonColor: "#FF0000",
       });
     }
@@ -182,7 +276,7 @@ export default function ViewProfile() {
         ...prev,
         hire_status: "cancelled task",
       }));
-      setIsHired(true); // Prevent search section from showing
+      setIsHired(true);
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -206,8 +300,14 @@ export default function ViewProfile() {
     setSearchQuery(e.target.value.toLowerCase());
   };
 
+  // Filter service providers based on search query
   const filteredProviders = serviceProviders.filter((provider) =>
     provider.provider_id?.full_name?.toLowerCase().includes(searchQuery)
+  );
+
+  // Filter related workers based on search query
+  const filteredRelatedWorkers = relatedWorkers.filter((worker) =>
+    worker.full_name?.toLowerCase().includes(searchQuery)
   );
 
   if (loading) {
@@ -270,10 +370,7 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>
-                  Category :-{" "}
-                  {orderData?.title || "Unknown Title"}
-                </span>
+                <span>Category :- {orderData?.title || "Unknown Title"}</span>
                 <div>
                   Detailed Address :- {orderData?.address || "No Address Provided"}
                   <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
@@ -322,22 +419,151 @@ export default function ViewProfile() {
               </p>
             </div>
 
+            {/* Hired Worker Details */}
+            {assignedWorker && (
+              <div className="mb-6 p-4 bg-white rounded-lg shadow-lg">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                  Hired Worker
+                </h2>
+                <div className="grid grid-cols-12 items-center gap-8">
+                  <div className="relative col-span-4">
+                    <img
+                      src={assignedWorker.profile_pic || Profile}
+                      alt={assignedWorker.full_name}
+                      className="h-full w-full rounded-lg object-cover"
+                    />
+                    <span className="absolute bottom-2 left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2 text-center">
+                      {assignedWorker?.status || "Available"}
+                    </span>
+                  </div>
+                  <div className="col-span-8">
+                    <div className="flex justify-between">
+                      <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
+                        {assignedWorker.full_name}
+                      </h2>
+                      <div className="flex gap-1 items-center">
+                        <img className="h-6 w-6" src={ratingImg} />
+                        <div>{assignedWorker?.averageRating || "N/A"}</div>
+                      </div>
+                    </div>
+                    <div className="font-semibold text-lg text-gray-800">
+                      About My Skill
+                    </div>
+                    <div className="leading-tight">{assignedWorker?.skill}</div>
+                    <div className="flex justify-between items-center my-4">
+                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full">
+                        {assignedWorker?.location?.address || "Unknown"}
+                      </div>
+                      <div className="flex gap-4">
+                        <Link
+                          to={`/service_provider/${assignedWorker._id}`}
+                          className="text-[#228B22] py-1 px-4 border rounded-lg"
+                        >
+                          View Profile
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Service Providers from Offer History */}
+            {orderData?.hire_status !== "cancelled" &&
+              orderData?.hire_status !== "cancelled task" &&
+              !isHired && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-black mb-4">
+                    Offered Service Providers
+                  </h2>
+                  {filteredProviders.length > 0 ? (
+                    <div className="space-y-4">
+                      {filteredProviders.map((provider) => (
+                        <div
+                          key={provider.provider_id._id}
+                          className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
+                        >
+                          <img
+                            src={provider.provider_id.profile_pic || Profile}
+                            alt={`Profile of ${
+                              provider.provider_id.full_name || "Provider"
+                            }`}
+                            className="w-16 h-16 rounded-full object-cover"
+                          />
+                          <div className="flex-1">
+                            <p className="text-lg font-semibold">
+                              {provider.provider_id.full_name ||
+                                "Unknown Provider"}
+                            </p>
+                            <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                              {provider.provider_id?.location?.address ||
+                                "No Address Provided"}
+                            </p>
+                            <Link
+                              to={`/service_provider/${provider.provider_id._id}`}
+                              className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                            >
+                              View Profile
+                            </Link>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {offerStatuses[provider.provider_id._id] ===
+                            "pending" ? (
+                              <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
+                                Cancelled
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  className="px-4 py-2 bg-[#228B22] text-white rounded opacity-50 cursor-not-allowed font-semibold"
+                                  disabled
+                                >
+                                  Offer Sent
+                                </button>
+                                <button
+                                  className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
+                                  onClick={() =>
+                                    handleCancelOffer(provider.provider_id._id)
+                                  }
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-600">
+                      No service providers found.
+                    </div>
+                  )}
+                </div>
+              )}
+
+            {/* Task Status / Cancel Button */}
             <div className="text-center mb-6">
-              {orderData?.hire_status === "cancelled" || orderData?.hire_status === "cancelled task" ? (
-                <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled Task
-                </span>
-              ) : orderData?.hire_status === "completed" ? (
-                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
-                  Task Completed
-                </span>
-              ) : orderData?.hire_status !== "assigned" ? (
-                <button
-                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
-                  onClick={() => setShowModal(true)}
-                >
-                  Cancel Task
-                </button>
+              {["assigned", "completed", "cancelled", "cancelled task"].includes(
+                orderData?.hire_status
+              ) ? (
+                orderData?.hire_status === "cancelled" ||
+                orderData?.hire_status === "cancelled task" ? (
+                  <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                    Cancelled Task
+                  </span>
+                ) : orderData?.hire_status === "completed" ? (
+                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
+                    Task Completed
+                  </span>
+                ) : orderData?.hire_status === "assigned" ? (
+                  <button
+                    className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Cancel Task
+                  </button>
+                ) : null
               ) : null}
             </div>
 
@@ -400,65 +626,80 @@ export default function ViewProfile() {
         </div>
       </div>
 
-      {orderData?.hire_status !== "cancelled" && orderData?.hire_status !== "cancelled task" && !isHired && (
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <h2 className="text-2xl font-semibold text-black mb-4">Related Workers</h2>
-          <div className="relative mb-4">
-            <input
-              type="text"
-              placeholder="Search providers by name..."
-              className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
-              value={searchQuery}
-              onChange={handleSearch}
-            />
-            <span className="absolute left-3 top-2.5">
-              <img src={Search} alt="Search" className="w-5 h-5 text-gray-400" />
-            </span>
-          </div>
-
-          {filteredProviders.length > 0 ? (
-            <div className="space-y-4">
-              {filteredProviders.map((provider) => (
-                <div
-                  key={provider.provider_id._id}
-                  className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
-                >
-                  <img
-                    src={provider.provider_id.profile_pic || Profile}
-                    alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <p className="text-lg font-semibold">
-                      {provider.provider_id.full_name || "Unknown Provider"}
-                    </p>
-                    <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                      {provider.provider_id?.location?.address ||
-                        "No Address Provided"}
-                    </p>
-                    <Link
-                      to={`/service_provider/${provider.provider_id._id}`}
-                      className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
-                    >
-                      View Profile
-                    </Link>
-                  </div>
-                  <button
-                    className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
-                    onClick={() => handleHire(provider.provider_id._id)}
-                  >
-                    Send Offer
-                  </button>
+      {/* Related Workers Section */}
+      {orderData?.hire_status !== "cancelled" &&
+        orderData?.hire_status !== "cancelled task" &&
+        !isHired && (
+          <div className="container mx-auto px-4 py-6 max-w-4xl">
+            <h2 className="text-2xl font-semibold text-black mb-4">
+              Related Workers
+            </h2>
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Search providers by name..."
+                className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+              <span className="absolute left-3 top-2.5">
+                <img
+                  src={Search}
+                  alt="Search"
+                  className="w-5 h-5 text-gray-400"
+                />
+              </span>
+            </div>
+            <div className="mb-6">
+              {relatedWorkersLoading ? (
+                <div className="text-center text-gray-600">
+                  Loading related workers...
                 </div>
-              ))}
+              ) : filteredRelatedWorkers.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredRelatedWorkers.map((worker) => (
+                    <div
+                      key={worker._id}
+                      className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
+                    >
+                      <img
+                        src={worker.profile_pic || Profile}
+                        alt={`Profile of ${worker.full_name || "Worker"}`}
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                      <div className="flex-1">
+                        <p className="text-lg font-semibold">
+                          {worker.full_name || "Unknown Worker"}
+                        </p>
+                        <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                          {worker.location?.address || "No Address Provided"}
+                        </p>
+                        <Link
+                          to={`/service_provider/${worker._id}`}
+                          className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                        >
+                          View Profile
+                        </Link>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+                          onClick={() => handleHire(worker._id)}
+                        >
+                          Hire
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-600">
+                  No related workers found.
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="text-center text-gray-600">
-              No service providers found.
-            </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
         <img
