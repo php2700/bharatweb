@@ -226,13 +226,20 @@ export default function Bid() {
               </div>
 
               <div
-                onClick={() =>
-                  bidPlaced ? setIsEditBidModel(true) : setIsBidModel(true)
-                }
-                className="text-lg font-semibold text-white bg-[#008000] text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer"
-              >
-                {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
-              </div>
+  onClick={() => {
+    if (bidPlaced) {
+      setIsEditBidModel(true); // only allow editing
+    } else {
+      setIsBidModel(true); // allow placing a new bid
+    }
+  }}
+  className={`text-lg font-semibold text-white text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer ${
+    bidPlaced ? "bg-gray-400 cursor-not-allowed" : "bg-[#008000] hover:bg-green-700"
+  }`}
+>
+  {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
+</div>
+
             </div>
           )}
 

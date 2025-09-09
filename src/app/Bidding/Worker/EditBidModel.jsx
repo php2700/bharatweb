@@ -1,5 +1,5 @@
 import bidModelImg from "../../../assets/directHiring/biddModel.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -9,41 +9,48 @@ export default function EditBidModal({
   orderId,
   initialAmount,
   initialDescription,
-  initialSubCategoryId, // ✅ add this
+  initialSubCategoryId = [], // array of valid ObjectIds
   onEditSuccess,
 }) {
   const [amount, setAmount] = useState(initialAmount || "");
   const [description, setDescription] = useState(initialDescription || "");
+  const [subCategoryIds, setSubCategoryIds] = useState(initialSubCategoryId);
+
+  useEffect(() => {
+    setAmount(initialAmount || "");
+    setDescription(initialDescription || "");
+    setSubCategoryIds(initialSubCategoryId || []);
+  }, [initialAmount, initialDescription, initialSubCategoryId]);
 
   if (!isOpen) return null;
+
+  const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate all sub_category_ids before sending
+    if (!subCategoryIds.length || !subCategoryIds.every(isValidObjectId)) {
+      toast.error("Sub-category IDs must be valid 24-character hex strings ❌");
+      return;
+    }
+
     const token = localStorage.getItem("bharat_token");
 
-    // ✅ sub_category_ids should be an array
     const payload = {
-  order_id: orderId,
-  title: "Updated Bid",
-  category_id: "12345",
-  sub_category_ids: initialSubCategoryId
-    ? Array.isArray(initialSubCategoryId)
-      ? initialSubCategoryId
-      : [initialSubCategoryId] // ensure it's an array
-    : [], 
-  address: "Some Address",
-  google_address: "Google Address here",
-  description,
-  cost: amount,
-  deadline: "2025-09-15",
-  images: [],
-};
+      order_id: orderId,
+      title: "Updated Bid",
+      category_id: subCategoryIds[0], // example: pick first as category_id
+      sub_category_ids: subCategoryIds, // send as array of valid ObjectIds
+      address: "Some Address",
+      google_address: "Google Address here",
+      description,
+      cost: amount,
+      deadline: "2025-09-15",
+      images: [],
+    };
 
-
-    // 🛠 Debug logs
     console.log("Payload being sent:", payload);
-    console.log("sub_category_ids type:", typeof payload.sub_category_ids, payload.sub_category_ids);
 
     try {
       const response = await fetch(
@@ -90,7 +97,7 @@ export default function EditBidModal({
           <div className="text-left">
             <label className="block font-medium mb-1">Enter Amount</label>
             <input
-              type="text"
+              type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
@@ -107,6 +114,25 @@ export default function EditBidModal({
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
               required
             />
+          </div>
+
+          <div className="text-left">
+            <label className="block font-medium mb-1">Sub-categories (IDs)</label>
+            <input
+              type="text"
+              placeholder="Enter comma-separated ObjectIds"
+              value={subCategoryIds.join(",")}
+              onChange={(e) =>
+                setSubCategoryIds(
+                  e.target.value.split(",").map((id) => id.trim())
+                )
+              }
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Enter valid 24-character hex ObjectIds, separated by commas.
+            </p>
           </div>
 
           <div className="flex w-1/2 mx-auto justify-center gap-4 mt-6">

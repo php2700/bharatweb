@@ -31,7 +31,7 @@ export default function Biddercheck() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-[64rem] space-y-6">
           {/* Work Detail Card */}
-          <div className="bg-white rounded-2xl shadow p-4 rounded-[42px] shadow-[0px_4px_4px_0px_#00000040]">
+          <div className="bg-white p-4 rounded-[42px] shadow-[0px_4px_4px_0px_#00000040]">
             <h2 className="text-center font-semibold text-gray-700 mb-4 text-[18px]">
               Work Detail
             </h2>
@@ -120,7 +120,7 @@ export default function Biddercheck() {
           </div>
 
           {/* Tabs Section */}
-          <div className="bg-white rounded-2xl shadow p-4 rounded-[42px] shadow-[0px_4px_4px_0px_#00000040]">
+          <div className="bg-white  p-4 rounded-[42px] shadow-[0px_4px_4px_0px_#00000040]">
             {/* Tabs */}
             <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
               <button
