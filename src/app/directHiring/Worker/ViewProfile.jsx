@@ -175,7 +175,7 @@ export default function ViewProfile() {
                   <button className="bg-[#228B22] text-white px-6 py-2 rounded-lg text-sm font-semibold w-full md:w-auto">
                     Accepted by me
                   </button>
-                  <Link to="/assign-work">
+                  <Link to="/emergency/worker/assign-work">
                     <button className="border border-[#228B22] text-[#228B22] px-6 py-2 rounded-lg hover:bg-green-50 text-sm font-semibold w-full md:w-auto">
                       Assign Work
                     </button>

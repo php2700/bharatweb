@@ -81,7 +81,6 @@ import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
 import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
-import PaymentProceedModel from "./app/directHiring/User/PaymentProceedModel";
 
 
 //Directing

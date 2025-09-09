@@ -33,20 +33,33 @@ export default function ViewProfile() {
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [offerStatuses, setOfferStatuses] = useState({});
   const acceptedSectionRef = useRef(null);
+  const [category_id, setCategory_id] = useState("");
+  const [subcategory_ids, setSubcategory_ids] = useState([]);
 
   // Fetch related workers based on category and subcategory
-  const fetchRelatedWorkers = async (categoryId, subcategoryId) => {
+  const fetchRelatedWorkers = async (category_id, subcategory_ids) => {
     try {
-      console.log("Fetching related workers with categoryId:", categoryId, "subcategoryId:", subcategoryId);
+      if (!category_id || !subcategory_ids?.length) {
+        console.warn("Category ID or Subcategory ID is missing");
+        setRelatedWorkers([]);
+        return;
+      }
+
+      console.log("Fetching related workers with categoryId:", category_id, "subcategoryIds:", subcategory_ids);
       setRelatedWorkersLoading(true);
+
       const token = localStorage.getItem("bharat_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
-      const response = await axios.get(
+
+      const response = await axios.post(
         `${BASE_URL}/user/getServiceProviders`,
         {
-          params: { category_id:categoryId, subcategory_ids:subcategoryId },
+          category_id: category_id,
+          subcategory_ids: subcategory_ids,
+        },
+        {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -54,7 +67,6 @@ export default function ViewProfile() {
         }
       );
       console.log("Related workers response:", response.data);
-      // Ensure the response data is an array
       const workers = Array.isArray(response.data.data) ? response.data.data : [];
       setRelatedWorkers(workers);
     } catch (err) {
@@ -70,6 +82,7 @@ export default function ViewProfile() {
     }
   };
 
+  // Fetch order data
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("bharat_token");
@@ -96,27 +109,16 @@ export default function ViewProfile() {
         setServiceProviders(orderResponse.data.data.order.offer_history || []);
         setIsHired(orderResponse.data.data.order.hire_status !== "pending");
 
-        // Initialize offer statuses for service providers
+        // Initialize offer statuses
         const initialStatuses = {};
         orderResponse.data.data.order.offer_history?.forEach((provider) => {
           initialStatuses[provider.provider_id._id] = "sent";
         });
         setOfferStatuses(initialStatuses);
 
-        // Fetch related workers if category and subcategory IDs are available
-        console.log(orderResponse,"--------------------------")
-        if (
-          orderResponse.data.data.order.category_id &&
-          orderResponse.data.data.order.subcategory_id
-        ) {
-          await fetchRelatedWorkers(
-            orderResponse.data.data.order.category_id,
-            orderResponse.data.data.order.subcategory_id
-          );
-        } else {
-          console.warn("Category ID or Subcategory ID is missing");
-          setRelatedWorkers([]);
-        }
+        // Save category and subcategory IDs in state
+        setCategory_id(orderResponse.data.data.order.category_id || null);
+        setSubcategory_ids(orderResponse.data.data.order.subcategory_ids || []);
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
         console.error("Error:", err);
@@ -127,6 +129,13 @@ export default function ViewProfile() {
 
     fetchData();
   }, [id]);
+
+  // Trigger related workers fetch when category/subcategory changes
+  useEffect(() => {
+    if (category_id && subcategory_ids.length > 0) {
+      fetchRelatedWorkers(category_id, subcategory_ids);
+    }
+  }, [category_id, subcategory_ids]);
 
   const handleHire = async (providerId) => {
     try {
@@ -631,8 +640,11 @@ export default function ViewProfile() {
         orderData?.hire_status !== "cancelled task" &&
         !isHired && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
-            <h2 className="text-2xl font-semibold text-black mb-4">
-              Related Workers
+            <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
+              Search other worker with Same categories
+            </h2>
+            <h2 className="text-lg font-bold text-[#FB3523] mb-4 mx-auto text-center -mt-4">
+              (Note: You can hire only one worker on this task.)
             </h2>
             <div className="relative mb-4">
               <input

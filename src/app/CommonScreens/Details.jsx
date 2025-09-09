@@ -39,14 +39,11 @@ export default function Details() {
   const [isUploading, setIsUploading] = useState(false);
 
   console.log("Selected Role from Redux:", selectedRole);
-  let verification=false;
- if (profile && profile.data) {
-verification=profile.data.verified;
-
- }
- console.log(profile);
- 
-
+  let verification = false;
+  if (profile && profile.data) {
+    verification = profile.data.verified;
+  }
+  console.log(profile);
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -83,8 +80,8 @@ verification=profile.data.verified;
   let verified = "Pending";
   let element;
   let rateAndReviews;
-  let age="N/A";
-  let gender="N/A";
+  let age = "N/A";
+  let gender = "N/A";
   console.log(profile);
   if (profile && profile.data) {
     full_name = profile.data.full_name || "Not Available";
@@ -98,8 +95,8 @@ verification=profile.data.verified;
     status = profile.data.verified || false;
     workImages = profile.data.hiswork || [];
     verified = status ? "Verified by Admin" : "Pending";
-    age=profile.data.age || "N/A";
-    gender=profile.data.gender || "N/A";
+    age = profile.data.age || "N/A";
+    gender = profile.data.gender || "N/A";
 
     element =
       document !== "Not Available" ? (
@@ -333,7 +330,9 @@ verification=profile.data.verified;
               "Switched!",
               "You are now viewing the User Profile.",
               "success"
-            );
+            ).then(() => {
+              navigate("/homeuser"); // ✅ Navigate after switching to user
+            });
           }
         }
       });
@@ -356,7 +355,9 @@ verification=profile.data.verified;
               "Switched!",
               "You are now viewing the Vendor Profile.",
               "success"
-            );
+            ).then(() => {
+              navigate("/homeservice"); // ✅ Navigate after switching to vendor
+            });
           } else if (!validateVendorProfile()) {
             Swal.fire({
               title: "Incomplete Profile",
@@ -368,7 +369,6 @@ verification=profile.data.verified;
               navigate("/editprofile", { state: { activeTab: "vendor" } });
             });
           } else if (selectedRole === "user" || verification === false) {
-            // Only call role upgrade API if the current role is "user"
             await requestRoleUpgrade();
             Swal.fire({
               title: "Profile Submitted",
@@ -378,7 +378,6 @@ verification=profile.data.verified;
               confirmButtonText: "OK",
             });
           } else {
-            // If role is "vendor", show a message or skip
             Swal.fire({
               title: "Already a Vendor",
               text: "You are already a vendor, no need to request a role upgrade.",
@@ -486,9 +485,10 @@ verification=profile.data.verified;
                 <div className="flex items-center gap-2 text-gray-600 font-semibold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
-                 
                 </div>
-                <span>Age : {age} ,<span>Gender:{gender}</span></span>
+                <span>
+                  Age : {age} ,<span>Gender:{gender}</span>
+                </span>
                 <div
                   className={`p-4 shadow-xl max-w-[600px] mt-10 ${
                     skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
@@ -543,7 +543,9 @@ verification=profile.data.verified;
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
                 </div>
-                <span>Age : {age} ,<span>Gender:{gender}</span></span>
+                <span>
+                  Age : {age} ,<span>Gender:{gender}</span>
+                </span>
                 <p className="text-base">
                   <span className="font-semibold text-[#228B22]">
                     Category-

@@ -128,7 +128,7 @@ console.log(workers);
 
                   <div className="md:col-span-8 p-4 col-span-12 space-y-2">
                     <div className="flex justify-between">
-                      <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
+                      <h2 className="text-base sm:text-base lg:text-base font-[600] text-gray-800">
                         {worker.workName}
                       </h2>
                       <div className="flex gap-1 items-center">
@@ -143,7 +143,7 @@ console.log(workers);
                       </div>
                     </div>
 
-                    <div className="leading-tight text-lg">{worker.description}</div>
+                    <div className="leading-tight text-base">{worker.description}</div>
                     <p className="text-sm font-semibold lg:text-[17px] text-[#008000] my-2">
                       &#8377;{worker.amount}
                     </p>

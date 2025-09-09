@@ -3,8 +3,7 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function BidModal({ isOpen, onClose, orderId }) {
-  console.log("Order ID in BidModel:", orderId); // 👈 check if orderId is received
+export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
 
@@ -13,12 +12,12 @@ export default function BidModal({ isOpen, onClose, orderId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("bharat_token"); // 🔑 get token
+    const token = localStorage.getItem("bharat_token");
 
     const payload = {
-      order_id: orderId, // 👈 passed from parent
+      order_id: orderId,
       bid_amount: amount,
-      duration: " ", // as you said
+      duration: " ",
       message: description,
     };
 
@@ -29,7 +28,7 @@ export default function BidModal({ isOpen, onClose, orderId }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // attach token
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(payload),
         }
@@ -39,18 +38,18 @@ export default function BidModal({ isOpen, onClose, orderId }) {
 
       if (response.ok) {
         toast.success("Bid placed successfully ✅");
-        
+        onBidSuccess(amount, description);
+        onClose();
       } else {
         toast.error(data.message || "Failed to place bid ❌");
       }
     } catch (error) {
       console.error("Error placing bid:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     }
   };
 
   return (
-    
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-50">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-2xl px-6 py-8">

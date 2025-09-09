@@ -1,119 +1,44 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // agar aapko id URL se lena hai
+import { useParams } from "react-router-dom";
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
-
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
-
-import { Search } from "lucide-react";
-
-import BidModel from "./BidModel";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-
+import BidModal from "./BidModel";
+import EditBidModal from "./EditBidModel";
 
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const { id } = useParams(); // agar route me /bid/:id hai to ye kaam karega
+  const { id } = useParams();
+
+  // Modal States
   const [isBidModel, setIsBidModel] = useState(false);
-   const [data, setData] = useState(null);
-   const [offer, setOffer] = useState("");
-  const [isOfferActive, setIsOfferActive] = useState(false);
+  const [isEditBidModel, setIsEditBidModel] = useState(false);
+
+  // Data States
+  const [data, setData] = useState(null);
   const [worker, setWorker] = useState(null);
+
+  // Bid States
+  const [bidPlaced, setBidPlaced] = useState(false);
+  const [bidAmount, setBidAmount] = useState("");
+  const [bidDescription, setBidDescription] = useState("");
+
+  // Offer / Negotiation
+  const [offer, setOffer] = useState("");
+  const [isOfferActive, setIsOfferActive] = useState(false);
+
+  // Loading / Error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    const token = localStorage.getItem("bharat_token");
-    
 
-    fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${id}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setData(data);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
-  }, []);
-    
-  let order_id='';
-  let service_provider_get_id='';
-  let user_get_id='';
-  let bidding_offer_id='';
-      if(data){
-        order_id=data.order_id;
-        service_provider_get_id=data.service_provider;
-        user_get_id=data.user;
-        bidding_offer_id=data._id;
-
-
-      }
-
- const handleNagotiation=async(offer)=>{
-   // user id from localStorage
-    const token = localStorage.getItem("bharat_token"); // bearer token from localStorage
-
-    if (!offer) {
-      toast.error("Please enter offer amount ❗");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BASE_URL}/negotiations/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // bearer token
-        },
-        body: JSON.stringify({
-          order_id:order_id, // from location.state
-          bidding_offer_id:bidding_offer_id, // from location.state
-          service_provider: service_provider_get_id, // from URL
-          user: user_get_id, // from localStorage
-          initiator: "service_provider", // fixed
-          offer_amount: Number(offer), // from parameter
-          message: `Can you do it for ${offer}?`, // dynamic with offer
-        }),
-      });
-
-      const data = await response.json();
-      console.log("Negotiation API Response:", data);
-
-      if (response.ok) {
-        toast.success(`You sent ₹${offer} Amount For Negotiation`);
-      } else {
-        alert(`Error: ${data.message || "Something went wrong"}`);
-      }
-    } catch (error) {
-      console.error("API Error:", error);
-      alert("Failed to start negotiation ❌");
-    }
-  }
-  const closeBidModel = () => {
-    setIsBidModel(false);
-  };
-
+  // Fetch Work Details
   useEffect(() => {
     const fetchWorkDetails = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
-        if (!token) {
-          setError("Token not found");
-          setLoading(false);
-          return;
-        }
+        if (!token) throw new Error("Token not found");
 
         const response = await fetch(
           `${BASE_URL}/bidding-order/getBiddingOrderById/${id}`,
@@ -126,46 +51,133 @@ export default function Bid() {
           }
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch work details");
-        }
+        if (!response.ok) throw new Error("Failed to fetch work details");
 
-        const alldata = await response.json();
-        const data = alldata.data;
-        console.log(data);
+        const result = await response.json();
+        const data = result.data;
 
         setWorker({
-          id: data._id,
+          _id: data._id,
+          order_id: data.order_id,
           project_id: data.project_id,
           workName: data.title,
           location: data.address,
           status: data.status,
-          image: 'd',
+          image: "d",
           amount: data.cost,
           date: data.createdAt,
           completionDate: data.deadline,
-          skills:data.description
+          skills: data.description,
+          service_provider: data.service_provider,
+          user: data.user,
+          sub_category_id: data.sub_category_id || "123", // single ID
         });
 
         setLoading(false);
       } catch (err) {
         console.error(err);
-        setError("Failed to load work details");
+        setError(err.message);
         setLoading(false);
       }
     };
 
     fetchWorkDetails();
-  }, [id]);
-  
+  }, [id, BASE_URL]);
+
+  // Fetch Latest Negotiation
+  useEffect(() => {
+    const token = localStorage.getItem("bharat_token");
+    if (!worker?.order_id || !token) return;
+
+    const fetchNegotiation = async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}/negotiations/getLatestNegotiation/${worker.order_id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch negotiation");
+
+        const result = await res.json();
+        setData(result);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      }
+    };
+
+    fetchNegotiation();
+  }, [worker, BASE_URL]);
+
+  // Handle Negotiation
+  const handleNegotiation = async (offer) => {
+    const token = localStorage.getItem("bharat_token");
+    if (!offer) {
+      toast.error("Please enter offer amount ❗");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/negotiations/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          order_id: worker?.order_id,
+          bidding_offer_id: data?._id,
+          service_provider: worker?.service_provider,
+          user: worker?.user,
+          initiator: "service_provider",
+          offer_amount: Number(offer),
+          message: `Can you do it for ${offer}?`,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Negotiation API Response:", result);
+
+      if (response.ok) {
+        toast.success(`You sent ₹${offer} Amount For Negotiation`);
+      } else {
+        toast.error(result.message || "Something went wrong ❌");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to start negotiation ❌");
+    }
+  };
+
+  // Handle Bid Success
+  const handleBidSuccess = (amount, description) => {
+    setBidPlaced(true);
+    setBidAmount(amount);
+    setBidDescription(description);
+    setIsBidModel(false);
+  };
+
+  // Handle Edit Bid Success
+  const handleEditBidSuccess = (amount, description) => {
+    setBidAmount(amount);
+    setBidDescription(description);
+    setIsEditBidModel(false);
+  };
+
   if (loading) return <div className="text-center py-6">Loading...</div>;
-  if (error)
-    return <div className="text-center py-6 text-red-500">{error}</div>;
-;
+  if (error) return <div className="text-center py-6 text-red-500">{error}</div>;
+
   return (
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
@@ -179,8 +191,7 @@ export default function Bid() {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-lg font-semibold">{worker.workName}</h2>
-                  
-                  <span className="inline-block bg-red-500 text-white text-lg font-semibold px-3 rounded-full mt-2">
+                  <span className="inline-block bg-[#F27773] text-white text-sm font-semibold px-3 rounded-full mt-2">
                     {worker.location}
                   </span>
                   <p className="font-semibold text-lg my-2 text-[#008000]">
@@ -213,13 +224,19 @@ export default function Bid() {
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{worker.skills}</p>
               </div>
-              <div onClick={() => setIsBidModel(true)}
-               className="text-xl text-white bg-[#008000] text-center py-1 border rounded-lg w-1/4 mx-auto">
-                Bid
+
+              <div
+                onClick={() =>
+                  bidPlaced ? setIsEditBidModel(true) : setIsBidModel(true)
+                }
+                className="text-lg font-semibold text-white bg-[#008000] text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer"
+              >
+                {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
               </div>
             </div>
           )}
-               <div className="flex flex-col items-center  p-6 ">
+
+          <div className="flex flex-col items-center p-6">
             <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
               <button
                 onClick={() => setIsOfferActive(true)}
@@ -229,7 +246,7 @@ export default function Bid() {
                     : "border border-green-600 text-green-600"
                 }`}
               >
-                Offer Price ({data.offer_amount})
+                Offer Price ({data?.offer_amount || 0})
               </button>
               <button
                 onClick={() => setIsOfferActive(false)}
@@ -244,37 +261,57 @@ export default function Bid() {
             </div>
 
             {!isOfferActive && (
-  <input
-    type="number"
-    placeholder="Enter your offer amount"
-    value={offer}
-    onChange={(e) => setOffer(e.target.value)}
-    className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-  />
-)}
+              <input
+                type="number"
+                placeholder="Enter your offer amount"
+                value={offer}
+                onChange={(e) => setOffer(e.target.value)}
+                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+              />
+            )}
+          </div>
 
-</div>
-
-{/* Accept / Send Request */}
-<div className="text-center">
-  <button
-    className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
-    onClick={() => {
-      if (isOfferActive) {
-        alert("Request Accepted ✅");
-      } else {
-        handleNagotiation(offer);
-      }
-    }}
-  >
-    {isOfferActive ? "Accept Request" : "Send Request"}
-  </button>
-</div>
+          <div className="text-center">
+            <button
+              className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
+              onClick={() => {
+                if (isOfferActive) {
+                  alert("Request Accepted ✅");
+                } else {
+                  handleNegotiation(offer);
+                }
+              }}
+            >
+              {isOfferActive ? "Accept Request" : "Send Request"}
+            </button>
+          </div>
         </div>
-       
       </div>
+
       <Footer />
-      {isBidModel && <BidModel isOpen={isBidModel} onClose={closeBidModel} orderId={id}/>}
+
+      {/* Add Bid Modal */}
+      {isBidModel && (
+        <BidModal
+          isOpen={isBidModel}
+          onClose={() => setIsBidModel(false)}
+          orderId={worker?._id}
+          onBidSuccess={handleBidSuccess}
+        />
+      )}
+
+      {/* Edit Bid Modal */}
+      {isEditBidModel && (
+        <EditBidModal
+          isOpen={isEditBidModel}
+          onClose={() => setIsEditBidModel(false)}
+          orderId={worker?._id}
+          initialAmount={bidAmount || worker?.amount}
+          initialDescription={bidDescription || worker?.skills}
+          initialSubCategoryId={worker?.sub_category_id} // single ID
+          onEditSuccess={handleEditBidSuccess}
+        />
+      )}
     </>
   );
 }
