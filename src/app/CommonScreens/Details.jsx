@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Header from "../../component/Header";
+import { useDispatch, useSelector } from "react-redux";
 import { selectRole } from "../../redux/roleSlice";
+import { fetchUserProfile } from "../../redux/userSlice";
+import { fetchEmergencyStatus, updateEmergencyStatus } from "../../redux/emergencySlice";
+import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import User from "../../assets/Details/User.png";
 import Edit from "../../assets/Details/edit.svg";
 import Location from "../../assets/Details/location.svg";
-import Sample from "../../assets/Details/sample.png";
-import Sample2 from "../../assets/Details/sample2.jpg";
 import Vector from "../../assets/Home-SP/Vector.svg";
 import Aadhar from "../../assets/Details/profile-line.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUserProfile } from "../../redux/userSlice";
 import edit from "../../assets/login/edit.png";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
@@ -28,14 +27,12 @@ export default function Details() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { profile, loading } = useSelector((state) => state.user);
+  const { isEmergencyOn, status: emergencyStatus, error: emergencyError } = useSelector((state) => state.emergency);
   const selectedRole = useSelector((state) => state.role.selectedRole);
   const savedRole = localStorage.getItem("role"); // "user" or "service_provider"
-  const [activeTab, setActiveTab] = useState(
-    selectedRole === "service_provider" ? "vendor" : "user" // Initialize based on selectedRole
-  );
-  const [vendorTab, setVendorTab] = useState("work");
+  const [activeTab, setActiveTab] = useState("user"); // Default to user tab
+  const [WorkerTab, setWorkerTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isEmergencyOn, setIsEmergencyOn] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   console.log("Selected Role from Redux:", selectedRole);
@@ -45,27 +42,65 @@ export default function Details() {
   }
   console.log(profile);
 
-  // Fetch user profile on mount
+  // Fetch user profile and emergency status on mount
   useEffect(() => {
     dispatch(fetchUserProfile());
+    dispatch(fetchEmergencyStatus());
   }, [dispatch]);
 
-  // Check vendor profile completeness on mount if selectedRole is service_provider
+  // Check verification status when switching to Worker tab
   useEffect(() => {
-    if (selectedRole === "service_provider" && activeTab === "vendor") {
-      if (!validateVendorProfile()) {
+    if (activeTab !== "Worker") return;
+
+    const timeoutId = setTimeout(() => {
+      if (profile?.data?.verified) {
+        if (!localStorage.getItem("verifiedAlertShown")) {
+          Swal.fire({
+            title: "Verified!",
+            text: "You just got verified by the admin.",
+            icon: "success",
+            confirmButtonColor: "#228B22",
+            confirmButtonText: "OK",
+          }).then(() => {
+            localStorage.setItem("verifiedAlertShown", "true");
+          });
+        }
+      } else if (profile?.data?.rejected) {
         Swal.fire({
-          title: "Incomplete Profile",
-          text: "Your vendor profile is incomplete, please complete your profile first.",
+          title: "Profile Rejected",
+          text: "Your profile got rejected please reupload your documents properly.",
+          icon: "error",
+          confirmButtonColor: "#228B22",
+          confirmButtonText: "Go to Edit Profile",
+        }).then(() => {
+          navigate("/editprofile", { state: { activeTab: "worker" } });
+        });
+      } else if (!validateWorkerProfile()) {
+        Swal.fire({
+          title: "Profile Not Completed",
+          text: "Profile not completed",
           icon: "warning",
           confirmButtonColor: "#228B22",
           confirmButtonText: "Go to Edit Profile",
         }).then(() => {
-          navigate("/editprofile", { state: { activeTab: "vendor" } });
+          navigate("/editprofile", { state: { activeTab: "worker" } });
+        });
+      } else {
+        // Pending: complete but not verified or rejected
+        Swal.fire({
+          title: "Pending Verification",
+          text: "Wait for admins approval it may take 2-3 days",
+          icon: "info",
+          confirmButtonColor: "#228B22",
+          confirmButtonText: "OK",
+        }).then(() => {
+          requestRoleUpgrade();
         });
       }
-    }
-  }, [selectedRole, activeTab, profile, navigate]);
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [activeTab, profile, navigate]);
 
   // Profile data initialization
   let full_name = "N/A";
@@ -77,12 +112,12 @@ export default function Details() {
   let document = "Not Available";
   let status = false;
   let workImages = [];
-  let verified = "Pending";
-  let element;
+  let verifiedStatus = "Pending";
+  let statusClass = "bg-yellow-100 text-yellow-600";
   let rateAndReviews;
   let age = "N/A";
   let gender = "N/A";
-  console.log(profile);
+  let element;
   if (profile && profile.data) {
     full_name = profile.data.full_name || "Not Available";
     address = profile.data.full_address[0]?.address || "Not Available";
@@ -94,7 +129,16 @@ export default function Details() {
     rateAndReviews = profile.data.rateAndReviews || "Not Available";
     status = profile.data.verified || false;
     workImages = profile.data.hiswork || [];
-    verified = status ? "Verified by Admin" : "Pending";
+    if (profile.data.verified) {
+      verifiedStatus = "Verified by Admin";
+      statusClass = "bg-green-100 text-green-600";
+    } else if (profile.data.rejected) {
+      verifiedStatus = "Rejected";
+      statusClass = "bg-red-100 text-red-600";
+    } else {
+      verifiedStatus = "Pending";
+      statusClass = "bg-yellow-100 text-yellow-600";
+    }
     age = profile.data.age || "N/A";
     gender = profile.data.gender || "N/A";
 
@@ -114,26 +158,16 @@ export default function Details() {
 
   const testimage = images && images !== "Not Available";
 
-  // Carousel for work/review images
-  const reviewImages = [Sample2, Sample];
+  // Carousel for work images only
   useEffect(() => {
-    if (activeTab !== "vendor") return;
-    if (
-      (vendorTab === "work" && workImages.length === 0) ||
-      (vendorTab === "review" && reviewImages.length === 0)
-    )
-      return;
+    if (activeTab !== "Worker" || WorkerTab !== "work" || workImages.length === 0) return;
 
     const interval = setInterval(() => {
-      if (vendorTab === "work") {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % workImages.length);
-      } else if (vendorTab === "review") {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % reviewImages.length);
-      }
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % workImages.length);
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [activeTab, vendorTab, workImages, reviewImages]);
+  }, [activeTab, WorkerTab, workImages]);
 
   // Handle profile picture edit click
   const handleEditClick = () => {
@@ -234,14 +268,42 @@ export default function Details() {
     }
   };
 
-  // Toggle emergency task
-  const handleToggle = () => {
-    setIsEmergencyOn(!isEmergencyOn);
+  // Handle image removal
+  const handleRemoveImage = async (imageIndex) => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const imageToRemove = workImages[imageIndex];
+      const res = await fetch(`${BASE_URL}/user/deleteHisworkImage`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imagePath: imageToRemove }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Image removed successfully!");
+        dispatch(fetchUserProfile()); // Refresh profile data
+      } else {
+        toast.error(data.message || "Failed to remove image.");
+      }
+    } catch (err) {
+      console.error("Error removing image:", err);
+      toast.error("Something went wrong while removing the image!");
+    }
   };
 
-  // Navigate to EditProfile
+  // Toggle emergency task
+  const handleToggle = () => {
+    dispatch(updateEmergencyStatus(!isEmergencyOn));
+  };
+
+  // Navigate to EditProfile with correct activeTab
   const Editpage = () => {
-    navigate("/editprofile", { state: { activeTab } });
+    const tabToNavigate = activeTab === "Worker" ? "worker" : "user";
+    navigate("/editprofile", { state: { activeTab: tabToNavigate } });
   };
 
   // Validate user profile fields
@@ -259,8 +321,8 @@ export default function Details() {
     return true;
   };
 
-  // Validate vendor profile fields
-  const validateVendorProfile = () => {
+  // Validate Worker profile fields
+  const validateWorkerProfile = () => {
     if (
       !profile?.data?.full_name ||
       !profile?.data?.skill ||
@@ -297,97 +359,18 @@ export default function Details() {
     }
   };
 
-  // Handle tab switch with validation for user and vendor
+  // Handle tab switch with validation for user and Worker
   const handleTabSwitch = (newTab) => {
     if (newTab === activeTab) return;
 
     if (newTab === "user") {
-      Swal.fire({
-        title: "Switch Profile",
-        text: "Switching your profile from Vendor to User",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonColor: "#228B22",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Switch",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          if (!validateUserProfile()) {
-            Swal.fire({
-              title: "Incomplete Profile",
-              text: "Your user profile is incomplete, please complete your profile first.",
-              icon: "warning",
-              confirmButtonColor: "#228B22",
-              confirmButtonText: "Go to Edit Profile",
-            }).then(() => {
-              navigate("/editprofile", { state: { activeTab: "user" } });
-            });
-          } else {
-            setActiveTab("user");
-            dispatch(selectRole("user"));
-            localStorage.setItem("role", "user");
-            Swal.fire(
-              "Switched!",
-              "You are now viewing the User Profile.",
-              "success"
-            ).then(() => {
-              navigate("/homeuser"); // ✅ Navigate after switching to user
-            });
-          }
-        }
-      });
-    } else if (newTab === "vendor") {
-      Swal.fire({
-        title: "Switch Profile",
-        text: "Switching your profile from User to Vendor",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonColor: "#228B22",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Switch",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          if (profile?.data?.verified) {
-            setActiveTab("vendor");
-            dispatch(selectRole("service_provider"));
-            localStorage.setItem("role", "service_provider");
-            Swal.fire(
-              "Switched!",
-              "You are now viewing the Vendor Profile.",
-              "success"
-            ).then(() => {
-              navigate("/homeservice"); // ✅ Navigate after switching to vendor
-            });
-          } else if (!validateVendorProfile()) {
-            Swal.fire({
-              title: "Incomplete Profile",
-              text: "Your vendor profile is incomplete, please complete your profile first.",
-              icon: "warning",
-              confirmButtonColor: "#228B22",
-              confirmButtonText: "Go to Edit Profile",
-            }).then(() => {
-              navigate("/editprofile", { state: { activeTab: "vendor" } });
-            });
-          } else if (selectedRole === "user" || verification === false) {
-            await requestRoleUpgrade();
-            Swal.fire({
-              title: "Profile Submitted",
-              text: "Profile completed, wait for admin's approval, it will take 2-3 days for verification.",
-              icon: "info",
-              confirmButtonColor: "#228B22",
-              confirmButtonText: "OK",
-            });
-          } else {
-            Swal.fire({
-              title: "Already a Vendor",
-              text: "You are already a vendor, no need to request a role upgrade.",
-              icon: "info",
-              confirmButtonColor: "#228B22",
-              confirmButtonText: "OK",
-            });
-          }
-        }
-      });
+      setActiveTab("user");
+      dispatch(selectRole("user"));
+      localStorage.setItem("role", "user");
+    } else if (newTab === "Worker") {
+      setActiveTab("Worker");
+      dispatch(selectRole("service_provider"));
+      localStorage.setItem("role", "service_provider");
     }
   };
 
@@ -425,17 +408,17 @@ export default function Details() {
           >
             User Profile
           </button>
-          {/* Vendor Profile Button */}
+          {/* Worker Profile Button */}
           <button
-            onClick={() => handleTabSwitch("vendor")}
+            onClick={() => handleTabSwitch("Worker")}
             className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
-              activeTab === "vendor"
+              activeTab === "Worker"
                 ? "bg-[#228B22] text-white"
                 : "bg-white text-[#228B22]"
             }`}
-            aria-label="View Vendor Profile"
+            aria-label="View Worker Profile"
           >
-            Vendor Profile
+            Worker Profile
           </button>
         </div>
       </div>
@@ -486,18 +469,19 @@ export default function Details() {
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
                 </div>
-                <span>
-                  Age : {age} ,<span>Gender:{gender}</span>
-                </span>
+                <div className="flex flex-col font-semibold text-base text-gray-700">
+                  <span>Age: {age}</span>
+                  <span>Gender: {gender}</span>
+                </div>
                 <div
                   className={`p-4 shadow-xl max-w-[600px] mt-10 ${
                     skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-xl">About My Skill</h3>
+                    <h3 className="font-semibold text-lg">About My Skill</h3>
                   </div>
-                  <p className="mt-7 text-gray-700 text-sm leading-relaxed break-all">
+                  <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
                     {skill}
                   </p>
                 </div>
@@ -505,7 +489,7 @@ export default function Details() {
             </div>
           </div>
         )}
-        {activeTab === "vendor" && (
+        {activeTab === "Worker" && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
               <div className="relative">
@@ -543,16 +527,17 @@ export default function Details() {
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
                   <span>{address}</span>
                 </div>
-                <span>
-                  Age : {age} ,<span>Gender:{gender}</span>
-                </span>
-                <p className="text-base">
+                <div className="flex flex-col font-semibold text-base text-gray-700">
+                  <span>Age: {age}</span>
+                  <span>Gender: {gender}</span>
+                </div>
+                <p className="text-base font-semibold text-gray-700">
                   <span className="font-semibold text-[#228B22]">
                     Category-
                   </span>{" "}
                   {category_name}
                 </p>
-                <p className="text-base -mt-4">
+                <p className="text-base font-semibold -mt-4 text-gray-700">
                   <span className="font-semibold text-[#228B22]">
                     {" "}
                     Sub-Categories-{" "}
@@ -572,9 +557,9 @@ export default function Details() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-xl">About My Skill</h3>
+                    <h3 className="font-semibold text-lg">About My Skill</h3>
                   </div>
-                  <p className="mt-1 text-gray-700 text-sm leading-relaxed break-all">
+                  <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
                     {skill}
                   </p>
                 </div>
@@ -584,11 +569,11 @@ export default function Details() {
               <div className="flex justify-center gap-6 p-4 mt-6">
                 <button
                   onClick={() => {
-                    setVendorTab("work");
+                    setWorkerTab("work");
                     setCurrentIndex(0);
                   }}
                   className={`px-6 py-2 rounded-md shadow-md font-semibold ${
-                    vendorTab === "work"
+                    WorkerTab === "work"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22]"
                   }`}
@@ -598,11 +583,11 @@ export default function Details() {
                 </button>
                 <button
                   onClick={() => {
-                    setVendorTab("review");
+                    setWorkerTab("review");
                     setCurrentIndex(0);
                   }}
                   className={`px-6 py-2 rounded-md shadow-md font-semibold ${
-                    vendorTab === "review"
+                    WorkerTab === "review"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22]"
                   }`}
@@ -611,8 +596,8 @@ export default function Details() {
                   Customer Review
                 </button>
               </div>
-              {vendorTab === "work" && (
-                <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
+              {WorkerTab === "work" && (
+                <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
                   <div className="relative w-[700px] h-[400px]">
                     {workImages.length > 0 ? (
                       <>
@@ -630,7 +615,7 @@ export default function Details() {
                       </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                        No His work available
+                        No work available
                         <div
                           className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
@@ -653,21 +638,44 @@ export default function Details() {
                       </div>
                     )}
                   </div>
+                  {/* Display selected images with remove button */}
+                  {workImages.length > 0 && (
+                    <div className="mt-6 flex flex-col items-center gap-4">
+                      <div className="flex flex-wrap gap-4 justify-center">
+                        {workImages.map((img, index) => (
+                          <div key={index} className="relative w-24 h-24 overflow-hidden">
+                            <img
+                              src={img}
+                              alt={`Work sample ${index + 1}`}
+                              className="w-full h-full object-cover rounded-md shadow-md"
+                            />
+                            <button
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
+                              aria-label={`Remove work image ${index + 1}`}
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-gray-700 text-base font-semibold">
+                        (You can upload up to 5 images here)
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
-              {vendorTab === "review" && (
+              {WorkerTab === "review" && (
                 <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
-                  <div className="relative w-[700px]">
-                    <img
-                      src={reviewImages[currentIndex]}
-                      alt={`Review ${currentIndex + 1}`}
-                      className="w-full rounded-md shadow-md"
-                    />
-                    <div
-                      className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
-                      onClick={handleEditClick}
-                    >
-                      <img src={Edit} alt="Edit" className="w-6 h-6" />
+                  <div className="relative w-[700px] h-[400px]">
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                      <p className="text-lg text-center">
+                        Customer reviews are not available at this moment.
+                      </p>
+                      <p className="text-sm text-center mt-2">
+                        Please check back later for updates on customer feedback.
+                      </p>
                     </div>
                     {isUploading && (
                       <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white font-semibold rounded-md">
@@ -715,8 +723,10 @@ export default function Details() {
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex justify-between items-start">
                   <h2 className="text-xl font-bold">Document</h2>
-                  <span className="bg-green-100 text-green-600 text-xs font-semibold px-3 py-1 rounded-full">
-                    {verified}
+                  <span
+                    className={`${statusClass} text-xs font-semibold px-3 py-1 rounded-full`}
+                  >
+                    {verifiedStatus}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-4">
@@ -737,7 +747,6 @@ export default function Details() {
             {/* Rate & Reviews Section */}
             <div className="container mx-auto max-w-[750px] px-6 py-6">
               <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
-
               {rateAndReviews && rateAndReviews.length > 0 ? (
                 rateAndReviews.map((item, index) => (
                   <div
@@ -759,12 +768,10 @@ export default function Details() {
                         </span>
                       ))}
                     </div>
-
                     {/* Review Content */}
                     <h3 className="font-semibold">{item.title}</h3>
                     <p className="text-gray-600 text-sm">{item.comment}</p>
                     <p className="text-xs text-gray-400 mt-2">{item.date}</p>
-
                     {/* Reviewer Images */}
                     <div className="flex mt-3">
                       {item.reviewers?.map((img, i) => (
@@ -783,7 +790,6 @@ export default function Details() {
                   No Ratings Available
                 </p>
               )}
-
               {/* See All Review Button */}
               {rateAndReviews && rateAndReviews.length > 0 && (
                 <div className="text-center mt-4">
@@ -795,9 +801,11 @@ export default function Details() {
             </div>
             {/* Add Workers Button */}
             <div className="container mx-auto max-w-[550px] px-6 py-6">
-              <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">
-                Add workers
-              </button>
+              <Link to="/workerlist">
+                <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">
+                  Add workers
+                </button>
+              </Link>
             </div>
           </div>
         )}

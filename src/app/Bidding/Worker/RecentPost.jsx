@@ -157,7 +157,7 @@ console.log(workers);
                     </div>
 
                     <div className="flex justify-between items-center my-4">
-                      <div className="text-white bg-red-500 text-sm py-1 px-8 rounded-full">
+                      <div className="text-white bg-[#F27773] text-sm py-1 px-8 rounded-full">
                         {worker.location}
                       </div>
                       <div>

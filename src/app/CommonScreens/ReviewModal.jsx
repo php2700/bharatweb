@@ -1,4 +1,4 @@
-// RateVendorModal.jsx
+// RateWorkerModal.jsx
 import React, { useState } from "react";
 import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -42,7 +42,7 @@ export default function ReviewModal({
 
       Swal.fire({
       title: "Success!",
-      text: "Thank you for rating the vendor!",
+      text: "Thank you for rating the Worker!",
       icon: "success",
       confirmButtonColor: "#228B22",
     }).then(() => {
@@ -70,7 +70,7 @@ export default function ReviewModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg max-w-md w-full">
         <h2 className="text-lg font-bold mb-4 text-green-700 text-center">
-          Rate the Vendor
+          Rate the Worker
         </h2>
         <p className="text-lg font-semibold mb-4 text-gray-600 text-center -mt-4">
           How was your experience with us?

@@ -2,6 +2,7 @@ import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditBidModal({
   isOpen,
@@ -9,52 +10,43 @@ export default function EditBidModal({
   orderId,
   initialAmount,
   initialDescription,
-  initialSubCategoryId = [], // array of valid ObjectIds
+  categoryId,          // ✅ received from parent
+  subCategoryIds = [], // ✅ received from parent
   onEditSuccess,
 }) {
   const [amount, setAmount] = useState(initialAmount || "");
   const [description, setDescription] = useState(initialDescription || "");
-  const [subCategoryIds, setSubCategoryIds] = useState(initialSubCategoryId);
 
   useEffect(() => {
     setAmount(initialAmount || "");
     setDescription(initialDescription || "");
-    setSubCategoryIds(initialSubCategoryId || []);
-  }, [initialAmount, initialDescription, initialSubCategoryId]);
+  }, [initialAmount, initialDescription]);
 
   if (!isOpen) return null;
-
-  const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate all sub_category_ids before sending
-    if (!subCategoryIds.length || !subCategoryIds.every(isValidObjectId)) {
-      toast.error("Sub-category IDs must be valid 24-character hex strings ❌");
-      return;
-    }
-
     const token = localStorage.getItem("bharat_token");
 
     const payload = {
-      order_id: orderId,
-      title: "Updated Bid",
-      category_id: subCategoryIds[0], // example: pick first as category_id
-      sub_category_ids: subCategoryIds, // send as array of valid ObjectIds
-      address: "Some Address",
-      google_address: "Google Address here",
-      description,
-      cost: amount,
-      deadline: "2025-09-15",
-      images: [],
-    };
+  order_id: orderId,
+  title: "Updated Bid",
+category_id: categoryId?._id || categoryId, // send only the ID
+sub_category_ids: subCategoryIds.map(sub => sub._id || sub).join(","), // send string of IDs
+  address: "Some Address",
+  google_address: "Google Address here",
+  description,
+  cost: amount,
+  deadline: "2025-09-15",
+  images: [],
+};
 
     console.log("Payload being sent:", payload);
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/bidding-order/edit`,
+        `${BASE_URL}/bidding-order/edit`,
         {
           method: "PUT",
           headers: {
@@ -114,25 +106,6 @@ export default function EditBidModal({
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
               required
             />
-          </div>
-
-          <div className="text-left">
-            <label className="block font-medium mb-1">Sub-categories (IDs)</label>
-            <input
-              type="text"
-              placeholder="Enter comma-separated ObjectIds"
-              value={subCategoryIds.join(",")}
-              onChange={(e) =>
-                setSubCategoryIds(
-                  e.target.value.split(",").map((id) => id.trim())
-                )
-              }
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Enter valid 24-character hex ObjectIds, separated by commas.
-            </p>
           </div>
 
           <div className="flex w-1/2 mx-auto justify-center gap-4 mt-6">

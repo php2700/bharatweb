@@ -764,9 +764,11 @@ export default function Home() {
           <p className="text-white text-xl sm:text-2xl md:text-4xl font-bold text-center px-4">
             Click here to post your project and get <br /> started!
           </p>
-          <button className="mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold px-6 sm:px-9 py-2 sm:py-3 rounded-sm shadow hover:bg-gray-100">
-            Post Work
-          </button>
+          <Link to="/bidding/newtask">
+            <button className="mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold px-6 sm:px-9 py-2 sm:py-3 rounded-sm shadow hover:bg-gray-100">
+              Post Work
+            </button>
+          </Link>
         </div>
       </div>
 

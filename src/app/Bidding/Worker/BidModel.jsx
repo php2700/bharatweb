@@ -2,6 +2,7 @@ import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
   const [amount, setAmount] = useState("");
@@ -23,7 +24,7 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/bidding-order/placeBid`,
+        `${BASE_URL}/bidding-order/placeBid`,
         {
           method: "POST",
           headers: {

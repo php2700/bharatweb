@@ -1,4 +1,3 @@
-// src/components/EditProfile.jsx
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Select from "react-select";
@@ -161,7 +160,7 @@ export default function EditProfile() {
         "image/gif",
       ];
       if (!allowedTypes.includes(files[0].type)) {
-        alert("Only PDF or image files are allowed!");
+        toast.error("Only PDF or image files are allowed!");
         return;
       }
       setFormData((prev) => ({ ...prev, document: files[0] }));
@@ -184,7 +183,7 @@ export default function EditProfile() {
 
     const allowedTypes = ["image/jpeg", "image/png"];
     if (!allowedTypes.includes(file.type)) {
-      alert("Only JPG/PNG images are allowed for profile picture!");
+      toast.error("Only JPG/PNG images are allowed for profile picture!");
       return;
     }
 
@@ -199,14 +198,60 @@ export default function EditProfile() {
         body: fd,
       });
       const data = await res.json();
-      if (!res.ok)
-        return alert(data.message || "Failed to update profile pic.");
+      if (!res.ok) {
+        toast.error(data.message || "Failed to update profile pic.");
+        return;
+      }
 
+      setProfilePic(URL.createObjectURL(file)); // Update preview
       toast.success("Profile picture updated successfully!");
       dispatch(fetchUserProfile());
     } catch (error) {
       console.error("Error updating profile pic:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
+    }
+  };
+
+  // Remove document
+  const handleRemoveDocument = async () => {
+    // If document is a new upload (not yet saved to server), clear locally
+    if (formData.document && documentPreview?.startsWith('blob:')) {
+      setFormData((prev) => ({ ...prev, document: null }));
+      setDocumentPreview(null);
+      toast.success("Document removed successfully!");
+      return;
+    }
+
+    // If document is from server, call API to remove
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const imagePath = profile?.data?.documents?.[0]?.url || profile?.data?.documents;
+      if (!imagePath) {
+        toast.error("No document found to remove.");
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/user/deleteHisworkImage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ imagePath }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message || "Failed to remove document.");
+        return;
+      }
+
+      setFormData((prev) => ({ ...prev, document: null })); // Clear document
+      setDocumentPreview(null); // Clear document preview
+      toast.success("Document removed successfully!");
+      dispatch(fetchUserProfile()); // Refresh profile data
+    } catch (error) {
+      console.error("Error removing document:", error);
+      toast.error("Something went wrong while removing the document!");
     }
   };
 
@@ -221,13 +266,15 @@ export default function EditProfile() {
     try {
       const token = localStorage.getItem("bharat_token");
 
-      if (activeTab === "vendor") {
+      if (activeTab === "worker") {
         if (!formData.category) return toast.error("Category is required!");
         if (!formData.subcategory.length)
           return toast.error("Select at least one subcategory!");
-         if(!formData.age) return toast.error("Age is required!");
+        if (!formData.age) return toast.error("Age is required!");
         const fd = new FormData();
-        fd.append("document", formData.document);
+        if (formData.document) {
+          fd.append("document", formData.document);
+        }
         fd.append("category_id", formData.category);
         formData.subcategory.forEach((sub) =>
           fd.append("subcategory_ids[]", sub)
@@ -243,7 +290,7 @@ export default function EditProfile() {
         });
         const data = await res.json();
         if (!res.ok)
-          return alert(data.message || "Failed to update vendor profile.");
+          return toast.error(data.message || "Failed to update worker profile.");
 
         // Update name
         const payload = { full_name: formData.name };
@@ -257,9 +304,9 @@ export default function EditProfile() {
         });
         const dataName = await resName.json();
         if (!resName.ok)
-          return alert(dataName.message || "Failed to update name.");
+          return toast.error(dataName.message || "Failed to update name.");
 
-        toast.success("Vendor profile updated successfully!");
+        toast.success("Worker profile updated successfully!");
         setTimeout(() => {
           navigate("/details");
         }, 2000);
@@ -277,7 +324,7 @@ export default function EditProfile() {
         });
         const dataName = await resName.json();
         if (!resName.ok)
-          return alert(dataName.message || "Failed to update name.");
+          return toast.error(dataName.message || "Failed to update name.");
 
         const skillPayload = { skill: formData.about };
         const resSkill = await fetch(`${BASE_URL}/user/updateUserDetails`, {
@@ -290,17 +337,16 @@ export default function EditProfile() {
         });
         const dataSkill = await resSkill.json();
         if (!resSkill.ok)
-          return alert(dataSkill.message || "Failed to update skill.");
+          return toast.error(dataSkill.message || "Failed to update skill.");
 
         toast.success("User profile updated successfully!");
-
         setTimeout(() => {
           navigate("/details");
-        }, 3000); // ✅ 3 sec baad navigate hoga
+        }, 2000);
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Something went wrong!");
+      toast.error("Something went wrong!");
     }
   };
 
@@ -318,161 +364,166 @@ export default function EditProfile() {
       </div>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
-  <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-    Update Your Profile
-  </h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+          {activeTab === "worker" ? "Get your profile verified" : "Update User Profile"}
+        </h2>
 
-  <form onSubmit={handleSubmit} className="space-y-6">
-    {/* Name */}
-    <div>
-      <label className="block mb-2 font-semibold text-gray-700">Name</label>
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Enter your name"
-        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-        required
-      />
-    </div>
-
-    {/* 🔹 Age (Auto-filled) */}
-    <div>
-  <label className="block mb-2 font-semibold text-gray-700">Age</label>
-  <input
-    type="number"
-    name="age"
-    value={formData.age || ""}
-    onChange={handleChange}
-    onInput={(e) => {
-      if (e.target.value.length > 2) {
-        e.target.value = e.target.value.slice(0, 2); // ✅ max 2 digits
-      }
-    }}
-    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-  />
-</div>
-
-
-
-    {/* 🔹 Gender (Auto-filled) */}
-  <div>
-  <label className="block mb-2 font-semibold text-gray-700">Gender</label>
-  <select
-    name="gender"
-    value={formData.gender || ""} // pehle se selected value
-    onChange={handleChange}       // agar change karne dena hai
-    className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-  >
-    <option value="" disabled>
-      Select Gender
-    </option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-    <option value="other">Other</option>
-  </select>
-</div>
-
-
-    {/* Vendor Fields */}
-    {activeTab === "vendor" && (
-      <>
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Category
-          </label>
-          <Select
-            options={categories}
-            value={categories.find((c) => c.value === formData.category)}
-            onChange={handleCategoryChange}
-            placeholder="Search or select category..."
-            isClearable
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Subcategory
-          </label>
-          <Select
-            options={subcategories}
-            value={subcategories.filter((s) =>
-              formData.subcategory.includes(s.value)
-            )}
-            onChange={handleSubcategoryChange}
-            isMulti
-            placeholder="Search or select subcategories..."
-            isDisabled={!formData.category}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Upload Document
-          </label>
-          <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
-            <span className="text-gray-700">
-              {formData.document ? formData.document.name : "Choose a file"}
-            </span>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name */}
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">Name</label>
             <input
-              type="file"
-              name="document"
+              type="text"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-              className="hidden"
+              placeholder="Enter your name"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+              required
             />
-          </label>
-          <p className="text-sm text-red-500 mt-1">
-            Allowed Documents: Driving License, PAN Card, Aadhaar, Passport, or
-            any Govt. ID (PDF / Image)
-          </p>
+          </div>
 
-          {/* Document preview */}
-          {documentPreview && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Document Preview
-              </h3>
-              <img
-                src={documentPreview}
-                alt="Document Preview"
-                className="w-32 h-32 object-cover mt-2"
-              />
-            </div>
+          {/* Age */}
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">Age</label>
+            <input
+              type="number"
+              name="age"
+              value={formData.age || ""}
+              onChange={handleChange}
+              onInput={(e) => {
+                if (e.target.value.length > 2) {
+                  e.target.value = e.target.value.slice(0, 2); // max 2 digits
+                }
+              }}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            />
+          </div>
+
+          {/* Gender */}
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">Gender</label>
+            <select
+              name="gender"
+              value={formData.gender || ""}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          {/* Worker Fields */}
+          {activeTab === "worker" && (
+            <>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Category
+                </label>
+                <Select
+                  options={categories}
+                  value={categories.find((c) => c.value === formData.category)}
+                  onChange={handleCategoryChange}
+                  placeholder="Search or select category..."
+                  isClearable
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Subcategory
+                </label>
+                <Select
+                  options={subcategories}
+                  value={subcategories.filter((s) =>
+                    formData.subcategory.includes(s.value)
+                  )}
+                  onChange={handleSubcategoryChange}
+                  isMulti
+                  placeholder="Search or select subcategories..."
+                  isDisabled={!formData.category}
+                />
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Upload Document
+                </label>
+                <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
+                  <span className="text-gray-700">
+                    {formData.document ? formData.document.name : "Choose a file"}
+                  </span>
+                  <input
+                    type="file"
+                    name="document"
+                    onChange={handleChange}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-base font-medium text-gray-700 mt-1">
+                  (Allowed Documents: Driving License, PAN Card, Aadhaar, Passport, or
+                  any Govt. ID (PDF / Image))
+                </p>
+
+                {/* Document preview */}
+                {documentPreview && (
+                  <div className="mt-4 relative">
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Document Preview
+                    </h3>
+                    <div className="relative w-32 h-32">
+                      <img
+                        src={documentPreview}
+                        alt="Document Preview"
+                        className="w-full h-full object-cover mt-2 rounded-lg shadow-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveDocument}
+                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
+                        aria-label="Remove document"
+                      >
+                        X
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
           )}
-        </div>
-      </>
-    )}
 
-    {/* About Skill */}
-    <div>
-      <label className="block mb-2 font-semibold text-gray-700">
-        About My Skill
-      </label>
-      <textarea
-        name="about"
-        value={formData.about}
-        onChange={handleChange}
-        placeholder="Describe your skill..."
-        maxLength={500}
-        className="w-full px-4 py-2 rounded-lg border border-gray-300 
-         focus:outline-none focus:ring-2 focus:ring-blue-400 
-         focus:border-transparent transition resize-none"
-        rows="4"
-      ></textarea>
-      <p className="text-sm text-gray-500 mt-1">
-        {formData.about.length}/500 characters
-      </p>
-    </div>
+          {/* About Skill */}
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">
+              About My Skill
+            </label>
+            <textarea
+              name="about"
+              value={formData.about}
+              onChange={handleChange}
+              placeholder="Describe your skill..."
+              maxLength={500}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
+              rows="4"
+            ></textarea>
+            <p className="text-sm text-gray-500 mt-1">
+              {formData.about.length}/500 characters
+            </p>
+          </div>
 
-    <button
-      type="submit"
-      className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
-    >
-      Submit
-    </button>
-  </form>
-</div>
+          <button
+            type="submit"
+            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
 
       <Footer />
     </>

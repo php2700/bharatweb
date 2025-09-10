@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BidModal from "./BidModel";
 import EditBidModal from "./EditBidModel";
+import { sub } from "date-fns";
 
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -70,8 +71,10 @@ export default function Bid() {
           skills: data.description,
           service_provider: data.service_provider,
           user: data.user,
-          sub_category_id: data.sub_category_id || "123", // single ID
+          category_id: data.category_id || null, // ✅ ensure available
+          sub_category_ids: data.sub_category_ids || [], // ✅ correct naming
         });
+console.log(data.sub_category_ids);
 
         setLoading(false);
       } catch (err) {
@@ -171,7 +174,8 @@ export default function Bid() {
   };
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
-  if (error) return <div className="text-center py-6 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-6 text-red-500">{error}</div>;
 
   return (
     <>
@@ -226,20 +230,17 @@ export default function Bid() {
               </div>
 
               <div
-  onClick={() => {
-    if (bidPlaced) {
-      setIsEditBidModel(true); // only allow editing
-    } else {
-      setIsBidModel(true); // allow placing a new bid
-    }
-  }}
-  className={`text-lg font-semibold text-white text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer ${
-    bidPlaced ? "bg-gray-400 cursor-not-allowed" : "bg-[#008000] hover:bg-green-700"
-  }`}
->
-  {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
-</div>
-
+                onClick={() => {
+                  if (bidPlaced) {
+                    setIsEditBidModel(true);
+                  } else {
+                    setIsBidModel(true);
+                  }
+                }}
+                className={`text-lg font-semibold text-white text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer bg-[#008000] hover:bg-green-700`}
+              >
+                {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
+              </div>
             </div>
           )}
 
@@ -315,7 +316,8 @@ export default function Bid() {
           orderId={worker?._id}
           initialAmount={bidAmount || worker?.amount}
           initialDescription={bidDescription || worker?.skills}
-          initialSubCategoryId={worker?.sub_category_id} // single ID
+          categoryId={worker?.category_id} // ✅ pass category_id
+          subCategoryIds={worker?.sub_category_ids || []} // ✅ pass subCategoryIds
           onEditSuccess={handleEditBidSuccess}
         />
       )}

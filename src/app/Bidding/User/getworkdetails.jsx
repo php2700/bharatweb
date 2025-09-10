@@ -218,16 +218,13 @@ export default function BiddinggetWorkDetail() {
         const token = localStorage.getItem("bharat_token");
 
         // ✅ API Call using fetch
-        fetch(
-          `${BASE_URL}/bidding-order/cancelBiddingOrder/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+        fetch(`${BASE_URL}/bidding-order/cancelBiddingOrder/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
           .then(async (res) => {
             if (!res.ok) {
               throw new Error("Failed to cancel task");
@@ -291,12 +288,12 @@ export default function BiddinggetWorkDetail() {
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
           <button
-                    className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-                    onClick={() => navigate(-1)}
-                  >
-                    <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
-                    Back
-                  </button>
+            className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+            onClick={() => navigate(-1)}
+          >
+            <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
+            Back
+          </button>
         </div>
         <div className="container max-w-5xl  mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
@@ -427,63 +424,70 @@ export default function BiddinggetWorkDetail() {
             {tab === "related" ? (
               <div className="flex flex-col items-center justify-center text-gray-500 py-10">
                 {Array.isArray(providers) && providers.length > 0 ? (
-                  providers.map((provider) => (
-                    <div
-                      key={provider._id}
-                      className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
-                    >
-                      <img
-                        src={images}
-                        alt={provider.full_name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                      />
+                  providers
+                    .filter(
+                      (provider) =>
+                        !offers?.data?.some(
+                          (offer) => offer.provider_id?._id === provider._id
+                        )
+                    )
+                    .map((provider) => (
+                      <div
+                        key={provider._id}
+                        className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
+                      >
+                        <img
+                          src={images}
+                          alt={provider.full_name}
+                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                        />
 
-                      {/* Worker Details */}
-                      <div className="flex-1 text-center sm:text-left">
-                        <h3 className="text-[17px] font-bold text-[#303030]">
-                          {provider.full_name}
-                        </h3>
-                        <p className="text-sm text-gray-500 truncate max-w-[200px]">
-                          {provider.skill}
-                        </p>
+                        {/* Worker Details */}
+                        <div className="flex-1 text-center sm:text-left">
+                          <h3 className="text-[17px] font-bold text-[#303030]">
+                            {provider.full_name}
+                          </h3>
+                          <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                            {provider.skill}
+                          </p>
 
-                        <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
-                          location
-                        </span>
-                        <div>
-                          <button className="text-green-600 font-medium text-sm mt-1">
-                            View Profile
-                          </button>
+                          <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
+                            location
+                          </span>
+                          <div>
+                            <button className="text-green-600 font-medium text-sm mt-1">
+                              View Profile
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Status + Invite */}
+                        <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                          <div className="flex items-center gap-4 sm:gap-7">
+                            <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                              <img
+                                src={call}
+                                alt="call"
+                                className="w-[18px] sm:w-[23px]"
+                              />
+                            </span>
+                            <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                              <img
+                                src={msg}
+                                alt="msg"
+                                className="w-[18px] sm:w-[23px]"
+                              />
+                            </span>
+                            <button
+                              onClick={() => InviteSendWorker(provider._id)}
+                              className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                            >
+                              Invite
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Status + Invite */}
-                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                        <div className="flex items-center gap-4 sm:gap-7">
-                          <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                            <img
-                              src={call}
-                              alt="call"
-                              className="w-[18px] sm:w-[23px]"
-                            />
-                          </span>
-                          <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                            <img
-                              src={msg}
-                              alt="msg"
-                              className="w-[18px] sm:w-[23px]"
-                            />
-                          </span>
-                          <button
-                            onClick={() => InviteSendWorker(provider._id)}
-                            className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                          >
-                            Invite
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
+                    ))
                 ) : (
                   <div className="flex flex-col items-center justify-center text-gray-500 py-10">
                     <img
@@ -542,7 +546,6 @@ export default function BiddinggetWorkDetail() {
                         <button className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700">
                           Accept
                         </button>
-                        
                       </div>
                     </div>
                   ))
