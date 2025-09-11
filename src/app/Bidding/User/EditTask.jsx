@@ -16,7 +16,6 @@ import {
   Autocomplete,
 } from "@react-google-maps/api";
 
-
 const libraries = ["places"];
 
 export default function BiddingEditTask() {
@@ -37,12 +36,8 @@ export default function BiddingEditTask() {
     images: [], // For new uploads
     existingImages: [], // For already uploaded images
   });
-
-  const [errors, setErrors] = useState({});
   const [isMapOpen, setIsMapOpen] = useState(false);
-  const [mapFor, setMapFor] = useState("location"); // "location" or "address"
   const [markerLocationGPS, setMarkerLocationGPS] = useState(null);
-  const [markerLocationAddress, setMarkerLocationAddress] = useState(null);
   const [tempAddress, setTempAddress] = useState({
     address: "",
     latitude: null,
@@ -84,7 +79,6 @@ export default function BiddingEditTask() {
   }, []);
 
   // 🔹 Fetch task details by ID and autopopulate
- 
   useEffect(() => {
     const fetchTaskById = async () => {
       try {
@@ -96,7 +90,6 @@ export default function BiddingEditTask() {
         const data = await res.json();
         if (res.ok && data.status) {
           const task = data.data;
-          
 
           // Set form fields
           setFormData((prev) => ({
@@ -109,7 +102,7 @@ export default function BiddingEditTask() {
             description: task.description || "",
             cost: task.cost || "",
             deadline: task.deadline ? task.deadline.split("T")[0] : "",
-            images:  [], // New uploads
+            images: [], // New uploads
             existingImages: task.image_url || [], // Existing uploaded images
           }));
 
@@ -231,8 +224,7 @@ export default function BiddingEditTask() {
         (pos) => {
           const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
           setCurrentLocation(loc);
-          if (mapFor === "location") setMarkerLocationGPS(loc);
-          else setMarkerLocationAddress(loc);
+          setMarkerLocationGPS(loc);
           getAddressFromLatLng(loc.lat, loc.lng);
           if (map) map.panTo(loc);
         },
@@ -251,8 +243,7 @@ export default function BiddingEditTask() {
         const lng = place.geometry.location.lng();
         const loc = { lat, lng };
         setCurrentLocation(loc);
-        if (mapFor === "location") setMarkerLocationGPS(loc);
-        else setMarkerLocationAddress(loc);
+        setMarkerLocationGPS(loc);
         getAddressFromLatLng(lat, lng);
         if (map) map.panTo(loc);
       }
@@ -262,13 +253,12 @@ export default function BiddingEditTask() {
   const handleMapClick = (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
-    if (mapFor === "location") setMarkerLocationGPS({ lat, lng });
-    else setMarkerLocationAddress({ lat, lng });
+    setMarkerLocationGPS({ lat, lng });
     getAddressFromLatLng(lat, lng);
   };
 
   const defaultCenter =
-    markerLocationGPS || markerLocationAddress || currentLocation || { lat: 28.6139, lng: 77.209 };
+    markerLocationGPS || currentLocation || { lat: 28.6139, lng: 77.209 };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -288,9 +278,9 @@ export default function BiddingEditTask() {
     try {
       const token = localStorage.getItem("bharat_token");
       const data = new FormData();
-      
+
       data.append("title", formData.title);
-      data.append("order_id",id);
+      data.append("order_id", id);
       data.append("category_id", formData.category);
       data.append("sub_category_ids", formData.subCategories.join(","));
       data.append("address", formData.googleAddress);
@@ -445,7 +435,6 @@ export default function BiddingEditTask() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <img src={Calender} alt="" className="w-5 h-5" />
                 </div>
-
                 <ReactDatePicker
                   selected={formData.deadline ? new Date(formData.deadline) : null}
                   onChange={(date) =>
@@ -482,7 +471,6 @@ export default function BiddingEditTask() {
                   accept="image/*"
                   onChange={handleFileChange}
                 />
-
                 <button
                   className="p-[2px] border border-[#228B22] rounded-[10px] w-[93px] mt-[13px] text-[#228B22] font-[500]"
                   onClick={(e) => {
@@ -495,12 +483,7 @@ export default function BiddingEditTask() {
               </label>
 
               {/* Preview Existing Images */}
-              
-
-              {/* Preview New Images */}
-              
-            </div>
-{formData.existingImages.length > 0 && (
+              {formData.existingImages.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3 justify-center">
                   {formData.existingImages.map((img, index) => (
                     <div key={index} className="relative">
@@ -527,14 +510,13 @@ export default function BiddingEditTask() {
                   ))}
                 </div>
               )}
-               {formData.images.length > 0 && (
-                
+
+              {/* Preview New Images */}
+              {formData.images.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3 justify-center">
-                    <span className="text-center">New Images</span>
+                  <span className="text-center w-full">New Images</span>
                   {formData.images.map((img, index) => (
-                    
                     <div key={index} className="relative">
-                        
                       <img
                         src={URL.createObjectURL(img)}
                         alt="preview"
@@ -556,6 +538,8 @@ export default function BiddingEditTask() {
                   ))}
                 </div>
               )}
+            </div>
+
             {/* Submit */}
             <div className="mt-6">
               <button
@@ -573,50 +557,44 @@ export default function BiddingEditTask() {
       {/* ===== MAP MODAL ===== */}
       {isMapOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div>
-            <button
-              onClick={() => setIsMapOpen(false)}
-              className="absolute top-2 right-2 text-red-600 font-bold text-xl"
-            >
-              &times;
-            </button>
-            {isLoaded && (
-              <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
+          <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
             <div className="flex justify-between mb-2">
               <h1 className="text-black text-[20px] font-semibold">Select Location</h1>
-              
-              <button onClick={() => setIsMapOpen(false)} className="text-red-500 font-bold">
+              <button
+                onClick={() => setIsMapOpen(false)}
+                className="text-red-500 font-bold"
+              >
                 X
               </button>
             </div>
-{tempAddress.address && (
-  <p className="mb-2 text-sm text-gray-700">
-   <span className="font-semibold">{tempAddress.address}</span>
-  </p>
-)}
-
-            <Autocomplete
-              onLoad={(ref) => (autoCompleteRef.current = ref)}
-              onPlaceChanged={handlePlaceChanged}
-            >
-              <input
-                type="text"
-                placeholder="Search location"
-                className="w-full border-2 border-gray-300 rounded-lg p-2 mb-2"
-              />
-            </Autocomplete>
-
-            <GoogleMap
-              mapContainerStyle={{ height: "350px", width: "100%" }}
-              center={defaultCenter}
-              zoom={15}
-              onLoad={(map) => setMap(map)}
-              onClick={handleMapClick}
-            >
-              {markerLocationGPS && <Marker position={markerLocationGPS} />}
-              {markerLocationAddress && <Marker position={markerLocationAddress} />}
-            </GoogleMap>
-
+            {tempAddress.address && (
+              <p className="mb-2 text-sm text-gray-700">
+                <span className="font-semibold">{tempAddress.address}</span>
+              </p>
+            )}
+            {isLoaded && (
+              <>
+                <Autocomplete
+                  onLoad={(ref) => (autoCompleteRef.current = ref)}
+                  onPlaceChanged={handlePlaceChanged}
+                >
+                  <input
+                    type="text"
+                    placeholder="Search location"
+                    className="w-full border-2 border-gray-300 rounded-lg p-2 mb-2"
+                  />
+                </Autocomplete>
+                <GoogleMap
+                  mapContainerStyle={{ height: "350px", width: "100%" }}
+                  center={defaultCenter}
+                  zoom={15}
+                  onLoad={(map) => setMap(map)}
+                  onClick={handleMapClick}
+                >
+                  {markerLocationGPS && <Marker position={markerLocationGPS} />}
+                </GoogleMap>
+              </>
+            )}
             <div className="flex mt-2 gap-2 justify-center">
               <button
                 onClick={handleCurrentLocation}
@@ -631,9 +609,6 @@ export default function BiddingEditTask() {
                 Confirm Location
               </button>
             </div>
-          </div>
-            )}
-           
           </div>
         </div>
       )}

@@ -18,28 +18,29 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function HireDetail() {
   const { id } = useParams();
-  const location=useLocation();
-    const { bidding_offer_id, order_id } = location.state || {};
-    
+  const location = useLocation();
+  const { bidding_offer_id, order_id } = location.state || {};
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [providerDetail, setProviderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
+  const [_error, setError] = useState(null); // Changed error to _error
   const dispatch = useDispatch();
- 
-  const { profile} = useSelector((state) => state.user);
+
+  const { profile } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchUserProfile());
-  }, [dispatch])
-  if(profile && profile.data){
-    localStorage.setItem('user_id',profile.data._id);
+  }, [dispatch]);
+
+  if (profile && profile.data) {
+    localStorage.setItem('user_id', profile.data._id);
   }
-  
-useEffect(() => {
+
+  useEffect(() => {
     const token = localStorage.getItem("bharat_token");
-    
 
     fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${id}`, {
       method: "GET",
@@ -55,12 +56,13 @@ useEffect(() => {
         return res.json();
       })
       .then((data) => {
-        setData(data);
+        setProviderDetail(data); // Changed setData to setProviderDetail
       })
       .catch((err) => {
         setError(err.message);
       });
-  }, []);
+  }, [BASE_URL, id]); // Added BASE_URL and id to dependency array
+
   useEffect(() => {
     const fetchServiceProviderById = async () => {
       try {
@@ -91,7 +93,7 @@ useEffect(() => {
     if (id) {
       fetchServiceProviderById();
     }
-  }, [id]);
+  }, [id, BASE_URL]); // Added BASE_URL to dependency array
 
   const imagsArray = [
     hisWorkImg,
@@ -120,7 +122,8 @@ useEffect(() => {
   if (!providerDetail) {
     return <div className="text-center py-10">No Provider Found</div>;
   }
-  const handleNagotiation=async(offer)=>{
+
+  const handleNagotiation = async (offer) => {
     const userId = localStorage.getItem("user_id"); // user id from localStorage
     const token = localStorage.getItem("bharat_token"); // bearer token from localStorage
 
@@ -159,7 +162,7 @@ useEffect(() => {
       console.error("API Error:", error);
       alert("Failed to start negotiation ❌");
     }
-  }
+  };
 
   return (
     <>
@@ -332,7 +335,7 @@ useEffect(() => {
           </div>
 
           {/* Offer/Negotiate Section */}
-          <div className="flex flex-col items-center  p-6 ">
+          <div className="flex flex-col items-center p-6">
             <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
               <button
                 onClick={() => setIsOfferActive(true)}
@@ -357,33 +360,31 @@ useEffect(() => {
             </div>
 
             {!isOfferActive && (
-  <input
-    type="number"
-    placeholder="Enter your offer amount"
-    value={offer}
-    onChange={(e) => setOffer(e.target.value)}
-    className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-  />
-)}
+              <input
+                type="number"
+                placeholder="Enter your offer amount"
+                value={offer}
+                onChange={(e) => setOffer(e.target.value)}
+                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+              />
+            )}
+          </div>
 
-</div>
-
-{/* Accept / Send Request */}
-<div className="text-center">
-  <button
-    className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
-    onClick={() => {
-      if (isOfferActive) {
-        alert("Request Accepted ✅");
-      } else {
-        handleNagotiation(offer);
-      }
-    }}
-  >
-    {isOfferActive ? "Accept Request" : "Send Request"}
-  </button>
-</div>
-
+          {/* Accept / Send Request */}
+          <div className="text-center">
+            <button
+              className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
+              onClick={() => {
+                if (isOfferActive) {
+                  alert("Request Accepted ✅");
+                } else {
+                  handleNagotiation(offer);
+                }
+              }}
+            >
+              {isOfferActive ? "Accept Request" : "Send Request"}
+            </button>
+          </div>
         </div>
       </div>
       <Footer />
