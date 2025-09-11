@@ -305,9 +305,11 @@ export default function Header() {
                                   </p>
                                 </div>
                               </div>
-                              <button className="text-green-600 text-xs font-medium hover:underline">
-                                View Details
-                              </button>
+                              <Link to="/notifications">
+                                <button className="text-green-600 text-xs font-medium hover:underline">
+                                  View Details
+                                </button>
+                              </Link>
                             </div>
                           ))}
                         </div>

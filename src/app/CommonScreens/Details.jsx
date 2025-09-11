@@ -35,12 +35,15 @@ export default function Details() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  console.log("Selected Role from Redux:", selectedRole);
   let verification = false;
   if (profile && profile.data) {
     verification = profile.data.verified;
   }
-  console.log(profile);
+
+  // Helper to get a stable userId for localStorage keys (fallback if not in profile)
+  const getUserId = () => {
+    return profile?.data?.userId || localStorage.getItem('userId') || 'default'; // Add 'userId' to localStorage on login if needed
+  };
 
   // Fetch user profile and emergency status on mount
   useEffect(() => {
@@ -48,58 +51,80 @@ export default function Details() {
     dispatch(fetchEmergencyStatus());
   }, [dispatch]);
 
-  // Check verification status when switching to Worker tab
+  // Trigger verification success alert ONLY on first switch to Worker tab after verification
   useEffect(() => {
     if (activeTab !== "Worker") return;
 
-    const timeoutId = setTimeout(() => {
-      if (profile?.data?.verified) {
-        if (!localStorage.getItem("verifiedAlertShown")) {
-          Swal.fire({
-            title: "Verified!",
-            text: "You just got verified by the admin.",
-            icon: "success",
-            confirmButtonColor: "#228B22",
-            confirmButtonText: "OK",
-          }).then(() => {
-            localStorage.setItem("verifiedAlertShown", "true");
-          });
-        }
-      } else if (profile?.data?.rejected) {
+    // Only show if verified and first time switching to Worker post-verification
+    if (profile?.data?.verified && !localStorage.getItem(`workerVerifiedFirstSwitchShown_${getUserId()}`)) {
+      Swal.fire({
+        title: "Yay! You got verified by the admin",
+        text: "Your profile is now verified!",
+        icon: "success",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      }).then(() => {
+        localStorage.setItem(`workerVerifiedFirstSwitchShown_${getUserId()}`, "true");
+      });
+    }
+  }, [activeTab, profile?.data?.verified]); // Depend on activeTab to trigger on switch
+
+  // Check Worker tab access and handle non-verified cases
+  useEffect(() => {
+    if (activeTab !== "Worker") return;
+
+    if (!profile?.data?.verified) {
+      if (profile?.data?.rejected) {
+        console.log("Profile rejected, showing rejection alert");
         Swal.fire({
-          title: "Profile Rejected",
-          text: "Your profile got rejected please reupload your documents properly.",
+          title: "Oops! Admin rejected your profile",
+          text: "Please fill details properly.",
           icon: "error",
           confirmButtonColor: "#228B22",
           confirmButtonText: "Go to Edit Profile",
         }).then(() => {
+          toast.dismiss(); // Prevent stale toasts
           navigate("/editprofile", { state: { activeTab: "worker" } });
+          setActiveTab("user");
+          dispatch(selectRole("user"));
+          localStorage.setItem("role", "user");
         });
       } else if (!validateWorkerProfile()) {
+        console.log("Profile incomplete, showing incomplete alert");
         Swal.fire({
-          title: "Profile Not Completed",
-          text: "Profile not completed",
+          title: "Your Worker profile is not completed",
+          text: "Please complete your profile to access the Worker tab.",
           icon: "warning",
           confirmButtonColor: "#228B22",
           confirmButtonText: "Go to Edit Profile",
         }).then(() => {
+          toast.dismiss(); // Prevent stale toasts
           navigate("/editprofile", { state: { activeTab: "worker" } });
+          setActiveTab("user");
+          dispatch(selectRole("user"));
+          localStorage.setItem("role", "user");
         });
       } else {
-        // Pending: complete but not verified or rejected
+        // Pending: complete but not verified
+        console.log("Profile complete but unverified, showing pending alert");
         Swal.fire({
-          title: "Pending Verification",
-          text: "Wait for admins approval it may take 2-3 days",
+          title: "Verification Pending",
+          text: "Your verification by admin is pending, it will take 2-3 days.",
           icon: "info",
           confirmButtonColor: "#228B22",
           confirmButtonText: "OK",
         }).then(() => {
+          toast.dismiss(); // Prevent stale toasts
           requestRoleUpgrade();
+          setActiveTab("user");
+          dispatch(selectRole("user"));
+          localStorage.setItem("role", "user");
         });
       }
-    }, 2000);
-
-    return () => clearTimeout(timeoutId);
+    } else {
+      console.log("Profile verified, allowing Worker tab access");
+      // No need to switch back—stay on Worker tab
+    }
   }, [activeTab, profile, navigate]);
 
   // Profile data initialization
@@ -181,7 +206,7 @@ export default function Details() {
 
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Only JPG/PNG images are allowed!");
+      toast.error("Only JPG/PNG images are allowed!", { toastId: "profile-pic-error" });
       return;
     }
 
@@ -204,14 +229,14 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Profile image updated successfully!");
+        toast.success("Profile image updated successfully!", { toastId: "profile-pic-success" });
         dispatch(fetchUserProfile()); // Refresh profile data
       } else {
-        toast.error(data.message || "Failed to update profile image.");
+        toast.error(data.message || "Failed to update profile image.", { toastId: "profile-pic-fail" });
       }
     } catch (err) {
       console.error("Error uploading profile pic:", err);
-      toast.error("Something went wrong while uploading the image!");
+      toast.error("Something went wrong while uploading the image!", { toastId: "profile-pic-error-catch" });
     }
   };
 
@@ -224,8 +249,17 @@ export default function Details() {
   const handleGalleryFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
-    if (selectedFiles.length > 5) {
-      toast.error("You can upload a maximum of 5 images at once");
+
+    // Check total images (existing + new) does not exceed 5
+    const totalImages = workImages.length + selectedFiles.length;
+    if (totalImages > 5) {
+      Swal.fire({
+        title: "Upload Limit Exceeded",
+        text: "You can only have a maximum of 5 images in total!",
+        icon: "error",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
@@ -254,14 +288,14 @@ export default function Details() {
 
       const data = await response.json();
       if (response.ok) {
-        toast.success("Images updated successfully!");
+        toast.success("Images updated successfully!", { toastId: "gallery-success" });
         dispatch(fetchUserProfile()); // Refresh profile data
       } else {
-        toast.error(data.message || "Failed to update images");
+        toast.error(data.message || "Failed to update images", { toastId: "gallery-fail" });
       }
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Something went wrong while uploading images!");
+      toast.error("Something went wrong while uploading images!", { toastId: "gallery-error" });
     } finally {
       setIsUploading(false);
       e.target.value = null; // Reset input
@@ -284,14 +318,14 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Image removed successfully!");
+        toast.success("Image removed successfully!", { toastId: "remove-image-success" });
         dispatch(fetchUserProfile()); // Refresh profile data
       } else {
-        toast.error(data.message || "Failed to remove image.");
+        toast.error(data.message || "Failed to remove image.", { toastId: "remove-image-fail" });
       }
     } catch (err) {
       console.error("Error removing image:", err);
-      toast.error("Something went wrong while removing the image!");
+      toast.error("Something went wrong while removing the image!", { toastId: "remove-image-error" });
     }
   };
 
@@ -302,6 +336,7 @@ export default function Details() {
 
   // Navigate to EditProfile with correct activeTab
   const Editpage = () => {
+    toast.dismiss(); // Prevent stale toasts
     const tabToNavigate = activeTab === "Worker" ? "worker" : "user";
     navigate("/editprofile", { state: { activeTab: tabToNavigate } });
   };
@@ -348,14 +383,14 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Role upgrade requested successfully!");
+        toast.success("Role upgrade requested successfully!", { toastId: "role-upgrade-success" });
         dispatch(fetchUserProfile()); // Refresh profile data
       } else {
-        toast.error(data.message || "Failed to request role upgrade.");
+        toast.error(data.message || "Failed to request role upgrade.", { toastId: "role-upgrade-fail" });
       }
     } catch (err) {
       console.error("Error requesting role upgrade:", err);
-      toast.error("Something went wrong while requesting role upgrade!");
+      toast.error("Something went wrong while requesting role upgrade!", { toastId: "role-upgrade-error" });
     }
   };
 
@@ -363,21 +398,37 @@ export default function Details() {
   const handleTabSwitch = (newTab) => {
     if (newTab === activeTab) return;
 
+    toast.dismiss(); // Prevent stale toasts
     if (newTab === "user") {
       setActiveTab("user");
       dispatch(selectRole("user"));
       localStorage.setItem("role", "user");
     } else if (newTab === "Worker") {
-      setActiveTab("Worker");
-      dispatch(selectRole("service_provider"));
-      localStorage.setItem("role", "service_provider");
+      if (validateWorkerProfile() && profile?.data?.verified) {
+        setActiveTab("Worker");
+        dispatch(selectRole("service_provider"));
+        localStorage.setItem("role", "service_provider");
+      } else {
+        setActiveTab("Worker"); // Trigger useEffect for alerts
+      }
     }
   };
 
   return (
     <>
       <Header />
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        limit={3}
+      />
       <div className="container mx-auto px-4 py-4">
         <Link
           to="/"
@@ -396,7 +447,6 @@ export default function Details() {
       </div>
       <div className="w-full bg-[#D9D9D9] py-6 mt-10">
         <div className="flex justify-center gap-10 mt-6">
-          {/* User Profile Button */}
           <button
             onClick={() => handleTabSwitch("user")}
             className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
@@ -408,7 +458,6 @@ export default function Details() {
           >
             User Profile
           </button>
-          {/* Worker Profile Button */}
           <button
             onClick={() => handleTabSwitch("Worker")}
             className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
@@ -522,6 +571,11 @@ export default function Details() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
+                  {profile?.data?.verified && (
+                    <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                      Verified
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-gray-600 font-semibold">
                   <img src={Location} alt="Location icon" className="w-5 h-5" />
@@ -614,8 +668,8 @@ export default function Details() {
                         </div>
                       </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                        No work available
+                      <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                        No work available.<br />you can upload up to 5 images here.
                         <div
                           className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
@@ -638,7 +692,6 @@ export default function Details() {
                       </div>
                     )}
                   </div>
-                  {/* Display selected images with remove button */}
                   {workImages.length > 0 && (
                     <div className="mt-6 flex flex-col items-center gap-4">
                       <div className="flex flex-wrap gap-4 justify-center">
@@ -686,39 +739,40 @@ export default function Details() {
                 </div>
               )}
             </div>
-            <div className="md:w-[700px] w-[90%] mx-auto mt-8 flex items-center justify-between p-4 rounded-lg border border-white shadow-lg">
-              <div className="flex items-center gap-2">
-                <img src={Vector} alt="Warning Icon" className="w-6 h-6" />
-                <span className="text-black font-medium text-lg max-md:text-sm">
-                  Emergency task
-                </span>
+            {activeTab === "Worker" && (
+              <div className="md:w-[700px] w-[90%] mx-auto mt-8 flex items-center justify-between p-4 rounded-lg border border-white shadow-lg">
+                <div className="flex items-center gap-2">
+                  <img src={Vector} alt="Warning Icon" className="w-6 h-6" />
+                  <span className="text-black font-medium text-lg max-md:text-sm">
+                    Emergency task
+                  </span>
+                </div>
+                <div className="toggle-wrapper">
+                  <button
+                    onClick={handleToggle}
+                    className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${
+                      isEmergencyOn
+                        ? "bg-[#228B22] justify-end"
+                        : "bg-[#DF1414] justify-start"
+                    }`}
+                    style={{
+                      width: "40px",
+                      height: "25px",
+                      minWidth: "40px",
+                      minHeight: "25px",
+                    }}
+                    aria-label={
+                      isEmergencyOn
+                        ? "Disable emergency task"
+                        : "Enable emergency task"
+                    }
+                    aria-checked={isEmergencyOn}
+                  >
+                    <div className="w-[15px] h-[15px] bg-white rounded-full shadow-md"></div>
+                  </button>
+                </div>
               </div>
-              <div className="toggle-wrapper">
-                <button
-                  onClick={handleToggle}
-                  className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${
-                    isEmergencyOn
-                      ? "bg-[#228B22] justify-end"
-                      : "bg-[#DF1414] justify-start"
-                  }`}
-                  style={{
-                    width: "40px",
-                    height: "25px",
-                    minWidth: "40px",
-                    minHeight: "25px",
-                  }}
-                  aria-label={
-                    isEmergencyOn
-                      ? "Disable emergency task"
-                      : "Enable emergency task"
-                  }
-                  aria-checked={isEmergencyOn}
-                >
-                  <div className="w-[15px] h-[15px] bg-white rounded-full shadow-md"></div>
-                </button>
-              </div>
-            </div>
-            {/* Document Section */}
+            )}
             <div className="container mx-auto max-w-[750px] px-6 py-6">
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex justify-between items-start">
@@ -744,7 +798,6 @@ export default function Details() {
                 </div>
               </div>
             </div>
-            {/* Rate & Reviews Section */}
             <div className="container mx-auto max-w-[750px] px-6 py-6">
               <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
               {rateAndReviews && rateAndReviews.length > 0 ? (
@@ -753,7 +806,6 @@ export default function Details() {
                     key={index}
                     className="bg-white rounded-xl shadow-md p-6 mb-4"
                   >
-                    {/* Star Rating */}
                     <div className="flex gap-1 mb-2">
                       {[1, 2, 3, 4, 5].map((star, i) => (
                         <span
@@ -768,11 +820,9 @@ export default function Details() {
                         </span>
                       ))}
                     </div>
-                    {/* Review Content */}
                     <h3 className="font-semibold">{item.title}</h3>
                     <p className="text-gray-600 text-sm">{item.comment}</p>
                     <p className="text-xs text-gray-400 mt-2">{item.date}</p>
-                    {/* Reviewer Images */}
                     <div className="flex mt-3">
                       {item.reviewers?.map((img, i) => (
                         <img
@@ -790,7 +840,6 @@ export default function Details() {
                   No Ratings Available
                 </p>
               )}
-              {/* See All Review Button */}
               {rateAndReviews && rateAndReviews.length > 0 && (
                 <div className="text-center mt-4">
                   <button className="text-[#228B22] font-semibold hover:underline">
@@ -799,7 +848,6 @@ export default function Details() {
                 </div>
               )}
             </div>
-            {/* Add Workers Button */}
             <div className="container mx-auto max-w-[550px] px-6 py-6">
               <Link to="/workerlist">
                 <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-lg font-semibold shadow-md hover:bg-green-700">

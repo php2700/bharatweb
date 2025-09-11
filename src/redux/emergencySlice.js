@@ -10,7 +10,7 @@ export const fetchEmergencyStatus = createAsyncThunk(
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await fetch(`${BASE_URL}/user/emergency`, {
-        method: "GET",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
