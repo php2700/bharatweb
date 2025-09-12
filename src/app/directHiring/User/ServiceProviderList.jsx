@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -11,13 +11,15 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ServiceProviderList() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { category_id, subcategory_ids } = location.state || {}; // 👈 coming from navigate
-console.log(category_id, subcategory_ids)
+  const { category_id, subcategory_ids } = location.state || {};
+  console.log(category_id, subcategory_ids);
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   useEffect(() => {
     const fetchWorkers = async () => {
       if (!category_id || !subcategory_ids) {
@@ -28,7 +30,6 @@ console.log(category_id, subcategory_ids)
 
       try {
         const token = localStorage.getItem("bharat_token");
-
         const response = await axios.post(
           `${BASE_URL}/user/getServiceProviders`,
           {
@@ -66,12 +67,12 @@ console.log(category_id, subcategory_ids)
     navigate(`/direct-hiring/${serviceProviderId}`);
   };
 
-	console.log("workers",workers)
+  console.log("workers", workers);
+
   return (
     <>
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
-        {/* Back button */}
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
           <button
             onClick={handleBack}
@@ -81,7 +82,6 @@ console.log(category_id, subcategory_ids)
           </button>
         </div>
 
-        {/* Banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}
@@ -90,7 +90,6 @@ console.log(category_id, subcategory_ids)
           />
         </div>
 
-        {/* Worker list */}
         <div className="container max-w-5xl mx-auto my-10">
           <div className="flex justify-between items-center p-3">
             <div className="text-2xl font-bold">Direct Hiring</div>
@@ -114,7 +113,6 @@ console.log(category_id, subcategory_ids)
                   key={worker.id || worker._id}
                   className="grid grid-cols-12 items-center bg-white rounded-lg shadow-lg p-4 gap-8"
                 >
-                  {/* Worker image */}
                   <div className="relative col-span-4">
                     <img
                       src={worker.profile_pic || "/default.png"}
@@ -126,7 +124,6 @@ console.log(category_id, subcategory_ids)
                     </span>
                   </div>
 
-                  {/* Worker details */}
                   <div className="col-span-8 p-4">
                     <div className="flex justify-between">
                       <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
@@ -142,17 +139,18 @@ console.log(category_id, subcategory_ids)
                     </div>
                     <div className="leading-tight break-words whitespace-normal">{worker?.skill}</div>
 
-                    {/* Location & buttons */}
                     <div className="flex justify-between items-center my-4">
                       <div className="text-white bg-[#f27773] text-sm px-8 rounded-full">
                         {worker?.location.address || "Unknown"}
                       </div>
                       <div className="flex gap-4">
-                        <button className="text-[#228B22] py-1 px-4 border rounded-lg">
-                          View Profile
-                        </button>
+                        <Link to={`/profile-details/${worker._id}`}> {/* Fixed: Use worker._id */}
+                          <button className="text-[#228B22] py-1 px-4 border rounded-lg">
+                            View Profile
+                          </button>
+                        </Link>
                         <button
-                          onClick={()=>handleHire(worker._id)}
+                          onClick={() => handleHire(worker._id)}
                           className="text-white bg-[#228B22] py-1 px-10 rounded-lg"
                         >
                           Hire
@@ -165,7 +163,6 @@ console.log(category_id, subcategory_ids)
             </div>
           )}
 
-          {/* See All button */}
           <div className="flex justify-center my-8">
             <div className="py-2 px-2 text-white rounded-full w-1/2 text-center bg-[#228B22]">
               See All
@@ -173,7 +170,6 @@ console.log(category_id, subcategory_ids)
           </div>
         </div>
 
-        {/* Bottom banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           <img
             src={banner}

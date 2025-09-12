@@ -83,6 +83,7 @@ import EmergencyWorkerAcceptReject from "./app/emergency/Worker/AcceptReject";
 import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
+import ViewProfileDetails from "./app/CommonScreens/ViewProfileDetails";
 
 
 //Directing
@@ -109,6 +110,7 @@ export default function App() {
         <Route path="/editworker/:id" element={<EditWorkerDetails />} />
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/filter-worker" element={<FilterWorker />} />
+        <Route path="/profile-details/:id" element={<ViewProfileDetails />} />
       
 
         {/* Service Provider Routes */}
