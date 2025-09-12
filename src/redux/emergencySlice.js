@@ -64,18 +64,21 @@ const emergencySlice = createSlice({
     error: null,
   },
   reducers: {
-    addNotification: (state, action) => {
-      const date = new Date().toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-      state.notifications.unshift({
-        title: action.payload.title,
-        message: action.payload.message,
-        createdAt: new Date().toISOString(),
-      });
-    },
+  addNotification: (state, action) => {
+    const date = new Date().toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    state.notifications.unshift({
+      title: action.payload.title,
+      message: action.payload.message,
+      createdAt: new Date().toISOString(),
+    });
+  },
+  setNotifications: (state, action) => {
+    state.notifications = action.payload; // Replace all notifications with API data
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -116,5 +119,5 @@ const emergencySlice = createSlice({
   },
 });
 
-export const { addNotification } = emergencySlice.actions;
+export const { addNotification, setNotifications } = emergencySlice.actions;
 export default emergencySlice.reducer;

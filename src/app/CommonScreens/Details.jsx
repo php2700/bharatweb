@@ -17,6 +17,7 @@ import edit from "../../assets/login/edit.png";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { addNotification } from "../../redux/notificationSlice";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -66,6 +67,13 @@ export default function Details() {
       }).then(() => {
         localStorage.setItem(`workerVerifiedFirstSwitchShown_${getUserId()}`, "true");
       });
+      // Add notification to Redux
+    dispatch(
+      addNotification({
+        title: "Profile Verified",
+        message: "Congratulations! Your profile has been verified by the admin.",
+      })
+    );
     }
   }, [activeTab, profile?.data?.verified]); // Depend on activeTab to trigger on switch
 

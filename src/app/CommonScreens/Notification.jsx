@@ -8,18 +8,22 @@ import banner from "../../assets/profile/banner.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { setNotifications } from "../../redux/emergencySlice"; // 👈 NEW
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Notifications() {
   const dispatch = useDispatch();
-  const { notifications, status, error } = useSelector((state) => state.emergency);
+  const { notifications, status, error } = useSelector(
+    (state) => state.emergency
+  );
 
   // Redirect to login if not authenticated
   if (!localStorage.getItem("bharat_token")) {
     return <Navigate to="/login" replace />;
   }
 
-  // Fetch notifications from API (optional, if you want to combine Redux and API notifications)
+  // Fetch notifications from API
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -31,10 +35,9 @@ export default function Notifications() {
           },
         });
         const data = await res.json();
+
         if (res.ok && data.success) {
-          // Optionally merge API notifications with Redux notifications
-          // For simplicity, we're using Redux notifications primarily
-          // If you want to merge, dispatch an action to add API notifications to the store
+          dispatch(setNotifications(data.notifications)); // 👈 update Redux
         } else {
           toast.error(data.message || "Failed to fetch notifications");
         }
@@ -46,6 +49,13 @@ export default function Notifications() {
 
     fetchNotifications();
   }, [dispatch]);
+
+  // 👇 Extra effect: show toast when profile verified
+  useEffect(() => {
+    if (notifications.some((n) => n.title.includes("Profile Verified"))) {
+      toast.success("🎉 Your profile has been verified!");
+    }
+  }, [notifications]);
 
   // Loading state
   if (status === "loading") {
@@ -120,7 +130,9 @@ export default function Notifications() {
         <h4 className="text-center mt-4 text-[20px]">Notifications</h4>
         <div className="divide-y">
           {notificationSections.length === 0 ? (
-            <p className="text-center text-gray-600 p-4">No notifications found</p>
+            <p className="text-center text-gray-600 p-4">
+              No notifications found
+            </p>
           ) : (
             notificationSections.map((section, i) => (
               <div key={i} className="p-4">

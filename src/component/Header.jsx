@@ -40,7 +40,9 @@ export default function Header() {
   const isLoggedIn = !!localStorage.getItem("bharat_token");
 
   // Fetch Redux notifications
-  const { notifications: reduxNotifications } = useSelector((state) => state.emergency);
+  const { notifications: reduxNotifications } = useSelector(
+    (state) => state.emergency
+  );
 
   // Outside click handle for profile and notification dropdowns
   useEffect(() => {
@@ -282,7 +284,7 @@ export default function Header() {
                     <>
                       {notificationSections.map((section, i) => (
                         <div key={i}>
-                          <div className="p-3 text-sm font-semibold text-gray-700 border-b">
+                          <div className="p-3 text-sm font-medium text-gray-700 border-b">
                             {section.section}
                           </div>
                           {section.items.map((notif, idx) => (
@@ -292,9 +294,9 @@ export default function Header() {
                             >
                               <div className="flex items-center gap-3">
                                 <img
-                                  src={money}
+                                  src={Logo}
                                   alt="coin"
-                                  className="w-8 h-8"
+                                  className="w-10 h-10"
                                 />
                                 <div>
                                   <p className="text-sm font-medium text-gray-800">
@@ -305,23 +307,23 @@ export default function Header() {
                                   </p>
                                 </div>
                               </div>
-                              <Link to="/notifications">
-                                <button className="text-green-600 text-xs font-medium hover:underline">
-                                  View Details
-                                </button>
-                              </Link>
+                              <span className="text-gray-400 text-xs font-medium">
+                                {section.section}
+                              </span>
                             </div>
                           ))}
                         </div>
                       ))}
                       <div className="border-t p-3 flex justify-center">
-                        <Link
-                          to="/notifications"
+                        <button
+                          onClick={() => {
+                            setIsNotifOpen(false); // close dropdown
+                            navigate("/notifications"); // navigate programmatically
+                          }}
                           className="text-sm font-medium text-[#228B22] hover:underline"
-                          onClick={() => setIsNotifOpen(false)}
                         >
                           See all messages
-                        </Link>
+                        </button>
                       </div>
                     </>
                   )}
