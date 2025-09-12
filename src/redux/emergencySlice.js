@@ -77,7 +77,7 @@ const emergencySlice = createSlice({
     });
   },
   setNotifications: (state, action) => {
-    state.notifications = action.payload; // Replace all notifications with API data
+    state.notifications = action.payload; 
   },
   },
   extraReducers: (builder) => {
