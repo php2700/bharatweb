@@ -1,9 +1,9 @@
-import { Star } from "lucide-react";
 import work from "../../assets/customer-review/his-work.png";
 import leftArrow from "../../assets/customer-review/back.png";
 import banner from "../../assets/profile/banner.png";
 import Footer from "../../component/footer";
 import Header from "../../component/Header";
+import React, { useState, useEffect } from "react";
 
 const testimonials = [
   {
@@ -51,6 +51,9 @@ const testimonials = [
 ];
 
 export default function Hiswork ()  {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Header />

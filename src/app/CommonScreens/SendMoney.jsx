@@ -1,10 +1,13 @@
-import React from "react";
+import {useEffect} from "react";
 import { Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 
 export default function SendMoney() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
     <Header/>

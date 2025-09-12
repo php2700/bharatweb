@@ -14,7 +14,9 @@ export default function ViewWorker() {
   const { id } = useParams(); // Get worker ID from URL
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [workerData, setWorkerData] = useState({
     name: "",
     phone: "",

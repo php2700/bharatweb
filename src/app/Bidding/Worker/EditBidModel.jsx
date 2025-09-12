@@ -16,7 +16,9 @@ export default function EditBidModal({
 }) {
   const [amount, setAmount] = useState(initialAmount || "");
   const [description, setDescription] = useState(initialDescription || "");
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   useEffect(() => {
     setAmount(initialAmount || "");
     setDescription(initialDescription || "");

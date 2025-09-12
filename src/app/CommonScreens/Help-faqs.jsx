@@ -6,6 +6,9 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function HelpFaqs ()  {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [helpFaqsData, setHelpFaqsData] = useState();
   const getHelpFaqsData = async () => {
     try {

@@ -2,8 +2,12 @@ import Header from "../../../component/Header";
 import banner from "../../../assets/profile/banner.png";
 import Footer from "../../../component/footer";
 import paymentImg from "../../../assets/directHiring/payment.png";
+import {useEffect} from "react";
 
 export default function PaymentConfirmation() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Header />

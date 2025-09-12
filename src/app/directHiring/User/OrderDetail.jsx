@@ -35,7 +35,9 @@ export default function ViewProfile() {
   const acceptedSectionRef = useRef(null);
   const [category_id, setCategory_id] = useState("");
   const [subcategory_ids, setSubcategory_ids] = useState([]);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Fetch related workers based on category and subcategory
   const fetchRelatedWorkers = async (category_id, subcategory_ids) => {
     try {

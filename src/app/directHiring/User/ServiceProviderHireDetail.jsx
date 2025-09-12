@@ -15,7 +15,9 @@ export default function ServiceProviderHireDetail() {
   const [isPaymentModelOpen, setIsPaymentModelOpen] = useState(true);
   const [isPaymentProceedModelOpen, setIsPaymentProceedModelOpen] =
     useState(true);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const closeHireModel = () => {
     setIsHireModel(false);
   };

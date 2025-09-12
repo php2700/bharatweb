@@ -14,7 +14,9 @@ export default function MyHireBidding() {
   const [showAll, setShowAll] = useState(false); // 🔹 Show all state
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   useEffect(() => {
     const fetchOrders = async () => {
       try {

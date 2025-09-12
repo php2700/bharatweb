@@ -2,18 +2,11 @@ import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
 import image from "../../../assets/workcategory/image.png";
 import banner from "../../../assets/banner.png";
-import ratingImg from "../../../assets/rating/ic_round-star.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
-import filterIcon from "../../../assets/directHiring/filter-square.png";
-import images from "../../../assets/workcategory/image.png";
 import warningImg from "../../../assets/directHiring/warning.png";
 import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
-
-import { SearchIcon } from "lucide-react";
-// import FilterWorker from "./FilterWorker";
-import Accepted from "../../directHiring/User/Accepted";
-// import Accepted from "./Accepted";
+import {useEffect} from "react";
 
 export default function BiddingWorkerDetail() {
   const workers = [
@@ -62,6 +55,9 @@ export default function BiddingWorkerDetail() {
         "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
     },
   ];
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   return (
     <>
       <Header />

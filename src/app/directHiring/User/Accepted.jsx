@@ -1,10 +1,13 @@
-import { Mail, MessageCircle, Phone } from "lucide-react";
 import image from "../../../assets/workcategory/image.png";
 import warningImg from "../../../assets/directHiring/warning.png";
 import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
+import {useEffect} from "react";
 
 export default function Accepted() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <div className="space-y-6">

@@ -20,6 +20,9 @@ import {
 const libraries = ["places"];
 
 export default function BiddingEditTask() {
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const { id } = useParams();
   const navigate = useNavigate();
 

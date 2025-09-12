@@ -11,7 +11,9 @@ export default function WorkerList() {
   const [loading, setLoading] = useState(true);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate(); // For redirecting on auth failure
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const fetchWorkers = async () => {
     try {
       const token = localStorage.getItem("bharat_token");

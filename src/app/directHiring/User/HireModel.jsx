@@ -1,6 +1,10 @@
 import hireaccess from "../../../assets/directHiring/hireaccess.png";
+import {useEffect} from "react";
 
 export default function HireModel({ open, close }) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   if (!open) return null;
 
   return (

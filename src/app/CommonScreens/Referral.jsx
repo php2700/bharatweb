@@ -1,14 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
-// import Header from "../../component/Header";
-// import Footer from "../../component/footer";
-import Arrow from "../../assets/profile/arrow_back.svg";
+import {useEffect} from "react";
 import Cartoon from "../../assets/Referral/cartoon.svg";
-import banner from "../../assets/profile/banner.png";
 
 export default function Referral() {
   const referralCode = "568500";
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const referralList = [
     { id: 1, name: "Ram Sharma", date: "05/15/25", amount: "Rs. 200/-" },
     { id: 2, name: "Ram Sharma", date: "05/15/25", amount: "Rs. 200/-" },

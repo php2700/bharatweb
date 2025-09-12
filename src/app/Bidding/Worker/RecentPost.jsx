@@ -4,7 +4,6 @@ import Header from "../../../component/Header";
 import banner from "../../../assets/profile/banner.png";
 import filterIcon from "../../../assets/directHiring/filter-square.png";
 import { SearchIcon } from "lucide-react";
-import image from "../../../assets/workcategory/image.png";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import { Link } from "react-router-dom";
 
@@ -14,7 +13,9 @@ export default function RecentPost() {
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   useEffect(() => {
     const fetchAvailableOrders = async () => {
       try {

@@ -54,6 +54,9 @@ const Post = () => {
       document.body.removeChild(script);
     };
   }, []);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Fetch categories
   useEffect(() => {

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2"; // Added SweetAlert2 import
 import image from "../../assets/workcategory/image.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import axios from "axios";
 
 export default function WorkerList() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [workers, setWorkers] = useState([]); // Moved to state
   const [loading, setLoading] = useState(true);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;

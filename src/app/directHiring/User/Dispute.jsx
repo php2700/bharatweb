@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useEffect} from "react";
 import { Link } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -11,7 +12,9 @@ export default function Dispute() {
   const [requirement, setRequirement] = useState("");
   const [image, setImage] = useState(null);
   const [errors, setErrors] = useState({});
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const handleImageUpload = (e) => {
     setImage(e.target.files[0]);
   };

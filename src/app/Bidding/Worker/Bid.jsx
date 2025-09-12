@@ -7,7 +7,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BidModal from "./BidModel";
 import EditBidModal from "./EditBidModel";
-import { sub } from "date-fns";
 
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -33,7 +32,9 @@ export default function Bid() {
   // Loading / Error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   // Fetch Work Details
   useEffect(() => {
     const fetchWorkDetails = async () => {

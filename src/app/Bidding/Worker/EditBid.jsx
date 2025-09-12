@@ -1,19 +1,19 @@
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
-import image from "../../../assets/workcategory/image.png";
 import banner from "../../../assets/profile/banner.png";
-import ratingImg from "../../../assets/rating/ic_round-star.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import filterIcon from "../../../assets/directHiring/filter-square.png";
-
-import { Search, SearchIcon } from "lucide-react";
+import {useEffect} from "react";
+import { Search} from "lucide-react";
 import biiderImg from "../../../assets/directHiring/bidder.png";
 import { useState } from "react";
 import EditBidModal from "./EditBidModel";
 
 export default function EditBid() {
   const [isBidModel, setIsBidModel] = useState(true);
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const closeBidModel = () => {
     setIsBidModel(false);
   };

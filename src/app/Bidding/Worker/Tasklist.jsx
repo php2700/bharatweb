@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -10,7 +11,9 @@ import Search from "../../../assets/search-normal.svg";
 export default function Tasklist() {
   const [activeTab, setActiveTab] = useState("Bidding");
   const navigate = useNavigate();
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const Bidding = [
     {
       id: 1,

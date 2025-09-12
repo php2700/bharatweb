@@ -15,7 +15,9 @@ export default function ServiceProviderHisWork() {
   ];
   const ratingArr = [ratingImg, ratingImg, ratingImg, ratingImg, ratingImg];
   const [imageIndex, setImageIndex] = useState(0);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       setImageIndex((prevIndex) => (prevIndex + 1) % imagsArray.length);

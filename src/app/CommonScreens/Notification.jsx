@@ -25,30 +25,38 @@ export default function Notifications() {
 
   // Fetch notifications from API
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const token = localStorage.getItem("bharat_token");
-        const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
 
-        if (res.ok && data.success) {
-          dispatch(setNotifications(data.notifications)); // 👈 update Redux
-        } else {
-          toast.error(data.message || "Failed to fetch notifications");
-        }
-      } catch (err) {
-        console.error("Error fetching notifications:", err);
-        toast.error("Something went wrong. Please try again.");
+      if (res.ok && data.success) {
+        dispatch(setNotifications(data.notifications)); // update Redux
+        // Save notifications in localStorage
+        localStorage.setItem(
+          "notifications",
+          JSON.stringify(data.notifications)
+        );
+      } else {
+        toast.error(data.message || "Failed to fetch notifications");
       }
-    };
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
 
-    fetchNotifications();
-  }, [dispatch]);
+  fetchNotifications();
+}, [dispatch]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // 👇 Extra effect: show toast when profile verified
   useEffect(() => {

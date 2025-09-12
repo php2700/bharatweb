@@ -1,7 +1,5 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BankImg from "../../assets/bank/bank-account.png";
-// import Footer from "../../component/footer";
-// import Header from "../../component/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -13,7 +11,9 @@ export default function BankDetails() {
     holderName: "",
     ifsc: "",
   });
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {

@@ -19,6 +19,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 
 export default function BiddinggetWorkDetail() {
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const { id } = useParams();
   localStorage.setItem("order_id", id);
   const [isCancelled, setIsCancelled] = useState(false);

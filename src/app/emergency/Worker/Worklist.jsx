@@ -16,6 +16,10 @@ export default function Worklist() {
   const token = localStorage.getItem("bharat_token");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
+  useEffect(() => {
     const fetchTasks = async () => {
       if (!token) {
         setError("No authentication token found. Please log in.");

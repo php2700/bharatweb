@@ -1,4 +1,5 @@
 import React from "react";
+import {useEffect} from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -64,7 +65,11 @@ export const cardData = [
   },
 ];
 
+
 export default function ChooseWorker() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const navigate = useNavigate();
 
   const handleAddWorker = (worker) => {

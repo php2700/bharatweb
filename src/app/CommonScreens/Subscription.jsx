@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import Arrow from "../../assets/profile/arrow_back.svg";
+import {useEffect} from "react";
 import CheckIcon from "../../assets/Subscription/tick.svg";
-import banner from "../../assets/profile/banner.png";
 
 export default function Subscription() {
   const [selectedPlan, setSelectedPlan] = useState(null);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const plans = [
     {
       id: "3m",

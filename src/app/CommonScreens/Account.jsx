@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Subscription from "./Subscription";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -8,7 +8,9 @@ import banner from "../../assets/banner.png";
 
 export default function Account() {
   const [activeTab, setActiveTab] = useState("membership");
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Header />

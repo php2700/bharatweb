@@ -296,7 +296,14 @@ export default function Home() {
             services are designed to transform your space into a pristine haven.
           </p>
           <button
-            onClick={() => navigate("/book")}
+            onClick={() => {
+              const isLoggedIn = !!localStorage.getItem("bharat_token");
+              if (isLoggedIn) {
+                navigate("/ourservices");
+              } else {
+                navigate("/login");
+              }
+            }}
             className="bg-[#228B22] hover:bg-green-800 text-white text-base sm:text-lg font-semibold px-6 sm:px-10 py-2 sm:py-3 rounded-md transition"
           >
             Book Now
@@ -324,15 +331,21 @@ export default function Home() {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12 md:gap-[100px] text-center text-white">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">9,168+</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                9,168+
+              </h2>
               <p className="text-sm sm:text-lg mt-2">Project Completed</p>
             </div>
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">4,573+</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                4,573+
+              </h2>
               <p className="text-sm sm:text-lg mt-2">Happy Customers</p>
             </div>
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">500+</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                500+
+              </h2>
               <p className="text-sm sm:text-lg mt-2">Dedicated Cleaners</p>
             </div>
           </div>
@@ -348,7 +361,10 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 text-center">
           {visibleServices.map((service) => (
-            <div key={service.id} className="p-4 md:p-6 hover:shadow-lg transition">
+            <div
+              key={service.id}
+              className="p-4 md:p-6 hover:shadow-lg transition"
+            >
               <div className="flex justify-center mb-4">
                 <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-[#008000]">
                   <img
@@ -361,7 +377,9 @@ export default function Home() {
               <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                 {service.title}
               </h3>
-              <p className="text-gray-600 text-xs sm:text-sm">{service.description}</p>
+              <p className="text-gray-600 text-xs sm:text-sm">
+                {service.description}
+              </p>
             </div>
           ))}
         </div>
@@ -377,13 +395,13 @@ export default function Home() {
 
       {/* Center Image Section */}
       <div className="flex justify-center items-center mt-8 md:mt-12">
-      <img
-        src={Image}
-        alt="Centered"
-        onClick={handleClick}
-        className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain cursor-pointer"
-      />
-    </div>
+        <img
+          src={Image}
+          alt="Centered"
+          onClick={handleClick}
+          className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain cursor-pointer"
+        />
+      </div>
 
       {/* Recent Posted Work & Feature Workers */}
       <div className="bg-[#EDFFF3] py-8 md:py-16">
@@ -415,7 +433,9 @@ export default function Home() {
                 />
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold text-base sm:text-lg">{work.title}</h3>
+                    <h3 className="font-semibold text-base sm:text-lg">
+                      {work.title}
+                    </h3>
                     <span className="text-green-600 font-bold text-sm sm:text-base">
                       Rs: {work.price}/-
                     </span>
@@ -464,9 +484,15 @@ export default function Home() {
                 />
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-base sm:text-lg font-semibold">{pro.name}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold">
+                      {pro.name}
+                    </h3>
                     <div className="flex items-center text-green-600 font-medium text-sm sm:text-base">
-                      <img src={Star} alt="star" className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      <img
+                        src={Star}
+                        alt="star"
+                        className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
+                      />
                       {pro.rating}
                     </div>
                   </div>
@@ -507,10 +533,10 @@ export default function Home() {
                     Exceptional Expertise
                   </h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    Choose us because of our extensive experience and expertise in
-                    the cleaning industry. Our dedicated team is highly skilled
-                    and trained to deliver top-notch services that meet your exact
-                    needs.
+                    Choose us because of our extensive experience and expertise
+                    in the cleaning industry. Our dedicated team is highly
+                    skilled and trained to deliver top-notch services that meet
+                    your exact needs.
                   </p>
                 </div>
               </div>
@@ -525,8 +551,9 @@ export default function Home() {
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
                     When you choose us, you opt for the highest standards of
                     cleanliness and hygiene. We maintain strict quality control
-                    procedures, using industry-leading equipment and eco-friendly
-                    products to ensure exceptional results every time.
+                    procedures, using industry-leading equipment and
+                    eco-friendly products to ensure exceptional results every
+                    time.
                   </p>
                 </div>
               </div>
@@ -539,10 +566,10 @@ export default function Home() {
                     Customer-Centric Approach
                   </h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    We prioritize our customers’ satisfaction and convenience. Our
-                    friendly and responsive customer support team is always ready
-                    to address your concerns, making your experience with us
-                    smooth and hassle-free. Your feedback and preferences are
+                    We prioritize our customers’ satisfaction and convenience.
+                    Our friendly and responsive customer support team is always
+                    ready to address your concerns, making your experience with
+                    us smooth and hassle-free. Your feedback and preferences are
                     valued, allowing us to continuously improve our services.
                   </p>
                 </div>
@@ -588,7 +615,9 @@ export default function Home() {
                 1
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Book Service Online</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Book Service Online
+            </p>
           </div>
           <div className="flex flex-col items-center mb-6 sm:mb-0 sm:translate-y-8">
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
@@ -603,7 +632,9 @@ export default function Home() {
                 2
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Wait till Completion</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Wait till Completion
+            </p>
           </div>
           <div className="flex flex-col items-center">
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
@@ -618,7 +649,9 @@ export default function Home() {
                 3
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Enjoy the Services</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Enjoy the Services
+            </p>
           </div>
         </div>
       </div>
@@ -669,7 +702,9 @@ export default function Home() {
                 </h3>
                 <p className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-6 md:mt-10 transition">
                   {plan.price}
-                  <span className="text-sm sm:text-base md:text-xl font-medium">/yr.</span>
+                  <span className="text-sm sm:text-base md:text-xl font-medium">
+                    /yr.
+                  </span>
                 </p>
                 <ul className="mt-6 md:mt-10 space-y-2 flex flex-col items-start w-full text-left px-2 sm:px-4">
                   {plan.features.map((feature, i) => (

@@ -1,11 +1,9 @@
 // Accepted.jsx
-import React, { useState } from "react";
+import {useEffect} from "react";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Call from "../../../assets/ViewProfile/call.svg";
 import Message from "../../../assets/ViewProfile/msg.svg";
 import { Link } from "react-router-dom";
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Accepted({
   serviceProvider,
@@ -19,6 +17,10 @@ export default function Accepted({
   }
 const service_provider_id = user;
 const order_id = orderId;
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <h2 className="text-lg font-semibold mb-4">Order Details</h2>

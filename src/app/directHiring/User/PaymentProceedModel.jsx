@@ -1,9 +1,12 @@
 import paymentProceed from "../../../assets/directHiring/paymentProceed.png";
 import { X } from "lucide-react";
+import {useEffect} from "react";
 
 export default function PaymentProceedModel({}) {
  
-
+useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/10 backdrop-blur-[1px] z-50">
       <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md px-8 py-10 text-center">

@@ -15,7 +15,9 @@ export default function ServiceProviderList() {
 console.log(category_id, subcategory_ids)
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     const fetchWorkers = async () => {
       if (!category_id || !subcategory_ids) {

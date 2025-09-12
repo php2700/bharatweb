@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -9,7 +9,9 @@ export const ContactEmail = () => {
     email: "",
     description: "",
   });
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 

@@ -2,12 +2,14 @@ import Footer from "../../component/footer";
 import Header from "../../component/Header";
 import CustomercareImg from "../../assets/customer-care/customer-care.png";
 import { ContactEmail } from "./Contact-email";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ContactCall } from "./Contact-call";
 
 export default function CustomerCare ()  {
   const [isContactOpen, setIsContactOpen] = useState(true);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const handleContactOpen = (isOpenContact) => {
     setIsContactOpen(isOpenContact);
   };

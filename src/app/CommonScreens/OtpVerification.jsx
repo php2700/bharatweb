@@ -1,8 +1,6 @@
 import React, { useState, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import banner from "../../assets/profile/banner.png";
@@ -18,7 +16,9 @@ export default function OtpVerification() {
   const navigate = useNavigate();
 
   const mobile = localStorage.getItem("mobileNumber");
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // ✅ Verify OTP (form submit)
   const handleSubmit = async (e) => {
     e.preventDefault();

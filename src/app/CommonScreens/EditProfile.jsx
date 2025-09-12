@@ -5,13 +5,16 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Arrow from "../../assets/profile/arrow_back.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditProfile() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);

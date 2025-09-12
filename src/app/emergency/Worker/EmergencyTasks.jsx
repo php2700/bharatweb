@@ -4,7 +4,6 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/profile/banner.png";
-import Work from "../../../assets/directHiring/Work.png";
 import Search from "../../../assets/search-normal.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +14,10 @@ export default function EmergencyTasks() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchTasks = async () => {

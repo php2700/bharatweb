@@ -17,7 +17,9 @@ const DirectHiring = () => {
   const [images, setImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // 🔹 Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");

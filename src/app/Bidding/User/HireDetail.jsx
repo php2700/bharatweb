@@ -17,6 +17,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function HireDetail() {
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const { id } = useParams();
   const location=useLocation();
     const { bidding_offer_id, order_id } = location.state || {};

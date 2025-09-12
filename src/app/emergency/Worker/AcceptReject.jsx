@@ -21,6 +21,10 @@ export default function WokerAcceptReject() {
   const token = localStorage.getItem("bharat_token");
 
   useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (!token) {
         setError("Authentication token not found. Please log in.");

@@ -1,5 +1,6 @@
 // RateWorkerModal.jsx
 import React, { useState } from "react";
+import {useEffect} from "react";
 import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import Swal from "sweetalert2";
@@ -21,6 +22,9 @@ export default function ReviewModal({
     service_provider_id,
     type,
   });
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("bharat_token");

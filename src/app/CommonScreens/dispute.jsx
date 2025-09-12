@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -9,15 +9,17 @@ import Swal from "sweetalert2";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Dispute() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { orderId, type } = useParams();
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [requirement, setRequirement] = useState("");
-  const [images, setImages] = useState([]); // changed to array
+  const [images, setImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  // Handle multiple image upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 

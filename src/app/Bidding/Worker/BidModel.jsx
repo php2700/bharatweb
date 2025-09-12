@@ -1,5 +1,6 @@
 import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState } from "react";
+import {useEffect} from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -49,7 +50,9 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
       toast.error("Something went wrong!");
     }
   };
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-50">
       <ToastContainer position="top-right" autoClose={3000} />

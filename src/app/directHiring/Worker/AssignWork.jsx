@@ -5,8 +5,7 @@ import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import banner from "../../../assets/profile/banner.png";
 import Profile from "../../../assets/ViewProfile/Worker.png";
-
-// cardData.ts (you can place it in a `data` folder or same file)
+import {useEffect} from "react";
 export const cardData = [
   {
     id: 1,
@@ -85,7 +84,9 @@ export default function AssignWork() {
       },
     });
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Header />

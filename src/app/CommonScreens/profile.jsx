@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -107,7 +107,9 @@ export default function Profile() {
       alert("Geolocation not supported by browser");
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const handlePlaceChanged = () => {
     if (autoCompleteRef.current) {
       const place = autoCompleteRef.current.getPlace();

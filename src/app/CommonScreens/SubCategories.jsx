@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import banner from "../../assets/profile/banner.png";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function OurSubCategories() {
   const navigate = useNavigate();
@@ -24,7 +23,9 @@ export default function OurSubCategories() {
       setSelectedIndexes([...selectedIndexes, index]);
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Fetch subcategories for given service._id
   useEffect(() => {
     const fetchSubCategories = async () => {
@@ -65,22 +66,20 @@ export default function OurSubCategories() {
   }
 
   const handleHire = () => {
-  // Pick selected subcategory IDs
-  const selectedSubIds = selectedIndexes.map((i) => subcategories[i]._id);
+    const selectedSubIds = selectedIndexes.map((i) => subcategories[i]._id);
 
-  if (selectedSubIds.length === 0) {
-    alert("Please select at least one subcategory!");
-    return;
-  }
+    if (selectedSubIds.length === 0) {
+      alert("Please select at least one subcategory!");
+      return;
+    }
 
-  navigate("/service-provider-list", {
-    state: {
-      category_id: service._id,       // 👈 from WorkCategories
-      subcategory_ids: selectedSubIds // 👈 send all selected subcategory IDs
-    },
-  });
-};
-
+    navigate("/service-provider-list", {
+      state: {
+        category_id: service._id,
+        subcategory_ids: selectedSubIds,
+      },
+    });
+  };
 
   return (
     <>
@@ -118,7 +117,7 @@ export default function OurSubCategories() {
                             : "/src/assets/workcategory/default.png"
                         }
                         alt={sub.name}
-                        className="w-[39px] h-[39px] filter brightness-0 sepia saturate-100 hue-rotate-100"
+                        className="w-[39px] h-[39px]"
                         style={{
                           filter:
                             "brightness(0) saturate(100%) invert(36%) sepia(100%) saturate(500%) hue-rotate(85deg)",
@@ -138,6 +137,7 @@ export default function OurSubCategories() {
           </div>
         )}
       </div>
+
       <div className="flex justify-center mt-10 mb-6">
         <button
           onClick={handleHire}

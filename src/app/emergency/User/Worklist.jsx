@@ -21,6 +21,9 @@ export default function Worklist() {
   const token = localStorage.getItem("bharat_token");
   // Set activeTab based on route parameter
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
     if (task) {
       // Decode URL parameter (e.g., "My%20Bidding" to "My Bidding")
       const decodedTask = decodeURIComponent(task);

@@ -1,7 +1,10 @@
 import paymentProcess from "../../../assets/directHiring/paymentprocess.png";
+import {useEffect} from "react";
 
 export default function PaymentModel({  }) {
-  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray/10 backdrop-blur-[1px] z-50">

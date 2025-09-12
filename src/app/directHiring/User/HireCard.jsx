@@ -1,8 +1,11 @@
-import { Phone, MessageSquare } from "lucide-react";
 import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
+import {useEffect} from "react";
 
 export default function HireCard({ task }) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex  my-4  bg-white rounded-lg shadow-2xl p-4">
       <img

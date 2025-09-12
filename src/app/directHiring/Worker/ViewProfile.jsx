@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {useEffect} from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
@@ -45,7 +46,9 @@ export default function ViewProfile() {
     setShowModal(false);
     // navigate("/dispute");
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Header />

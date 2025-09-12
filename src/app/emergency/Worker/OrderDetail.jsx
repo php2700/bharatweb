@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import Profile from "../../../assets/ViewProfile/Worker.png";
 import Gardening from "../../../assets/profile/profile image.png";
 import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning image import
 import axios from "axios";
@@ -20,6 +19,10 @@ export default function ViewProfile() {
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {

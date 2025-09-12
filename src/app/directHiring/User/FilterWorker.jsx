@@ -2,9 +2,13 @@ import filterIcon from "../../../assets/directHiring/filter-square.png";
 import { SearchIcon } from "lucide-react";
 import image from "../../../assets/workcategory/image.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
+import {useEffect} from "react";
 
 
 export default function FilterWorker(){
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const workers = [
       {
         id: 1,

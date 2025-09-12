@@ -15,7 +15,9 @@ import Arrow from "../../assets/profile/arrow_back.svg";
 export default function RoleSelection() {
   const dispatch = useDispatch();
   const selectedRole = useSelector((state) => state.role.selectedRole);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);

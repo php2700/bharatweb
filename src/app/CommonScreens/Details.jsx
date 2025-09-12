@@ -22,16 +22,19 @@ import { addNotification } from "../../redux/notificationSlice";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Details() {
-  const [image, setImage] = useState(User); // Profile image preview
-  const fileInputRef = useRef(null); // Ref for profile picture input
-  const hiddenFileInputRef = useRef(null); // Ref for gallery images input
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  const [image, setImage] = useState(User);
+  const fileInputRef = useRef(null);
+  const hiddenFileInputRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { profile, loading } = useSelector((state) => state.user);
   const { isEmergencyOn, status: emergencyStatus, error: emergencyError } = useSelector((state) => state.emergency);
   const selectedRole = useSelector((state) => state.role.selectedRole);
-  const savedRole = localStorage.getItem("role"); // "user" or "service_provider"
-  const [activeTab, setActiveTab] = useState("user"); // Default to user tab
+  const savedRole = localStorage.getItem("role");
+  const [activeTab, setActiveTab] = useState("user");
   const [WorkerTab, setWorkerTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -41,22 +44,18 @@ export default function Details() {
     verification = profile.data.verified;
   }
 
-  // Helper to get a stable userId for localStorage keys (fallback if not in profile)
   const getUserId = () => {
-    return profile?.data?.userId || localStorage.getItem('userId') || 'default'; // Add 'userId' to localStorage on login if needed
+    return profile?.data?.userId || localStorage.getItem('userId') || 'default';
   };
 
-  // Fetch user profile and emergency status on mount
   useEffect(() => {
     dispatch(fetchUserProfile());
     dispatch(fetchEmergencyStatus());
   }, [dispatch]);
 
-  // Trigger verification success alert ONLY on first switch to Worker tab after verification
   useEffect(() => {
     if (activeTab !== "Worker") return;
 
-    // Only show if verified and first time switching to Worker post-verification
     if (profile?.data?.verified && !localStorage.getItem(`workerVerifiedFirstSwitchShown_${getUserId()}`)) {
       Swal.fire({
         title: "Yay! You got verified by the admin",
@@ -67,7 +66,6 @@ export default function Details() {
       }).then(() => {
         localStorage.setItem(`workerVerifiedFirstSwitchShown_${getUserId()}`, "true");
       });
-      // Add notification to Redux
     dispatch(
       addNotification({
         title: "Profile Verified",
@@ -75,9 +73,8 @@ export default function Details() {
       })
     );
     }
-  }, [activeTab, profile?.data?.verified]); // Depend on activeTab to trigger on switch
+  }, [activeTab, profile?.data?.verified]); 
 
-  // Check Worker tab access and handle non-verified cases
   useEffect(() => {
     if (activeTab !== "Worker") return;
 
@@ -91,7 +88,7 @@ export default function Details() {
           confirmButtonColor: "#228B22",
           confirmButtonText: "Go to Edit Profile",
         }).then(() => {
-          toast.dismiss(); // Prevent stale toasts
+          toast.dismiss();
           navigate("/editprofile", { state: { activeTab: "worker" } });
           setActiveTab("user");
           dispatch(selectRole("user"));
@@ -106,14 +103,13 @@ export default function Details() {
           confirmButtonColor: "#228B22",
           confirmButtonText: "Go to Edit Profile",
         }).then(() => {
-          toast.dismiss(); // Prevent stale toasts
+          toast.dismiss();
           navigate("/editprofile", { state: { activeTab: "worker" } });
           setActiveTab("user");
           dispatch(selectRole("user"));
           localStorage.setItem("role", "user");
         });
       } else {
-        // Pending: complete but not verified
         console.log("Profile complete but unverified, showing pending alert");
         Swal.fire({
           title: "Verification Pending",
@@ -122,7 +118,7 @@ export default function Details() {
           confirmButtonColor: "#228B22",
           confirmButtonText: "OK",
         }).then(() => {
-          toast.dismiss(); // Prevent stale toasts
+          toast.dismiss();
           requestRoleUpgrade();
           setActiveTab("user");
           dispatch(selectRole("user"));
@@ -131,11 +127,8 @@ export default function Details() {
       }
     } else {
       console.log("Profile verified, allowing Worker tab access");
-      // No need to switch back—stay on Worker tab
     }
   }, [activeTab, profile, navigate]);
-
-  // Profile data initialization
   let full_name = "N/A";
   let address = "N/A";
   let images = "";
@@ -190,8 +183,6 @@ export default function Details() {
   }
 
   const testimage = images && images !== "Not Available";
-
-  // Carousel for work images only
   useEffect(() => {
     if (activeTab !== "Worker" || WorkerTab !== "work" || workImages.length === 0) return;
 
@@ -202,12 +193,9 @@ export default function Details() {
     return () => clearInterval(interval);
   }, [activeTab, WorkerTab, workImages]);
 
-  // Handle profile picture edit click
   const handleEditClick = () => {
     fileInputRef.current.click();
   };
-
-  // Handle profile picture upload
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -238,7 +226,7 @@ export default function Details() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Profile image updated successfully!", { toastId: "profile-pic-success" });
-        dispatch(fetchUserProfile()); // Refresh profile data
+        dispatch(fetchUserProfile());
       } else {
         toast.error(data.message || "Failed to update profile image.", { toastId: "profile-pic-fail" });
       }
@@ -247,18 +235,12 @@ export default function Details() {
       toast.error("Something went wrong while uploading the image!", { toastId: "profile-pic-error-catch" });
     }
   };
-
-  // Handle gallery image edit click
   const handleGalleryEditClick = () => {
     hiddenFileInputRef.current.click();
   };
-
-  // Handle gallery images upload
   const handleGalleryFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
-
-    // Check total images (existing + new) does not exceed 5
     const totalImages = workImages.length + selectedFiles.length;
     if (totalImages > 5) {
       Swal.fire({
@@ -297,7 +279,7 @@ export default function Details() {
       const data = await response.json();
       if (response.ok) {
         toast.success("Images updated successfully!", { toastId: "gallery-success" });
-        dispatch(fetchUserProfile()); // Refresh profile data
+        dispatch(fetchUserProfile());
       } else {
         toast.error(data.message || "Failed to update images", { toastId: "gallery-fail" });
       }
@@ -306,11 +288,9 @@ export default function Details() {
       toast.error("Something went wrong while uploading images!", { toastId: "gallery-error" });
     } finally {
       setIsUploading(false);
-      e.target.value = null; // Reset input
+      e.target.value = null;
     }
   };
-
-  // Handle image removal
   const handleRemoveImage = async (imageIndex) => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -327,7 +307,7 @@ export default function Details() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Image removed successfully!", { toastId: "remove-image-success" });
-        dispatch(fetchUserProfile()); // Refresh profile data
+        dispatch(fetchUserProfile());
       } else {
         toast.error(data.message || "Failed to remove image.", { toastId: "remove-image-fail" });
       }
@@ -336,20 +316,14 @@ export default function Details() {
       toast.error("Something went wrong while removing the image!", { toastId: "remove-image-error" });
     }
   };
-
-  // Toggle emergency task
   const handleToggle = () => {
     dispatch(updateEmergencyStatus(!isEmergencyOn));
   };
-
-  // Navigate to EditProfile with correct activeTab
   const Editpage = () => {
-    toast.dismiss(); // Prevent stale toasts
+    toast.dismiss();
     const tabToNavigate = activeTab === "Worker" ? "worker" : "user";
     navigate("/editprofile", { state: { activeTab: tabToNavigate } });
   };
-
-  // Validate user profile fields
   const validateUserProfile = () => {
     if (
       !profile?.data?.full_name ||
@@ -363,8 +337,6 @@ export default function Details() {
     }
     return true;
   };
-
-  // Validate Worker profile fields
   const validateWorkerProfile = () => {
     if (
       !profile?.data?.full_name ||
@@ -377,8 +349,6 @@ export default function Details() {
     }
     return true;
   };
-
-  // Handle request role upgrade
   const requestRoleUpgrade = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -392,7 +362,7 @@ export default function Details() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Role upgrade requested successfully!", { toastId: "role-upgrade-success" });
-        dispatch(fetchUserProfile()); // Refresh profile data
+        dispatch(fetchUserProfile());
       } else {
         toast.error(data.message || "Failed to request role upgrade.", { toastId: "role-upgrade-fail" });
       }
@@ -401,12 +371,10 @@ export default function Details() {
       toast.error("Something went wrong while requesting role upgrade!", { toastId: "role-upgrade-error" });
     }
   };
-
-  // Handle tab switch with validation for user and Worker
   const handleTabSwitch = (newTab) => {
     if (newTab === activeTab) return;
 
-    toast.dismiss(); // Prevent stale toasts
+    toast.dismiss();
     if (newTab === "user") {
       setActiveTab("user");
       dispatch(selectRole("user"));
@@ -417,7 +385,7 @@ export default function Details() {
         dispatch(selectRole("service_provider"));
         localStorage.setItem("role", "service_provider");
       } else {
-        setActiveTab("Worker"); // Trigger useEffect for alerts
+        setActiveTab("Worker");
       }
     }
   };

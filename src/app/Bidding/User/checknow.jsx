@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useEffect} from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "../../../component/Header";
@@ -12,6 +13,9 @@ import call from "../../../assets/bidding/call.png";
 import msg from "../../../assets/bidding/msg.png";
 
 export default function Biddercheck() {
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const [tab, setTab] = useState("bidder");
   const [isCancelled, setIsCancelled] = useState(false); // ✅ new state
 

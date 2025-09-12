@@ -9,7 +9,7 @@ import Calender from "../../../assets/bidding/calender.png";
 import Select from "react-select";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch, useSelector } from "react-redux";
+import {useSelector } from "react-redux";
 import {
   GoogleMap,
   Marker,
@@ -20,6 +20,9 @@ import {
 const libraries = ["places"];
 
 export default function BiddingNewTask() {
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const navigate = useNavigate();
 const { profile, loading } = useSelector((state) => state.user);
   const [categories, setCategories] = useState([]);

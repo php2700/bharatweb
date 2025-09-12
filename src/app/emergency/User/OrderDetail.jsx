@@ -30,7 +30,9 @@ export default function ViewProfile() {
   const [isHired, setIsHired] = useState(false);
 
   const [showCompletedModal, setShowCompletedModal] = useState(false);
-   
+   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("bharat_token");

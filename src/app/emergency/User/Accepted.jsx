@@ -41,7 +41,9 @@ export default function Accepted({
       document.body.removeChild(script);
     };
   }, []);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Create order by calling backend API
   const createOrder = async () => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -12,6 +12,9 @@ import banner from "../../assets/profile/banner.png";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ServiceProviderHome() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const navigate=useNavigate()
   const [isEmergencyOn, setIsEmergencyOn] = useState(true);
   const token = localStorage.getItem("bharat_token");

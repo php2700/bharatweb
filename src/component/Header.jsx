@@ -172,43 +172,51 @@ export default function Header() {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-[90%] mx-auto px-4 py-3 flex items-center justify-between">
         {/* Left Section - Logo and Location Input */}
-        <div className="flex items-center gap-4 flex-1">
-          <div className="flex-shrink-0">
-            <Link to="/">
-              <img src={Logo} alt="Logo" className="h-12 w-[180px]" />
-            </Link>
-          </div>
-          {/* Location Input - Shown only if user is logged in */}
-          {isLoggedIn && (
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                placeholder="Location"
-                className="px-4 py-2 rounded-lg bg-[#EBEBEB] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-48 sm:w-64 placeholder:text-[#334247] placeholder:font-semibold"
-                aria-label="Location input"
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5 text-[#334247] font-semibold absolute right-3"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                />
-              </svg>
-            </div>
-          )}
-        </div>
+<div className="flex items-center gap-4 flex-1">
+  <div className="flex-shrink-0">
+    <img
+      src={Logo}
+      alt="Logo"
+      className="h-12 w-[180px] cursor-pointer"
+      onClick={() => {
+        const role = localStorage.getItem("role");
+        if (role === "user") navigate("/homeuser");
+        else if (role === "service_provider") navigate("/homeservice");
+        else navigate("/"); // default fallback
+      }}
+    />
+  </div>
+  {/* Location Input - Shown only if user is logged in */}
+  {isLoggedIn && (
+    <div className="relative flex items-center">
+      <input
+        type="text"
+        placeholder="Location"
+        className="px-4 py-2 rounded-lg bg-[#EBEBEB] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-48 sm:w-64 placeholder:text-[#334247] placeholder:font-semibold"
+        aria-label="Location input"
+      />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="w-5 h-5 text-[#334247] font-semibold absolute right-3"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+        />
+      </svg>
+    </div>
+  )}
+</div>
 
         {/* Desktop Navigation - hidden on mobile */}
         <nav className="flex-1 hidden max-md:!hidden md:flex justify-center gap-8 text-[#969696] text-base font-medium">

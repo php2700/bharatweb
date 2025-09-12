@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Main from "../../assets/processingPayment/image1.svg";
@@ -7,6 +7,9 @@ import Main2 from "../../assets/processingPayment/2.svg";
 import Main3 from "../../assets/processingPayment/3.svg";
 
 export default function Payment() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
     <Header/>

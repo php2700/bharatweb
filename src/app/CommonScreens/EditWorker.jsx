@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import image from "../../assets/addworker/worker-profile.png";
 import editicon from "../../assets/addworker/edit-icon.svg";
 import flag from "../../assets/addworker/flag.png";
 import downarrow from "../../assets/addworker/downarrow.png";
@@ -12,6 +11,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function EditWorker() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { id } = useParams();
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;

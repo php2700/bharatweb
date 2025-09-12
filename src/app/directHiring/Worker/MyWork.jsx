@@ -18,7 +18,9 @@ export default function MyWork() {
   const token = localStorage.getItem("bharat_token");
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("bharat_token");

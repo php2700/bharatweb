@@ -3,8 +3,12 @@ import Header from "../../../component/Header";
 import image from "../../../assets/workcategory/image.png";
 import banner from "../../../assets/profile/banner.png";
 import HireCard from "./HireCard";
+import {useEffect} from "react";
 
 export default function MyHire() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const tasks = [
       {
       id: "#new2323",

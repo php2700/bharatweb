@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import review1 from "../../assets/customer-review/customer-review.png";
 import leftArrow from "../../assets/customer-review/back.png";
 import banner from "../../assets/profile/banner.png";
@@ -50,6 +49,9 @@ const testimonials = [
 ];
 
 export default function CustomerReview ()  {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
     <Header />

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -17,7 +17,9 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [mobile, setMobile] = useState("");
   const [permissionGranted, setPermissionGranted] = useState(false);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   // 🔹 Login page load hote hi notification permission prompt
 useEffect(() => {
   if (Notification.permission === "default") {
