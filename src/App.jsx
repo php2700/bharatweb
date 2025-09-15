@@ -88,6 +88,7 @@ import ViewProfileDetails from "./app/CommonScreens/ViewProfileDetails";
 
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
+import Chat from "./app/CommonScreens/Chat";
 
 export default function App() {
   return (
@@ -111,7 +112,7 @@ export default function App() {
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/filter-worker" element={<FilterWorker />} />
         <Route path="/profile-details/:serviceProviderId" element={<ViewProfileDetails />} />
-      
+        <Route path="/chats/:receiverId" element={<Chat />} />
 
         {/* Service Provider Routes */}
         <Route

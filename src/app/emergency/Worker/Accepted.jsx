@@ -3,7 +3,7 @@ import {useEffect} from "react";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Call from "../../../assets/ViewProfile/call.svg";
 import Message from "../../../assets/ViewProfile/msg.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Accepted({
   serviceProvider,
@@ -17,10 +17,13 @@ export default function Accepted({
   }
 const service_provider_id = user;
 const order_id = orderId;
+const navigate = useNavigate();
 useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
+const handleChatOpen = (receiverId) => {
+    navigate(`/chats/${receiverId}`); // go to chat page
+  };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <h2 className="text-lg font-semibold mb-4">Order Details</h2>
@@ -49,7 +52,7 @@ useEffect(() => {
               <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                 <img src={Call} alt="Call" className="w-5 h-5" />
               </div>
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id)}>
                 <img src={Message} alt="Message" className="w-5 h-5" />
               </div>
 
