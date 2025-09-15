@@ -55,8 +55,8 @@ export default function ViewProfileDetails() {
             },
           }
         );
-
-        if (response.data?.status) {
+        console.log("daya", response.data);
+        if (response.data?.success){
           setWorker(response.data.data);
         } else {
           console.error("Failed to fetch worker profile:", response.data?.message);

@@ -5,6 +5,8 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import banner from "../../../assets/profile/banner.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
+import Default from "../../../assets/default-image.jpg";
+import Arrow from "../../../assets/profile/arrow_back.svg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +17,7 @@ export default function ServiceProviderList() {
   console.log(category_id, subcategory_ids);
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,26 +62,54 @@ export default function ServiceProviderList() {
     fetchWorkers();
   }, [category_id, subcategory_ids]);
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleHire = (serviceProviderId) => {
     navigate(`/direct-hiring/${serviceProviderId}`);
   };
 
+  // Function to truncate text based on word limit
+  const truncateText = (text, wordLimit = 25) => {
+    if (!text) return "";
+    const words = text.trim().split(/\s+/);
+    console.log("Word count:", words.length, "Text:", text); // Debugging
+    if (words.length > wordLimit) {
+      const truncated = words.slice(0, wordLimit).join(" ");
+      console.log("Truncated text:", truncated + "..."); // Debugging
+      return truncated + "...";
+    }
+    return text;
+  };
+
+  // Function to capitalize the first letter of each word
+  const capitalizeWords = (text) => {
+    if (!text) return "";
+    return text
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  // Filter workers based on search query
+  const filteredWorkers = workers.filter((worker) => {
+    const fullName = worker.full_name ? worker.full_name.toLowerCase() : "";
+    const skill = worker.skill ? worker.skill.toLowerCase() : "";
+    const query = searchQuery.toLowerCase();
+    return fullName.includes(query) || skill.includes(query);
+  });
+
   console.log("workers", workers);
+  console.log("filteredWorkers", filteredWorkers);
 
   return (
     <>
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
+        <div className="container mx-auto px-4 py-4">
           <button
-            onClick={handleBack}
-            className="text-green-600 text-sm hover:underline"
+            className="flex items-center text-green-600 hover:text-green-800 font-semibold"
+            onClick={() => navigate(-1)}
           >
-            &lt; Back
+            <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
+            Back
           </button>
         </div>
 
@@ -95,39 +126,38 @@ export default function ServiceProviderList() {
             <div className="text-2xl font-bold">Direct Hiring</div>
             <div>
               <input
-                className="border rounded-lg p-2"
+                className="border rounded-lg p-2 w-64"
                 type="search"
                 placeholder="Search for services"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
           {loading ? (
             <p className="text-center text-gray-500">Loading workers...</p>
-          ) : workers.length === 0 ? (
+          ) : filteredWorkers.length === 0 ? (
             <p className="text-center text-gray-500">No workers found.</p>
           ) : (
             <div className="w-full rounded-xl p-3 sm:p-4 space-y-4">
-              {workers.map((worker) => (
+              {filteredWorkers.map((worker) => (
                 <div
                   key={worker.id || worker._id}
                   className="grid grid-cols-12 items-center bg-white rounded-lg shadow-lg p-4 gap-8"
                 >
-                  <div className="relative col-span-4">
+                  <div className="relative col-span-4 h-[200px] w-[200px] ml-4">
                     <img
-                      src={worker.profile_pic || "/default.png"}
+                      src={worker.profile_pic || Default}
                       alt={worker.full_name}
-                      className="h-full w-full rounded-lg object-cover"
+                      className="h-[200px] w-[200px] rounded-lg object-cover mx-auto"
                     />
-                    <span className="absolute bottom-2 left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2 text-center">
-                      {worker?.status || "Available"}
-                    </span>
                   </div>
 
                   <div className="col-span-8 p-4">
                     <div className="flex justify-between">
                       <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
-                        {worker.full_name}
+                        {capitalizeWords(worker.full_name)}
                       </h2>
                       <div className="flex gap-1 items-center">
                         <img className="h-6 w-6" src={ratingImg} />
@@ -137,14 +167,16 @@ export default function ServiceProviderList() {
                     <div className="font-semibold text-lg text-gray-800">
                       About My Skill
                     </div>
-                    <div className="leading-tight break-words whitespace-normal">{worker?.skill}</div>
+                    <div className="leading-tight break-words whitespace-normal max-w-full truncate-skill">
+                      {truncateText(capitalizeWords(worker?.skill))}
+                    </div>
 
                     <div className="flex justify-between items-center my-4">
-                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full">
-                        {worker?.location.address || "Unknown"}
+                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full max-w-[50%] truncate">
+                        {capitalizeWords(worker?.location.address) || "Unknown"}
                       </div>
                       <div className="flex gap-4">
-                        <Link to={`/profile-details/${worker._id}`}> {/* Fixed: Use worker._id */}
+                        <Link to={`/profile-details/${worker._id}`}>
                           <button className="text-[#228B22] py-1 px-4 border rounded-lg">
                             View Profile
                           </button>
@@ -162,12 +194,6 @@ export default function ServiceProviderList() {
               ))}
             </div>
           )}
-
-          <div className="flex justify-center my-8">
-            <div className="py-2 px-2 text-white rounded-full w-1/2 text-center bg-[#228B22]">
-              See All
-            </div>
-          </div>
         </div>
 
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
@@ -182,6 +208,16 @@ export default function ServiceProviderList() {
       <div className="mt-[50px]">
         <Footer />
       </div>
+
+      <style jsx>{`
+        .truncate-skill {
+          display: -webkit-box;
+          -webkit-line-clamp: 3; /* Limit to 3 lines */
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      `}</style>
     </>
   );
 }
