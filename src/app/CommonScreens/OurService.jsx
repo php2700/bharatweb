@@ -58,7 +58,7 @@ export default function OurServices() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-[60px]">
           {services.length === 0 ? (
             <p className="text-center text-gray-500 col-span-full">
-              No services found.
+              No services found.<br/>Login to get all the services.
             </p>
           ) : (
             services.map((service) => (

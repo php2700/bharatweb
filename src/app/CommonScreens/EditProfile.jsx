@@ -9,7 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Arrow from "../../assets/profile/arrow_back.svg";
+import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const libraries = ["places"];
 
 export default function EditProfile() {
   useEffect(() => {
@@ -21,28 +24,42 @@ export default function EditProfile() {
   const location = useLocation();
   const { activeTab } = location.state || { activeTab: "user" };
   const fileInputRef = useRef(null);
+  const autoCompleteRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
     category: "",
     subcategory: [],
     about: "",
-    document: null,
+    documents: [], // Changed to array to store multiple documents
     age: '',
     gender: '',
+    willingToVisit: "", // For user tab
+    willingToCallCustomer: "", // For worker tab
+    shopAddress: { title: "", landmark: "", address: "", latitude: null, longitude: null },
   });
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
-  const [documentPreview, setDocumentPreview] = useState(null);
+  const [documentPreviews, setDocumentPreviews] = useState([]); // Changed to array for multiple previews
   const [profilePic, setProfilePic] = useState(null);
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [markerLocation, setMarkerLocation] = useState(null);
+  const [map, setMap] = useState(null);
+  const [shopAddressModalOpen, setShopAddressModalOpen] = useState(false);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
+    libraries,
+  });
 
   // Fetch profile initially
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
-  // Prefill formData and document preview when profile loads
+  // Prefill formData and document previews when profile loads
   useEffect(() => {
     if (profile && profile.data) {
       setFormData((prev) => ({
@@ -53,15 +70,18 @@ export default function EditProfile() {
         subcategory: profile.data.subcategory_ids || [],
         age: profile.data.age || '',
         gender: profile.data.gender || '',
+        willingToVisit: profile.data.willing_to_visit || "",
+        willingToCallCustomer: profile.data.willing_to_call_customer || "",
+        shopAddress: profile.data.shop_address || { title: "", landmark: "", address: "", latitude: null, longitude: null },
+        documents: [], // Initialize as empty; server documents handled below
       }));
 
-      // Document preview (single document)
+      // Document previews (multiple documents)
       if (profile.data.documents) {
-        if (Array.isArray(profile.data.documents)) {
-          setDocumentPreview(profile.data.documents[0].url || null);
-        } else {
-          setDocumentPreview(profile.data.documents);
-        }
+        const docs = Array.isArray(profile.data.documents) 
+          ? profile.data.documents.map(doc => doc.url).filter(url => url) 
+          : [profile.data.documents].filter(url => url);
+        setDocumentPreviews(docs);
       }
 
       // Profile picture
@@ -151,10 +171,64 @@ export default function EditProfile() {
     });
   };
 
+  const getAddressFromLatLng = (lat, lng) => {
+    if (!isLoaded) return;
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const address = results[0].formatted_address;
+        setFormData((prev) => ({
+          ...prev,
+          shopAddress: { ...prev.shopAddress, address, latitude: lat, longitude: lng },
+        }));
+        setMarkerLocation({ lat, lng });
+      }
+    });
+  };
+
+  const handleCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setCurrentLocation(loc);
+          setMarkerLocation(loc);
+          getAddressFromLatLng(loc.lat, loc.lng);
+          if (map) map.panTo(loc);
+        },
+        () => toast.error("Unable to fetch current location")
+      );
+    } else {
+      toast.error("Geolocation not supported by browser");
+    }
+  };
+
+  const handlePlaceChanged = () => {
+    if (autoCompleteRef.current) {
+      const place = autoCompleteRef.current.getPlace();
+      if (place.geometry) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        const loc = { lat, lng };
+        setCurrentLocation(loc);
+        setMarkerLocation(loc);
+        getAddressFromLatLng(lat, lng);
+        if (map) map.panTo(loc);
+      }
+    }
+  };
+
+  const handleMapClick = (e) => {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+    setMarkerLocation({ lat, lng });
+    getAddressFromLatLng(lat, lng);
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "document" && files && files[0]) {
+    if (name === "documents" && files) {
       const allowedTypes = [
         "application/pdf",
         "image/jpeg",
@@ -162,12 +236,36 @@ export default function EditProfile() {
         "image/avif",
         "image/gif",
       ];
-      if (!allowedTypes.includes(files[0].type)) {
+      const newFiles = Array.from(files);
+      const validFiles = newFiles.filter(file => allowedTypes.includes(file.type));
+      
+      if (newFiles.length > 5 || (formData.documents.length + newFiles.length) > 5) {
+        toast.error("You can upload a maximum of 5 documents!");
+        return;
+      }
+
+      if (newFiles.length !== validFiles.length) {
         toast.error("Only PDF or image files are allowed!");
         return;
       }
-      setFormData((prev) => ({ ...prev, document: files[0] }));
-      setDocumentPreview(URL.createObjectURL(files[0]));
+
+      setFormData((prev) => ({
+        ...prev,
+        documents: [...prev.documents, ...validFiles],
+      }));
+      setDocumentPreviews((prev) => [
+        ...prev,
+        ...validFiles.map(file => URL.createObjectURL(file)),
+      ]);
+      return;
+    }
+
+    if (name.startsWith("shopAddress.")) {
+      const field = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        shopAddress: { ...prev.shopAddress, [field]: value },
+      }));
       return;
     }
 
@@ -216,11 +314,14 @@ export default function EditProfile() {
   };
 
   // Remove document
-  const handleRemoveDocument = async () => {
-    // If document is a new upload (not yet saved to server), clear locally
-    if (formData.document && documentPreview?.startsWith('blob:')) {
-      setFormData((prev) => ({ ...prev, document: null }));
-      setDocumentPreview(null);
+  const handleRemoveDocument = async (index, url) => {
+    // If document is a new upload (not yet saved to server)
+    if (url.startsWith('blob:')) {
+      setFormData((prev) => ({
+        ...prev,
+        documents: prev.documents.filter((_, i) => i !== index),
+      }));
+      setDocumentPreviews((prev) => prev.filter((_, i) => i !== index));
       toast.success("Document removed successfully!");
       return;
     }
@@ -228,19 +329,13 @@ export default function EditProfile() {
     // If document is from server, call API to remove
     try {
       const token = localStorage.getItem("bharat_token");
-      const imagePath = profile?.data?.documents?.[0]?.url || profile?.data?.documents;
-      if (!imagePath) {
-        toast.error("No document found to remove.");
-        return;
-      }
-
       const res = await fetch(`${BASE_URL}/user/deleteHisworkImage`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ imagePath }),
+        body: JSON.stringify({ imagePath: url }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -248,8 +343,11 @@ export default function EditProfile() {
         return;
       }
 
-      setFormData((prev) => ({ ...prev, document: null })); // Clear document
-      setDocumentPreview(null); // Clear document preview
+      setFormData((prev) => ({
+        ...prev,
+        documents: prev.documents.filter((_, i) => i !== index),
+      }));
+      setDocumentPreviews((prev) => prev.filter((_, i) => i !== index));
       toast.success("Document removed successfully!");
       dispatch(fetchUserProfile()); // Refresh profile data
     } catch (error) {
@@ -265,6 +363,12 @@ export default function EditProfile() {
     if (!formData.name.trim()) return toast.error("Name is required!");
     if (!formData.about.trim() && activeTab !== "user")
       return toast.error("Skill is required!");
+    if (activeTab === "user" && !formData.willingToVisit)
+      return toast.error("Please select if you are willing to visit the service provider's shop!");
+    if (activeTab === "worker" && !formData.willingToCallCustomer)
+      return toast.error("Please select if you are willing to call the customer to your shop!");
+    if (activeTab === "worker" && formData.willingToCallCustomer === "yes" && !formData.shopAddress.address)
+      return toast.error("Shop address is required!");
 
     try {
       const token = localStorage.getItem("bharat_token");
@@ -275,9 +379,9 @@ export default function EditProfile() {
           return toast.error("Select at least one subcategory!");
         if (!formData.age) return toast.error("Age is required!");
         const fd = new FormData();
-        if (formData.document) {
-          fd.append("document", formData.document);
-        }
+        formData.documents.forEach((doc, index) => {
+          fd.append(`documents[${index}]`, doc);
+        });
         fd.append("category_id", formData.category);
         formData.subcategory.forEach((sub) =>
           fd.append("subcategory_ids[]", sub)
@@ -285,6 +389,10 @@ export default function EditProfile() {
         fd.append("skill", formData.about);
         fd.append("age", formData.age);
         fd.append("gender", formData.gender);
+        fd.append("willing_to_call_customer", formData.willingToCallCustomer);
+        if (formData.willingToCallCustomer === "yes") {
+          fd.append("shop_address", JSON.stringify(formData.shopAddress));
+        }
 
         const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
           method: "PUT",
@@ -316,31 +424,22 @@ export default function EditProfile() {
       }
 
       if (activeTab === "user") {
-        const namePayload = { full_name: formData.name };
-        const resName = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+        const payload = {
+          full_name: formData.name,
+          skill: formData.about,
+          willing_to_visit: formData.willingToVisit,
+        };
+        const res = await fetch(`${BASE_URL}/user/updateUserProfile`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(namePayload),
+          body: JSON.stringify(payload),
         });
-        const dataName = await resName.json();
-        if (!resName.ok)
-          return toast.error(dataName.message || "Failed to update name.");
-
-        const skillPayload = { skill: formData.about };
-        const resSkill = await fetch(`${BASE_URL}/user/updateUserDetails`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(skillPayload),
-        });
-        const dataSkill = await resSkill.json();
-        if (!resSkill.ok)
-          return toast.error(dataSkill.message || "Failed to update skill.");
+        const data = await res.json();
+        if (!res.ok)
+          return toast.error(data.message || "Failed to update user profile.");
 
         toast.success("User profile updated successfully!");
         setTimeout(() => {
@@ -352,6 +451,8 @@ export default function EditProfile() {
       toast.error("Something went wrong!");
     }
   };
+
+  const defaultCenter = markerLocation || currentLocation || { lat: 28.6139, lng: 77.209 };
 
   return (
     <>
@@ -421,9 +522,88 @@ export default function EditProfile() {
             </select>
           </div>
 
+          {/* Willing to Visit (User Tab Only) */}
+          {activeTab === "user" && (
+            <div>
+              <label className="block mb-2 font-semibold text-gray-700">
+                Are you willing to go to the service provider's shop?
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="willingToVisit"
+                    value="yes"
+                    checked={formData.willingToVisit === "yes"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="willingToVisit"
+                    value="no"
+                    checked={formData.willingToVisit === "no"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  No
+                </label>
+              </div>
+            </div>
+          )}
+
           {/* Worker Fields */}
           {activeTab === "worker" && (
             <>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-700">
+                  Are you willing to call the customer to your shop?
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="willingToCallCustomer"
+                      value="yes"
+                      checked={formData.willingToCallCustomer === "yes"}
+                      onChange={handleChange}
+                      className="mr-2"
+                    />
+                    Yes
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="willingToCallCustomer"
+                      value="no"
+                      checked={formData.willingToCallCustomer === "no"}
+                      onChange={handleChange}
+                      className="mr-2"
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+
+              {formData.willingToCallCustomer === "yes" && (
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-700">
+                    Shop Address
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Click to enter shop address"
+                    value={formData.shopAddress.address}
+                    readOnly
+                    onClick={() => setShopAddressModalOpen(true)}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
                   Category
@@ -455,44 +635,52 @@ export default function EditProfile() {
 
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
-                  Upload Document
+                  Upload Documents (Up to 5)
                 </label>
                 <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
                   <span className="text-gray-700">
-                    {formData.document ? formData.document.name : "Choose a file"}
+                    {formData.documents.length > 0 
+                      ? `${formData.documents.length} file(s) selected`
+                      : "Choose files"}
                   </span>
                   <input
                     type="file"
-                    name="document"
+                    name="documents"
                     onChange={handleChange}
                     className="hidden"
+                    multiple
+                    accept="application/pdf,image/jpeg,image/png,image/avif,image/gif"
                   />
                 </label>
                 <p className="text-base font-medium text-gray-700 mt-1">
                   (Allowed Documents: Driving License, PAN Card, Aadhaar, Passport, or
-                  any Govt. ID (PDF / Image))
+                  any Govt. ID (PDF / Image). Max 5 files.)
                 </p>
 
-                {/* Document preview */}
-                {documentPreview && (
-                  <div className="mt-4 relative">
+                {/* Document previews */}
+                {documentPreviews.length > 0 && (
+                  <div className="mt-4">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      Document Preview
+                      Document Previews
                     </h3>
-                    <div className="relative w-32 h-32">
-                      <img
-                        src={documentPreview}
-                        alt="Document Preview"
-                        className="w-full h-full object-cover mt-2 rounded-lg shadow-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleRemoveDocument}
-                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
-                        aria-label="Remove document"
-                      >
-                        X
-                      </button>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2">
+                      {documentPreviews.map((preview, index) => (
+                        <div key={index} className="relative w-32 h-32">
+                          <img
+                            src={preview}
+                            alt={`Document Preview ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg shadow-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveDocument(index, preview)}
+                            className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
+                            aria-label={`Remove document ${index + 1}`}
+                          >
+                            X
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -527,6 +715,110 @@ export default function EditProfile() {
           </button>
         </form>
       </div>
+
+      {/* Shop Address Modal */}
+      {shopAddressModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-md">
+            <h2 className="text-lg font-bold mb-4">Enter Shop Address Details</h2>
+            <input
+              type="text"
+              placeholder="Title"
+              name="shopAddress.title"
+              value={formData.shopAddress.title}
+              onChange={handleChange}
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Landmark"
+              name="shopAddress.landmark"
+              value={formData.shopAddress.landmark}
+              onChange={handleChange}
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Click to select on map"
+              name="shopAddress.address"
+              value={formData.shopAddress.address}
+              readOnly
+              onClick={() => setIsMapOpen(true)}
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 cursor-pointer"
+            />
+            <div className="mt-4 flex justify-between">
+              <button
+                onClick={() => setShopAddressModalOpen(false)}
+                className="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShopAddressModalOpen(false)}
+                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
+              >
+                Save Address
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Map Modal */}
+      {isMapOpen && isLoaded && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
+            <div className="flex justify-between mb-2">
+              <h1 className="text-black text-[20px] font-semibold">
+                Select Shop Address
+              </h1>
+              <button onClick={() => setIsMapOpen(false)} className="text-red-500 font-bold">
+                X
+              </button>
+            </div>
+
+            <p className="text-center mb-2 text-sm text-gray-600">
+              {formData.shopAddress.address || "Not selected"}
+            </p>
+
+            <Autocomplete
+              onLoad={(ref) => (autoCompleteRef.current = ref)}
+              onPlaceChanged={handlePlaceChanged}
+            >
+              <input
+                type="text"
+                placeholder="Search location"
+                className="w-full border-2 border-gray-300 rounded-lg p-2 mb-2"
+              />
+            </Autocomplete>
+
+            <GoogleMap
+              mapContainerStyle={{ height: "350px", width: "100%" }}
+              center={defaultCenter}
+              zoom={15}
+              onLoad={(map) => setMap(map)}
+              onClick={handleMapClick}
+            >
+              {markerLocation && <Marker position={markerLocation} />}
+            </GoogleMap>
+
+            <div className="flex mt-2 gap-2 justify-center">
+              <button
+                onClick={handleCurrentLocation}
+                className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
+              >
+                Current Location
+              </button>
+              <button
+                onClick={() => setIsMapOpen(false)}
+                className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg"
+              >
+                Confirm Location
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </>

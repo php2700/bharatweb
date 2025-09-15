@@ -13,11 +13,11 @@ import Edit from "../../assets/Details/edit.svg";
 import Location from "../../assets/Details/location.svg";
 import Vector from "../../assets/Home-SP/Vector.svg";
 import Aadhar from "../../assets/Details/profile-line.svg";
-import edit from "../../assets/login/edit.png";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { addNotification } from "../../redux/notificationSlice";
+import Default from "../../assets/default-image.jpg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -453,7 +453,7 @@ export default function Details() {
           type="button"
           className="flex items-center gap-2 text-white bg-[#228B22] hover:bg-[#0254c6] focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 float-right transition-colors duration-300"
         >
-          <img src={edit} alt="Edit" width="20px" />
+          <img src={Edit} alt="Edit" width="20px" />
           Edit Profile
         </button>
         {activeTab === "user" && (
@@ -467,9 +467,11 @@ export default function Details() {
                     className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
-                  <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-                    No Profile Picture available
-                  </div>
+                  <img
+                    src={Default}
+                    alt="User Profile"
+                    className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
+                  />
                 )}
                 <button
                   className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
@@ -640,7 +642,7 @@ export default function Details() {
                           className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
                         >
-                          <img src={edit} alt="Edit" className="w-6 h-6" />
+                          <img src={Edit} alt="Edit" className="w-6 h-6" />
                         </div>
                       </>
                     ) : (
@@ -650,7 +652,7 @@ export default function Details() {
                           className="absolute top-2 right-2 w-12 h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
                         >
-                          <img src={edit} alt="Edit" className="w-6 h-6" />
+                          <img src={Edit} alt="Edit" className="w-6 h-6" />
                         </div>
                       </div>
                     )}
