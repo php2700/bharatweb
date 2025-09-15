@@ -427,7 +427,7 @@ export default function EditProfile() {
         const payload = {
           full_name: formData.name,
           skill: formData.about,
-          willing_to_visit: formData.willingToVisit,
+          // willing_to_visit: formData.willingToVisit,
         };
         const res = await fetch(`${BASE_URL}/user/updateUserProfile`, {
           method: "POST",

@@ -3,27 +3,30 @@ import { useSelector } from "react-redux";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import images from "../../assets/workcategory/image.png";
-import banner1 from "../../assets/workcategory/banner1.png";
 import hire1 from "../../assets/workcategory/hire1.png";
 import hire2 from "../../assets/workcategory/hire2.png";
-import banner from "../../assets/profile/banner.png";
 import hire3 from "../../assets/workcategory/hire3.png";
+import banner1 from "../../assets/workcategory/banner1.png";
 import { useNavigate } from "react-router-dom";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [bannerImages, setBannerImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const socket = useSelector((state) => state.socket?.socket);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null); // New state for error message
 
-  // ✅ API Call
+  // Fetch categories
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("bharat_token"); // ya sessionStorage
+      const token = localStorage.getItem("bharat_token");
       const res = await fetch(`${BASE_URL}/work-category`, {
         headers: {
           "Content-Type": "application/json",
@@ -36,18 +39,64 @@ export default function WorkCategories() {
       if (res.ok && data.status) {
         setCategories(data.data || []);
       } else {
-        console.error("Failed to fetch categories:", data.message);
+        console.error("Failed to fetch categories:", data.message || "Unknown error");
       }
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      console.error("Error fetching categories:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch banner images
+  // Fetch banner images
+const fetchBannerImages = async () => {
+  try {
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    console.log("Banner API response:", data); // 🔍 Debug response
+
+    // ✅ Flexible handling of different API structures
+    if (res.ok) {
+      if (Array.isArray(data.images) && data.images.length > 0) {
+        // Case 1: data.data contains banners
+        setBannerImages(data.images);
+      }  else {
+        // Case 3: No banners found
+        setBannerImages([]);
+        setBannerError("No banners available");
+      }
+    } else {
+      const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+      console.error("Failed to fetch banner images:", errorMessage);
+      setBannerError(errorMessage);
+    }
+  } catch (err) {
+    console.error("Error fetching banner images:", err.message);
+    setBannerError(err.message);
+  } finally {
+    setBannerLoading(false);
+  }
+};
+
+
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchCategories();
+    fetchBannerImages();
   }, []);
+
   const SeeAll = () => {
     navigate("/ourservices");
   };
@@ -63,7 +112,7 @@ export default function WorkCategories() {
   const directHiring = () => {
     navigate("/service-provider-list");
   };
-  
+
   const WorkerList = () => {
     navigate("/service-provider-list");
   };
@@ -72,33 +121,66 @@ export default function WorkCategories() {
     navigate(`/direct-hiring/${workerDetail?._id}`);
   };
 
+  const postWork = () => {
+    navigate('/bidding/newtask');
+  };
 
-  const postWork=()=>{
-    navigate('/bidding/newtask')
-  }
+  const handleBidding = () => {
+    navigate('/bidding/myhire');
+  };
 
-  const handleBidding=()=>{
-    navigate('/bidding/myhire')
-  }
+  const postEmergencyWork = () => {
+    navigate('/emergency/userpost');
+  };
 
-  const postEmergencyWork=()=>{
-    navigate('/emergency/userpost')
-  }
-
-  
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+console.log("images",bannerImages);
   return (
     <>
       <Header />
       <div className="font-sans text-gray-800 mt-20">
-        {/* Hero Section */}
+        {/* Hero Section with Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/workcategory/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/workcategory/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
 
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
+        </div>
 
         {/* Categories */}
         <div className="mx-auto px-4 py-10 w-full">
@@ -221,9 +303,12 @@ export default function WorkCategories() {
                     >
                       View Profile
                     </button>
-                    <button  onClick={() => {
+                    <button
+                      onClick={() => {
                         hireWorker(item);
-                      }} className="flex-1 bg-[#228B22] text-white py-2 rounded font-semibold text-center hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+                      }}
+                      className="flex-1 bg-[#228B22] text-white py-2 rounded font-semibold text-center hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
+                    >
                       Hire
                     </button>
                   </div>
@@ -241,11 +326,12 @@ export default function WorkCategories() {
               Post Work with bidder
             </h2>
             <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-              Lorem Ipsum is simply dummy text of the printing and <br />
-              typesetting industry. Lorem Ipsum has been the industry's <br />
-              standard dummy text ever since the 1500s...
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
             </p>
-            <button  onClick={postWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+            <button
+              onClick={postWork}
+              className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
+            >
               Post Work
             </button>
           </div>
@@ -256,13 +342,15 @@ export default function WorkCategories() {
           <div className="mx-auto px-4 sm:px-10 grid md:grid-cols-2 gap-6 items-center">
             <div>
               <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
-                Post Work with bidder
+                Emergency Work
               </h2>
               <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and <br />
-                typesetting industry. Lorem Ipsum has been the industry's...
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
               </p>
-              <button onClick={postEmergencyWork} className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300">
+              <button
+                onClick={postEmergencyWork}
+                className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
+              >
                 Post Work
               </button>
             </div>
@@ -299,7 +387,10 @@ export default function WorkCategories() {
               className="w-full h-[322px] sm:h-[383px] object-cover"
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-              <button onClick={handleBidding} className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300">
+              <button
+                onClick={handleBidding}
+                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+              >
                 Bidding
               </button>
             </div>
@@ -313,7 +404,10 @@ export default function WorkCategories() {
               className="w-full h-[322px] sm:h-[383px] object-cover"
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
-              <button className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300" onClick={() => navigate('/emergency/userPost')}>
+              <button
+                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+                onClick={() => navigate('/emergency/userPost')}
+              >
                 Emergency
               </button>
             </div>

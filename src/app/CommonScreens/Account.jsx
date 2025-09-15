@@ -4,13 +4,73 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import BankDetails from "./BankDetails";
 import Referral from "./Referral";
-import banner from "../../assets/banner.png";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Account() {
   const [activeTab, setActiveTab] = useState("membership");
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <>
       <Header />
@@ -58,18 +118,41 @@ export default function Account() {
           {/* Tab Content */}
           <div>
             {activeTab === "membership" && <Subscription />}
-
             {activeTab === "bank" && <BankDetails />}
-
             {activeTab === "referral" && <Referral />}
           </div>
         </div>
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
-          <img
-            src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-          />
+
+        {/* Banner Slider */}
+        <div className="w-full max-w-[75rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
       </div>
 

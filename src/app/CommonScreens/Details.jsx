@@ -6,7 +6,6 @@ import { fetchUserProfile } from "../../redux/userSlice";
 import { fetchEmergencyStatus, updateEmergencyStatus } from "../../redux/emergencySlice";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import User from "../../assets/Details/User.png";
 import Edit from "../../assets/Details/edit.svg";
@@ -18,13 +17,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { addNotification } from "../../redux/notificationSlice";
 import Default from "../../assets/default-image.jpg";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Details() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   const [image, setImage] = useState(User);
   const fileInputRef = useRef(null);
   const hiddenFileInputRef = useRef(null);
@@ -38,6 +37,9 @@ export default function Details() {
   const [WorkerTab, setWorkerTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
 
   let verification = false;
   if (profile && profile.data) {
@@ -48,9 +50,49 @@ export default function Details() {
     return profile?.data?.userId || localStorage.getItem('userId') || 'default';
   };
 
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   useEffect(() => {
+    window.scrollTo(0, 0);
     dispatch(fetchUserProfile());
     dispatch(fetchEmergencyStatus());
+    fetchBannerImages();
   }, [dispatch]);
 
   useEffect(() => {
@@ -66,14 +108,14 @@ export default function Details() {
       }).then(() => {
         localStorage.setItem(`workerVerifiedFirstSwitchShown_${getUserId()}`, "true");
       });
-    dispatch(
-      addNotification({
-        title: "Profile Verified",
-        message: "Congratulations! Your profile has been verified by the admin.",
-      })
-    );
+      dispatch(
+        addNotification({
+          title: "Profile Verified",
+          message: "Congratulations! Your profile has been verified by the admin.",
+        })
+      );
     }
-  }, [activeTab, profile?.data?.verified]); 
+  }, [activeTab, profile?.data?.verified]);
 
   useEffect(() => {
     if (activeTab !== "Worker") return;
@@ -129,6 +171,7 @@ export default function Details() {
       console.log("Profile verified, allowing Worker tab access");
     }
   }, [activeTab, profile, navigate]);
+
   let full_name = "N/A";
   let address = "N/A";
   let images = "";
@@ -183,6 +226,7 @@ export default function Details() {
   }
 
   const testimage = images && images !== "Not Available";
+
   useEffect(() => {
     if (activeTab !== "Worker" || WorkerTab !== "work" || workImages.length === 0) return;
 
@@ -196,6 +240,7 @@ export default function Details() {
   const handleEditClick = () => {
     fileInputRef.current.click();
   };
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -235,9 +280,11 @@ export default function Details() {
       toast.error("Something went wrong while uploading the image!", { toastId: "profile-pic-error-catch" });
     }
   };
+
   const handleGalleryEditClick = () => {
     hiddenFileInputRef.current.click();
   };
+
   const handleGalleryFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
@@ -291,6 +338,7 @@ export default function Details() {
       e.target.value = null;
     }
   };
+
   const handleRemoveImage = async (imageIndex) => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -316,14 +364,17 @@ export default function Details() {
       toast.error("Something went wrong while removing the image!", { toastId: "remove-image-error" });
     }
   };
+
   const handleToggle = () => {
     dispatch(updateEmergencyStatus(!isEmergencyOn));
   };
+
   const Editpage = () => {
     toast.dismiss();
     const tabToNavigate = activeTab === "Worker" ? "worker" : "user";
     navigate("/editprofile", { state: { activeTab: tabToNavigate } });
   };
+
   const validateUserProfile = () => {
     if (
       !profile?.data?.full_name ||
@@ -337,6 +388,7 @@ export default function Details() {
     }
     return true;
   };
+
   const validateWorkerProfile = () => {
     if (
       !profile?.data?.full_name ||
@@ -349,6 +401,7 @@ export default function Details() {
     }
     return true;
   };
+
   const requestRoleUpgrade = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -371,6 +424,7 @@ export default function Details() {
       toast.error("Something went wrong while requesting role upgrade!", { toastId: "role-upgrade-error" });
     }
   };
+
   const handleTabSwitch = (newTab) => {
     if (newTab === activeTab) return;
 
@@ -388,6 +442,18 @@ export default function Details() {
         setActiveTab("Worker");
       }
     }
+  };
+
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
   };
 
   return (
@@ -414,12 +480,36 @@ export default function Details() {
           Back
         </Link>
       </div>
+      {/* Banner Slider */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={banner}
-          alt="Gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
       <div className="w-full bg-[#D9D9D9] py-6 mt-10">
         <div className="flex justify-center gap-10 mt-6">
@@ -492,10 +582,6 @@ export default function Details() {
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold">{full_name}</h2>
                 </div>
-                <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                  <img src={Location} alt="Location icon" className="w-5 h-5" />
-                  <span>{address}</span>
-                </div>
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
@@ -554,10 +640,6 @@ export default function Details() {
                       Verified
                     </span>
                   )}
-                </div>
-                <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                  <img src={Location} alt="Location icon" className="w-5 h-5" />
-                  <span>{address}</span>
                 </div>
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
