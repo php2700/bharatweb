@@ -3,9 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import banner from "../../../assets/profile/banner.png";
 import Work from "../../../assets/directHiring/Work.png"; // Fallback image
 import Search from "../../../assets/search-normal.svg";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function MyWork() {
   const [activeTab, setActiveTab] = useState("My Hire");
@@ -14,13 +18,55 @@ export default function MyWork() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("bharat_token");
@@ -45,7 +91,7 @@ export default function MyWork() {
             endpoint = `${BASE_URL}/direct-order/apiGetAllDirectOrders`;
             break;
           case "My Bidding":
-            endpoint = `${BASE_URL}/direct-order/apiGetAllBiddingOrders`; 
+            endpoint = `${BASE_URL}/direct-order/apiGetAllBiddingOrders`;
             break;
           case "Emergency Tasks":
             endpoint = `${BASE_URL}/direct-order/apiGetAllEmergencyTasks`;
@@ -79,7 +125,7 @@ export default function MyWork() {
         }
 
         const workData = Array.isArray(data) ? data : data.data || [];
-        
+
         const transformedData = workData.map((item) => ({
           id: item.id || item.orderId,
           name: item.name || item.title || "Untitled",
@@ -133,13 +179,45 @@ export default function MyWork() {
         </Link>
       </div>
 
-      {/* Top Banner */}
+      {/* Top Banner Slider */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={banner}
-          alt="Gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider
+            dots={true}
+            infinite={true}
+            speed={500}
+            slidesToShow={1}
+            slidesToScroll={1}
+            autoplay={true}
+            autoplaySpeed={3000}
+            arrows={true}
+          >
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       {/* Work Section */}
@@ -274,12 +352,46 @@ export default function MyWork() {
             See All
           </button>
         </div>
+
+        {/* Bottom Banner Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider
+              dots={true}
+              infinite={true}
+              speed={500}
+              slidesToShow={1}
+              slidesToScroll={1}
+              autoplay={true}
+              autoplaySpeed={3000}
+              arrows={true}
+            >
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
       </div>
 

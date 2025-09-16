@@ -5,6 +5,7 @@ import Message from "../../../assets/ViewProfile/msg.svg";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -18,7 +19,7 @@ export default function Accepted({
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-
+const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -232,6 +233,9 @@ export default function Accepted({
     toast.info("Form cleared!");
   };
 
+	 const handleChatOpen = (receiverId) => {
+    navigate(`/chats/${receiverId}`); // go to chat page
+  };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       {/* Add ToastContainer to render toasts */}
@@ -268,7 +272,7 @@ export default function Accepted({
                   <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                     <img src={Call} alt="Call" className="w-5 h-5" />
                   </div>
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id)}>
                     <img src={Message} alt="Message" className="w-5 h-5" />
                   </div>
                 </div>

@@ -1,26 +1,74 @@
+import React, { useState, useEffect } from "react";
 import Header from "../../../component/Header";
-import banner from "../../../assets/banner.png";
 import Footer from "../../../component/footer";
 import serviceProviderImg from "../../../assets/directHiring/service-provider.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
-import { useEffect, useState } from "react";
 import ServiceProviderHisWork from "./ServiceProviderHisWork";
 import HireModel from "./HireModel";
 import PaymentModel from "./PaymentModel";
 import PaymentProceedModel from "./PaymentProceedModel";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ServiceProviderHireDetail() {
   const [isHireModel, setIsHireModel] = useState(false);
   const [isPaymentModelOpen, setIsPaymentModelOpen] = useState(true);
-  const [isPaymentProceedModelOpen, setIsPaymentProceedModelOpen] =
-    useState(true);
+  const [isPaymentProceedModelOpen, setIsPaymentProceedModelOpen] = useState(true);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
   const closeHireModel = () => {
     setIsHireModel(false);
   };
+
   const closePaymentModel = () => {
     setIsPaymentModelOpen(false);
   };
@@ -29,21 +77,57 @@ export default function ServiceProviderHireDetail() {
     setIsPaymentProceedModelOpen(false);
   };
 
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <>
       <Header />
-      <div className="min-h-screen   bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
           <button className="text-green-600 text-sm hover:underline">
             &lt; Back
           </button>
         </div>
-        <div className="w-full  mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
-          <img
-            src={banner}
-            alt="Gardening"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-          />
+        {/* Banner Slider */}
+        <div className="w-full mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[412px] mt-5">
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[412px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
 
         <div className="container max-w-6xl mx-auto my-10">
@@ -66,7 +150,7 @@ export default function ServiceProviderHireDetail() {
                   Mohan Sharma
                 </div>
                 <div className="flex flex-col gap-1 items-end">
-                  <div className="flex items-center text-sm  text-gray-700">
+                  <div className="flex items-center text-sm text-gray-700">
                     <span className="font-semibold">(4.5</span>
                     <img
                       className="h-5 w-5 mx-1"
@@ -85,7 +169,7 @@ export default function ServiceProviderHireDetail() {
                 <img
                   src={locationIcon}
                   alt="Location"
-                  className="h-5  mr-2 text-green-500"
+                  className="h-5 mr-2 text-green-500"
                 />
                 Indore M.P. INDIA
               </div>

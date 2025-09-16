@@ -3,10 +3,12 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
-import banner from "../../../assets/profile/banner.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import Default from "../../../assets/default-image.jpg";
 import Arrow from "../../../assets/profile/arrow_back.svg";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -18,9 +20,50 @@ export default function ServiceProviderList() {
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Banner API response:", response.data); // Debug response
+
+      if (response.data?.status) {
+        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+          setBannerImages(response.data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
 
   useEffect(() => {
@@ -99,6 +142,18 @@ export default function ServiceProviderList() {
   console.log("workers", workers);
   console.log("filteredWorkers", filteredWorkers);
 
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <>
       <Header />
@@ -113,12 +168,36 @@ export default function ServiceProviderList() {
           </button>
         </div>
 
+        {/* Top Banner Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
 
         <div className="container max-w-5xl mx-auto my-10">
@@ -196,12 +275,36 @@ export default function ServiceProviderList() {
           )}
         </div>
 
+        {/* Bottom Banner Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
       </div>
 

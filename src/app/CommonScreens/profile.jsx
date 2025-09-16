@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import RegistrationCompleted from "../../assets/registration_completed.png";
 import {
@@ -11,14 +10,17 @@ import {
   useJsApiLoader,
   Autocomplete,
 } from "@react-google-maps/api";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 // Move libraries outside the component to avoid reloading warning
 const libraries = ["places"];
 
-export default function Profile() {
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const navigate = useNavigate();
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+export default function Profile() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -27,19 +29,15 @@ export default function Profile() {
     address: "",
     referral: "",
   });
-
   const [errors, setErrors] = useState({});
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [mapFor, setMapFor] = useState("location"); // "location" or "address"
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
-
   const [currentLocation, setCurrentLocation] = useState(null);
   const [map, setMap] = useState(null);
-
   const [markerLocationGPS, setMarkerLocationGPS] = useState(null);
   const [markerLocationAddress, setMarkerLocationAddress] = useState(null);
-
   const [tempAddress, setTempAddress] = useState({
     title: "",
     landmark: "",
@@ -47,6 +45,9 @@ export default function Profile() {
     latitude: null,
     longitude: null,
   });
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
 
   const autoCompleteRef = useRef(null);
 
@@ -55,8 +56,46 @@ export default function Profile() {
     libraries,
   });
 
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   const ProfileComplete = () => {
-    localStorage.setItem('isProfileComplete','true');
+    localStorage.setItem('isProfileComplete', 'true');
     const role = localStorage.getItem("role");
     if (role === "service_provider") navigate("/homeservice");
     if (role === "user") navigate("/homeuser");
@@ -107,9 +146,12 @@ export default function Profile() {
       alert("Geolocation not supported by browser");
     }
   };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
   const handlePlaceChanged = () => {
     if (autoCompleteRef.current) {
       const place = autoCompleteRef.current.getPlace();
@@ -146,7 +188,6 @@ export default function Profile() {
     else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100)
       newErrors.age = "Enter a valid age between 1 and 100";
     if (!formData.gender.trim()) newErrors.gender = "Gender is required";
-    // if (!formData.location.trim()) newErrors.location = "Please select your location";
     if (!formData.address.trim()) newErrors.address = "Address is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -199,6 +240,18 @@ export default function Profile() {
 
   const defaultCenter = markerLocationGPS || markerLocationAddress || currentLocation || { lat: 28.6139, lng: 77.209 };
 
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -231,23 +284,21 @@ export default function Profile() {
             </div>
 
             {/* Age */}
-             <div>
-  <label className="font-[700] block text-center">Your Age</label>
-  <input
-    type="text"   // ✅ ab text hi hai
-    name="age"
-    placeholder="Enter Your Age"
-    value={formData.age}
-    onChange={(e) => {
-      let value = e.target.value;
-      // ✅ sirf number hi allow + max 2 digit
-      value = value.replace(/[^0-9]/g, "").slice(0, 2);
-      handleChange({ target: { name: "age", value } });
-    }}
-    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
-  />
-  {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
-</div>
+            <div>
+              <label className="font-[700] block text-center">Your Age</label>
+              <input
+                type="text"
+                name="age"
+                placeholder="Enter Your Age"
+                value={formData.age}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
+                  handleChange({ target: { name: "age", value } });
+                }}
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
+              />
+              {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
+            </div>
 
             {/* Gender */}
             <div>
@@ -265,23 +316,6 @@ export default function Profile() {
               </select>
               {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
             </div>
-
-            {/* Location Gps */}
-            {/* <div>
-              <label className="font-[700] block text-center">Location (GPS)</label>
-              <input
-                type="text"
-                placeholder="Click to select location"
-                value={formData.location}
-                readOnly
-                onClick={() => {
-                  setMapFor("location");
-                  setIsMapOpen(true);
-                }}
-                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
-              />
-              {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
-            </div> */}
 
             {/* Full Address */}
             <div>
@@ -441,7 +475,7 @@ export default function Profile() {
               You have successfully completed your registration!
             </p>
             <button
-             onClick={() => ProfileComplete()}
+              onClick={() => ProfileComplete()}
               className="bg-[#228B22] hover:bg-green-700 text-white px-16 py-2 rounded-[8px] font-semibold"
             >
               OK
@@ -450,12 +484,36 @@ export default function Profile() {
         </div>
       )}
 
+      {/* Banner Slider */}
       <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={banner}
-          alt="Gardening illustration"
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-        />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       <Footer />

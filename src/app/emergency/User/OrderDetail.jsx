@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
-import banner from "../../../assets/profile/banner.png";
-import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning image import
+import Warning from "../../../assets/ViewProfile/warning.svg";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -13,7 +12,9 @@ import Search from "../../../assets/search-normal.svg";
 import Accepted from "./Accepted";
 import ReviewModal from "../../CommonScreens/ReviewModal";
 import Swal from "sweetalert2";
-
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -28,11 +29,53 @@ export default function ViewProfile() {
   const [serviceProviders, setServiceProviders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isHired, setIsHired] = useState(false);
-
   const [showCompletedModal, setShowCompletedModal] = useState(false);
-   useEffect(() => {
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Banner API response:", response.data); // Debug response
+
+      if (response.data?.status) {
+        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+          setBannerImages(response.data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
+  useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("bharat_token");
@@ -116,38 +159,34 @@ export default function ViewProfile() {
   };
 
   const handleMarkComplete = async () => {
-  try {
-    const token = localStorage.getItem("bharat_token");
-    const response = await axios.post(
-      `${BASE_URL}/emergency-order/completeOrderUser`,
-      { order_id: id },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/completeOrderUser`,
+        { order_id: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    if (response.status === 200) {
-      // Show SweetAlert first
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Order marked as complete successfully!",
+          confirmButtonColor: "#228B22",
+        }).then(() => {
+          setShowCompletedModal(true);
+        });
+      }
+    } catch (err) {
+      console.error(err);
       Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: 'Order marked as complete successfully!',
-        confirmButtonColor: '#228B22',
-      }).then(() => {
-        // Open the ReviewModal after user clicks "OK"
-        setShowCompletedModal(true);
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to mark order as complete. Please try again.",
+        confirmButtonColor: "#FF0000",
       });
     }
-  } catch (err) {
-    console.error(err);
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops!',
-      text: 'Failed to mark order as complete. Please try again.',
-      confirmButtonColor: '#FF0000',
-    });
-  }
-};
-
-
+  };
 
   const handleConfirmCancel = async () => {
     setShowModal(false);
@@ -170,7 +209,7 @@ export default function ViewProfile() {
       setError("Failed to cancel order. Please try again later.");
     }
   };
-  
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
   };
@@ -178,6 +217,18 @@ export default function ViewProfile() {
   const filteredProviders = serviceProviders.filter((provider) =>
     provider.full_name?.toLowerCase().includes(searchQuery)
   );
+
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
 
   if (loading) {
     return (
@@ -302,11 +353,10 @@ export default function ViewProfile() {
                 </span>
               ) : orderData?.hire_status === "completed" ? (
                 <span
-  className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer"
->
-  Task Completed
-</span>
-
+                  className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                >
+                  Task Completed
+                </span>
               ) : orderData?.hire_status !== "assigned" ? (
                 <button
                   className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
@@ -317,65 +367,60 @@ export default function ViewProfile() {
               ) : null}
             </div>
 
-            {/* Render Accepted component when hire_status is assigned */}
             {(orderData?.hire_status === "assigned" || orderData?.hire_status === "completed") && (
-  <>
-    <Accepted
-      serviceProvider={orderData?.service_provider_id}
-      assignedWorker={assignedWorker}
-      paymentHistory={orderData?.service_payment?.payment_history}
-      orderId={id}
-      hireStatus={orderData?.hire_status}
-    />
+              <>
+                <Accepted
+                  serviceProvider={orderData?.service_provider_id}
+                  assignedWorker={assignedWorker}
+                  paymentHistory={orderData?.service_payment?.payment_history}
+                  orderId={id}
+                  hireStatus={orderData?.hire_status}
+                />
 
-    {/* Show buttons only if still assigned, not completed */}
-    {orderData?.hire_status === "assigned" && (
-      <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-        {/* Yellow warning box */}
-        <div className="relative max-w-2xl mx-auto">
-          <div className="relative z-10">
-            <img
-              src={Warning}
-              alt="Warning"
-              className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
-            />
-          </div>
-          <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
-            <h2 className="text-[#FE2B2B] font-bold -mt-2">Warning Message</h2>
-            <p className="text-gray-700 text-sm md:text-base">
-              Lorem Ipsum is simply dummy text...
-            </p>
-          </div>
-        </div>
+                {orderData?.hire_status === "assigned" && (
+                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                    <div className="relative max-w-2xl mx-auto">
+                      <div className="relative z-10">
+                        <img
+                          src={Warning}
+                          alt="Warning"
+                          className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                        />
+                      </div>
+                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+                        <h2 className="text-[#FE2B2B] font-bold -mt-2">Warning Message</h2>
+                        <p className="text-gray-700 text-sm md:text-base">
+                          Lorem Ipsum is simply dummy text...
+                        </p>
+                      </div>
+                    </div>
 
-        {/* Action buttons */}
-        <div className="flex space-x-4">
-          <>
-  <button
-  className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md" onClick={handleMarkComplete}>Mark as Complete</button>
-
-  <ReviewModal
-  show={showCompletedModal}
-  onClose={() => setShowCompletedModal(false)}
-  service_provider_id={orderData?.service_provider_id._id}
-  orderId={id}
-  type="emergency"
-/>
-
-</>
-          <Link to={`/dispute/${id}/emergency`}>
-  <button
-    className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-  >
-    Cancel Task and Create Dispute
-  </button>
-</Link>
-
-        </div>
-      </div>
-    )}
-  </>
-)}
+                    <div className="flex space-x-4">
+                      <button
+                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                        onClick={handleMarkComplete}
+                      >
+                        Mark as Complete
+                      </button>
+                      <ReviewModal
+                        show={showCompletedModal}
+                        onClose={() => setShowCompletedModal(false)}
+                        service_provider_id={orderData?.service_provider_id._id}
+                        orderId={id}
+                        type="emergency"
+                      />
+                      <Link to={`/dispute/${id}/emergency`}>
+                        <button
+                          className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                        >
+                          Cancel Task and Create Dispute
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -386,7 +431,7 @@ export default function ViewProfile() {
             <input
               type="text"
               placeholder="Search providers by name..."
-              className="w-full p-2 pl-10  rounded-lg focus:outline-none bg-[#F5F5F5]"
+              className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -442,12 +487,36 @@ export default function ViewProfile() {
         </div>
       )}
 
+      {/* Bottom Banner Slider */}
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
-        <img
-          src={banner}
-          alt="Decorative gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       <Footer />
@@ -480,8 +549,6 @@ export default function ViewProfile() {
           </div>
         </div>
       )}
-
-      
     </>
   );
 }

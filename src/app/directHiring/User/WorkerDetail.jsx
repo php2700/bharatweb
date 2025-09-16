@@ -1,14 +1,74 @@
+import React, { useState, useEffect } from "react";
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
 import image from "../../../assets/workcategory/image.png";
-import banner from "../../../assets/profile/banner.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
-import {useEffect} from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function WorkerDetail() {
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
+
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 6,
+    arrows: true,
+  };
+
   const workers = [
     {
       id: 1,
@@ -55,6 +115,7 @@ export default function WorkerDetail() {
         "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
     },
   ];
+
   return (
     <>
       <Header />
@@ -64,18 +125,18 @@ export default function WorkerDetail() {
             &lt; Back
           </button>
         </div>
-        <div className="container max-w-5xl  mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
+        <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
 
           <div>
             <img src={hisWorkImg} className="h-80 w-full" />
           </div>
-          <div className=" py-6 space-y-4">
+          <div className="py-6 space-y-4">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-lg font-semibold">Chair Work</h2>
                 <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
-                <span className="inline-block bg-red-500 text-white text-lg font-semibold px-3  rounded-full mt-2">
+                <span className="inline-block bg-red-500 text-white text-lg font-semibold px-3 rounded-full mt-2">
                   Indore M.P.
                 </span>
               </div>
@@ -115,7 +176,6 @@ export default function WorkerDetail() {
             </div>
 
             {/* default ui we show */}
-
             <div className="flex items-center justify-between border border-[#228B22] rounded-lg py-4 px-6">
               <div className="flex items-center gap-4">
                 <img
@@ -134,7 +194,7 @@ export default function WorkerDetail() {
                 </div>
               </div>
 
-              <div className="flex  flex-col gap-3">
+              <div className="flex flex-col gap-3">
                 <button className="bg-green-200 text-green-800 px-2 md:px-6 py-2 rounded-lg font-medium">
                   Offer Sent
                 </button>
@@ -149,17 +209,37 @@ export default function WorkerDetail() {
           </div>
         </div>
 
-        {/* filter data getting  */}
-        
-
+        {/* Banner Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
-
       </div>
       <Footer />
     </>
