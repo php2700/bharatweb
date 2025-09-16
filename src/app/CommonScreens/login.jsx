@@ -4,7 +4,7 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../../firebase";
-import image from '../../assets/login/img.png';
+import image from "../../assets/login/img.png";
 import flag from '../../assets/login/flag.png';
 import logo from "../../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
@@ -25,55 +25,55 @@ export default function LoginPage() {
   const [bannerError, setBannerError] = useState(null);
 
   // Fetch banner images
-  const fetchBannerImages = async () => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+  // const fetchBannerImages = async () => {
+  //   try {
+  //     const token = localStorage.getItem("bharat_token");
+  //     if (!token) {
+  //       throw new Error("No authentication token found");
+  //     }
 
-      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  //     const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-      const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
+  //     const data = await res.json();
+  //     console.log("Banner API response:", data); // Debug response
 
-      if (res.ok) {
-        if (Array.isArray(data.images) && data.images.length > 0) {
-          setBannerImages(data.images);
-        } else {
-          setBannerImages([]);
-          setBannerError("No banners available");
-        }
-      } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
-        console.error("Failed to fetch banner images:", errorMessage);
-        setBannerError(errorMessage);
-      }
-    } catch (err) {
-      console.error("Error fetching banner images:", err.message);
-      setBannerError(err.message);
-    } finally {
-      setBannerLoading(false);
-    }
-  };
+  //     if (res.ok) {
+  //       if (Array.isArray(data.images) && data.images.length > 0) {
+  //         setBannerImages(data.images);
+  //       } else {
+  //         setBannerImages([]);
+  //         setBannerError("No banners available");
+  //       }
+  //     } else {
+  //       const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+  //       console.error("Failed to fetch banner images:", errorMessage);
+  //       setBannerError(errorMessage);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching banner images:", err.message);
+  //     setBannerError(err.message);
+  //   } finally {
+  //     setBannerLoading(false);
+  //   }
+  // };
 
   // Notification permission and banner fetch on load
-  useEffect(() => {
-    if (Notification.permission === "default") {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") setPermissionGranted(true);
-      });
-    } else if (Notification.permission === "granted") {
-      setPermissionGranted(true);
-    }
+  // useEffect(() => {
+  //   if (Notification.permission === "default") {
+  //     Notification.requestPermission().then((permission) => {
+  //       if (permission === "granted") setPermissionGranted(true);
+  //     });
+  //   } else if (Notification.permission === "granted") {
+  //     setPermissionGranted(true);
+  //   }
 
-    fetchBannerImages();
-  }, []);
+  //   fetchBannerImages();
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -197,7 +197,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Banner Slider */}
+      {/* Banner Slider
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -227,7 +227,7 @@ export default function LoginPage() {
             No banners available
           </p>
         )}
-      </div>
+      </div> */}
 
       <div className="mt-[50px]">
         <Footer />

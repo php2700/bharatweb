@@ -30,30 +30,28 @@ export default function Notifications() {
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      const token = localStorage.getItem("bharat_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
 
-      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
+      console.log("Banner API response:", response.data); // Debug response
 
-      if (res.ok) {
-        if (Array.isArray(data.images) && data.images.length > 0) {
-          setBannerImages(data.images);
+      if (response.data?.status) {
+        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+          setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage = response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }

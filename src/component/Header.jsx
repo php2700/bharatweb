@@ -386,7 +386,9 @@ export default function Header() {
     }
   };
 
-  let fullName = profile?.data?.full_name || null;
+  let fullName = profile?.full_name || null;
+  console.log("fullname",fullName);
+  console.log("profile", profile);
   if (!isLoggedIn) fullName = null;
 
   const logoutdestroy = () => {

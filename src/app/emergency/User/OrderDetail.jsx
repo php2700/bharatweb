@@ -37,7 +37,6 @@ export default function ViewProfile() {
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      const token = localStorage.getItem("bharat_token");
       if (!token) {
         throw new Error("No authentication token found");
       }

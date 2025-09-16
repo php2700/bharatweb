@@ -57,7 +57,6 @@
 
 
 
-// redux/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -66,12 +65,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const fetchUserProfile = createAsyncThunk(
   "user/fetchUserProfile",
   async (_, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        return rejectWithValue("No token found");
-      }
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      return rejectWithValue("No token found, user not logged in");
+    }
 
+    try {
       const res = await fetch(`${BASE_URL}/user/getUserProfileData`, {
         method: "GET",
         headers: {
