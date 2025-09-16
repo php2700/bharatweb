@@ -8,16 +8,20 @@ import Emergency from "../../assets/Home-SP/emergency.png";
 import Promise from "../../assets/Home-SP/promise.png";
 import Paper from "../../assets/Home-SP/paper.svg";
 import Vector from "../../assets/Home-SP/Vector.svg";
-import banner from "../../assets/profile/banner.png";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ServiceProviderHome() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [isEmergencyOn, setIsEmergencyOn] = useState(true);
   const token = localStorage.getItem("bharat_token");
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
   const [directHiring, setDirectHiring] = useState([
     {
       image: Hiring,
@@ -123,6 +127,48 @@ export default function ServiceProviderHome() {
     },
   ]);
 
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchBannerImages();
+  }, []);
+
   const handleToggle = async () => {
     const newEmergencyState = !isEmergencyOn;
     try {
@@ -139,11 +185,9 @@ export default function ServiceProviderHome() {
         throw new Error("Failed to update emergency status");
       }
 
-      // Update state only if API call is successful
       setIsEmergencyOn(newEmergencyState);
     } catch (error) {
       console.error("Error updating emergency status:", error);
-      // Optionally, show an error message to the user
       alert("Failed to update emergency status. Please try again.");
     }
   };
@@ -152,19 +196,52 @@ export default function ServiceProviderHome() {
     navigate("/subscription");
   };
 
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <>
       <Header />
-
-      {/* First Full Width Image */}
+      {/* First Full Width Image with Slider */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          <img
-            src={banner}
-            alt="Gardening illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/Home-SP/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
+      </div>
 
       {/* Second Image with Button */}
       <div className="w-[90%] mx-auto relative mt-8">
@@ -177,12 +254,9 @@ export default function ServiceProviderHome() {
         {/* Desktop Layout: Circle + Text on left, Button on right */}
         <div className="hidden max-md:!hidden md:flex items-center absolute top-1/2 -translate-y-1/2 left-[100px] gap-[100px]">
           <div className="flex items-center gap-[100px]">
-            {/* White Circular Div */}
             <div className="w-[100px] h-[100px] bg-white rounded-full shadow flex items-center justify-center">
               <img src={Paper} alt="Icon" className="w-12 h-12" />
             </div>
-
-            {/* Text Content */}
             <div className="flex flex-col">
               <h2 className="text-2xl font-semibold text-black">Pro Plan</h2>
               <p className="text-xl text-gray-600 mt-1">Expiry on: 15 Aug 2025</p>
@@ -191,19 +265,16 @@ export default function ServiceProviderHome() {
           </div>
         </div>
         <div className="hidden max-md:!hidden md:block absolute right-[100px] top-1/2 -translate-y-1/2">
-          <button onClick={()=>{handlePlan()}} className="bg-[#228B22] hover:bg-green-800 text-white px-6 py-2 rounded-xl shadow">
+          <button onClick={handlePlan} className="bg-[#228B22] hover:bg-green-800 text-white px-6 py-2 rounded-xl shadow">
             Upgrade Now
           </button>
         </div>
 
         {/* Mobile Layout: Button on right, Circle + Text to its right */}
         <div className="md:hidden flex flex-row-reverse items-center absolute top-1/2 -translate-y-1/2 right-4 gap-3">
-          {/* Upgrade Now Button */}
-          <button className="bg-[#228B22] hover:bg-green-800 text-white px-4 py-1 rounded-xl shadow">
+          <button onClick={handlePlan} className="bg-[#228B22] hover:bg-green-800 text-white px-4 py-1 rounded-xl shadow">
             Upgrade Now
           </button>
-
-          {/* Circle + Text Section */}
           <div className="flex items-center gap-3">
             <div className="w-[70px] h-[70px] bg-white rounded-full shadow flex items-center justify-center">
               <img src={Paper} alt="Icon" className="w-8 h-8" />
@@ -375,7 +446,7 @@ export default function ServiceProviderHome() {
           </div>
         )}
       </div>
-      {/* Footer */}
+
       <div className="mt-[50px]">
         <Footer />
       </div>

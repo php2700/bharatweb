@@ -1,36 +1,79 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../../firebase";
-import banner from "../../assets/profile/banner.png";
 import image from '../../assets/login/img.png';
 import flag from '../../assets/login/flag.png';
 import logo from "../../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [mobile, setMobile] = useState("");
   const [permissionGranted, setPermissionGranted] = useState(false);
-  
-  // 🔹 Login page load hote hi notification permission prompt
-useEffect(() => {
-  if (Notification.permission === "default") {
-    Notification.requestPermission().then((permission) => {
-      if(permission === "granted") setPermissionGranted(true);
-    });
-  } else if (Notification.permission === "granted") {
-    setPermissionGranted(true);
-  } else {
-    
-  }
-}, []);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
 
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Banner API response:", data); // Debug response
+
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
+  // Notification permission and banner fetch on load
+  useEffect(() => {
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") setPermissionGranted(true);
+      });
+    } else if (Notification.permission === "granted") {
+      setPermissionGranted(true);
+    }
+
+    fetchBannerImages();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +86,7 @@ useEffect(() => {
     setLoading(true);
 
     try {
-      // 🔹 FCM token generate, sirf agar permission allow ho
+      // FCM token generate, only if permission is granted
       let fcmToken = "";
       if (permissionGranted) {
         try {
@@ -83,6 +126,18 @@ useEffect(() => {
     }
   };
 
+  // Slider settings for react-slick
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <>
       <Header />
@@ -117,15 +172,14 @@ useEffect(() => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-               <input
-  type="tel"
-  placeholder="Mobile Number"
-  value={mobile}
-  onChange={(e) => setMobile(e.target.value)}
-  maxLength={10} // 🔴 Max 10 digits allowed
-  className="w-full py-2 px-2 text-gray-700 focus:outline-none"
-/>
-
+                  <input
+                    type="tel"
+                    placeholder="Mobile Number"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                    maxLength={10}
+                    className="w-full py-2 px-2 text-gray-700 focus:outline-none"
+                  />
                 </div>
 
                 <button
@@ -143,8 +197,36 @@ useEffect(() => {
         </div>
       </div>
 
+      {/* Banner Slider */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img src={banner} alt="Gardening illustration" className="absolute inset-0 w-full h-full object-cover" />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       <div className="mt-[50px]">

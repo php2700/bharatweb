@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link } from "react-router-dom";
-import Address from "../assets/location.svg";
+import AddressIcon from "../assets/location.svg";
 import Profile from "../assets/profile.svg";
 import Logout from "../assets/logout.svg";
 import Account from "../assets/account.svg";
@@ -43,16 +43,23 @@ export default function Header() {
   const [isNotifLoading, setIsNotifLoading] = useState(false);
   const [notifError, setNotifError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tempAddress, setTempAddress] = useState({
+  const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState({
     title: "",
     landmark: "",
     address: "",
     latitude: 51.505,
     longitude: -0.09,
   });
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(
+    parseInt(localStorage.getItem("selectedAddressId")) || 0
+  );
+  const [editingAddress, setEditingAddress] = useState(null);
   const [mapError, setMapError] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("Location");
   const markerRef = useRef(null);
+  const addressDropdownRef = useRef(null);
 
   const isLoggedIn = !!localStorage.getItem("bharat_token");
 
@@ -66,37 +73,54 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const { profile, loading } = useSelector((state) => state.user);
-  const { notifications: reduxNotifications } = useSelector((state) => state.emergency);
+  const { notifications: reduxNotifications } = useSelector(
+    (state) => state.emergency
+  );
 
   // Prevent body scrolling when modal is open
   useEffect(() => {
     if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
 
   // Outside click handler
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        addressDropdownRef.current &&
+        !addressDropdownRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
         setIsNotifOpen(false);
-        setIsModalOpen(false);
+        setIsAddressDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch user profile
+  // Fetch user profile and addresses
   useEffect(() => {
     if (isLoggedIn) {
-      dispatch(fetchUserProfile());
+      dispatch(fetchUserProfile()).then((result) => {
+        if (result.payload?.data?.full_address) {
+          setSavedAddresses(result.payload.data.full_address);
+          const savedIndex = parseInt(localStorage.getItem("selectedAddressId")) || 0;
+          if (result.payload.data.full_address.length > 0) {
+            const defaultAddress = result.payload.data.full_address[savedIndex] || result.payload.data.full_address[0];
+            setSelectedAddress(defaultAddress.title || defaultAddress.address);
+            setSelectedAddressId(savedIndex);
+          }
+        }
+      });
     }
   }, [dispatch, isLoggedIn]);
 
@@ -116,7 +140,10 @@ export default function Header() {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          const combinedNotifications = [...reduxNotifications, ...(data.data || [])];
+          const combinedNotifications = [
+            ...reduxNotifications,
+            ...(data.data || []),
+          ];
           setNotifications(combinedNotifications);
           setNotificationCount(combinedNotifications.length);
         } else {
@@ -139,13 +166,13 @@ export default function Header() {
     }
   }, [isLoggedIn, reduxNotifications]);
 
-  // Fetch user's current location
+  // Fetch user's current location when modal opens
   useEffect(() => {
     if (isModalOpen && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const { latitude, longitude } = pos.coords;
-          setTempAddress((prev) => ({ ...prev, latitude, longitude }));
+          setCurrentAddress((prev) => ({ ...prev, latitude, longitude }));
           setMapError(null);
           try {
             const response = await fetch(
@@ -158,12 +185,12 @@ export default function Header() {
               if (data.address.suburb) addressParts.push(data.address.suburb);
               if (data.address.city) addressParts.push(data.address.city);
               const address = addressParts.join(", ") || "Current Location";
-              setTempAddress((prev) => ({ ...prev, address }));
+              setCurrentAddress((prev) => ({ ...prev, address }));
             } else {
-              setTempAddress((prev) => ({ ...prev, address: "" }));
+              setCurrentAddress((prev) => ({ ...prev, address: "" }));
             }
           } catch (err) {
-            setTempAddress((prev) => ({ ...prev, address: "" }));
+            setCurrentAddress((prev) => ({ ...prev, address: "" }));
             toast.error("Failed to fetch address details.");
           }
         },
@@ -178,7 +205,11 @@ export default function Header() {
   // Handle map click
   const handleMapClick = async (e) => {
     const newPosition = [e.latlng.lat, e.latlng.lng];
-    setTempAddress((prev) => ({ ...prev, latitude: newPosition[0], longitude: newPosition[1] }));
+    setCurrentAddress((prev) => ({
+      ...prev,
+      latitude: newPosition[0],
+      longitude: newPosition[1],
+    }));
     setMapError(null);
 
     try {
@@ -192,12 +223,12 @@ export default function Header() {
         if (data.address.suburb) addressParts.push(data.address.suburb);
         if (data.address.city) addressParts.push(data.address.city);
         const address = addressParts.join(", ") || "Selected Location";
-        setTempAddress((prev) => ({ ...prev, address }));
+        setCurrentAddress((prev) => ({ ...prev, address }));
       } else {
-        setTempAddress((prev) => ({ ...prev, address: "" }));
+        setCurrentAddress((prev) => ({ ...prev, address: "" }));
       }
     } catch (err) {
-      setTempAddress((prev) => ({ ...prev, address: "" }));
+      setCurrentAddress((prev) => ({ ...prev, address: "" }));
       toast.error("Failed to fetch address details.");
     }
   };
@@ -206,7 +237,11 @@ export default function Header() {
   const handleMarkerDrag = async (e) => {
     const marker = e.target;
     const newPosition = marker.getLatLng();
-    setTempAddress((prev) => ({ ...prev, latitude: newPosition.lat, longitude: newPosition.lng }));
+    setCurrentAddress((prev) => ({
+      ...prev,
+      latitude: newPosition.lat,
+      longitude: newPosition.lng,
+    }));
     setMapError(null);
 
     try {
@@ -220,12 +255,12 @@ export default function Header() {
         if (data.address.suburb) addressParts.push(data.address.suburb);
         if (data.address.city) addressParts.push(data.address.city);
         const address = addressParts.join(", ") || "Selected Location";
-        setTempAddress((prev) => ({ ...prev, address }));
+        setCurrentAddress((prev) => ({ ...prev, address }));
       } else {
-        setTempAddress((prev) => ({ ...prev, address: "" }));
+        setCurrentAddress((prev) => ({ ...prev, address: "" }));
       }
     } catch (err) {
-      setTempAddress((prev) => ({ ...prev, address: "" }));
+      setCurrentAddress((prev) => ({ ...prev, address: "" }));
       toast.error("Failed to fetch address details.");
     }
   };
@@ -233,39 +268,63 @@ export default function Header() {
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setTempAddress((prev) => ({ ...prev, [name]: value }));
+    setCurrentAddress((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle save location
   const handleSaveLocation = async () => {
-    if (!tempAddress.title.trim() || !tempAddress.landmark.trim() || !tempAddress.address.trim()) {
+    if (
+      !currentAddress.title.trim() ||
+      !currentAddress.landmark.trim() ||
+      !currentAddress.address.trim() ||
+      !currentAddress.latitude ||
+      !currentAddress.longitude
+    ) {
       toast.error("Please fill in all fields: Title, Landmark, and Address.");
       return;
     }
 
-    setSelectedAddress(tempAddress.title || "Location");
-    console.log("Saved Location:", tempAddress);
-
-    // Optionally send to API
     try {
       const token = localStorage.getItem("bharat_token");
-      const response = await fetch(`${BASE_URL}/user/updateLocation`, {
+      const newAddress = {
+        title: currentAddress.title,
+        landmark: currentAddress.landmark,
+        address: currentAddress.address,
+        latitude: currentAddress.latitude,
+        longitude: currentAddress.longitude,
+      };
+
+      let updatedAddresses;
+      if (editingAddress !== null) {
+        updatedAddresses = savedAddresses.map((addr, idx) =>
+          idx === editingAddress ? newAddress : addr
+        );
+      } else {
+        updatedAddresses = [...savedAddresses, newAddress];
+      }
+
+      const response = await fetch(`${BASE_URL}/user/updateUserProfile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          title: tempAddress.title,
-          landmark: tempAddress.landmark,
-          address: tempAddress.address,
-          latitude: tempAddress.latitude,
-          longitude: tempAddress.longitude,
+          full_address: updatedAddresses,
+          location: newAddress, // Set the new or edited address as the primary location
         }),
       });
       const data = await response.json();
       if (response.ok) {
         toast.success("Location updated successfully!");
+        setSavedAddresses(updatedAddresses);
+        const newIndex = editingAddress !== null ? editingAddress : updatedAddresses.length - 1;
+        setSelectedAddressId(newIndex);
+        setSelectedAddress(newAddress.title || newAddress.address);
+        localStorage.setItem("selectedAddressId", newIndex);
+        setEditingAddress(null);
+        // Re-fetch profile to ensure synchronization
+        dispatch(fetchUserProfile());
       } else {
         toast.error(data.message || "Failed to update location");
       }
@@ -274,6 +333,57 @@ export default function Header() {
     }
 
     setIsModalOpen(false);
+    setCurrentAddress({
+      title: "",
+      landmark: "",
+      address: "",
+      latitude: 51.505,
+      longitude: -0.09,
+    });
+  };
+
+  // Handle edit address
+  const handleEditAddress = (index) => {
+    setEditingAddress(index);
+    setCurrentAddress(savedAddresses[index]);
+    setIsModalOpen(true);
+    setIsAddressDropdownOpen(false);
+  };
+
+  // Handle select address
+  const handleSelectAddress = (index) => {
+    setSelectedAddressId(index);
+    setSelectedAddress(savedAddresses[index].title || savedAddresses[index].address);
+    localStorage.setItem("selectedAddressId", index);
+  };
+
+  // Handle save changes
+  const handleSaveChanges = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          full_address: savedAddresses,
+          location: savedAddresses[selectedAddressId] || savedAddresses[0],
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Profile updated successfully!");
+        setIsAddressDropdownOpen(false);
+        // Re-fetch profile to ensure synchronization
+        dispatch(fetchUserProfile());
+      } else {
+        toast.error(data.message || "Failed to update profile");
+      }
+    } catch (err) {
+      toast.error("Network error while updating profile");
+    }
   };
 
   let fullName = profile?.data?.full_name || null;
@@ -284,6 +394,7 @@ export default function Header() {
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
     localStorage.removeItem("otp");
+    localStorage.removeItem("selectedAddressId");
     navigate("/login");
   };
 
@@ -296,8 +407,15 @@ export default function Header() {
       month: "long",
       year: "numeric",
     });
-    const today = new Date().toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
-    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+    const today = new Date().toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString(
+      "en-US",
+      { day: "numeric", month: "long", year: "numeric" }
+    );
 
     let section = date;
     if (date === today) section = "Today";
@@ -308,13 +426,15 @@ export default function Header() {
     return acc;
   }, {});
 
-  const notificationSections = Object.keys(groupedNotifications).map((section) => ({
-    section,
-    items: groupedNotifications[section].map((notif) => ({
-      title: notif.title || "Notification",
-      message: notif.message || "No message available",
-    })),
-  }));
+  const notificationSections = Object.keys(groupedNotifications).map(
+    (section) => ({
+      section,
+      items: groupedNotifications[section].map((notif) => ({
+        title: notif.title || "Notification",
+        message: notif.message || "No message available",
+      })),
+    })
+  );
 
   return (
     <header className="w-full bg-white shadow-[0_6px_10px_-2px_rgba(0,0,0,0.3)]">
@@ -331,13 +451,13 @@ export default function Header() {
             />
           </div>
           {isLoggedIn && (
-            <div className="relative flex items-center">
+            <div className="relative flex items-center" ref={addressDropdownRef}>
               <input
                 type="text"
                 placeholder={selectedAddress}
                 className="px-4 py-2 rounded-lg bg-[#EBEBEB] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-48 sm:w-64 placeholder:text-[#334247] placeholder:font-semibold cursor-pointer"
                 aria-label="Location input"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
                 readOnly
               />
               <svg
@@ -348,19 +468,93 @@ export default function Header() {
                 stroke="currentColor"
                 className="w-5 h-5 text-[#334247] font-semibold absolute right-3"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+                />
               </svg>
+              {isAddressDropdownOpen && (
+                <div className="absolute top-12 left-0 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-4">
+                  {savedAddresses.length === 0 ? (
+                    <p className="text-sm text-gray-600">No saved addresses</p>
+                  ) : (
+                    savedAddresses.map((address, index) => (
+                      <div key={index} className="flex items-center justify-between py-2">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            name="selectedAddress"
+                            checked={selectedAddressId === index}
+                            onChange={() => handleSelectAddress(index)}
+                            className="form-radio h-4 w-4 text-[#228B22]"
+                          />
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{address.title || address.address}</p>
+                            <p className="text-xs text-gray-500">{address.address}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleEditAddress(index)}
+                          className="text-sm text-[#228B22] hover:underline"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    ))
+                  )}
+                  <button
+                    onClick={() => {
+                      setEditingAddress(null);
+                      setCurrentAddress({
+                        title: "",
+                        landmark: "",
+                        address: "",
+                        latitude: 51.505,
+                        longitude: -0.09,
+                      });
+                      setIsModalOpen(true);
+                      setIsAddressDropdownOpen(false);
+                    }}
+                    className="w-full mt-2 bg-[#228B22] text-white py-2 rounded-lg hover:bg-green-800"
+                  >
+                    Add Address
+                  </button>
+                  {savedAddresses.length > 0 && (
+                    <button
+                      onClick={handleSaveChanges}
+                      className="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                    >
+                      Save Changes
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Desktop Navigation */}
         <nav className="flex-1 hidden max-md:!hidden md:flex justify-center gap-8 text-[#969696] text-base font-medium">
-          <Link to={homeLink} className="hover:text-black">Home</Link>
-          <Link to="/aboutus" className="hover:text-black">About</Link>
-          <Link to="/ourservices" className="hover:text-black">Services</Link>
-          {isLoggedIn && <Link to="/chats" className="hover:text-black">Chats</Link>}
+          <Link to={homeLink} className="hover:text-black">
+            Home
+          </Link>
+          <Link to="/aboutus" className="hover:text-black">
+            About
+          </Link>
+          <Link to="/ourservices" className="hover:text-black">
+            Services
+          </Link>
+          {isLoggedIn && (
+            <Link to="/chats" className="hover:text-black">
+              Chats
+            </Link>
+          )}
         </nav>
 
         {/* Right Section */}
@@ -378,7 +572,11 @@ export default function Header() {
                 className="relative hidden sm:flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
               >
-                <img src={Notification} alt="Notification" className="w-6 h-6 text-gray-700" />
+                <img
+                  src={Notification}
+                  alt="Notification"
+                  className="w-6 h-6 text-gray-700"
+                />
                 {notificationCount > 0 && (
                   <span className="absolute top-1.5 right-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
                     {notificationCount}
@@ -395,24 +593,43 @@ export default function Header() {
                       </div>
                     </div>
                   ) : notifError ? (
-                    <div className="p-4 text-center text-red-500 text-sm">{notifError}</div>
+                    <div className="p-4 text-center text-red-500 text-sm">
+                      {notifError}
+                    </div>
                   ) : notificationSections.length === 0 ? (
-                    <div className="p-4 text-center text-gray-600 text-sm">No recent update</div>
+                    <div className="p-4 text-center text-gray-600 text-sm">
+                      No recent update
+                    </div>
                   ) : (
                     <>
                       {notificationSections.map((section, i) => (
                         <div key={i}>
-                          <div className="p-3 text-sm font-medium text-gray-700 border-b">{section.section}</div>
+                          <div className="p-3 text-sm font-medium text-gray-700 border-b">
+                            {section.section}
+                          </div>
                           {section.items.map((notif, idx) => (
-                            <div key={idx} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50">
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                            >
                               <div className="flex items-center gap-3">
-                                <img src={Logo} alt="coin" className="w-10 h-10" />
+                                <img
+                                  src={Logo}
+                                  alt="coin"
+                                  className="w-10 h-10"
+                                />
                                 <div>
-                                  <p className="text-sm font-medium text-gray-800">{notif.title}</p>
-                                  <p className="text-xs text-gray-500">{notif.message}</p>
+                                  <p className="text-sm font-medium text-gray-800">
+                                    {notif.title}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {notif.message}
+                                  </p>
                                 </div>
                               </div>
-                              <span className="text-gray-400 text-xs font-medium">{section.section}</span>
+                              <span className="text-gray-400 text-xs font-medium">
+                                {section.section}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -444,7 +661,9 @@ export default function Header() {
                 <img
                   src={Dropdown}
                   alt="Dropdown"
-                  className={`w-6 h-6 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}
+                  className={`w-6 h-6 transition-transform duration-300 ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
                 />
               </button>
             ) : (
@@ -458,17 +677,21 @@ export default function Header() {
             )}
             {isOpen && fullName && (
               <div className="absolute right-0 mt-2 w-44 bg-white shadow-lg rounded-lg border border-gray-200 z-50 transition-all duration-300 transform">
-                <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsOpen(false)}>
+                <Link
+                  to="/account"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
                   <img src={Account} alt="Account" className="w-5 h-5" />
                   Account
                 </Link>
-                <Link to="/details" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsOpen(false)}>
+                <Link
+                  to="/details"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
                   <img src={Profile} alt="Profile" className="w-5 h-5" />
                   Profile
-                </Link>
-                <Link to="/address" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200" onClick={() => setIsOpen(false)}>
-                  <img src={Address} alt="Address" className="w-5 h-5" />
-                  Address
                 </Link>
                 <button
                   onClick={logoutdestroy}
@@ -492,7 +715,11 @@ export default function Header() {
               stroke="currentColor"
               className="w-6 h-6 text-white"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
             </svg>
           </button>
         </div>
@@ -501,10 +728,20 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
           <div className="px-4 py-3 space-y-4 text-[#969696] font-medium flex flex-col items-center justify-center text-center">
-            <Link to={homeLink} className="hover:text-black">Home</Link>
-            <Link to="/aboutus" className="hover:text-black">About</Link>
-            <Link to="/ourservices" className="hover:text-black">Services</Link>
-            {isLoggedIn && <Link to="/chats" className="hover:text-black">Chats</Link>}
+            <Link to={homeLink} className="hover:text-black">
+              Home
+            </Link>
+            <Link to="/aboutus" className="hover:text-black">
+              About
+            </Link>
+            <Link to="/ourservices" className="hover:text-black">
+              Services
+            </Link>
+            {isLoggedIn && (
+              <Link to="/chats" className="hover:text-black">
+                Chats
+              </Link>
+            )}
             {isLoggedIn && (
               <Link to="/bidding/newtask">
                 <button className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-7 py-2 rounded-xl shadow w-fit whitespace-nowrap mx-auto flex items-center justify-center">
@@ -512,7 +749,10 @@ export default function Header() {
                 </button>
               </Link>
             )}
-            <Link to="/login" className="bg-white px-4 py-2 rounded-lg shadow text-base font-medium flex items-center gap-2 cursor-pointer">
+            <Link
+              to="/login"
+              className="bg-white px-4 py-2 rounded-lg shadow text-base font-medium flex items-center gap-2 cursor-pointer"
+            >
               Login/Signup
               <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
             </Link>
@@ -521,8 +761,14 @@ export default function Header() {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 overflow-y-auto"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition-colors"
               onClick={() => setIsModalOpen(false)}
@@ -535,80 +781,109 @@ export default function Header() {
                 stroke="currentColor"
                 className="w-8 h-8"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Your Location</h2>
+
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              {editingAddress !== null ? "Edit Address" : "Add New Address"}
+            </h2>
+
             {mapError && (
-              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">{mapError}</div>
+              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">
+                {mapError}
+              </div>
             )}
+
             <div className="mb-6">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Title
               </label>
               <input
                 type="text"
                 id="title"
                 name="title"
-                value={tempAddress.title}
+                value={currentAddress.title}
                 onChange={handleInputChange}
                 className="px-4 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
                 placeholder="Enter a title (e.g., Home, Office)"
               />
             </div>
+
             <div className="mb-6">
-              <label htmlFor="landmark" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="landmark"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Landmark
               </label>
               <input
                 type="text"
                 id="landmark"
                 name="landmark"
-                value={tempAddress.landmark}
+                value={currentAddress.landmark}
                 onChange={handleInputChange}
                 className="px-4 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
                 placeholder="Enter a landmark (e.g., Near City Mall)"
               />
             </div>
+
             <div className="mb-6">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Address
               </label>
               <input
                 type="text"
                 id="address"
                 name="address"
-                value={tempAddress.address}
+                value={currentAddress.address}
                 onChange={handleInputChange}
                 className="px-4 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
                 placeholder="Select location on map"
               />
             </div>
-            <div className="h-[400px] mb-6 rounded-lg overflow-hidden shadow-md border border-gray-200">
+
+            <div
+              className="h-[400px] mb-6 rounded-lg overflow-hidden shadow-md border border-gray-200"
+              onClick={(e) => e.stopPropagation()}
+            >
               <MapContainer
-                center={[tempAddress.latitude, tempAddress.longitude]}
+                center={[currentAddress.latitude, currentAddress.longitude]}
                 zoom={13}
                 style={{ height: "100%", width: "100%" }}
                 onClick={handleMapClick}
               >
-                <MapController position={[tempAddress.latitude, tempAddress.longitude]} />
+                <MapController
+                  position={[currentAddress.latitude, currentAddress.longitude]}
+                />
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 <Marker
-                  position={[tempAddress.latitude, tempAddress.longitude]}
+                  position={[currentAddress.latitude, currentAddress.longitude]}
                   draggable={true}
                   eventHandlers={{ dragend: handleMarkerDrag }}
                   ref={markerRef}
                 >
                   <Popup>
-                    Selected Location: {tempAddress.latitude.toFixed(4)},{" "}
-                    {tempAddress.longitude.toFixed(4)}
+                    Selected Location: {currentAddress.latitude.toFixed(4)},{" "}
+                    {currentAddress.longitude.toFixed(4)}
                   </Popup>
                 </Marker>
               </MapContainer>
             </div>
+
             <div className="flex justify-end gap-3">
               <button
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"

@@ -88,18 +88,6 @@ export default function Footer() {
               Subscribe for Exclusive Offers, Cleaning Tips, and More! Join our
               community and stay updated with the latest news and special promotions.
             </p>
-            {/* Newsletter Input + Button */}
-            <div className="mt-4 relative w-full max-w-sm sm:max-w-md md:max-w-full mx-auto md:mx-0">
-              <input
-              id="emailInput"
-                type="email"
-                placeholder="Email Address"
-                className="w-full h-[48px] sm:h-[52px] border border-gray-300 rounded-[4px] pl-3 pr-[110px] text-gray-700 placeholder-gray-400 focus:outline-none text-[13px] sm:text-[14px] bg-white"
-              />
-              <button id="footerbutton" className="absolute top-1 right-1 h-[44px] w-[100px] sm:w-[120px] bg-[#008000] rounded-r-[4px] font-cairo font-semibold hover:bg-green-700 text-[13px] sm:text-[14px] text-white">
-                SUBSCRIBE
-              </button>
-            </div>
           </div>
         </div>
       </div>
