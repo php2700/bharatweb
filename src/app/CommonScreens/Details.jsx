@@ -118,6 +118,7 @@ export default function Details() {
   }, [activeTab, profile?.data?.verified]);
 
   useEffect(() => {
+    console.log("Profile data:", profile); // Debug profile data
     if (activeTab !== "Worker") return;
 
     if (!profile?.data?.verified) {
@@ -138,6 +139,13 @@ export default function Details() {
         });
       } else if (!validateWorkerProfile()) {
         console.log("Profile incomplete, showing incomplete alert");
+        console.log({
+          full_name: profile?.data?.full_name,
+          skill: profile?.data?.skill,
+          category_id: profile?.data?.category_id,
+          subcategory_ids: profile?.data?.subcategory_ids,
+          documents: profile?.data?.documents,
+        }); // Debug which fields are missing
         Swal.fire({
           title: "Your Worker profile is not completed",
           text: "Please complete your profile to access the Worker tab.",
@@ -187,29 +195,28 @@ export default function Details() {
   let age = "N/A";
   let gender = "N/A";
   let element;
-  if (profile && profile.data) {
-    full_name = profile.data.full_name || "Not Available";
-    address = profile.data.full_address[0]?.address || "Not Available";
-    images = profile.data.profilePic || "Not Available";
-    skill = profile.data.skill || "No Skill Available";
-    category_name = profile.data.category_name || "Not Available";
-    subcategory_names = profile.data.subcategory_names || "Not Available";
-    document = profile.data.documents || "Not Available";
-    rateAndReviews = profile.data.rateAndReviews || "Not Available";
-    status = profile.data.verified || false;
-    workImages = profile.data.hiswork || [];
-    if (profile.data.verified) {
+  if (profile) {
+    full_name = profile.full_name || "Not Available";
+    images = profile.profilePic || "Not Available";
+    skill = profile.skill || "No Skill Available";
+    category_name = profile.category_name || "Not Available";
+    subcategory_names = profile.subcategory_names || "Not Available";
+    document = profile.documents || "Not Available";
+    rateAndReviews = profile.rateAndReviews || "Not Available";
+    status = profile.verified || false;
+    workImages = profile.hiswork || [];
+    if (profile.verified) {
       verifiedStatus = "Verified by Admin";
       statusClass = "bg-green-100 text-green-600";
-    } else if (profile.data.rejected) {
+    } else if (profile.rejected) {
       verifiedStatus = "Rejected";
       statusClass = "bg-red-100 text-red-600";
     } else {
       verifiedStatus = "Pending";
       statusClass = "bg-yellow-100 text-yellow-600";
     }
-    age = profile.data.age || "N/A";
-    gender = profile.data.gender || "N/A";
+    age = profile.age || "N/A";
+    gender = profile.gender || "N/A";
 
     element =
       document !== "Not Available" ? (
@@ -395,7 +402,7 @@ export default function Details() {
       !profile?.data?.skill ||
       !profile?.data?.category_id ||
       !profile?.data?.subcategory_ids?.length ||
-      !profile?.data?.documents
+      !profile?.data?.documents?.length // Ensure documents is an array with at least one item
     ) {
       return false;
     }
@@ -444,7 +451,6 @@ export default function Details() {
     }
   };
 
-  // Slider settings for react-slick
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -480,7 +486,6 @@ export default function Details() {
           Back
         </Link>
       </div>
-      {/* Banner Slider */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -495,11 +500,11 @@ export default function Details() {
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner || "/src/assets/profile/default.png"}
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = "/src/assets/profile/default.png";
                   }}
                 />
               </div>

@@ -66,9 +66,9 @@ export const fetchUserProfile = createAsyncThunk(
   "user/fetchUserProfile",
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("bharat_token");
-    if (!token) {
-      return rejectWithValue("No token found, user not logged in");
-    }
+    // if (!token) {
+    //   return rejectWithValue("No token found, user not logged in");
+    // }
 
     try {
       const res = await fetch(`${BASE_URL}/user/getUserProfileData`, {

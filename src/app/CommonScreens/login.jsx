@@ -24,57 +24,7 @@ export default function LoginPage() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
 
-  // Fetch banner images
-  // const fetchBannerImages = async () => {
-  //   try {
-  //     const token = localStorage.getItem("bharat_token");
-  //     if (!token) {
-  //       throw new Error("No authentication token found");
-  //     }
-
-  //     const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = await res.json();
-  //     console.log("Banner API response:", data); // Debug response
-
-  //     if (res.ok) {
-  //       if (Array.isArray(data.images) && data.images.length > 0) {
-  //         setBannerImages(data.images);
-  //       } else {
-  //         setBannerImages([]);
-  //         setBannerError("No banners available");
-  //       }
-  //     } else {
-  //       const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
-  //       console.error("Failed to fetch banner images:", errorMessage);
-  //       setBannerError(errorMessage);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching banner images:", err.message);
-  //     setBannerError(err.message);
-  //   } finally {
-  //     setBannerLoading(false);
-  //   }
-  // };
-
-  // Notification permission and banner fetch on load
-  // useEffect(() => {
-  //   if (Notification.permission === "default") {
-  //     Notification.requestPermission().then((permission) => {
-  //       if (permission === "granted") setPermissionGranted(true);
-  //     });
-  //   } else if (Notification.permission === "granted") {
-  //     setPermissionGranted(true);
-  //   }
-
-  //   fetchBannerImages();
-  // }, []);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -197,37 +147,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Banner Slider
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
-        ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
-          </p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
-                <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
-                  }}
-                />
-              </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
-        )}
-      </div> */}
+      
 
       <div className="mt-[50px]">
         <Footer />

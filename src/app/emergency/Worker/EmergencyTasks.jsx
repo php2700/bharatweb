@@ -83,11 +83,13 @@ export default function EmergencyTasks() {
           }
         );
 
+        const data = await response.json(); // Parse JSON response
+
         if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`);
+          // Handle non-200 responses
+          throw new Error(data.message || `API request failed with status ${response.status}`);
         }
 
-        const data = await response.json();
         console.log("Fetched tasks:", data);
         const transformedData = data.data.map((item) => ({
           id: item._id,
@@ -106,8 +108,8 @@ export default function EmergencyTasks() {
         setTasks(transformedData);
         setError(null);
       } catch (error) {
-        console.error("Error fetching tasks:", error);
-        setError("Failed to load tasks. Please try again later.");
+        console.error("Error fetching tasks:", error.message);
+        setError(error.message || "Failed to load tasks. Please try again later.");
       } finally {
         setLoading(false);
       }

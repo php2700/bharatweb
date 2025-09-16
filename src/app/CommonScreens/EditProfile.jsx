@@ -34,11 +34,10 @@ export default function EditProfile() {
     documents: [], // Changed to array to store multiple documents
     age: '',
     gender: '',
-    willingToVisit: "", // For user tab
-    willingToCallCustomer: "", // For worker tab
-    shopAddress: { title: "", landmark: "", address: "", latitude: null, longitude: null },
+    // willingToVisit: "", // For user tab
+    // willingToCallCustomer: "", // For worker tab
+    // shopAddress: { title: "", landmark: "", address: "", latitude: null, longitude: null },
   });
-
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [documentPreviews, setDocumentPreviews] = useState([]); // Changed to array for multiple previews
@@ -70,9 +69,9 @@ export default function EditProfile() {
         subcategory: profile.data.subcategory_ids || [],
         age: profile.data.age || '',
         gender: profile.data.gender || '',
-        willingToVisit: profile.data.willing_to_visit || "",
-        willingToCallCustomer: profile.data.willing_to_call_customer || "",
-        shopAddress: profile.data.shop_address || { title: "", landmark: "", address: "", latitude: null, longitude: null },
+        // willingToVisit: profile.data.willing_to_visit || "",
+        // willingToCallCustomer: profile.data.willing_to_call_customer || "",
+        // shopAddress: profile.data.shop_address || { title: "", landmark: "", address: "", latitude: null, longitude: null },
         documents: [], // Initialize as empty; server documents handled below
       }));
 
@@ -312,7 +311,7 @@ export default function EditProfile() {
       toast.error("Something went wrong!");
     }
   };
-
+   console.log("form", formData);
   // Remove document
   const handleRemoveDocument = async (index, url) => {
     // If document is a new upload (not yet saved to server)
@@ -361,14 +360,14 @@ export default function EditProfile() {
     e.preventDefault();
 
     if (!formData.name.trim()) return toast.error("Name is required!");
-    if (!formData.about.trim() && activeTab !== "user")
-      return toast.error("Skill is required!");
-    if (activeTab === "user" && !formData.willingToVisit)
-      return toast.error("Please select if you are willing to visit the service provider's shop!");
-    if (activeTab === "worker" && !formData.willingToCallCustomer)
-      return toast.error("Please select if you are willing to call the customer to your shop!");
-    if (activeTab === "worker" && formData.willingToCallCustomer === "yes" && !formData.shopAddress.address)
-      return toast.error("Shop address is required!");
+    // if (!formData.about.trim() && activeTab !== "user")
+    //   return toast.error("Skill is required!");
+    // if (activeTab === "user" && !formData.willingToVisit)
+    //   return toast.error("Please select if you are willing to visit the service provider's shop!");
+    // if (activeTab === "worker" && !formData.willingToCallCustomer)
+    //   return toast.error("Please select if you are willing to call the customer to your shop!");
+    // if (activeTab === "worker" && formData.willingToCallCustomer === "yes" && !formData.shopAddress.address)
+    //   return toast.error("Shop address is required!");
 
     try {
       const token = localStorage.getItem("bharat_token");
@@ -380,19 +379,17 @@ export default function EditProfile() {
         if (!formData.age) return toast.error("Age is required!");
         const fd = new FormData();
         formData.documents.forEach((doc, index) => {
-          fd.append(`documents[${index}]`, doc);
+          fd.append(`document`, doc);
         });
         fd.append("category_id", formData.category);
-        formData.subcategory.forEach((sub) =>
-          fd.append("subcategory_ids[]", sub)
-        );
+        fd.append("subcategory_ids", JSON.stringify(formData.subcategory));
         fd.append("skill", formData.about);
         fd.append("age", formData.age);
         fd.append("gender", formData.gender);
-        fd.append("willing_to_call_customer", formData.willingToCallCustomer);
-        if (formData.willingToCallCustomer === "yes") {
-          fd.append("shop_address", JSON.stringify(formData.shopAddress));
-        }
+        // fd.append("willing_to_call_customer", formData.willingToCallCustomer);
+        // if (formData.willingToCallCustomer === "yes") {
+        //   fd.append("shop_address", JSON.stringify(formData.shopAddress));
+        // }
 
         const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
           method: "PUT",
