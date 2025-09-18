@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AddressIcon from "../assets/location.svg";
 import Profile from "../assets/profile.svg";
 import Logout from "../assets/logout.svg";
 import Account from "../assets/account.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserProfile } from "../redux/userSlice";
-import { useNavigate } from "react-router-dom";
+import { fetchUserProfile, clearUserProfile } from "../redux/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Notification from "../assets/notifications.svg";
@@ -60,22 +59,35 @@ export default function Header() {
   const [selectedAddress, setSelectedAddress] = useState("Location");
   const markerRef = useRef(null);
   const addressDropdownRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const isLoggedIn = !!localStorage.getItem("bharat_token");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { profile, loading, error } = useSelector((state) => state.user);
+  const { notifications: reduxNotifications } = useSelector(
+    (state) => state.emergency
+  );
 
   let homeLink = "/";
   if (isLoggedIn) {
     homeLink = role === "service_provider" ? "/homeservice" : "/homeuser";
   }
 
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const dispatch = useDispatch();
-  const { profile, loading } = useSelector((state) => state.user);
-  const { notifications: reduxNotifications } = useSelector(
-    (state) => state.emergency
-  );
+  // Handle unauthorized access (401)
+  const handleUnauthorized = () => {
+    console.log("handleUnauthorized: Clearing localStorage and redirecting to login");
+    localStorage.removeItem("bharat_token");
+    localStorage.removeItem("isProfileComplete");
+    localStorage.removeItem("role");
+    localStorage.removeItem("otp");
+    localStorage.removeItem("selectedAddressId");
+    dispatch(clearUserProfile());
+    toast.error("Session expired, please log in again");
+    navigate("/login");
+  };
 
   // Prevent body scrolling when modal is open
   useEffect(() => {
@@ -89,7 +101,7 @@ export default function Header() {
     };
   }, [isModalOpen]);
 
-  // Outside click handler
+  // Outside click handler for dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -107,31 +119,55 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch user profile and addresses
+  // Fetch user profile only if logged in and profile is not already loaded
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && !profile && !loading && !error) {
+      const token = localStorage.getItem("bharat_token");
+      console.log("useEffect: fetchUserProfile triggered, token:", token ? token.slice(0, 10) + "..." : "null");
       dispatch(fetchUserProfile()).then((result) => {
-        if (result.payload?.data?.full_address) {
-          setSavedAddresses(result.payload.data.full_address);
-          const savedIndex = parseInt(localStorage.getItem("selectedAddressId")) || 0;
-          if (result.payload.data.full_address.length > 0) {
-            const defaultAddress = result.payload.data.full_address[savedIndex] || result.payload.data.full_address[0];
-            setSelectedAddress(defaultAddress.title || defaultAddress.address);
-            setSelectedAddressId(savedIndex);
+        if (fetchUserProfile.fulfilled.match(result)) {
+          console.log("useEffect: fetchUserProfile succeeded");
+          if (result.payload?.full_address) {
+            setSavedAddresses(result.payload.full_address);
+            const savedIndex = parseInt(localStorage.getItem("selectedAddressId")) || 0;
+            if (result.payload.full_address.length > 0) {
+              const defaultAddress = result.payload.full_address[savedIndex] || result.payload.full_address[0];
+              setSelectedAddress(defaultAddress.title || defaultAddress.address);
+              setSelectedAddressId(savedIndex);
+            }
+          }
+        } else if (fetchUserProfile.rejected.match(result)) {
+          console.log("useEffect: fetchUserProfile failed:", result.payload);
+          toast.error(result.payload || "Failed to fetch user profile");
+          if (result.payload === "Session expired, please log in again") {
+            handleUnauthorized();
           }
         }
       });
     }
-  }, [dispatch, isLoggedIn]);
+  }, [dispatch, isLoggedIn, profile, loading, error]);
 
-  // Fetch notifications
+  // Fetch notifications only if logged in
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         setIsNotifLoading(true);
         const token = localStorage.getItem("bharat_token");
-        if (!token) return;
+        if (!token) {
+          console.log("fetchNotifications: No token found, skipping API call");
+          setNotifError("User not logged in");
+          toast.error("Please log in to view notifications");
+          return;
+        }
 
+        // Basic token format validation (e.g., expecting JWT-like structure)
+        if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
+          console.log("fetchNotifications: Invalid token format, clearing token");
+          handleUnauthorized();
+          return;
+        }
+
+        console.log("fetchNotifications: Attempting API call with token:", token.slice(0, 10) + "...");
         const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
           method: "GET",
           headers: {
@@ -140,6 +176,7 @@ export default function Header() {
         });
         const data = await res.json();
         if (res.ok && data.success) {
+          console.log("fetchNotifications: Success, data received");
           const combinedNotifications = [
             ...reduxNotifications,
             ...(data.data || []),
@@ -147,10 +184,16 @@ export default function Header() {
           setNotifications(combinedNotifications);
           setNotificationCount(combinedNotifications.length);
         } else {
+          console.log("fetchNotifications: Failed with status", res.status, data?.message);
+          if (res.status === 401) {
+            handleUnauthorized();
+            return;
+          }
           setNotifError(data.message || "Failed to fetch notifications");
           toast.error(data.message || "Failed to fetch notifications");
         }
       } catch (err) {
+        console.error("fetchNotifications: Error:", err.message);
         setNotifError("Something went wrong while fetching notifications");
         toast.error("Something went wrong while fetching notifications");
       } finally {
@@ -159,8 +202,10 @@ export default function Header() {
     };
 
     if (isLoggedIn) {
+      console.log("useEffect: fetchNotifications triggered");
       fetchNotifications();
     } else {
+      console.log("useEffect: Not logged in, using reduxNotifications");
       setNotifications(reduxNotifications);
       setNotificationCount(reduxNotifications.length);
     }
@@ -286,6 +331,12 @@ export default function Header() {
 
     try {
       const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        console.log("handleSaveLocation: No token found, redirecting to login");
+        handleUnauthorized();
+        return;
+      }
+
       const newAddress = {
         title: currentAddress.title,
         landmark: currentAddress.landmark,
@@ -311,7 +362,7 @@ export default function Header() {
         },
         body: JSON.stringify({
           full_address: updatedAddresses,
-          location: newAddress, // Set the new or edited address as the primary location
+          location: newAddress,
         }),
       });
       const data = await response.json();
@@ -323,9 +374,13 @@ export default function Header() {
         setSelectedAddress(newAddress.title || newAddress.address);
         localStorage.setItem("selectedAddressId", newIndex);
         setEditingAddress(null);
-        // Re-fetch profile to ensure synchronization
         dispatch(fetchUserProfile());
       } else {
+        if (response.status === 401) {
+          console.log("handleSaveLocation: 401 Unauthorized, redirecting to login");
+          handleUnauthorized();
+          return;
+        }
         toast.error(data.message || "Failed to update location");
       }
     } catch (err) {
@@ -361,6 +416,12 @@ export default function Header() {
   const handleSaveChanges = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        console.log("handleSaveChanges: No token found, redirecting to login");
+        handleUnauthorized();
+        return;
+      }
+
       const response = await fetch(`${BASE_URL}/user/updateUserProfile`, {
         method: "POST",
         headers: {
@@ -376,9 +437,13 @@ export default function Header() {
       if (response.ok) {
         toast.success("Profile updated successfully!");
         setIsAddressDropdownOpen(false);
-        // Re-fetch profile to ensure synchronization
         dispatch(fetchUserProfile());
       } else {
+        if (response.status === 401) {
+          console.log("handleSaveChanges: 401 Unauthorized, redirecting to login");
+          handleUnauthorized();
+          return;
+        }
         toast.error(data.message || "Failed to update profile");
       }
     } catch (err) {
@@ -390,15 +455,9 @@ export default function Header() {
   if (!isLoggedIn) fullName = null;
 
   const logoutdestroy = () => {
-    localStorage.removeItem("bharat_token");
-    localStorage.removeItem("isProfileComplete");
-    localStorage.removeItem("role");
-    localStorage.removeItem("otp");
-    localStorage.removeItem("selectedAddressId");
-    navigate("/login");
+    console.log("logoutdestroy: Logging out and clearing localStorage");
+    handleUnauthorized();
   };
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Group notifications
   const groupedNotifications = notifications.reduce((acc, notif) => {

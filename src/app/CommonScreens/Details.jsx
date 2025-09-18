@@ -42,8 +42,8 @@ export default function Details() {
   const [bannerError, setBannerError] = useState(null);
 
   let verification = false;
-  if (profile && profile.data) {
-    verification = profile.data.verified;
+  if (profile) {
+    verification = profile.verified;
   }
 
   const getUserId = () => {
@@ -66,7 +66,6 @@ export default function Details() {
       });
 
       const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
 
       if (res.ok) {
         if (Array.isArray(data.images) && data.images.length > 0) {
@@ -115,70 +114,63 @@ export default function Details() {
         })
       );
     }
-  }, [activeTab, profile?.data?.verified]);
+  }, [activeTab, profile?.data?.verified, dispatch]);
 
   useEffect(() => {
-    console.log("Profile data:", profile); // Debug profile data
     if (activeTab !== "Worker") return;
 
-    if (!profile?.data?.verified) {
-      if (profile?.data?.rejected) {
-        console.log("Profile rejected, showing rejection alert");
-        Swal.fire({
-          title: "Oops! Admin rejected your profile",
-          text: "Please fill details properly.",
-          icon: "error",
-          confirmButtonColor: "#228B22",
-          confirmButtonText: "Go to Edit Profile",
-        }).then(() => {
-          toast.dismiss();
-          navigate("/editprofile", { state: { activeTab: "worker" } });
-          setActiveTab("user");
-          dispatch(selectRole("user"));
-          localStorage.setItem("role", "user");
-        });
-      } else if (!validateWorkerProfile()) {
-        console.log("Profile incomplete, showing incomplete alert");
-        console.log({
-          full_name: profile?.data?.full_name,
-          skill: profile?.data?.skill,
-          category_id: profile?.data?.category_id,
-          subcategory_ids: profile?.data?.subcategory_ids,
-          documents: profile?.data?.documents,
-        }); // Debug which fields are missing
-        Swal.fire({
-          title: "Your Worker profile is not completed",
-          text: "Please complete your profile to access the Worker tab.",
-          icon: "warning",
-          confirmButtonColor: "#228B22",
-          confirmButtonText: "Go to Edit Profile",
-        }).then(() => {
-          toast.dismiss();
-          navigate("/editprofile", { state: { activeTab: "worker" } });
-          setActiveTab("user");
-          dispatch(selectRole("user"));
-          localStorage.setItem("role", "user");
-        });
-      } else {
-        console.log("Profile complete but unverified, showing pending alert");
-        Swal.fire({
-          title: "Verification Pending",
-          text: "Your verification by admin is pending, it will take 2-3 days.",
-          icon: "info",
-          confirmButtonColor: "#228B22",
-          confirmButtonText: "OK",
-        }).then(() => {
-          toast.dismiss();
-          requestRoleUpgrade();
-          setActiveTab("user");
-          dispatch(selectRole("user"));
-          localStorage.setItem("role", "user");
-        });
-      }
-    } else {
+    if (profile?.data?.verified) {
       console.log("Profile verified, allowing Worker tab access");
+      setActiveTab("Worker");
+      dispatch(selectRole("service_provider"));
+      localStorage.setItem("role", "service_provider");
+    } else if (profile?.data?.rejected) {
+      console.log("Profile rejected, showing rejection alert");
+      Swal.fire({
+        title: "Oops! Admin rejected your profile",
+        text: "Please fill details properly.",
+        icon: "error",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "Go to Edit Profile",
+      }).then(() => {
+        toast.dismiss();
+        navigate("/editprofile", { state: { activeTab: "worker" } });
+        setActiveTab("user");
+        dispatch(selectRole("user"));
+        localStorage.setItem("role", "user");
+      });
+    } else if (!validateWorkerProfile()) {
+      console.log("Profile incomplete, showing incomplete alert");
+      Swal.fire({
+        title: "Your Worker profile is not completed",
+        text: "Please complete your profile to access the Worker tab.",
+        icon: "warning",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "Go to Edit Profile",
+      }).then(() => {
+        toast.dismiss();
+        navigate("/editprofile", { state: { activeTab: "worker" } });
+        setActiveTab("user");
+        dispatch(selectRole("user"));
+        localStorage.setItem("role", "user");
+      });
+    } else {
+      console.log("Profile complete but unverified, showing pending alert");
+      Swal.fire({
+        title: "Verification Pending",
+        text: "Your verification by admin is pending, it will take 2-3 days.",
+        icon: "info",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      }).then(() => {
+        toast.dismiss();
+        requestRoleUpgrade();
+        setActiveTab("user");
+        dispatch(selectRole("user"));
+        localStorage.setItem("role", "user");
+      });
     }
-  }, [activeTab, profile, navigate]);
+  }, [activeTab, profile, navigate, dispatch]);
 
   let full_name = "N/A";
   let address = "N/A";
@@ -402,7 +394,7 @@ export default function Details() {
       !profile?.data?.skill ||
       !profile?.data?.category_id ||
       !profile?.data?.subcategory_ids?.length ||
-      !profile?.data?.documents?.length // Ensure documents is an array with at least one item
+      !profile?.data?.documents?.length
     ) {
       return false;
     }
@@ -441,13 +433,7 @@ export default function Details() {
       dispatch(selectRole("user"));
       localStorage.setItem("role", "user");
     } else if (newTab === "Worker") {
-      if (validateWorkerProfile() && profile?.data?.verified) {
-        setActiveTab("Worker");
-        dispatch(selectRole("service_provider"));
-        localStorage.setItem("role", "service_provider");
-      } else {
-        setActiveTab("Worker");
-      }
+      setActiveTab("Worker"); // Validation is handled in useEffect
     }
   };
 

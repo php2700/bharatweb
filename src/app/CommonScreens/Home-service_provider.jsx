@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Hiring from "../../assets/Home-SP/hiring1.png";
@@ -563,12 +563,6 @@ export default function ServiceProviderHome() {
                             alt={capitalizeFirst(card.work)}
                             className="w-full h-36 object-cover rounded-2xl"
                           />
-                          {/* <div
-                            className="absolute bottom-2 right-2 px-4 py-1 rounded-full text-white text-sm"
-                            style={{ backgroundColor: "#372E27" }}
-                          >
-                            Add Feature
-                          </div> */}
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">{capitalizeFirst(card.work)}</h3>
