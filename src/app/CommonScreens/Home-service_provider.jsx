@@ -133,7 +133,7 @@ export default function ServiceProviderHome() {
       if (res.ok) {
         if (Array.isArray(data.data)) {
           setBidding(data.data.map(item => ({
-            image: item.image_url ? `${IMAGE_URL}/${item.image_url}` : Bidding,
+            image: item.image_urls ? `${IMAGE_URL}/${item.image_url}` : Bidding,
             work: item.title || "Make a chair",
             description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
             amount: item.platform_fee || "₹200",

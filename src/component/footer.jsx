@@ -49,27 +49,27 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
               <li>
-                <Link to={homeLink} className="hover:text-white">
+                <Link to={homeLink} className="font-bold hover:text-white">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/aboutus" className="hover:text-white">
+                <Link to="/aboutus" className="font-bold hover:text-white">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/ourservices" className="hover:text-white">
+                <Link to="/ourservices" className="font-bold hover:text-white">
                   Services
                 </Link>
               </li>
               <li>
-                <Link to="/subscription" className="hover:text-white">
+                <Link to="/subscription" className="font-bold hover:text-white">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="/customer-care" className="hover:text-white">
+                <Link to="/customer-care" className="font-bold hover:text-white">
                   Contact Us
                 </Link>
               </li>
@@ -83,17 +83,17 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
               <li>
-                <Link to="/help-faq" className="hover:text-white">
+                <Link to="/help-faq" className="font-bold hover:text-white">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link to="/term-condition" className="hover:text-white">
+                <Link to="/term-condition" className="font-bold hover:text-white">
                   Terms of Services
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="hover:text-white">
+                <Link to="/privacy-policy" className="font-bold hover:text-white">
                   Privacy Policy
                 </Link>
               </li>

@@ -93,6 +93,23 @@ export default function EditProfile() {
     navigate("/login");
   };
 
+  // Validate URL accessibility - Modified to skip validation in local development to avoid CORS issues
+  const isValidUrl = async (url) => {
+    // Bypass validation for localhost to avoid CORS errors during development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log(`Skipping URL validation for ${url} in local development`);
+      return true; // Assume valid in dev
+    }
+
+    try {
+      const response = await fetch(url, { method: "HEAD" });
+      return response.ok;
+    } catch (error) {
+      console.error(`Failed to validate URL ${url}:`, error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("bharat_token");
     if (token && token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
@@ -115,90 +132,83 @@ export default function EditProfile() {
       const selectedAddressIndex = parseInt(localStorage.getItem("selectedAddressId")) || 0;
       const selectedAddress = profile.full_address?.[selectedAddressIndex] || {};
 
-      // Process documents: Extract URLs from profile.documents[i].images and documentNames
-      const validDocuments = [];
-      const validPreviews = [];
-      (profile.documents || []).forEach((doc) => {
-        if (doc && Array.isArray(doc.images)) {
-          doc.images.forEach((image) => {
-            if (typeof image === "string" && image.trim() && !["null", "undefined"].includes(image.toLowerCase())) {
-              validDocuments.push({ documentName: doc.documentName || "unknown", images: [image] });
-              validPreviews.push(image);
+      // Process documents: Extract valid URLs and documentNames - Modified to handle CORS gracefully
+      const processDocuments = async () => {
+        const validDocuments = [];
+        const validPreviews = [];
+        const seenUrls = new Set(); // Track unique URLs to avoid duplicates
+        const inaccessibleDocs = []; // Track inaccessible docs for user notification
+
+        for (const [index, doc] of (profile.documents || []).entries()) {
+          console.log(`Processing profile document ${index}:`, doc);
+          if (doc && Array.isArray(doc.images) && doc.images.length > 0) {
+            for (const image of doc.images) {
+              if (
+                typeof image === "string" &&
+                image.trim() &&
+                !["null", "undefined"].includes(image.toLowerCase()) &&
+                !seenUrls.has(image)
+              ) {
+                // Validate URL before adding
+                const isAccessible = await isValidUrl(image);
+                if (isAccessible) {
+                  validDocuments.push({ documentName: doc.documentName || "unknown", images: [image] });
+                  validPreviews.push(image);
+                  seenUrls.add(image);
+                } else {
+                  console.warn(`Skipping inaccessible URL: ${image}`);
+                  inaccessibleDocs.push({ docName: doc.documentName || "unknown", url: image });
+                }
+              } else {
+                console.warn(`Invalid or duplicate image in document ${index}:`, image);
+              }
             }
-          });
-        }
-      });
-
-      console.log("Profile documents:", profile.documents);
-
-      // Map isShop to hasShop and businessAddress to shopAddress/shopFullAddress
-      const hasShop = profile.isShop ? "yes" : "no";
-      const shopAddress = profile.businessAddress?.address || "";
-      const shopFullAddress = profile.businessAddress?.address
-        ? [{
-            title: "Shop",
-            landmark: "",
-            address: profile.businessAddress.address,
-            latitude: profile.businessAddress.latitude,
-            longitude: profile.businessAddress.longitude,
-          }]
-        : [];
-
-      setFormData((prev) => ({
-        ...prev,
-        name: profile.full_name || "",
-        about: profile.skill || "",
-        category: profile.category_id || "",
-        subcategory: profile.subcategory_ids || [],
-        age: profile.age?.toString() || "",
-        gender: profile.gender || "",
-        address: selectedAddress.address || "",
-        full_address: profile.full_address || [],
-        documents: validDocuments,
-        willingToVisitShop: profile.willingToVisitShop || "",
-        hasShop,
-        shopAddress,
-        shopFullAddress,
-      }));
-      console.log("form",formData);
-      // Set document previews
-      setDocumentPreviews(validPreviews);
-
-      if (profile.profilePic) {
-        setProfilePic(profile.profilePic);
-      }
-
-      if (profile.category_id) {
-        const fetchSubcategories = async () => {
-          try {
-            const token = localStorage.getItem("bharat_token");
-            if (!token) {
-              console.log("fetchSubcategories: No token, redirecting to login");
-              handleUnauthorized();
-              return;
-            }
-            const res = await fetch(`${BASE_URL}/subcategories/${profile.category_id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const data = await res.json();
-            if (res.ok) {
-              setSubcategories(
-                (data.data || []).map((sub) => ({
-                  value: sub._id,
-                  label: sub.name,
-                }))
-              );
-            } else if (res.status === 401) {
-              console.log("fetchSubcategories: 401 Unauthorized, redirecting to login");
-              handleUnauthorized();
-            }
-          } catch (error) {
-            console.error("Error fetching subcategories:", error);
-            toast.error("Failed to fetch subcategories", { toastId: "fetchSubcategoriesError" });
+          } else {
+            console.warn(`Profile document ${index} is invalid or empty:`, doc);
           }
-        };
-        fetchSubcategories();
-      }
+        }
+
+        console.log("Profile documents:", profile.documents);
+        console.log("Valid documents:", validDocuments);
+        console.log("Valid previews:", validPreviews);
+
+        // Notify user about inaccessible documents if any
+        if (inaccessibleDocs.length > 0) {
+          toast.error(
+            `The following documents are inaccessible and will not be displayed: ${inaccessibleDocs.map(d => d.docName).join(', ')}. Please re-upload them.`,
+            { toastId: "inaccessibleDocumentsError" }
+          );
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          name: profile.full_name || "",
+          about: profile.skill || "",
+          category: profile.category_id || "",
+          subcategory: profile.subcategory_ids || [],
+          age: profile.age?.toString() || "",
+          gender: profile.gender || "",
+          address: selectedAddress.address || "",
+          full_address: profile.full_address || [],
+          documents: validDocuments,
+          willingToVisitShop: profile.willingToVisitShop || "",
+          hasShop: profile.isShop ? "yes" : "no",
+          shopAddress: profile.businessAddress?.address || "",
+          shopFullAddress: profile.businessAddress?.address
+            ? [{
+                title: "Shop",
+                landmark: "",
+                address: profile.businessAddress.address,
+                latitude: profile.businessAddress.latitude,
+                longitude: profile.businessAddress.longitude,
+              }]
+            : [],
+        }));
+
+        setDocumentPreviews(validPreviews);
+      };
+
+      processDocuments();
     }
   }, [profile]);
 
@@ -487,7 +497,7 @@ export default function EditProfile() {
 
       if (!url || typeof url !== "string") {
         console.error("Invalid URL:", url);
-        // Remove invalid document from all arrays
+        // Remove invalid document from local state
         const updatedDocs = formData.documents.filter((_, i) => i !== index);
         const updatedPreviews = documentPreviews.filter((_, i) => i !== index);
 
@@ -533,7 +543,7 @@ export default function EditProfile() {
             return;
           }
           console.error("Server error removing document:", data.message);
-          toast.error(data.message || "Failed to remove document.", { toastId: "removeDocumentError" });
+          toast.error(data.message || "Failed to remove document. Please try again.", { toastId: "removeDocumentError" });
           return;
         }
 
@@ -605,183 +615,183 @@ export default function EditProfile() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Validate required fields
-  if (!formData.name.trim()) return toast.error("Name is required!", { toastId: "nameRequiredError" });
-  if (!formData.age) return toast.error("Age is required!", { toastId: "ageRequiredError" });
-  if (!formData.gender) return toast.error("Gender is required!", { toastId: "genderRequiredError" });
-  if (!formData.address.trim()) return toast.error("Address is required!", { toastId: "addressRequiredError" });
-  if (activeTab === "user" && !formData.willingToVisitShop) {
-    return toast.error("Please select if you are willing to visit the shop!", { toastId: "willingToVisitShopError" });
-  }
-  if (activeTab === "worker") {
-    if (!formData.category) return toast.error("Category is required!", { toastId: "categoryRequiredError" });
-    if (!formData.subcategory.length) return toast.error("Select at least one subcategory!", { toastId: "subcategoryRequiredError" });
-    if (!formData.documents.length) return toast.error("At least one document is required for worker profile!", { toastId: "documentsRequiredError" });
-    if (!formData.hasShop) return toast.error("Please select if you have a shop!", { toastId: "hasShopError" });
-    if (formData.hasShop === "yes" && !formData.shopAddress.trim()) {
-      return toast.error("Shop address is required if you have a shop!", { toastId: "shopAddressError" });
+    // Validate required fields
+    if (!formData.name.trim()) return toast.error("Name is required!", { toastId: "nameRequiredError" });
+    if (!formData.age) return toast.error("Age is required!", { toastId: "ageRequiredError" });
+    if (!formData.gender) return toast.error("Gender is required!", { toastId: "genderRequiredError" });
+    if (!formData.address.trim()) return toast.error("Address is required!", { toastId: "addressRequiredError" });
+    if (activeTab === "user" && !formData.willingToVisitShop) {
+      return toast.error("Please select if you are willing to visit the shop!", { toastId: "willingToVisitShopError" });
     }
-  }
-
-  try {
-    const token = localStorage.getItem("bharat_token");
-    if (!token) {
-      console.log("handleSubmit: No token, redirecting to login");
-      handleUnauthorized();
-      return;
-    }
-
     if (activeTab === "worker") {
-      const fd = new FormData();
-
-      console.log("FormData before submission:", {
-        name: formData.name,
-        category: formData.category,
-        subcategory: formData.subcategory,
-        skill: formData.about,
-        age: formData.age,
-        gender: formData.gender,
-        full_address: formData.full_address,
-        documents: formData.documents,
-        isShop: formData.hasShop === "yes",
-        businessAddress: formData.shopFullAddress[0] || {},
-      });
-
-      // Send all documents (new files and existing URLs)
-      const existingDocs = [];
-      formData.documents.forEach((doc, index) => {
-        console.log(`Processing document ${index}:`, { documentName: doc.documentName, image: doc.images[0] });
-        if (doc.images[0] instanceof File) {
-          fd.append("documents", doc.images[0]);
-          fd.append("documentTypes[]", doc.documentName || "unknown");
-        } else if (typeof doc.images[0] === "string" && doc.images[0].trim()) {
-          existingDocs.push({
-            documentName: doc.documentName || "unknown",
-            image: doc.images[0],
-          });
-        }
-      });
-
-      // Append existing documents as JSON
-      if (existingDocs.length > 0) {
-        fd.append("existingDocuments", JSON.stringify(existingDocs));
+      if (!formData.category) return toast.error("Category is required!", { toastId: "categoryRequiredError" });
+      if (!formData.subcategory.length) return toast.error("Select at least one subcategory!", { toastId: "subcategoryRequiredError" });
+      if (!formData.documents.length) return toast.error("At least one document is required for worker profile!", { toastId: "documentsRequiredError" });
+      if (!formData.hasShop) return toast.error("Please select if you have a shop!", { toastId: "hasShopError" });
+      if (formData.hasShop === "yes" && !formData.shopAddress.trim()) {
+        return toast.error("Shop address is required if you have a shop!", { toastId: "shopAddressError" });
       }
-
-      fd.append("category_id", formData.category);
-      fd.append("subcategory_ids", JSON.stringify(formData.subcategory));
-      fd.append("skill", formData.about);
-      fd.append("age", formData.age);
-      fd.append("gender", formData.gender);
-      fd.append("full_address", JSON.stringify(formData.full_address));
-      fd.append("isShop", formData.hasShop === "yes");
-      if (formData.hasShop === "yes" && formData.shopFullAddress.length > 0) {
-        fd.append("businessAddress", JSON.stringify(formData.shopFullAddress[0]));
-      }
-
-      for (let [key, value] of fd.entries()) {
-        console.log(`FormData entry: ${key}=${value}`);
-      }
-
-      const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-
-      const data = await res.json();
-      console.log("Server response (updateUserDetails):", data);
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          console.log("handleSubmit: 401 Unauthorized, redirecting to login");
-          handleUnauthorized();
-          return;
-        }
-        return toast.error(data.message || "Failed to update worker profile.", { toastId: "updateUserDetailsError" });
-      }
-
-      // Refresh profile data after successful submission
-      await dispatch(fetchUserProfile());
-
-      const payload = {
-        full_name: formData.name,
-        full_address: formData.full_address,
-      };
-      const resName = await fetch(`${BASE_URL}/user/updateUserProfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const dataName = await resName.json();
-      console.log("Server response (updateUserProfile):", dataName);
-
-      if (!resName.ok) {
-        if (resName.status === 401) {
-          console.log("handleSubmit: 401 Unauthorized, redirecting to login");
-          handleUnauthorized();
-          return;
-        }
-        return toast.error(dataName.message || "Failed to update name.", { toastId: "updateUserProfileError" });
-      }
-
-      toast.success("Worker profile updated successfully!", {
-        toastId: "updateWorkerSuccess",
-        onClose: () => setTimeout(() => navigate("/details"), 500),
-      });
     }
 
-    if (activeTab === "user") {
-      const payload = {
-        full_name: formData.name,
-        skill: formData.about,
-        age: formData.age,
-        gender: formData.gender,
-        full_address: formData.full_address,
-        willingToVisitShop: formData.willingToVisitShop,
-      };
-
-      console.log("User profile payload:", payload);
-
-      const res = await fetch(`${BASE_URL}/user/updateUserProfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      console.log("Server response (user profile):", data);
-
-      if (!res.ok) {
-        if (res.status === 401) {
-          console.log("handleSubmit: 401 Unauthorized, redirecting to login");
-          handleUnauthorized();
-          return;
-        }
-        return toast.error(data.message || "Failed to update user profile.", { toastId: "updateUserProfileError" });
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        console.log("handleSubmit: No token, redirecting to login");
+        handleUnauthorized();
+        return;
       }
 
-      // Refresh profile data after successful submission
-      await dispatch(fetchUserProfile());
+      if (activeTab === "worker") {
+        const fd = new FormData();
 
-      toast.success("User profile updated successfully!", {
-        toastId: "updateUserSuccess",
-        onClose: () => setTimeout(() => navigate("/details"), 500),
-      });
+        console.log("FormData before submission:", {
+          name: formData.name,
+          category: formData.category,
+          subcategory: formData.subcategory,
+          skill: formData.about,
+          age: formData.age,
+          gender: formData.gender,
+          full_address: formData.full_address,
+          documents: formData.documents,
+          isShop: formData.hasShop === "yes",
+          businessAddress: formData.shopFullAddress[0] || {},
+        });
+
+        // Send all documents (new files and existing URLs)
+        const existingDocs = [];
+        formData.documents.forEach((doc, index) => {
+          console.log(`Processing document ${index}:`, { documentName: doc.documentName, image: doc.images[0] });
+          if (doc.images[0] instanceof File) {
+            fd.append("documents", doc.images[0]);
+            fd.append("documentTypes[]", doc.documentName || "unknown");
+          } else if (typeof doc.images[0] === "string" && doc.images[0].trim()) {
+            existingDocs.push({
+              documentName: doc.documentName || "unknown",
+              image: doc.images[0],
+            });
+          }
+        });
+
+        // Append existing documents as JSON
+        if (existingDocs.length > 0) {
+          fd.append("existingDocuments", JSON.stringify(existingDocs));
+        }
+
+        fd.append("category_id", formData.category);
+        fd.append("subcategory_ids", JSON.stringify(formData.subcategory));
+        fd.append("skill", formData.about);
+        fd.append("age", formData.age);
+        fd.append("gender", formData.gender);
+        fd.append("full_address", JSON.stringify(formData.full_address));
+        fd.append("isShop", formData.hasShop === "yes");
+        if (formData.hasShop === "yes" && formData.shopFullAddress.length > 0) {
+          fd.append("businessAddress", JSON.stringify(formData.shopFullAddress[0]));
+        }
+
+        for (let [key, value] of fd.entries()) {
+          console.log(`FormData entry: ${key}=${value}`);
+        }
+
+        const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+
+        const data = await res.json();
+        console.log("Server response (updateUserDetails):", data);
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            console.log("handleSubmit: 401 Unauthorized, redirecting to login");
+            handleUnauthorized();
+            return;
+          }
+          return toast.error(data.message || "Failed to update worker profile.", { toastId: "updateUserDetailsError" });
+        }
+
+        // Refresh profile data after successful submission
+        await dispatch(fetchUserProfile());
+
+        const payload = {
+          full_name: formData.name,
+          full_address: formData.full_address,
+        };
+        const resName = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const dataName = await resName.json();
+        console.log("Server response (updateUserProfile):", dataName);
+
+        if (!resName.ok) {
+          if (resName.status === 401) {
+            console.log("handleSubmit: 401 Unauthorized, redirecting to login");
+            handleUnauthorized();
+            return;
+          }
+          return toast.error(dataName.message || "Failed to update name.", { toastId: "updateUserProfileError" });
+        }
+
+        toast.success("Worker profile updated successfully!", {
+          toastId: "updateWorkerSuccess",
+          onClose: () => setTimeout(() => navigate("/details"), 500),
+        });
+      }
+
+      if (activeTab === "user") {
+        const payload = {
+          full_name: formData.name,
+          skill: formData.about,
+          age: formData.age,
+          gender: formData.gender,
+          full_address: formData.full_address,
+          willingToVisitShop: formData.willingToVisitShop,
+        };
+
+        console.log("User profile payload:", payload);
+
+        const res = await fetch(`${BASE_URL}/user/updateUserProfile`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        console.log("Server response (user profile):", data);
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            console.log("handleSubmit: 401 Unauthorized, redirecting to login");
+            handleUnauthorized();
+            return;
+          }
+          return toast.error(data.message || "Failed to update user profile.", { toastId: "updateUserProfileError" });
+        }
+
+        // Refresh profile data after successful submission
+        await dispatch(fetchUserProfile());
+
+        toast.success("User profile updated successfully!", {
+          toastId: "updateUserSuccess",
+          onClose: () => setTimeout(() => navigate("/details"), 500),
+        });
+      }
+    } catch (error) {
+      console.error("Error in handleSubmit:", error);
+      toast.error("Something went wrong!", { toastId: "submitGeneralError" });
     }
-  } catch (error) {
-    console.error("Error in handleSubmit:", error);
-    toast.error("Something went wrong!", { toastId: "submitGeneralError" });
-  }
-};
+  };
 
   const defaultCenter = markerLocationAddress || markerLocationShop || currentLocation || { lat: 28.6139, lng: 77.209 };
 
@@ -978,7 +988,7 @@ export default function EditProfile() {
                     <h3 className="text-lg font-semibold text-gray-800">Document Previews</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 mt-2">
                       {documentPreviews.map((preview, index) => (
-                        <div key={index} className="relative w-32 h-32">
+                        <div key={`${preview}-${index}`} className="relative w-32 h-32">
                           {/\.pdf$/i.test(preview) ? (
                             <a
                               href={preview}
@@ -995,7 +1005,10 @@ export default function EditProfile() {
                               className="w-full h-full object-cover rounded-lg shadow-md"
                               onError={(e) => {
                                 console.error(`Error loading preview for document ${index + 1}, URL:`, preview);
-                                handleRemoveDocument(index, preview);
+                                toast.error(`Failed to load document ${formData.documents[index]?.documentName || "Unknown"}. Please remove or re-upload.`, {
+                                  toastId: `previewError-${index}`,
+                                });
+                                // Do not automatically remove; let user decide
                               }}
                             />
                           )}

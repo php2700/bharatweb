@@ -45,7 +45,7 @@ export default function Details() {
   if (profile) {
     verification = profile.verified;
   }
-
+console.log("pppp", profile);
   const getUserId = () => {
     return profile?.data?.userId || localStorage.getItem('userId') || 'default';
   };
@@ -170,7 +170,7 @@ export default function Details() {
         localStorage.setItem("role", "user");
       });
     }
-  }, [activeTab, profile, navigate, dispatch]);
+  }, [activeTab, profile, dispatch]);
 
   let full_name = "N/A";
   let address = "N/A";
@@ -192,7 +192,7 @@ export default function Details() {
     images = profile.profilePic || "Not Available";
     skill = profile.skill || "No Skill Available";
     category_name = profile.category_name || "Not Available";
-    subcategory_names = profile.subcategory_names || "Not Available";
+    subcategory_names = profile.subcategory_names[0] || "Not Available";
     document = profile.documents || "Not Available";
     rateAndReviews = profile.rateAndReviews || "Not Available";
     status = profile.verified || false;
