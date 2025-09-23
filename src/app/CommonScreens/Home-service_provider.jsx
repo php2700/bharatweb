@@ -36,7 +36,6 @@ export default function ServiceProviderHome() {
   const [emergencyLoading, setEmergencyLoading] = useState(false);
   const [emergencyError, setEmergencyError] = useState(null);
 
-  // Helper function to capitalize first letter
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -195,8 +194,6 @@ export default function ServiceProviderHome() {
       setEmergencyLoading(false);
     }
   };
-
-  // Handle "See All" button clicks
   const handleSeeAll = (route) => {
     if (!token) {
       Swal.fire({
