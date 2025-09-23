@@ -12,6 +12,8 @@ const Chat = () => {
 	const { receiverId } = useParams();
 	 const user = useSelector((state) => state.user.profile);
 	 const userId = user?._id;
+	 console.log("User ID from Redux:", userId);
+	console.log("Receiver ID from URL:", receiverId);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
