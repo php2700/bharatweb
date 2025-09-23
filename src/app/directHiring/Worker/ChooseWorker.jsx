@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
@@ -9,6 +10,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const token = localStorage.getItem("bharat_token");
 
 export const cardData = [
   {
@@ -69,7 +71,7 @@ export const cardData = [
   },
 ];
 
-export default function AssignWork() {
+export default function ChooseWorker() {
   const navigate = useNavigate();
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
@@ -78,30 +80,28 @@ export default function AssignWork() {
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      const token = localStorage.getItem("bharat_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
 
-      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
+      console.log("Banner API response:", response.data); // Debug response
 
-      if (res.ok) {
-        if (Array.isArray(data.images) && data.images.length > 0) {
-          setBannerImages(data.images);
+      if (response.data?.status) {
+        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+          setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage = response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -119,18 +119,9 @@ export default function AssignWork() {
   }, []);
 
   const handleAddWorker = (worker) => {
-    navigate("/view-profile", {
+    navigate("/emergency/order-detail", {
       state: {
-        work: {
-          id: 1,
-          name: "Chair work",
-          image: null,
-          date: "21/02/25",
-          skills: "No details available.",
-          location: "Indore M.P.",
-        },
-        profile: worker, // Pass the worker as the profile
-        assignedWorker: worker, // Explicitly set assignedWorker
+        assignedWorker: worker, // pass worker to order-detail
       },
     });
   };
@@ -154,7 +145,7 @@ export default function AssignWork() {
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4">
         <Link
-          to="/view-profile"
+          to="/emergency/order-detail"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />

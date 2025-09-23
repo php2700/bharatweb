@@ -26,30 +26,35 @@ export default function Worklist() {
   const token = localStorage.getItem("bharat_token");
 
   // Fetch banner images
- const fetchBannerImages = async () => {
+  const fetchBannerImages = async () => {
     try {
       if (!token) {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      console.log("Banner API response:", response.data); // Debug response
-
-      if (response.data?.status) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+      if (response.data?.success) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -90,7 +95,7 @@ export default function Worklist() {
             endpoint = `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`;
             break;
           case "My Hire":
-            endpoint = `${BASE_URL}/direct-order/apiGetAllDirectOrders`;
+            endpoint = `${BASE_URL}/direct-order/getOrdersByUser`;
             break;
           case "Emergency Tasks":
             endpoint = `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`;
@@ -128,7 +133,12 @@ export default function Worklist() {
           completiondate: task.deadline
             ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
-          location: task.google_address || task.location || task.address || "Unknown Location",
+          status: task.hire_status || "N/A",
+          location:
+            task.google_address ||
+            task.location ||
+            task.address ||
+            "Unknown Location",
         }));
 
         setTaskData(mappedTasks);
@@ -301,12 +311,36 @@ export default function Worklist() {
                     </p>
                   </div>
                   <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
-                  <div className="mt-3">
-                    <p className="text-green-600 font-bold">{task.price}</p>
+                  <p className="text-green-600 font-bold mt-3">{task.price}</p>
+                  <div className="flex justify-between items-start">
                     <p className="text-sm text-[#334247] mt-1 font-semibold">
                       Completion Date: {task.completiondate}
                     </p>
+                    <p
+                      className={`text-sm font-semibold px-2 py-1 rounded 
+    ${
+      task.status === "pending"
+        ? "bg-yellow-200 text-yellow-800"
+        : task.status === "cancelled"
+        ? "bg-red-200 text-red-800"
+        : task.status === "completed"
+        ? "bg-green-200 text-green-800"
+        : task.status === "cancelledDispute"
+        ? "bg-orange-200 text-orange-800"
+        : task.status === "accepted"
+        ? "bg-blue-200 text-blue-800"
+        : ""
+    }`}
+                    >
+                      Project Status:{" "}
+                      {task.status
+                        .replace(/([A-Z])/g, " $1") // split camelCase (CancelledDispute → Cancelled Dispute)
+                        .trim()
+                        .replace(/\b\w/g, (char) => char.toUpperCase())}{" "}
+                      {/* Capitalize each word */}
+                    </p>
                   </div>
+                  <div className="mt-3"></div>
                   <div className="flex justify-between items-center mt-4">
                     <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
                       {task.location}
@@ -325,6 +359,21 @@ export default function Worklist() {
                     >
                       View Details
                     </button>
+										{/**<button
+                      className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
+                      onClick={() => {
+                        const tabRoutes = {
+                          "My Bidding": "bidding/worker",
+                          "My Hire": "hire/worker",
+                          "Emergency Tasks": "emergency/worker",
+                        };
+
+                        const route = tabRoutes[activeTab];
+                        navigate(`/${route}/order-detail/${task.id}`);
+                      }}
+                    >
+                      View Details
+                    </button> */}
                   </div>
                 </div>
               </div>

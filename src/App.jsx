@@ -40,9 +40,6 @@ import EditProfile from "./app/CommonScreens/EditProfile";
 
 // Direct Hiring
 import Dispute from "./app/CommonScreens/dispute";
-import MyWork from "./app/directHiring/Worker/MyWork";
-import ViewProfile from "./app/directHiring/Worker/ViewProfile";
-import AssignWork from "./app/directHiring/Worker/AssignWork";
 import WorkerDetail from "./app/directHiring/User/WorkerDetail";
 
 // Route Protection Components
@@ -85,6 +82,8 @@ import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
 import ViewProfileDetails from "./app/CommonScreens/ViewProfileDetails";
 
+//Direct Hiring
+import DirectProviderordetail from "./app/directHiring/Worker/OrderDetail";
 
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
@@ -142,11 +141,8 @@ export default function App() {
           element={<ServiceProviderHireDetail />}
         />
         <Route path="/direct-hiring/:id" element={<DirectHiring />} />
-        <Route path="/emergency/worker/assign-work" element={<AssignWork />} />
         <Route path="/dispute/:orderId/:type" element={<Dispute />} />
         <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
-        <Route path="/mywork" element={<MyWork />} />
-        <Route path="/view-profile" element={<ViewProfile />} />
         <Route path="/worker-detail" element={<WorkerDetail />} />
         <Route path="/my-hire" element={<MyHire />} />
         <Route path="/directhiring/workdetail" element={<WorkerDetail />} />
@@ -224,12 +220,15 @@ export default function App() {
         <Route path="/view-worker/:id" element={<ViewWorker />} />
         {/**Direct hiring  Routing */}
         {/**User */}
-        my-hire/order-detail
+        
         <Route
           path="/my-hire/order-detail/:id"
           element={<MyHireOrderDetails />}
         />
         {/**Provider */}
+       
+       <Route path="/hire/worker/order-detail/:id" element={<DirectProviderordetail />} />
+
       </Routes>
     </>
   );

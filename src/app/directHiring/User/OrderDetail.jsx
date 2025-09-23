@@ -37,6 +37,7 @@ export default function ViewProfile() {
   const acceptedSectionRef = useRef(null);
   const [category_id, setCategory_id] = useState("");
   const [subcategory_ids, setSubcategory_ids] = useState([]);
+  const [assignedProviderId, setAssignedProviderId] = useState(null); // New state for assigned provider ID
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
@@ -49,24 +50,29 @@ export default function ViewProfile() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log("Banner API response:", response.data); // Debug response
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data?.success) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -84,6 +90,7 @@ export default function ViewProfile() {
   }, []);
 
   // Fetch related workers based on category and subcategory
+
   const fetchRelatedWorkers = async (category_id, subcategory_ids) => {
     try {
       if (!category_id || !subcategory_ids?.length) {
@@ -92,7 +99,6 @@ export default function ViewProfile() {
         return;
       }
 
-      console.log("Fetching related workers with categoryId:", category_id, "subcategoryIds:", subcategory_ids);
       setRelatedWorkersLoading(true);
 
       const token = localStorage.getItem("bharat_token");
@@ -114,7 +120,9 @@ export default function ViewProfile() {
         }
       );
       console.log("Related workers response:", response.data);
-      const workers = Array.isArray(response.data.data) ? response.data.data : [];
+      const workers = Array.isArray(response.data.data)
+        ? response.data.data
+        : [];
       setRelatedWorkers(workers);
     } catch (err) {
       console.error("Error fetching related workers:", err);
@@ -163,9 +171,29 @@ export default function ViewProfile() {
         });
         setOfferStatuses(initialStatuses);
 
-        // Save category and subcategory IDs in state
-        setCategory_id(orderResponse.data.data.order.category_id || null);
-        setSubcategory_ids(orderResponse.data.data.order.subcategory_ids || []);
+        // Extract category_id, subcategory_ids, and assigned provider ID
+        if (
+          orderResponse.data.data.order.offer_history &&
+          orderResponse.data.data.order.offer_history.length > 0
+        ) {
+          setCategory_id(
+            orderResponse.data.data.order.offer_history[0].provider_id
+              .category_id._id || null
+          );
+          setSubcategory_ids(
+            orderResponse.data.data.order.offer_history[0].provider_id.subcategory_ids.map(
+              (sub) => sub._id
+            ) || []
+          );
+          setAssignedProviderId(
+            orderResponse.data.data.order.offer_history[0].provider_id._id ||
+              null
+          );
+        } else {
+          setCategory_id(null);
+          setSubcategory_ids([]);
+          setAssignedProviderId(null);
+        }
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
         console.error("Error:", err);
@@ -184,63 +212,143 @@ export default function ViewProfile() {
     }
   }, [category_id, subcategory_ids]);
 
-  const handleHire = async (providerId) => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      const response = await axios.post(
-        `${BASE_URL}/direct-order/send-next-offer`,
-        {
-          next_provider_id: providerId,
-          order_id: id,
+
+  // const handleHire = async (providerId) => {
+  //   try {
+  //     const token = localStorage.getItem("bharat_token");
+  //     const response = await axios.post(
+  //       `${BASE_URL}/direct-order/send-next-offer`,
+  //       {
+  //         next_provider_id: providerId,
+  //         order_id: id,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("Hire Response:", response.data);
+
+  //     // Update state
+  //     setOrderData((prev) => ({
+  //       ...prev,
+  //       hire_status: "assigned",
+  //     }));
+  //     setIsHired(true);
+  //     setServiceProviders([]);
+  //     setRelatedWorkers([]);
+
+  //     // Show backend success message
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Success!",
+  //       text: response.data.message || "Provider hired successfully!",
+  //       confirmButtonColor: "#228B22",
+  //     });
+
+  //     // Scroll to accepted section
+  //     acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  //     // Refresh order data
+  //     const orderResponse = await axios.get(
+  //       `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     setOrderData(orderResponse.data.data.order);
+  //     setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+  //   } catch (err) {
+  //     console.error(
+  //       "Error hiring provider:",
+  //       err.response?.data || err.message
+  //     );
+  //     // Extract backend error message if available
+  //     const errorMessage =
+  //       err.response?.data?.message ||
+  //       err.message ||
+  //       "Failed to hire provider. Please try again.";
+  //     setError(errorMessage);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Oops!",
+  //       text: errorMessage, // Use backend error message
+  //       confirmButtonColor: "#FF0000",
+  //     });
+  //   }
+  // };
+
+const handleHire = async (providerId) => {
+  try {
+    const token = localStorage.getItem("bharat_token");
+    const response = await axios.post(
+      `${BASE_URL}/direct-order/send-next-offer`,
+      {
+        next_provider_id: providerId,
+        order_id: id,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Hire Response:", response.data);
+      }
+    );
+    console.log("Hire Response:", response.data);
 
-      setOrderData((prev) => ({
-        ...prev,
-        hire_status: "assigned",
-      }));
-      setIsHired(true);
-      setServiceProviders([]);
-      setRelatedWorkers([]); // Clear related workers after hiring
+    // Update state
+    setOrderData((prev) => ({
+      ...prev,
+      hire_status: "accepted",
+    }));
+    setIsHired(true);
+    setServiceProviders([]);
+    setRelatedWorkers([]);
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Provider hired successfully!",
-        confirmButtonColor: "#228B22",
-      });
+    // Show backend success message in modal
+    Swal.fire({
+      icon: "success",
+      title: "Success!",
+      text: response.data.message || "Provider hired successfully!",
+      confirmButtonColor: "#228B22",
+    });
 
-      acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scroll to accepted section
+    acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
 
-      const orderResponse = await axios.get(
-        `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setOrderData(orderResponse.data.data.order);
-      setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-    } catch (err) {
-      setError("Failed to hire provider. Please try again later.");
-      console.error("Error:", err);
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to hire provider. Please try again.",
-        confirmButtonColor: "#FF0000",
-      });
-    }
-  };
+    // Refresh order data
+    const orderResponse = await axios.get(
+      `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setOrderData(orderResponse.data.data.order);
+    setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+  } catch (err) {
+    console.error("Error hiring provider:", err.response?.data || err.message);
+    // Extract backend error message if available
+    const errorMessage =
+      err.response?.data?.message || err.message || "Failed to hire provider. Please try again.";
+    
+    // Show error message only in SweetAlert modal
+    Swal.fire({
+      icon: "error",
+      title: "Oops!",
+      text: errorMessage, // Use backend error message
+      confirmButtonColor: "#FF0000",
+    });
+  }
+};
+
 
   const handleCancelOffer = async (providerId) => {
     try {
@@ -267,7 +375,7 @@ export default function ViewProfile() {
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: "Offer cancelled successfully!",
+        text: "Order has been cancelled successfully!",
         confirmButtonColor: "#228B22",
       });
     } catch (err) {
@@ -361,9 +469,11 @@ export default function ViewProfile() {
     provider.provider_id?.full_name?.toLowerCase().includes(searchQuery)
   );
 
-  // Filter related workers based on search query
-  const filteredRelatedWorkers = relatedWorkers.filter((worker) =>
-    worker.full_name?.toLowerCase().includes(searchQuery)
+  // Filter related workers based on search query and exclude assigned provider
+  const filteredRelatedWorkers = relatedWorkers.filter(
+    (worker) =>
+      worker.full_name?.toLowerCase().includes(searchQuery) &&
+      worker._id !== assignedProviderId
   );
 
   // Slider settings for react-slick
@@ -440,9 +550,11 @@ export default function ViewProfile() {
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <span>Category :- {orderData?.title || "Unknown Title"}</span>
                 <div>
-                  Detailed Address :- {orderData?.address || "No Address Provided"}
+                  Detailed Address :-{" "}
+                  {orderData?.address || "No Address Provided"}
                   <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                    {orderData?.user_id?.location?.address || "Unknown Location"}
+                    {orderData?.user_id?.location?.address ||
+                      "Unknown Location"}
                   </div>
                 </div>
               </div>
@@ -460,12 +572,36 @@ export default function ViewProfile() {
                   Status:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
-                      ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
-                      ${orderData?.hire_status === "cancelled task" ? "bg-[#FF0000]" : ""}
-                      ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
-                      ${orderData?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
-                      ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+                      ${
+                        orderData?.hire_status === "pending"
+                          ? "bg-yellow-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "cancelled"
+                          ? "bg-[#FF0000]"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "cancelled task"
+                          ? "bg-[#FF0000]"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "completed"
+                          ? "bg-[#228B22]"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "cancelldispute"
+                          ? "bg-[#FF0000]"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "accepted"
+                          ? "bg-blue-500"
+                          : ""
+                      }`}
                   >
                     {orderData?.hire_status
                       ? orderData.hire_status
@@ -524,7 +660,7 @@ export default function ViewProfile() {
                       </div>
                       <div className="flex gap-4">
                         <Link
-                          to={`/service_provider/${assignedWorker._id}`}
+                          to={`/view-worker/${assignedWorker._id}`}
                           className="text-[#228B22] py-1 px-4 border rounded-lg"
                         >
                           View Profile
@@ -568,7 +704,7 @@ export default function ViewProfile() {
                                 "No Address Provided"}
                             </p>
                             <Link
-                              to={`/service_provider/${provider.provider_id._id}`}
+                              to={`/profile-details/${provider.provider_id._id}`}
                               className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                             >
                               View Profile
@@ -586,7 +722,7 @@ export default function ViewProfile() {
                                   className="px-4 py-2 bg-[#228B22] text-white rounded opacity-50 cursor-not-allowed font-semibold"
                                   disabled
                                 >
-                                  Offer Sent
+                                  {provider.status}
                                 </button>
                                 <button
                                   className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
@@ -594,7 +730,7 @@ export default function ViewProfile() {
                                     handleCancelOffer(provider.provider_id._id)
                                   }
                                 >
-                                  Cancel
+                                  Cancel Project
                                 </button>
                               </>
                             )}
@@ -612,9 +748,12 @@ export default function ViewProfile() {
 
             {/* Task Status / Cancel Button */}
             <div className="text-center mb-6">
-              {["assigned", "completed", "cancelled", "cancelled task"].includes(
-                orderData?.hire_status
-              ) ? (
+              {[
+                "accepted",
+                "completed",
+                "cancelled",
+                "cancelled task",
+              ].includes(orderData?.hire_status) ? (
                 orderData?.hire_status === "cancelled" ||
                 orderData?.hire_status === "cancelled task" ? (
                   <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
@@ -624,7 +763,7 @@ export default function ViewProfile() {
                   <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
                     Task Completed
                   </span>
-                ) : orderData?.hire_status === "assigned" ? (
+                ) : orderData?.hire_status === "pending" ? (
                   <button
                     className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
                     onClick={() => setShowModal(true)}
@@ -635,7 +774,7 @@ export default function ViewProfile() {
               ) : null}
             </div>
 
-            {(orderData?.hire_status === "assigned" ||
+            {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed") && (
               <div ref={acceptedSectionRef}>
                 <Accepted
@@ -645,49 +784,6 @@ export default function ViewProfile() {
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
-
-                {orderData?.hire_status === "assigned" && (
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    <div className="relative max-w-2xl mx-auto">
-                      <div className="relative z-10">
-                        <img
-                          src={Warning}
-                          alt="Warning"
-                          className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
-                        />
-                      </div>
-                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
-                        <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                          Warning Message
-                        </h2>
-                        <p className="text-gray-700 text-sm md:text-base">
-                          Lorem Ipsum is simply dummy text...
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-4">
-                      <button
-                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                        onClick={handleMarkComplete}
-                      >
-                        Mark as Complete
-                      </button>
-                      <ReviewModal
-                        show={showCompletedModal}
-                        onClose={() => setShowCompletedModal(false)}
-                        service_provider_id={orderData?.service_provider_id?._id}
-                        orderId={id}
-                        type="direct"
-                      />
-                      <Link to={`/dispute/${id}/direct`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          Cancel Task and Create Dispute
-                        </button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -746,7 +842,7 @@ export default function ViewProfile() {
                           {worker.location?.address || "No Address Provided"}
                         </p>
                         <Link
-                          to={`/service_provider/${worker._id}`}
+                          to={`/profile-details/${worker._id}`}
                           className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                         >
                           View Profile
@@ -787,11 +883,11 @@ export default function ViewProfile() {
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner || "/src/assets/profile/default.png"}
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = "/src/assets/profile/default.png";
                   }}
                 />
               </div>

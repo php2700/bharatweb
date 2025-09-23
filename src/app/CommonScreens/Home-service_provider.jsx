@@ -79,7 +79,7 @@ export default function ServiceProviderHome() {
   const fetchDirectHiring = async () => {
     try {
       setDirectHiringLoading(true);
-      const res = await fetch(`${BASE_URL}/direct-order/apiGetAllDirectOrders`, {
+      const res = await fetch(`${BASE_URL}/direct-order/getOrdersByProvider`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -423,7 +423,7 @@ export default function ServiceProviderHome() {
                 <h2 className="text-xl font-bold text-black max-md:text-lg">Recent Direct Hiring</h2>
                 {directHiring.length > 4 && (
                   <button
-                    onClick={() => handleSeeAll("/mywork")}
+                    onClick={() => handleSeeAll("/worker/work-list/My Hire")}
                     className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                   >
                     See All
@@ -480,7 +480,7 @@ export default function ServiceProviderHome() {
                 <h2 className="text-xl font-bold text-black max-md:text-lg">Bidding</h2>
                 {bidding.length > 4 && (
                   <button
-                    onClick={() => handleSeeAll("/bidding/recent-post")}
+                    onClick={() => handleSeeAll("/worker/work-list/My Bidding")}
                     className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                   >
                     See All
@@ -538,7 +538,7 @@ export default function ServiceProviderHome() {
                   <h2 className="text-xl font-bold text-black max-md:text-lg">Emergency</h2>
                   {emergency.length > 4 && (
                     <button
-                      onClick={() => handleSeeAll("/emergency/tasks")}
+                      onClick={() => handleSeeAll("/worker/work-list/Emergency Tasks")}
                       className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                     >
                       See All

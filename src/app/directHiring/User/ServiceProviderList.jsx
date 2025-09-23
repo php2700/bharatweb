@@ -16,7 +16,6 @@ export default function ServiceProviderList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { category_id, subcategory_ids } = location.state || {};
-  console.log(category_id, subcategory_ids);
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +40,7 @@ export default function ServiceProviderList() {
 
       console.log("Banner API response:", response.data); // Debug response
 
-      if (response.data?.status) {
+      if (response.data?.success) {
         if (Array.isArray(response.data.images) && response.data.images.length > 0) {
           setBannerImages(response.data.images);
         } else {
@@ -89,7 +88,6 @@ export default function ServiceProviderList() {
             },
           }
         );
-        console.log("Workers response:", response.data);
         if (response.data?.status) {
           setWorkers(response.data.data || []);
         } else {
@@ -113,10 +111,8 @@ export default function ServiceProviderList() {
   const truncateText = (text, wordLimit = 25) => {
     if (!text) return "";
     const words = text.trim().split(/\s+/);
-    console.log("Word count:", words.length, "Text:", text); // Debugging
     if (words.length > wordLimit) {
       const truncated = words.slice(0, wordLimit).join(" ");
-      console.log("Truncated text:", truncated + "..."); // Debugging
       return truncated + "...";
     }
     return text;
@@ -139,8 +135,6 @@ export default function ServiceProviderList() {
     return fullName.includes(query) || skill.includes(query);
   });
 
-  console.log("workers", workers);
-  console.log("filteredWorkers", filteredWorkers);
 
   // Slider settings for react-slick
   const sliderSettings = {
