@@ -1,5 +1,5 @@
 // Accepted.jsx
-import {useEffect} from "react";
+import { useEffect } from "react";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Call from "../../../assets/ViewProfile/call.svg";
 import Message from "../../../assets/ViewProfile/msg.svg";
@@ -10,62 +10,70 @@ export default function Accepted({
   assignedWorker,
   paymentHistory,
   orderId,
-	user,
+  user,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-const service_provider_id = user;
-const order_id = orderId;
-const navigate = useNavigate();
-useEffect(() => {
+  const service_provider_id = user;
+  const order_id = orderId;
+  const navigate = useNavigate();
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-const handleChatOpen = (receiverId) => {
+  const handleChatOpen = (receiverId) => {
     navigate(`/chats/${receiverId}`); // go to chat page
   };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
-      <h2 className="text-lg font-semibold mb-4">Order Details</h2>
+      <h2 className="text-lg font-semibold mb-4">User Details</h2>
 
       {/* Service Provider Details */}
       {serviceProvider && (
         <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-          <div className="flex items-center space-x-4">
-            {/* Profile */}
-            <img
-              src={serviceProvider.profile_pic || Profile}
-              alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
-              className="w-16 h-16 rounded-full object-cover"
-            />
-
-            {/* Name */}
-            <div>
+          <div className="flex items-center justify-between">
+            {/* --- Left: Profile Info --- */}
+            <div className="flex items-center space-x-4">
+              <img
+                src={serviceProvider.profile_pic || Profile}
+                alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
+                className="w-16 h-16 rounded-full object-cover"
+              />
               <p className="text-lg font-semibold">
                 {serviceProvider.full_name || "Unknown Worker"}
               </p>
             </div>
 
-            {/* Call & Message icons */}
-
-            <div className="flex items-center space-x-3 ml-auto">
+            {/* --- Center: Call & Message Icons --- */}
+            <div className="flex items-center space-x-3 justify-center">
               <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                 <img src={Call} alt="Call" className="w-5 h-5" />
               </div>
-              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id)}>
+              <div
+                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                onClick={() => handleChatOpen(serviceProvider._id)}
+              >
                 <img src={Message} alt="Message" className="w-5 h-5" />
               </div>
+            </div>
 
-              {/* View Profile button */}
-							<div className="flex flex-col gap-3">
+            {/* --- Right: Buttons --- */}
+            <div className="flex flex-col gap-3">
               <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
                 View Profile
               </button>
-							<Link to={`/assign-work/${orderId}/emergency`} className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white"
-							>
-              Assign work
-             </Link>
-						</div>
+              {assignedWorker ? (
+                <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
+                  Assigned
+                </button>
+              ) : (
+                <Link
+                  to={`/assign-work/${orderId}/direct`}
+                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white text-center"
+                >
+                  Assign work
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -95,7 +103,10 @@ const handleChatOpen = (receiverId) => {
               </div>
 
               {/* View Profile Button aligned right */}
-              <Link to={`/view-worker/${assignedWorker._id}`} className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
+              <Link
+                to={`/view-worker/${assignedWorker._id}`}
+                className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+              >
                 View Profile
               </Link>
             </div>

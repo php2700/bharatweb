@@ -14,6 +14,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
+	  const token = localStorage.getItem("bharat_token");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -22,8 +23,16 @@ export default function WorkCategories() {
   const socket = useSelector((state) => state.socket?.socket);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null); // New state for error message
-
+const [directHiring, setDirectHiring] = useState([]);
+	const [directHiringLoading, setDirectHiringLoading] = useState(false);
+	const [directHiringError, setDirectHiringError] = useState(null);
   // Fetch categories
+	 const visibleDirectHiring = directHiring.slice(0, 4);
+	 console.log("visibleDirectHiring" ,visibleDirectHiring)
+	  const capitalizeFirst = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -48,6 +57,47 @@ export default function WorkCategories() {
     }
   };
 
+	// Fetch direct hiring
+		const fetchDirectHiring = async () => {
+			try {
+				setDirectHiringLoading(true);
+				const res = await fetch(`${BASE_URL}/direct-order/getOrdersByUser`, {
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				});
+	
+				const data = await res.json();
+				// console.log("Direct Hiring API response:", data);
+	
+				if (res.ok) {
+					if (Array.isArray(data.data)) {
+						setDirectHiring(data.data.map(item => ({
+							id:item._id || "",
+							image: item.image_url[0] || Hiring,
+							work: item.title || "Make a chair",
+							description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+							amount: item.platform_fee || "₹200",
+							location: item.address || "Indore M.P.",
+						})));
+					} else {
+						setDirectHiring([]);
+						setDirectHiringError("No direct hiring tasks available");
+					}
+				} else {
+					const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+					console.error("Failed to fetch direct hiring:", errorMessage);
+					setDirectHiringError(errorMessage);
+				}
+			} catch (err) {
+				console.error("Error fetching direct hiring:", err.message);
+				setDirectHiringError(err.message);
+			} finally {
+				setDirectHiringLoading(false);
+			}
+		};
+
   // Fetch banner images
   // Fetch banner images
 const fetchBannerImages = async () => {
@@ -65,7 +115,7 @@ const fetchBannerImages = async () => {
     });
 
     const data = await res.json();
-    console.log("Banner API response:", data); // 🔍 Debug response
+    // console.log("Banner API response:", data); // 🔍 Debug response
 
     // ✅ Flexible handling of different API structures
     if (res.ok) {
@@ -95,6 +145,7 @@ const fetchBannerImages = async () => {
     window.scrollTo(0, 0);
     fetchCategories();
     fetchBannerImages();
+		fetchDirectHiring();
   }, []);
 
   const SeeAll = () => {
@@ -107,10 +158,6 @@ const fetchBannerImages = async () => {
 
   const viewProfile = () => {
     navigate("/details");
-  };
-
-  const directHiring = () => {
-    navigate("/service-provider-list");
   };
 
   const WorkerList = () => {
@@ -236,84 +283,62 @@ console.log("images",bannerImages);
         {/* Direct Hiring Section */}
         <div className="w-full bg-[#EDFFF3] py-10">
           <div className="mx-auto px-4 sm:px-10">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-              <h2 className="font-bold text-[19px] sm:text-[22px] text-[#303030]">
-                Direct Hiring
-              </h2>
-              <button
-                onClick={() => {
-                  WorkerList();
-                }}
-                type="button"
-                className="font-bold text-[19px] sm:text-[22px] text-[#303030] mt-2 sm:mt-0"
-              >
-                See All
-              </button>
-            </div>
+                         <div className="max-w-[90%] mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-black max-md:text-lg">Direct Hiring</h2>
+                {directHiring.length > 4 && (
+                  <button
+                    onClick={() => navigate("/user/work-list/My Hire")}
+                    className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
+                  >
+                    See All
+                  </button>
+                )}
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((item) => (
-                <div
-                  key={item}
-                  className="bg-white rounded-[42px] shadow p-4 relative"
-                >
-                  <div className="relative">
-                    <img
-                      src={images}
-                      alt="Profile"
-                      className="w-full h-48 sm:h-50 object-cover rounded-2xl"
-                    />
-                    <button
-                      className="absolute bottom-3 right-3 w-[140px] sm:w-[160px] h-[32px] bg-[#372E27] text-white text-[14px] sm:text-[16px] rounded-full 
-                               transition-all duration-300 ease-in-out 
-                               hover:bg-[#4a3e34] hover:shadow-lg hover:scale-105"
-                    >
-                      Add Feature
-                    </button>
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-[18px] sm:text-[24px] text-[#191A1D] font-semibold">
-                        Dipak Sharma
-                      </h3>
-                      <div className="flex items-center text-yellow-500 text-[14px] sm:text-[15px] font-semibold">
-                        <span className="text-[20px] sm:text-[25px]">★</span>
-                        <span className="ml-1 text-[16px] sm:text-[21px] text-black font-bold">
-                          4.5
-                        </span>
+              {directHiringLoading ? (
+                <p className="text-gray-500 text-center">Loading direct hiring tasks...</p>
+              ) : directHiringError ? (
+                <p className="text-red-500 text-center">Error: {directHiringError}</p>
+              ) : directHiring.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {visibleDirectHiring.map((card, index) => (
+                    <div key={index} className="bg-white rounded-xl shadow-md p-2">
+                      <div className="relative w-full">
+                        <img
+                          src={card.image}
+                          alt={capitalizeFirst(card.work)}
+                          className="w-full h-36 object-cover rounded-2xl"
+                        />
+                        {/* <div
+                          className="absolute bottom-2 right-2 px-4 py-1 rounded-full text-white text-sm"
+                          style={{ backgroundColor: "#372E27" }}
+                        >
+                          Add Feature
+                        </div> */}
+                      </div>
+                      <div className="flex items-center justify-between mt-2">
+                        <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">{capitalizeFirst(card.work)}</h3>
+                        <p className="text-black font-medium max-md:text-sm">₹{card.amount}</p>
+                      </div>
+                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">{capitalizeFirst(card.description)}</p>
+                      <div
+                        className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
+                        style={{ backgroundColor: "#F27773", width: "100px" }}
+                      >
+                        {capitalizeFirst(card.location)}
+                      </div>
+                      <div className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
+											onClick={() => navigate(`/my-hire/order-detail/${card.id}`)}
+											>
+                        View Details
                       </div>
                     </div>
-
-                    <p className="text-[12px] sm:text-sm text-white mt-2 px-3 py-1 bg-[#F27773] rounded-full inline-block w-[140px] sm:w-[160px] text-center float-right">
-                      Indore M.P.
-                    </p>
-
-                    <p className="text-gray-700 font-semibold mt-2 text-sm sm:text-base">
-                      ₹200.00
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2 mt-4 sm:mt-6">
-                    <button
-                      onClick={() => {
-                        viewProfile(item);
-                      }}
-                      className="flex-1 border border-[#228B22] py-2 rounded font-semibold text-[#228B22] hover:bg-[#228B22] hover:text-white hover:shadow-md hover:scale-105 transition-all duration-300"
-                    >
-                      View Profile
-                    </button>
-                    <button
-                      onClick={() => {
-                        hireWorker(item);
-                      }}
-                      className="flex-1 bg-[#228B22] text-white py-2 rounded font-semibold text-center hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
-                    >
-                      Hire
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-gray-500 text-center">No direct hiring tasks available</p>
+              )}
             </div>
           </div>
         </div>
@@ -370,7 +395,7 @@ console.log("images",bannerImages);
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
               <button
                 onClick={() => {
-                  directHiring();
+                  
                 }}
                 className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
               >

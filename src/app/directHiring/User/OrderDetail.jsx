@@ -37,7 +37,7 @@ export default function ViewProfile() {
   const acceptedSectionRef = useRef(null);
   const [category_id, setCategory_id] = useState("");
   const [subcategory_ids, setSubcategory_ids] = useState([]);
-  const [assignedProviderId, setAssignedProviderId] = useState(null); // New state for assigned provider ID
+  const [assignedProviderIds, setAssignedProviderIds] = useState([]); // Changed to store multiple provider IDs
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
@@ -90,7 +90,6 @@ export default function ViewProfile() {
   }, []);
 
   // Fetch related workers based on category and subcategory
-
   const fetchRelatedWorkers = async (category_id, subcategory_ids) => {
     try {
       if (!category_id || !subcategory_ids?.length) {
@@ -119,11 +118,19 @@ export default function ViewProfile() {
           },
         }
       );
-      console.log("Related workers response:", response.data);
+      // console.log("Related workers response:", response.data);
       const workers = Array.isArray(response.data.data)
         ? response.data.data
         : [];
-      setRelatedWorkers(workers);
+      // Filter out any workers who are already in serviceProviders or assigned
+      const filteredWorkers = workers.filter(
+        (worker) =>
+          !assignedProviderIds.includes(worker._id) &&
+          !serviceProviders.some(
+            (provider) => provider.provider_id._id === worker._id
+          )
+      );
+      setRelatedWorkers(filteredWorkers);
     } catch (err) {
       console.error("Error fetching related workers:", err);
       Swal.fire({
@@ -164,14 +171,17 @@ export default function ViewProfile() {
         setServiceProviders(orderResponse.data.data.order.offer_history || []);
         setIsHired(orderResponse.data.data.order.hire_status !== "pending");
 
-        // Initialize offer statuses
+        // Initialize offer statuses and assigned provider IDs
         const initialStatuses = {};
+        const providerIds = [];
         orderResponse.data.data.order.offer_history?.forEach((provider) => {
-          initialStatuses[provider.provider_id._id] = "sent";
+          initialStatuses[provider.provider_id._id] = provider.status[0] || "sent";
+          providerIds.push(provider.provider_id._id);
         });
         setOfferStatuses(initialStatuses);
+        setAssignedProviderIds(providerIds);
 
-        // Extract category_id, subcategory_ids, and assigned provider ID
+        // Extract category_id and subcategory_ids
         if (
           orderResponse.data.data.order.offer_history &&
           orderResponse.data.data.order.offer_history.length > 0
@@ -185,14 +195,9 @@ export default function ViewProfile() {
               (sub) => sub._id
             ) || []
           );
-          setAssignedProviderId(
-            orderResponse.data.data.order.offer_history[0].provider_id._id ||
-              null
-          );
         } else {
           setCategory_id(null);
           setSubcategory_ids([]);
-          setAssignedProviderId(null);
         }
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
@@ -210,145 +215,106 @@ export default function ViewProfile() {
     if (category_id && subcategory_ids.length > 0) {
       fetchRelatedWorkers(category_id, subcategory_ids);
     }
-  }, [category_id, subcategory_ids]);
+  }, [category_id, subcategory_ids, assignedProviderIds, serviceProviders]);
 
-
-  // const handleHire = async (providerId) => {
-  //   try {
-  //     const token = localStorage.getItem("bharat_token");
-  //     const response = await axios.post(
-  //       `${BASE_URL}/direct-order/send-next-offer`,
-  //       {
-  //         next_provider_id: providerId,
-  //         order_id: id,
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     console.log("Hire Response:", response.data);
-
-  //     // Update state
-  //     setOrderData((prev) => ({
-  //       ...prev,
-  //       hire_status: "assigned",
-  //     }));
-  //     setIsHired(true);
-  //     setServiceProviders([]);
-  //     setRelatedWorkers([]);
-
-  //     // Show backend success message
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Success!",
-  //       text: response.data.message || "Provider hired successfully!",
-  //       confirmButtonColor: "#228B22",
-  //     });
-
-  //     // Scroll to accepted section
-  //     acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  //     // Refresh order data
-  //     const orderResponse = await axios.get(
-  //       `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     setOrderData(orderResponse.data.data.order);
-  //     setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-  //   } catch (err) {
-  //     console.error(
-  //       "Error hiring provider:",
-  //       err.response?.data || err.message
-  //     );
-  //     // Extract backend error message if available
-  //     const errorMessage =
-  //       err.response?.data?.message ||
-  //       err.message ||
-  //       "Failed to hire provider. Please try again.";
-  //     setError(errorMessage);
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Oops!",
-  //       text: errorMessage, // Use backend error message
-  //       confirmButtonColor: "#FF0000",
-  //     });
-  //   }
-  // };
-
-const handleHire = async (providerId) => {
-  try {
-    const token = localStorage.getItem("bharat_token");
-    const response = await axios.post(
-      `${BASE_URL}/direct-order/send-next-offer`,
-      {
-        next_provider_id: providerId,
-        order_id: id,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+  // Modified handleHire function
+  const handleHire = async (providerId) => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/send-next-offer`,
+        {
+          next_provider_id: providerId,
+          order_id: id,
         },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // console.log("Hire Response:", response.data);
+
+      // Find the hired provider from relatedWorkers
+      const hiredProvider = relatedWorkers.find(
+        (worker) => worker._id === providerId
+      );
+
+      if (hiredProvider) {
+        // Create a new provider object
+        const newProvider = {
+          provider_id: {
+            _id: hiredProvider._id,
+            full_name: hiredProvider.full_name,
+            profile_pic: hiredProvider.profile_pic,
+            location: hiredProvider.location,
+            category_id: hiredProvider.category_id,
+            subcategory_ids: hiredProvider.subcategory_ids,
+          },
+          status: ["sent"],
+        };
+
+        // Update serviceProviders and assignedProviderIds
+        setServiceProviders((prev) => [...prev, newProvider]);
+        setAssignedProviderIds((prev) => [...prev, providerId]);
       }
-    );
-    console.log("Hire Response:", response.data);
 
-    // Update state
-    setOrderData((prev) => ({
-      ...prev,
-      hire_status: "accepted",
-    }));
-    setIsHired(true);
-    setServiceProviders([]);
-    setRelatedWorkers([]);
+      // Update order data and clear related workers
+      setOrderData((prev) => ({
+        ...prev,
+        hire_status: "accepted",
+      }));
+      setIsHired(true);
+      setServiceProviders([]); // Clear service providers after hire
+      setRelatedWorkers([]); // Clear related workers after hire
 
-    // Show backend success message in modal
-    Swal.fire({
-      icon: "success",
-      title: "Success!",
-      text: response.data.message || "Provider hired successfully!",
-      confirmButtonColor: "#228B22",
-    });
+      // Update offer statuses
+      setOfferStatuses((prev) => ({
+        ...prev,
+        [providerId]: "sent",
+      }));
 
-    // Scroll to accepted section
-    acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+      // Show success message
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: response.data.message || "Provider hired successfully!",
+        confirmButtonColor: "#228B22",
+      });
+      window.location.reload();
+      // Scroll to accepted section
+      acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
 
-    // Refresh order data
-    const orderResponse = await axios.get(
-      `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    setOrderData(orderResponse.data.data.order);
-    setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-  } catch (err) {
-    console.error("Error hiring provider:", err.response?.data || err.message);
-    // Extract backend error message if available
-    const errorMessage =
-      err.response?.data?.message || err.message || "Failed to hire provider. Please try again.";
-    
-    // Show error message only in SweetAlert modal
-    Swal.fire({
-      icon: "error",
-      title: "Oops!",
-      text: errorMessage, // Use backend error message
-      confirmButtonColor: "#FF0000",
-    });
-  }
-};
-
+      // Refresh order data
+      const orderResponse = await axios.get(
+        `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setOrderData(orderResponse.data.data.order);
+      setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+    } catch (err) {
+      console.error(
+        "Error hiring provider:",
+        err.response?.data || err.message
+      );
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to hire provider. Please try again.";
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: errorMessage,
+        confirmButtonColor: "#FF0000",
+      });
+    }
+  };
 
   const handleCancelOffer = async (providerId) => {
     try {
@@ -371,6 +337,11 @@ const handleHire = async (providerId) => {
         ...prev,
         [providerId]: "pending",
       }));
+
+      // Remove provider from assignedProviderIds
+      setAssignedProviderIds((prev) =>
+        prev.filter((id) => id !== providerId)
+      );
 
       Swal.fire({
         icon: "success",
@@ -469,11 +440,14 @@ const handleHire = async (providerId) => {
     provider.provider_id?.full_name?.toLowerCase().includes(searchQuery)
   );
 
-  // Filter related workers based on search query and exclude assigned provider
+  // Filter related workers based on search query and exclude all assigned/offered providers
   const filteredRelatedWorkers = relatedWorkers.filter(
     (worker) =>
       worker.full_name?.toLowerCase().includes(searchQuery) &&
-      worker._id !== assignedProviderId
+      !assignedProviderIds.includes(worker._id) &&
+      !serviceProviders.some(
+        (provider) => provider.provider_id._id === worker._id
+      )
   );
 
   // Slider settings for react-slick
@@ -623,126 +597,83 @@ const handleHire = async (providerId) => {
               </p>
             </div>
 
-            {/* Hired Worker Details */}
-            {assignedWorker && (
-              <div className="mb-6 p-4 bg-white rounded-lg shadow-lg">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Hired Worker
-                </h2>
-                <div className="grid grid-cols-12 items-center gap-8">
-                  <div className="relative col-span-4">
-                    <img
-                      src={assignedWorker.profile_pic || Profile}
-                      alt={assignedWorker.full_name}
-                      className="h-full w-full rounded-lg object-cover"
-                    />
-                    <span className="absolute bottom-2 left-0 w-full bg-black/80 text-white font-medium text-sm px-4 py-2 text-center">
-                      {assignedWorker?.status || "Available"}
-                    </span>
-                  </div>
-                  <div className="col-span-8">
-                    <div className="flex justify-between">
-                      <h2 className="text-base sm:text-lg lg:text-[25px] font-[600] text-gray-800">
-                        {assignedWorker.full_name}
-                      </h2>
-                      <div className="flex gap-1 items-center">
-                        <img className="h-6 w-6" src={ratingImg} />
-                        <div>{assignedWorker?.averageRating || "N/A"}</div>
-                      </div>
-                    </div>
-                    <div className="font-semibold text-lg text-gray-800">
-                      About My Skill
-                    </div>
-                    <div className="leading-tight">{assignedWorker?.skill}</div>
-                    <div className="flex justify-between items-center my-4">
-                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full">
-                        {assignedWorker?.location?.address || "Unknown"}
-                      </div>
-                      <div className="flex gap-4">
-                        <Link
-                          to={`/view-worker/${assignedWorker._id}`}
-                          className="text-[#228B22] py-1 px-4 border rounded-lg"
-                        >
-                          View Profile
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Service Providers from Offer History */}
             {orderData?.hire_status !== "cancelled" &&
               orderData?.hire_status !== "cancelled task" &&
-              !isHired && (
+              !isHired &&
+              filteredProviders.length > 0 && (
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-black mb-4">
                     Offered Service Providers
                   </h2>
-                  {filteredProviders.length > 0 ? (
-                    <div className="space-y-4">
-                      {filteredProviders.map((provider) => (
-                        <div
-                          key={provider.provider_id._id}
-                          className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
-                        >
-                          <img
-                            src={provider.provider_id.profile_pic || Profile}
-                            alt={`Profile of ${
-                              provider.provider_id.full_name || "Provider"
-                            }`}
-                            className="w-16 h-16 rounded-full object-cover"
-                          />
-                          <div className="flex-1">
-                            <p className="text-lg font-semibold">
-                              {provider.provider_id.full_name ||
-                                "Unknown Provider"}
-                            </p>
-                            <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                              {provider.provider_id?.location?.address ||
-                                "No Address Provided"}
-                            </p>
-                            <Link
-                              to={`/profile-details/${provider.provider_id._id}`}
-                              className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
-                            >
-                              View Profile
-                            </Link>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            {offerStatuses[provider.provider_id._id] ===
-                            "pending" ? (
-                              <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
-                                Cancelled
-                              </span>
-                            ) : (
-                              <>
-                                <button
-                                  className="px-4 py-2 bg-[#228B22] text-white rounded opacity-50 cursor-not-allowed font-semibold"
-                                  disabled
-                                >
-                                  {provider.status}
-                                </button>
-                                <button
-                                  className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
-                                  onClick={() =>
-                                    handleCancelOffer(provider.provider_id._id)
-                                  }
-                                >
-                                  Cancel Project
-                                </button>
-                              </>
-                            )}
-                          </div>
+                  <div className="space-y-4">
+                    {filteredProviders.map((provider) => (
+                      <div
+                        key={provider.provider_id._id}
+                        className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
+                      >
+                        <img
+                          src={provider.provider_id.profile_pic || Profile}
+                          alt={`Profile of ${
+                            provider.provider_id.full_name || "Provider"
+                          }`}
+                          className="w-16 h-16 rounded-full object-cover"
+                        />
+                        <div className="flex-1">
+                          <p className="text-lg font-semibold">
+                            {provider.provider_id.full_name ||
+                              "Unknown Provider"}
+                          </p>
+                          <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                            {provider.provider_id?.location?.address ||
+                              "No Address Provided"}
+                          </p>
+                          <Link
+                            to={`/profile-details/${provider.provider_id._id}`}
+                            className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                          >
+                            View Profile
+                          </Link>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center text-gray-600">
-                      No service providers found.
-                    </div>
-                  )}
+                        <div className="flex flex-col gap-2">
+                          {offerStatuses[provider.provider_id._id] ===
+                          "pending" ? (
+                            <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
+                              Cancelled
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                className="px-4 py-2 bg-[#228B22] text-white rounded opacity-50 cursor-not-allowed font-semibold"
+                                disabled
+                              >
+                                {Array.isArray(provider.status)
+                                  ? provider.status
+                                      .map(
+                                        (word) =>
+                                          word.charAt(0).toUpperCase() +
+                                          word.slice(1)
+                                      )
+                                      .join(" ")
+                                  : provider.status
+                                  ? provider.status.charAt(0).toUpperCase() +
+                                    provider.status.slice(1)
+                                  : ""}
+                              </button>
+                              <button
+                                className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
+                                onClick={() =>
+                                  handleCancelOffer(provider.provider_id._id)
+                                }
+                              >
+                                Cancel Project
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -793,7 +724,8 @@ const handleHire = async (providerId) => {
       {/* Related Workers Section */}
       {orderData?.hire_status !== "cancelled" &&
         orderData?.hire_status !== "cancelled task" &&
-        !isHired && (
+        !isHired &&
+        filteredRelatedWorkers.length > 0 && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
             <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
               Search other worker with Same categories
@@ -822,7 +754,7 @@ const handleHire = async (providerId) => {
                 <div className="text-center text-gray-600">
                   Loading related workers...
                 </div>
-              ) : filteredRelatedWorkers.length > 0 ? (
+              ) : (
                 <div className="space-y-4">
                   {filteredRelatedWorkers.map((worker) => (
                     <div
@@ -858,10 +790,6 @@ const handleHire = async (providerId) => {
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div className="text-center text-gray-600">
-                  No related workers found.
                 </div>
               )}
             </div>

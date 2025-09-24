@@ -111,12 +111,18 @@ export default function ViewProfile() {
         setOrderData(orderResponse.data.data.order);
         setAssignedWorker(orderResponse.data.data.assignedWorker || null);
         setServiceProviders(orderResponse.data.data.order.offer_history || []);
+console.log("jdjdjd",  orderResponse.data.data.order.offer_history);
+        // const initialStatuses = {};
 
-        const initialStatuses = {};
-        orderResponse.data.data.order.offer_history?.forEach((provider) => {
-          initialStatuses[provider.provider_id._id] = provider.status;
-        });
-        setOfferStatuses(initialStatuses);
+        // // Build the object: { providerId: status }
+        // orderResponse.data.data.order.offer_history?.forEach((provider) => {
+        //   initialStatuses[provider.provider_id._id] = provider.status;
+        // });
+       const FilterStatus = orderResponse.data.data.order.offer_history?.filter((provider) => provider.provider_id._id == userId)
+        console.log("filter", FilterStatus[0].status);
+        // Update state
+        setOfferStatuses(FilterStatus[0].status);
+
         setIsHired(orderResponse.data.data.order.hire_status !== "pending");
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
@@ -161,36 +167,6 @@ export default function ViewProfile() {
         icon: "error",
         title: "Oops!",
         text: "Failed to cancel offer. Please try again.",
-        confirmButtonColor: "#FF0000",
-      });
-    }
-  };
-
-  const handleMarkComplete = async () => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      const response = await axios.post(
-        `${BASE_URL}/direct-order/completeOrderUser`,
-        { order_id: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Order marked as complete successfully!",
-          confirmButtonColor: "#228B22",
-        }).then(() => {
-          setShowCompletedModal(true);
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to mark order as complete. Please try again.",
         confirmButtonColor: "#FF0000",
       });
     }
@@ -504,112 +480,123 @@ export default function ViewProfile() {
                 {orderData?.description}
               </p>
             </div>
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-black mb-4">
-                User Details
-              </h2>
+            {orderData?.hire_status == "pending" ? (
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-black mb-4">
+                  User Details
+                </h2>
 
-              {orderData?.user_id ? (
-                <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-md">
-                  {/* --- Left: User Info --- */}
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={orderData.user_id.profile_pic || Profile}
-                      alt={orderData.user_id.full_name || "User"}
-                      className="w-16 h-16 rounded-full object-cover bg-yellow-200"
-                    />
-                    <div>
-                      <p className="text-lg font-semibold">
-                        {orderData.user_id.full_name || "Unknown User"}
-                      </p>
-                      <button
-                        className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                        onClick={() =>
-                          navigate(`/profile-details/${orderData.user_id._id}`)
-                        }
-                      >
-                        View Profile
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* --- Middle: Contact Buttons --- */}
-                  <div className="text-center">
-                    <p className="text-gray-600 font-medium mb-2">Contact</p>
-                    <div className="flex space-x-2 justify-center mt-1">
-                      <button
-                        className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                        title="Call"
-                        onClick={() =>
-                          window.open(`tel:${orderData.user_id.phone}`, "_self")
-                        }
-                      >
-                        <img src={CallIcon} alt="Call" className="w-6 h-6" />
-                      </button>
-                      <button
-                        className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                        title="Chat"
-                        onClick={() =>
-                          navigate(`/chat/${orderData.user_id._id}`)
-                        }
-                      >
-                        <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* --- Right: Action / Status Buttons --- */}
-                  <div className="flex flex-col items-center space-y-2">
-                    {offerStatuses?.[orderData.user_id._id] === "accepted" ? (
-                      <>
-                        <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
-                          Accepted
-                        </span>
+                {orderData?.user_id ? (
+                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-md">
+                    {/* --- Left: User Info --- */}
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src={orderData.user_id.profile_pic || Profile}
+                        alt={orderData.user_id.full_name || "User"}
+                        className="w-16 h-16 rounded-full object-cover bg-yellow-200"
+                      />
+                      <div>
+                        <p className="text-lg font-semibold">
+                          {orderData.user_id.full_name || "Unknown User"}
+                        </p>
                         <button
-                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                          className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
-                            handleAssignWork(orderData.user_id._id)
+                            navigate(
+                              `/profile-details/${orderData.user_id._id}`
+                            )
                           }
                         >
-                          Assign Work
-                        </button>
-                      </>
-                    ) : offerStatuses?.[orderData.user_id._id] ===
-                      "rejected" ? (
-                      <span className="px-4 py-2 bg-[#FF0000] text-white rounded-lg text-sm font-medium">
-                        Rejected
-                      </span>
-                    ) : offerStatuses?.[orderData.user_id._id] ===
-                      "accepted" ? (
-                      <span className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-                        Work Assigned
-                      </span>
-                    ) : (
-                      <div className="flex space-x-2">
-                        <button
-                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                          onClick={() =>
-                            handleAcceptOffer(orderData.user_id._id)
-                          }
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
-                          onClick={() =>
-                            handleRejectOffer(orderData.user_id._id)
-                          }
-                        >
-                          Reject
+                          View Profile
                         </button>
                       </div>
-                    )}
+                    </div>
+
+                    {/* --- Middle: Contact Buttons --- */}
+                    <div className="text-center">
+                      <p className="text-gray-600 font-medium mb-2">Contact</p>
+                      <div className="flex space-x-2 justify-center mt-1">
+                        <button
+                          className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                          title="Call"
+                          onClick={() =>
+                            window.open(
+                              `tel:${orderData.user_id.phone}`,
+                              "_self"
+                            )
+                          }
+                        >
+                          <img src={CallIcon} alt="Call" className="w-6 h-6" />
+                        </button>
+                        <button
+                          className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                          title="Chat"
+                          onClick={() =>
+                            navigate(`/chat/${orderData.user_id._id}`)
+                          }
+                        >
+                          <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* --- Right: Action / Status Buttons --- */}
+                    <div className="flex flex-col items-center space-y-2">
+                      {offerStatuses?.[orderData.user_id._id] === "accepted" ? (
+                        <>
+                          <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
+                            Accepted
+                          </span>
+                          <button
+                            className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                            onClick={() =>
+                              handleAssignWork(orderData.user_id._id)
+                            }
+                          >
+                            Assign Work
+                          </button>
+                        </>
+                      ) : offerStatuses?.[orderData.user_id._id] ===
+                        "rejected" ? (
+                        <span className="px-4 py-2 bg-[#FF0000] text-white rounded-lg text-sm font-medium">
+                          Rejected
+                        </span>
+                      ) : offerStatuses?.[orderData.user_id._id] ===
+                        "accepted" ? (
+                        <span className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
+                          Work Assigned
+                        </span>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <button
+                            className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                            onClick={() =>
+                              handleAcceptOffer(orderData.user_id._id)
+                            }
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
+                            onClick={() =>
+                              handleRejectOffer(orderData.user_id._id)
+                            }
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="text-center text-gray-600">No user found.</div>
-              )}
-            </div>
+                ) : (
+                  <div className="text-center text-gray-600">
+                    No user found.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <></>
+            )}
 
             {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed") && (
@@ -643,21 +630,6 @@ export default function ViewProfile() {
                     </div>
 
                     <div className="flex space-x-4">
-                      <button
-                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                        onClick={handleMarkComplete}
-                      >
-                        Mark as Complete
-                      </button>
-                      <ReviewModal
-                        show={showCompletedModal}
-                        onClose={() => setShowCompletedModal(false)}
-                        service_provider_id={
-                          orderData?.service_provider_id?._id
-                        }
-                        orderId={id}
-                        type="direct"
-                      />
                       <Link to={`/dispute/${id}/direct`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
                           Cancel Task and Create Dispute
