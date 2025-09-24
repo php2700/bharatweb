@@ -68,7 +68,7 @@ export default function WorkerList() {
       }
     );
 
-    console.log("API Response:", response.data); // Log the full response
+    // console.log("API Response:", response.data); // Log the full response
 
     if (response.data.success) { // Changed from response.data.status to response.data.success
       Swal.fire({
@@ -82,7 +82,8 @@ export default function WorkerList() {
       });
       setTimeout(() => {
         console.log("Navigating to:", `/emergency/worker/order-detail/${orderId}`);
-        navigate(`/emergency/worker/order-detail/${orderId}`);
+        // navigate(`/emergency/worker/order-detail/${orderId}`);
+				navigate(-1);
       }, 2000); // Navigate after toast duration
     } else {
       console.log("Error Message:", response.data.message);

@@ -175,7 +175,8 @@ export default function ViewProfile() {
         const initialStatuses = {};
         const providerIds = [];
         orderResponse.data.data.order.offer_history?.forEach((provider) => {
-          initialStatuses[provider.provider_id._id] = provider.status[0] || "sent";
+          initialStatuses[provider.provider_id._id] =
+            provider.status[0] || "sent";
           providerIds.push(provider.provider_id._id);
         });
         setOfferStatuses(initialStatuses);
@@ -339,9 +340,7 @@ export default function ViewProfile() {
       }));
 
       // Remove provider from assignedProviderIds
-      setAssignedProviderIds((prev) =>
-        prev.filter((id) => id !== providerId)
-      );
+      setAssignedProviderIds((prev) => prev.filter((id) => id !== providerId));
 
       Swal.fire({
         icon: "success",
@@ -553,12 +552,7 @@ export default function ViewProfile() {
                       }
                       ${
                         orderData?.hire_status === "cancelled"
-                          ? "bg-[#FF0000]"
-                          : ""
-                      }
-                      ${
-                        orderData?.hire_status === "cancelled task"
-                          ? "bg-[#FF0000]"
+                          ? "bg-red-500"
                           : ""
                       }
                       ${
@@ -567,8 +561,8 @@ export default function ViewProfile() {
                           : ""
                       }
                       ${
-                        orderData?.hire_status === "cancelldispute"
-                          ? "bg-[#FF0000]"
+                        orderData?.hire_status === "cancelledDispute"
+                          ? "bg-orange-500"
                           : ""
                       }
                       ${
@@ -644,7 +638,10 @@ export default function ViewProfile() {
                           ) : (
                             <>
                               <button
-                                className="px-4 py-2 bg-[#228B22] text-white rounded opacity-50 cursor-not-allowed font-semibold"
+                                className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
+    ${provider.status === "pending" ? "bg-yellow-500" : ""}
+    ${provider.status === "accepted" ? "bg-green-600" : ""}
+    ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
                                 disabled
                               >
                                 {Array.isArray(provider.status)
@@ -683,10 +680,9 @@ export default function ViewProfile() {
                 "accepted",
                 "completed",
                 "cancelled",
-                "cancelled task",
+                "cancelledDispute",
               ].includes(orderData?.hire_status) ? (
-                orderData?.hire_status === "cancelled" ||
-                orderData?.hire_status === "cancelled task" ? (
+                orderData?.hire_status === "cancelled" ? (
                   <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                     Cancelled Task
                   </span>
@@ -706,7 +702,8 @@ export default function ViewProfile() {
             </div>
 
             {(orderData?.hire_status === "accepted" ||
-              orderData?.hire_status === "completed") && (
+              orderData?.hire_status === "completed" ||
+              orderData?.hire_status === "cancelledDispute") && (
               <div ref={acceptedSectionRef}>
                 <Accepted
                   serviceProvider={orderData?.service_provider_id}
@@ -715,6 +712,48 @@ export default function ViewProfile() {
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
+                {orderData?.hire_status === "accepted" && (
+                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                    <div className="relative max-w-2xl mx-auto">
+                      <div className="relative z-10">
+                        <img
+                          src={Warning}
+                          alt="Warning"
+                          className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                        />
+                      </div>
+                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+                        <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                          Warning Message
+                        </h2>
+                        <p className="text-gray-700 text-sm md:text-base">
+                          Lorem Ipsum is simply dummy text...
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-4">
+                      <button
+                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                        onClick={handleMarkComplete}
+                      >
+                        Mark as Complete
+                      </button>
+                      <ReviewModal
+                        show={showCompletedModal}
+                        onClose={() => setShowCompletedModal(false)}
+                        service_provider_id={orderData?.service_provider_id._id}
+                        orderId={id}
+                        type="direct"
+                      />
+                      <Link to={`/dispute/${id}/direct`}>
+                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                          Cancel Task and Create Dispute
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

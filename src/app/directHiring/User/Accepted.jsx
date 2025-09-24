@@ -19,7 +19,7 @@ export default function Accepted({
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -49,9 +49,10 @@ const navigate = useNavigate();
   const createOrder = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
+      const totalAmount = parseFloat(amount) + parseFloat(amount) * 0.09; // Calculate total (amount + tax)
       const response = await axios.post(
         `${BASE_URL}/emergency-order/create-razorpay-order`,
-        { amount: parseFloat(amount) },
+        { amount: totalAmount }, // Send total amount to Razorpay
         {
           headers: {
             "Content-Type": "application/json",
@@ -277,7 +278,9 @@ const navigate = useNavigate();
                   </div>
                 </div>
               )}
-              <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
+              <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+							onClick={()=>navigate(`/profile-details/${serviceProvider._id}`)}
+							>
                 View Profile
               </button>
             </div>
@@ -319,7 +322,7 @@ const navigate = useNavigate();
         <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Payment Summary</h3>
-            {hireStatus !== "completed" && (
+            {hireStatus == "accepted" && (
               <button
                 onClick={() => setShowForm(true)}
                 className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
@@ -396,6 +399,13 @@ const navigate = useNavigate();
                   <option value="cod">Cash on Delivery</option>
                 </select>
               </div>
+              {amount && parseFloat(amount) > 0 && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Tax (9%): ₹{(parseFloat(amount) * 0.09).toFixed(2)}
+                  <br />
+                  Total: ₹{(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(2)}
+                </div>
+              )}
               <div className="flex justify-end space-x-4 mt-4">
                 <button
                   onClick={handlePaymentSubmit}
