@@ -59,7 +59,9 @@ export default function Accepted({
 
             {/* --- Right: Buttons --- */}
             <div className="flex flex-col gap-3">
-              <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
+              <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white"
+							onClick={() => navigate(`/profile-user-details/${serviceProvider._id}`)}
+							>
                 View Profile
               </button>
               {assignedWorker ? (

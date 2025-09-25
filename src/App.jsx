@@ -81,6 +81,7 @@ import EmergencyProviderOrderDetails from "./app/emergency/Worker/OrderDetail";
 import AssignWorker from "./app/CommonScreens/AssignWorker";
 import ViewWorker from "./app/CommonScreens/ViewWorker";
 import ViewProfileDetails from "./app/CommonScreens/ViewProfileDetails";
+import ViewUserProfileDetails from "./app/CommonScreens/ViewUserProfileDetails";
 
 //Direct Hiring
 import DirectProviderordetail from "./app/directHiring/Worker/OrderDetail";
@@ -111,6 +112,7 @@ export default function App() {
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/filter-worker" element={<FilterWorker />} />
         <Route path="/profile-details/:serviceProviderId" element={<ViewProfileDetails />} />
+				<Route path="/profile-user-details/:userId" element={<ViewUserProfileDetails />} />
         <Route path="/chats/:receiverId" element={<Chat />} />
 
         {/* Service Provider Routes */}

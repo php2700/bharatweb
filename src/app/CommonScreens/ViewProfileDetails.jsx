@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../component/Header";
@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import defaultPic from "../../assets/default-image.jpg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,10 +21,13 @@ export default function ViewProfileDetails() {
   const [worker, setWorker] = useState(null);
   const [loading, setLoading] = useState(true);
   const [WorkerTab, setWorkerTab] = useState("work");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [workIndex, setWorkIndex] = useState(0);
+  const [reviewIndex, setReviewIndex] = useState(0);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -39,8 +43,6 @@ export default function ViewProfileDetails() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("Banner API response:", response.data); // Debug response
 
       if (response.data?.success) {
         if (Array.isArray(response.data.images) && response.data.images.length > 0) {
@@ -112,15 +114,51 @@ export default function ViewProfileDetails() {
     fetchBannerImages();
   }, [serviceProviderId, navigate]);
 
+  // Memoize worker data to prevent new references
+  const memoizedWorker = useMemo(() => worker, [worker]);
+
+  // Work carousel
   useEffect(() => {
-    if (WorkerTab !== "work" || !worker?.hiswork?.length) return;
+    if (WorkerTab !== "work" || !memoizedWorker?.hiswork?.length) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % worker.hiswork.length);
+      setWorkIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.hiswork.length);
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [WorkerTab, worker?.hiswork]);
+  }, [WorkerTab, memoizedWorker?.hiswork]);
+
+  // Review carousel
+  useEffect(() => {
+    if (WorkerTab !== "review" || !memoizedWorker?.customerReview?.length) return;
+
+    const interval = setInterval(() => {
+      setReviewIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.customerReview.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [WorkerTab, memoizedWorker?.customerReview]);
+
+  // Business images carousel
+  useEffect(() => {
+    if (WorkerTab !== "business" || !memoizedWorker?.businessImage?.length) return;
+
+    const interval = setInterval(() => {
+      setWorkIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.businessImage.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [WorkerTab, memoizedWorker?.businessImage]);
+
+  // Handle document image click
+  const handleDocumentClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   if (loading) {
     return (
@@ -140,43 +178,38 @@ export default function ViewProfileDetails() {
 
   const {
     full_name = "N/A",
+    phone = "N/A",
+    location = { address: "Not Available" },
     full_address = [{ address: "Not Available" }],
-    profilePic = "Not Available",
+    businessAddress = { address: "Not Available" },
+    isShop = false,
+    profilePic = null,
     skill = "No Skill Available",
-    category_name = "Not Available",
-    subcategory_names = "Not Available",
-    documents = "Not Available",
+    category = { name: "Not Available" },
+    subcategory_names = [],
+    emergencySubcategory_names = [],
+    documents = [],
     rateAndReviews = [],
-    verified = false,
+    verificationStatus = "pending",
     hiswork = [],
-    age = "N/A",
-    gender = "N/A",
-  } = worker;
+    customerReview = [],
+    businessImage = [],
+    avgRating = "0.0",
+    totalReviews = 0,
+  } = memoizedWorker;
 
-  const verifiedStatus = verified
+  const verifiedStatus = verificationStatus === "verified"
     ? "Verified by Admin"
-    : worker.rejected
+    : verificationStatus === "rejected"
     ? "Rejected"
     : "Pending";
-  const statusClass = verified
+  const statusClass = verificationStatus === "verified"
     ? "bg-green-100 text-green-600"
-    : worker.rejected
+    : verificationStatus === "rejected"
     ? "bg-red-100 text-red-600"
     : "bg-yellow-100 text-yellow-600";
 
   const testimage = profilePic && profilePic !== "Not Available";
-  const element =
-    documents !== "Not Available" ? (
-      <img
-        src={documents}
-        alt="Document"
-        className="w-40 h-24 object-cover rounded-md shadow"
-      />
-    ) : (
-      <div className="w-40 h-24 flex items-center justify-center bg-gray-200 rounded-md shadow text-gray-700">
-        Not Uploaded
-      </div>
-    );
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -189,6 +222,9 @@ export default function ViewProfileDetails() {
     autoplaySpeed: 3000,
     arrows: true,
   };
+
+  // Determine reviews to display
+  const displayedReviews = showAllReviews ? rateAndReviews : rateAndReviews.slice(0, 2);
 
   return (
     <>
@@ -229,11 +265,11 @@ export default function ViewProfileDetails() {
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner || defaultPic}
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = defaultPic;
                   }}
                 />
               </div>
@@ -247,7 +283,7 @@ export default function ViewProfileDetails() {
       </div>
       <div className="container mx-auto px-6 py-6">
         <h2 className="text-3xl font-bold text-black mb-3 text-left ml-10 mt-10">
-          Working Person Details
+          {isShop ? "Business Details" : "Working Person Details"}
         </h2>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
@@ -257,6 +293,9 @@ export default function ViewProfileDetails() {
                   src={profilePic}
                   alt="User Profile"
                   className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
                 />
               ) : (
                 <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
@@ -267,40 +306,53 @@ export default function ViewProfileDetails() {
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold">{full_name}</h2>
-                {verified && (
+                {verificationStatus === "verified" && (
                   <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
                     Verified
                   </span>
                 )}
               </div>
+             {/* <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                <img src={Location} alt="Phone icon" className="w-5 h-5" />
+                <span>{phone}</span>
+              </div> */}
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
                 <img src={Location} alt="Location icon" className="w-5 h-5" />
-                <span>{full_address[0]?.address || "Not Available"}</span>
-              </div>
-              <div className="flex flex-col font-semibold text-base text-gray-700">
-                <span>Age: {age}</span>
-                <span>Gender: {gender}</span>
+                <span>{isShop ? businessAddress.address : location.address}</span>
               </div>
               <p className="text-base font-semibold text-gray-700">
                 <span className="font-semibold text-[#228B22]">Category-</span>{" "}
-                {category_name}
+                {category.name}
               </p>
               <p className="text-base font-semibold -mt-4 text-gray-700">
                 <span className="font-semibold text-[#228B22]">
                   Sub-Categories-
                 </span>{" "}
-                {Array.isArray(subcategory_names)
+                {Array.isArray(subcategory_names) && subcategory_names.length > 0
                   ? subcategory_names.map((name, index) => (
                       <span key={index}>
-                        {name}
+                        {name.trim()}
                         {index !== subcategory_names.length - 1 ? ", " : ""}
                       </span>
                     ))
-                  : subcategory_names}
+                  : "Not Available"}
               </p>
+              {emergencySubcategory_names.length > 0 && (
+                <p className="text-base font-semibold -mt-4 text-gray-700">
+                  <span className="font-semibold text-[#228B22]">
+                    Emergency Sub-Categories-
+                  </span>{" "}
+                  {emergencySubcategory_names.map((name, index) => (
+                    <span key={index}>
+                      {name.trim()}
+                      {index !== emergencySubcategory_names.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </p>
+              )}
               <div
                 className={`p-4 shadow-xl max-w-[600px] ${
-                  skill === "Not Available" ? "h-[260px]" : "h-[260px]"
+                  skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -317,7 +369,7 @@ export default function ViewProfileDetails() {
               <button
                 onClick={() => {
                   setWorkerTab("work");
-                  setCurrentIndex(0);
+                  setWorkIndex(0);
                 }}
                 className={`px-6 py-2 rounded-md shadow-md font-semibold ${
                   WorkerTab === "work"
@@ -331,7 +383,7 @@ export default function ViewProfileDetails() {
               <button
                 onClick={() => {
                   setWorkerTab("review");
-                  setCurrentIndex(0);
+                  setReviewIndex(0);
                 }}
                 className={`px-6 py-2 rounded-md shadow-md font-semibold ${
                   WorkerTab === "review"
@@ -342,15 +394,34 @@ export default function ViewProfileDetails() {
               >
                 Customer Review
               </button>
+              {isShop && businessImage?.length > 0 && (
+                <button
+                  onClick={() => {
+                    setWorkerTab("business");
+                    setWorkIndex(0);
+                  }}
+                  className={`px-6 py-2 rounded-md shadow-md font-semibold ${
+                    WorkerTab === "business"
+                      ? "bg-[#228B22] text-white"
+                      : "bg-green-100 text-[#228B22]"
+                  }`}
+                  aria-label="View Business Images"
+                >
+                  Business Images
+                </button>
+              )}
             </div>
             {WorkerTab === "work" && (
               <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
                 <div className="relative w-[700px] h-[400px]">
                   {hiswork.length > 0 ? (
                     <img
-                      src={hiswork[currentIndex]}
-                      alt={`Work sample ${currentIndex + 1}`}
+                      src={hiswork[workIndex]}
+                      alt={`Work sample ${workIndex + 1}`}
                       className="w-full h-full object-cover rounded-md shadow-md"
+                      onError={(e) => {
+                        e.target.src = defaultPic;
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
@@ -364,69 +435,203 @@ export default function ViewProfileDetails() {
                       {hiswork.map((img, index) => (
                         <div
                           key={index}
-                          className="relative w-24 h-24 overflow-hidden"
+                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                          onClick={() => setWorkIndex(index)}
                         >
                           <img
                             src={img}
                             alt={`Work sample ${index + 1}`}
                             className="w-full h-full object-cover rounded-md shadow-md"
+                            onError={(e) => {
+                              e.target.src = defaultPic;
+                            }}
                           />
                         </div>
                       ))}
                     </div>
-                    <p className="text-gray-700 text-base font-semibold">
-                      (You can upload up to 5 images here)
-                    </p>
                   </div>
                 )}
               </div>
             )}
             {WorkerTab === "review" && (
-              <div className="mt-6 w-full bg-[#D3FFD3] flex justify-center items-center py-10">
+              <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
                 <div className="relative w-[700px] h-[400px]">
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                    <p className="text-lg text-center">
-                      Customer reviews are not available at this moment.
-                    </p>
-                    <p className="text-sm text-center mt-2">
-                      Please check back later for updates on customer feedback.
+                  {customerReview.length > 0 ? (
+                    <img
+                      src={customerReview[reviewIndex]}
+                      alt={`Customer review ${reviewIndex + 1}`}
+                      className="w-full h-full object-cover rounded-md shadow-md"
+                      onError={(e) => {
+                        e.target.src = defaultPic;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                      No customer reviews available.
+                    </div>
+                  )}
+                </div>
+                {customerReview.length > 0 && (
+                  <div className="mt-6 flex flex-col items-center gap-4">
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      {customerReview.map((img, index) => (
+                        <div
+                          key={index}
+                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                          onClick={() => setReviewIndex(index)}
+                        >
+                          <img
+                            src={img}
+                            alt={`Customer review ${index + 1}`}
+                            className="w-full h-full object-cover rounded-md shadow-md"
+                            onError={(e) => {
+                              e.target.src = defaultPic;
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-gray-700 text-base font-semibold">
+                      Customer review images
                     </p>
                   </div>
+                )}
+              </div>
+            )}
+            {WorkerTab === "business" && isShop && (
+              <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
+                <div className="relative w-[700px] h-[400px]">
+                  {businessImage.length > 0 ? (
+                    <img
+                      src={businessImage[workIndex]}
+                      alt={`Business image ${workIndex + 1}`}
+                      className="w-full h-full object-cover rounded-md shadow-md"
+                      onError={(e) => {
+                        e.target.src = defaultPic;
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                      No business images available.
+                    </div>
+                  )}
                 </div>
+                {businessImage.length > 0 && (
+                  <div className="mt-6 flex flex-col items-center gap-4">
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      {businessImage.map((img, index) => (
+                        <div
+                          key={index}
+                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                          onClick={() => setWorkIndex(index)}
+                        >
+                          <img
+                            src={img}
+                            alt={`Business image ${index + 1}`}
+                            className="w-full h-full object-cover rounded-md shadow-md"
+                            onError={(e) => {
+                              e.target.src = defaultPic;
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-gray-700 text-base font-semibold">
+                      Business images
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="bg-white rounded-xl shadow-md p-6">
               <div className="flex justify-between items-start">
-                <h2 className="text-xl font-bold">Document</h2>
+                <h2 className="text-xl font-bold">Documents</h2>
                 <span
                   className={`${statusClass} text-xs font-semibold px-3 py-1 rounded-full`}
                 >
                   {verifiedStatus}
                 </span>
               </div>
-              <div className="flex justify-between items-center mt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-lg">
-                    <img
-                      src={Aadhar}
-                      alt="Document Icon"
-                      className="w-9 h-9"
-                    />
+              <div className="mt-4">
+                {documents.length > 0 ? (
+                  documents.map((doc, index) => (
+                    <div key={index} className="mb-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 flex items-center justify-center rounded-lg">
+                          <img
+                            src={Aadhar}
+                            alt="Document Icon"
+                            className="w-9 h-9"
+                          />
+                        </div>
+                        <p className="font-medium">{doc.documentName}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-4">
+                        {doc.images.map((img, imgIndex) => (
+                          <div
+                            key={imgIndex}
+                            className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                            onClick={() => handleDocumentClick(img)}
+                          >
+                            <img
+                              src={img}
+                              alt={`${doc.documentName} image ${imgIndex + 1}`}
+                              className="w-full h-full object-cover rounded-md shadow-md"
+                              onError={(e) => {
+                                e.target.src = defaultPic;
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center bg-gray-200 rounded-md p-4 text-gray-700 font-semibold">
+                    No Documents Uploaded
                   </div>
-                  <p className="font-medium">Aadhar card</p>
-                </div>
-                {element}
+                )}
               </div>
             </div>
           </div>
+          {/* Document Preview Modal */}
+          {selectedImage && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-4 rounded-lg max-w-3xl">
+                <div className="flex justify-end">
+                  <button
+                    onClick={closeModal}
+                    className="text-gray-600 hover:text-gray-800 font-semibold"
+                  >
+                    Close
+                  </button>
+                </div>
+                <img
+                  src={selectedImage}
+                  alt="Document Preview"
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
+                />
+              </div>
+            </div>
+          )}
           <div className="container mx-auto max-w-[750px] px-6 py-6">
-            <h2 className="text-xl font-bold mb-4">Rate & Reviews</h2>
-            {rateAndReviews.length > 0 ? (
-              rateAndReviews.map((item, index) => (
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Rate & Reviews</h2>
+              <div className="flex items-center gap-2">
+							<span className="text-2xl font-bold text-lead-600">Ratings</span>
+                <span className="text-2xl font-bold text-[#228B22]">{avgRating}</span>
+                <span className="text-sm text-gray-600">({totalReviews} reviews)</span>
+              </div>
+            </div>
+            {displayedReviews.length > 0 ? (
+              displayedReviews.map((item) => (
                 <div
-                  key={index}
+                  key={item._id}
                   className="bg-white rounded-xl shadow-md p-6 mb-4"
                 >
                   <div className="flex gap-1 mb-2">
@@ -443,28 +648,48 @@ export default function ViewProfileDetails() {
                       </span>
                     ))}
                   </div>
-                  <h3 className="font-semibold">{item.title}</h3>
-                  <p className="text-gray-600 text-sm">{item.comment}</p>
-                  <p className="text-xs text-gray-400 mt-2">{item.date}</p>
-                  <div className="flex mt-3">
-                    {item.reviewers?.map((img, i) => (
-                      <img
-                        key={i}
-                        src={img}
-                        alt="Reviewer"
-                        className="w-8 h-8 rounded-full border -ml-2 first:ml-0"
-                      />
-                    ))}
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={item.user.profilePic || defaultPic}
+                      alt="Reviewer"
+                      className="w-8 h-8 rounded-full"
+                      onError={(e) => {
+                        e.target.src = defaultPic;
+                      }}
+                    />
+                    <h3 className="font-semibold">{item.user.name}</h3>
                   </div>
+                  <p className="text-gray-600 text-sm mb-2">{item.review}</p>
+                  <p className="text-xs text-gray-400 mb-2">
+                    {new Date(item.createdAt).toLocaleDateString()} • {item.order_type}
+                  </p>
+                  {item.images?.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {item.images.map((img, i) => (
+                        <img
+                          key={i}
+                          src={img}
+                          alt={`Review image ${i + 1}`}
+                          className="w-16 h-16 object-cover rounded-md"
+                          onError={(e) => {
+                            e.target.src = defaultPic;
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
               <p className="text-gray-500 text-center">No Ratings Available</p>
             )}
-            {rateAndReviews.length > 0 && (
+            {rateAndReviews.length > 2 && !showAllReviews && (
               <div className="text-center mt-4">
-                <button className="text-[#228B22] font-semibold hover:underline">
-                  See All Review
+                <button
+                  onClick={() => setShowAllReviews(true)}
+                  className="text-[#228B22] font-semibold hover:underline"
+                >
+                  See All Reviews
                 </button>
               </div>
             )}

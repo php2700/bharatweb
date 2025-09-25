@@ -1,8 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import Header from "../../../component/Header";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+
+// 🔹 Load Google Maps script
+const loadGoogleMapsScript = (callback) => {
+  if (window.google && window.google.maps) {
+    callback();
+    return;
+  }
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+  script.async = true;
+  script.onload = callback;
+  document.body.appendChild(script);
+  return () => document.body.removeChild(script);
+};
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
@@ -15,21 +29,148 @@ const DirectHiring = () => {
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [images, setImages] = useState([]);
+  const [isShopVisited, setIsShopVisited] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+	const [platformFee, setPlatformFee] = useState("");
+  const mapRef = useRef(null);
+  const autocompleteRef = useRef(null);
+  const mapAutocompleteRef = useRef(null); // 🔹 Ref for modal autocomplete
+  const markerRef = useRef(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  // 🔹 Load Razorpay script
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
+	 useEffect(() => {
+    const fetchPlatformFee = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/get-fee/direct`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        // 🔹 Assuming response structure is { data: { fee: 200 } } or { fee: 200 }
+        // Adjust the path based on your API response structure
+        const fee = res.data.data?.fee  // Fallback to 200 if not found
+        setPlatformFee(fee);
+      } catch (error) {
+        console.error("Error fetching platform fee:", error);
+        setPlatformFee(200); // Fallback to default value
+      }
     };
+
+    fetchPlatformFee();
   }, []);
+
+  // 🔹 Load Razorpay and Google Maps scripts
+  useEffect(() => {
+    const razorpayScript = document.createElement("script");
+    razorpayScript.src = "https://checkout.razorpay.com/v1/checkout.js";
+    razorpayScript.async = true;
+    document.body.appendChild(razorpayScript);
+
+    // 🔹 Initialize Google Maps Autocomplete for address input
+    loadGoogleMapsScript(() => {
+      const input = document.getElementById("address-input");
+      const autocomplete = new window.google.maps.places.Autocomplete(input, {
+        types: ["address"],
+        componentRestrictions: { country: "in" }, // 🔹 Restrict to India
+      });
+      autocompleteRef.current = autocomplete;
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place.formatted_address) {
+          setAddress(place.formatted_address);
+        }
+      });
+
+      // 🔹 Initialize map and autocomplete in modal
+      if (isMapModalOpen && mapRef.current) {
+        const map = new window.google.maps.Map(mapRef.current, {
+          center: { lat: 20.5937, lng: 78.9629 }, // 🔹 Default center (India)
+          zoom: 5,
+          mapTypeControl: false,
+          streetViewControl: false,
+        });
+
+        const autocompleteInput = document.getElementById("map-autocomplete-input");
+        const mapAutocomplete = new window.google.maps.places.Autocomplete(autocompleteInput, {
+          types: ["address"],
+          componentRestrictions: { country: "in" },
+        });
+        mapAutocompleteRef.current = mapAutocomplete;
+
+        // 🔹 Update map and marker when place is selected in modal
+        mapAutocomplete.addListener("place_changed", () => {
+          const place = mapAutocomplete.getPlace();
+          if (place.geometry) {
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+            if (markerRef.current) {
+              markerRef.current.setMap(null);
+            }
+            markerRef.current = new window.google.maps.Marker({
+              position: place.geometry.location,
+              map,
+              draggable: true,
+              title: "Selected Location",
+            });
+
+            setAddress(place.formatted_address);
+
+            // 🔹 Update address on marker drag
+            markerRef.current.addListener("dragend", () => {
+              const geocoder = new window.google.maps.Geocoder();
+              geocoder.geocode(
+                { location: markerRef.current.getPosition() },
+                (results, status) => {
+                  if (status === "OK" && results[0]) {
+                    setAddress(results[0].formatted_address);
+                  }
+                }
+              );
+            });
+        };
+			});
+        // 🔹 Add marker on map click
+        map.addListener("click", (event) => {
+          if (markerRef.current) {
+            markerRef.current.setMap(null);
+          }
+          markerRef.current = new window.google.maps.Marker({
+            position: event.latLng,
+            map,
+            draggable: true,
+            title: "Selected Location",
+          });
+
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: event.latLng }, (results, status) => {
+            if (status === "OK" && results[0]) {
+              setAddress(results[0].formatted_address);
+            }
+          });
+
+          // 🔹 Update address on marker drag
+          markerRef.current.addListener("dragend", () => {
+            geocoder.geocode(
+              { location: markerRef.current.getPosition() },
+              (results, status) => {
+                if (status === "OK" && results[0]) {
+                  setAddress(results[0].formatted_address);
+                }
+              }
+            );
+          });
+        });
+      }
+    });
+
+    return () => {
+      document.body.removeChild(razorpayScript);
+    };
+  }, [isMapModalOpen]);
 
   const handleImageUpload = (e) => {
     if (!e.target.files) return;
@@ -94,11 +235,11 @@ const DirectHiring = () => {
       formData.append("address", address);
       formData.append("description", description);
       formData.append("deadline", deadline);
+      formData.append("isShopVisited", isShopVisited);
       images.forEach((image) => {
         formData.append("images", image);
       });
 
-      // 🔹 Step 1: Create direct order & Razorpay order
       const res = await axios.post(
         `${BASE_URL}/direct-order/create`,
         formData,
@@ -111,9 +252,7 @@ const DirectHiring = () => {
       );
 
       const { razorpay_order } = res.data;
-      console.log("rrooamount", razorpay_order.amount)
 
-      // 🔹 Step 2: Open Razorpay Checkout
       const options = {
         key: `${import.meta.env.VITE_RAZORPAY_KEY_ID}`,
         amount: razorpay_order.amount,
@@ -123,7 +262,6 @@ const DirectHiring = () => {
         order_id: razorpay_order.id,
         handler: async function (response) {
           try {
-            // 🔹 Step 3: Verify payment
             const verifyRes = await axios.post(
               `${BASE_URL}/direct-order/verify-platform-payment`,
               {
@@ -134,7 +272,7 @@ const DirectHiring = () => {
                 headers: { Authorization: `Bearer ${token}` },
               }
             );
-            if (verifyRes.status == 200) {
+            if (verifyRes.status === 200) {
               navigate("/user/work-list/My Hire");
             } else {
               setErrors({ general: "Payment verification failed." });
@@ -159,6 +297,14 @@ const DirectHiring = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const openMapModal = () => {
+    setIsMapModalOpen(true);
+  };
+
+  const closeMapModal = () => {
+    setIsMapModalOpen(false);
   };
 
   return (
@@ -207,7 +353,7 @@ const DirectHiring = () => {
             </span>
             <input
               type="text"
-              value="Rs 200.00"
+              value={`₹ ${platformFee}`}
               disabled
               className="mt-1 block w-full rounded-lg bg-gray-100 border border-gray-300 px-4 py-2 text-base text-gray-600"
               aria-disabled="true"
@@ -234,14 +380,17 @@ const DirectHiring = () => {
           <label className="block">
             <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
               Address
-              <span className="text-[#228B22] cursor-pointer">Edit</span>
+              <span className="text-[#228B22] cursor-pointer" onClick={openMapModal}>
+                Select on Map
+              </span>
             </span>
             <div className="relative">
               <input
+                id="address-input"
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter Full Address"
+                placeholder="Enter or select address"
                 className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.address ? "true" : "false"}
               />
@@ -251,6 +400,34 @@ const DirectHiring = () => {
               <p className="text-red-500 text-sm mt-1">{errors.address}</p>
             )}
           </label>
+
+          <div className="block">
+            <span className="text-sm font-medium text-gray-600">
+              Do you want to go to shop?
+            </span>
+            <div className="mt-2 flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isShopVisited"
+                  checked={isShopVisited === true}
+                  onChange={() => setIsShopVisited(true)}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isShopVisited"
+                  checked={isShopVisited === false}
+                  onChange={() => setIsShopVisited(false)}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+          </div>
 
           <label className="block">
             <span className="text-sm font-medium text-gray-600">
@@ -326,6 +503,39 @@ const DirectHiring = () => {
           </button>
         </form>
       </div>
+
+      {/* 🔹 Map Modal */}
+      {isMapModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Select Address on Map</h3>
+              <button
+                onClick={closeMapModal}
+                className="text-red-600 font-semibold"
+              >
+                Close
+              </button>
+            </div>
+            <input
+              id="map-autocomplete-input"
+              type="text"
+              placeholder="Search for an address"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 mb-4"
+            />
+            <div
+              ref={mapRef}
+              className="w-full h-full rounded-lg border border-gray-300"
+            />
+            <button
+              onClick={closeMapModal}
+              className="mt-4 bg-[#228B22] text-white font-semibold py-2 rounded-lg"
+            >
+              Confirm Address
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
