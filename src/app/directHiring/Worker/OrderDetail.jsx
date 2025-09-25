@@ -545,7 +545,7 @@ export default function ViewProfile() {
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
                             navigate(
-                              `/profile-details/${orderData.user_id._id}`
+                              `/profile-user-details/${orderData.user_id._id}`
                             )
                           }
                         >
