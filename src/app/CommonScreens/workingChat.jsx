@@ -8,6 +8,7 @@ const socket = io("https://api.thebharatworks.com/");
 
 const Chat = () => {
   const senderId = localStorage.getItem("senderId");
+  const receiverId = localStorage.getItem("receiverId"); // Assuming standard spelling; adjust if key is different
   console.log("User ID from Redux:", senderId);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
@@ -19,7 +20,7 @@ const Chat = () => {
   const scrollRef = useRef();
   const fileInputRef = useRef(null);
 
-  // Fetch conversations
+  // Fetch conversations and handle new room creation if receiverId is provided
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -36,16 +37,50 @@ const Chat = () => {
           unreadCount: 0,
         }));
         setConversations(conversationsWithUnread || []);
-        if (conversationsWithUnread.length > 0)
+
+        // If receiverId is provided, check for existing conversation or create a new one
+        if (receiverId) {
+          const existingConv = conversationsWithUnread.find((conv) =>
+            conv.members.some((m) => m._id === receiverId)
+          );
+          if (existingConv) {
+            setCurrentChat(existingConv);
+          } else {
+            // Create new conversation (adjust body if backend expects different format, e.g., {receiverId} or {members: [senderId, receiverId]})
+            try {
+              const createRes = await axios.post(
+                `${Base_url}api/chat/conversations`,
+                { senderId, receiverId },
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }
+              );
+              const newConv = {
+                ...createRes.data.conversation,
+                unreadCount: 0,
+              };
+              setConversations((prev) => [...prev, newConv]);
+              setCurrentChat(newConv);
+            } catch (createErr) {
+              console.error("Failed to create conversation:", createErr);
+              alert("Failed to start new conversation. Please check backend endpoint.");
+            }
+          }
+          // Clear receiverId from localStorage after handling to prevent repeated attempts
+          localStorage.removeItem("receiverId");
+        } else if (conversationsWithUnread.length > 0) {
           setCurrentChat(conversationsWithUnread[0]);
+        }
       } catch (err) {
         console.error("Failed to fetch conversations:", err);
       }
     };
     fetchConversations();
-  }, [senderId]);
+  }, [senderId, receiverId]); // Dependencies include receiverId to react if it changes (though typically on mount)
 
-  // Join Socket
+  // Join Socket for online users
   useEffect(() => {
     socket.emit("addUser", senderId);
     socket.on("getUsers", (users) => {
@@ -53,6 +88,13 @@ const Chat = () => {
     });
     return () => socket.off("getUsers");
   }, [senderId]);
+
+  // Join Socket room for the current conversation (assuming backend supports rooms)
+  useEffect(() => {
+    if (currentChat) {
+      socket.emit("joinRoom", currentChat._id); // Join the room to receive targeted messages
+    }
+  }, [currentChat]);
 
   // Fetch messages when chat is selected
   useEffect(() => {
@@ -73,6 +115,10 @@ const Chat = () => {
               conv._id === currentChat._id ? { ...conv, unreadCount: 0 } : conv
             )
           );
+          // Scroll to bottom after fetching messages
+          setTimeout(() => {
+            scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, 100); // Small delay to ensure DOM update
         } catch (err) {
           console.error("Failed to fetch messages:", err);
         }
@@ -141,8 +187,8 @@ const Chat = () => {
   // Send message (text or files)
   const sendMessage = async () => {
     if (!message.trim() && files.length === 0) return;
-    const receiverId = currentChat.members.find((m) => m._id !== senderId)?._id;
-    if (!receiverId) {
+    const chatReceiverId = currentChat.members.find((m) => m._id !== senderId)?._id;
+    if (!chatReceiverId) {
       alert("Receiver ID not found in conversation");
       return;
     }
@@ -151,9 +197,9 @@ const Chat = () => {
       let newMsg;
       if (files.length > 0) {
         const formData = new FormData();
-        files.forEach((file) => formData.append("images", file)); // Changed to "files" for backend compatibility
+        files.forEach((file) => formData.append("images", file)); // Adjust if backend expects "files"
         formData.append("senderId", senderId);
-        formData.append("receiverId", receiverId);
+        formData.append("receiverId", chatReceiverId);
         formData.append("conversationId", currentChat._id);
         formData.append("messageType", "image"); // Generic "file" type
         if (message.trim()) formData.append("message", message);
@@ -168,7 +214,7 @@ const Chat = () => {
       } else {
         newMsg = {
           senderId,
-          receiverId,
+          receiverId: chatReceiverId,
           conversationId: currentChat._id,
           message,
           messageType: "text",
@@ -305,6 +351,8 @@ const Chat = () => {
               </div>
             </div>
           ))}
+          {/* Dummy element for scrolling to bottom when no messages */}
+          <div ref={scrollRef}></div>
         </div>
 
         {/* Input */}

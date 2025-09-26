@@ -284,7 +284,7 @@ export default function Accepted({
                 </div>
               
               <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-							onClick={()=>navigate(`/profile-details/${serviceProvider._id}`)}
+							onClick={()=>navigate(`/profile-details/${serviceProvider._id}/direct`)}
 							>
                 View Profile
               </button>
