@@ -14,11 +14,13 @@ import Notification from "../assets/notifications.svg";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { FaBriefcase, FaGavel, FaTrophy, FaUserTie } from "react-icons/fa";
 
 // Fix for default marker icon in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
@@ -78,7 +80,9 @@ export default function Header() {
 
   // Handle unauthorized access (401)
   const handleUnauthorized = () => {
-    console.log("handleUnauthorized: Clearing localStorage and redirecting to login");
+    console.log(
+      "handleUnauthorized: Clearing localStorage and redirecting to login"
+    );
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
@@ -123,16 +127,24 @@ export default function Header() {
   useEffect(() => {
     if (isLoggedIn && !profile && !loading && !error) {
       const token = localStorage.getItem("bharat_token");
-      console.log("useEffect: fetchUserProfile triggered, token:", token ? token.slice(0, 10) + "..." : "null");
+      console.log(
+        "useEffect: fetchUserProfile triggered, token:",
+        token ? token.slice(0, 10) + "..." : "null"
+      );
       dispatch(fetchUserProfile()).then((result) => {
         if (fetchUserProfile.fulfilled.match(result)) {
           console.log("useEffect: fetchUserProfile succeeded");
           if (result.payload?.full_address) {
             setSavedAddresses(result.payload.full_address);
-            const savedIndex = parseInt(localStorage.getItem("selectedAddressId")) || 0;
+            const savedIndex =
+              parseInt(localStorage.getItem("selectedAddressId")) || 0;
             if (result.payload.full_address.length > 0) {
-              const defaultAddress = result.payload.full_address[savedIndex] || result.payload.full_address[0];
-              setSelectedAddress(defaultAddress.title || defaultAddress.address);
+              const defaultAddress =
+                result.payload.full_address[savedIndex] ||
+                result.payload.full_address[0];
+              setSelectedAddress(
+                defaultAddress.title || defaultAddress.address
+              );
               setSelectedAddressId(savedIndex);
             }
           }
@@ -162,12 +174,17 @@ export default function Header() {
 
         // Basic token format validation (e.g., expecting JWT-like structure)
         if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
-          console.log("fetchNotifications: Invalid token format, clearing token");
+          console.log(
+            "fetchNotifications: Invalid token format, clearing token"
+          );
           handleUnauthorized();
           return;
         }
 
-        console.log("fetchNotifications: Attempting API call with token:", token.slice(0, 10) + "...");
+        console.log(
+          "fetchNotifications: Attempting API call with token:",
+          token.slice(0, 10) + "..."
+        );
         const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
           method: "GET",
           headers: {
@@ -184,7 +201,11 @@ export default function Header() {
           setNotifications(combinedNotifications);
           setNotificationCount(combinedNotifications.length);
         } else {
-          console.log("fetchNotifications: Failed with status", res.status, data?.message);
+          console.log(
+            "fetchNotifications: Failed with status",
+            res.status,
+            data?.message
+          );
           if (res.status === 401) {
             handleUnauthorized();
             return;
@@ -369,7 +390,10 @@ export default function Header() {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
-        const newIndex = editingAddress !== null ? editingAddress : updatedAddresses.length - 1;
+        const newIndex =
+          editingAddress !== null
+            ? editingAddress
+            : updatedAddresses.length - 1;
         setSelectedAddressId(newIndex);
         setSelectedAddress(newAddress.title || newAddress.address);
         localStorage.setItem("selectedAddressId", newIndex);
@@ -377,7 +401,9 @@ export default function Header() {
         dispatch(fetchUserProfile());
       } else {
         if (response.status === 401) {
-          console.log("handleSaveLocation: 401 Unauthorized, redirecting to login");
+          console.log(
+            "handleSaveLocation: 401 Unauthorized, redirecting to login"
+          );
           handleUnauthorized();
           return;
         }
@@ -408,7 +434,9 @@ export default function Header() {
   // Handle select address
   const handleSelectAddress = (index) => {
     setSelectedAddressId(index);
-    setSelectedAddress(savedAddresses[index].title || savedAddresses[index].address);
+    setSelectedAddress(
+      savedAddresses[index].title || savedAddresses[index].address
+    );
     localStorage.setItem("selectedAddressId", index);
   };
 
@@ -440,7 +468,9 @@ export default function Header() {
         dispatch(fetchUserProfile());
       } else {
         if (response.status === 401) {
-          console.log("handleSaveChanges: 401 Unauthorized, redirecting to login");
+          console.log(
+            "handleSaveChanges: 401 Unauthorized, redirecting to login"
+          );
           handleUnauthorized();
           return;
         }
@@ -510,7 +540,10 @@ export default function Header() {
             />
           </div>
           {isLoggedIn && (
-            <div className="relative flex items-center" ref={addressDropdownRef}>
+            <div
+              className="relative flex items-center"
+              ref={addressDropdownRef}
+            >
               <input
                 type="text"
                 placeholder={selectedAddress}
@@ -544,7 +577,10 @@ export default function Header() {
                     <p className="text-sm text-gray-600">No saved addresses</p>
                   ) : (
                     savedAddresses.map((address, index) => (
-                      <div key={index} className="flex items-center justify-between py-2">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between py-2"
+                      >
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
@@ -554,8 +590,12 @@ export default function Header() {
                             className="form-radio h-4 w-4 text-[#228B22]"
                           />
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{address.title || address.address}</p>
-                            <p className="text-xs text-gray-500">{address.address}</p>
+                            <p className="text-sm font-medium text-gray-800">
+                              {address.title || address.address}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {address.address}
+                            </p>
                           </div>
                         </div>
                         <button
@@ -752,36 +792,56 @@ export default function Header() {
                   <img src={Profile} alt="Profile" className="w-5 h-5" />
                   Profile
                 </Link>
-								<Link
+                <Link
                   to="/user/work-list/My Hire"
                   className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  <div>
+                    <FaUserTie
+                      className="w-5 h-5 text-black-500"
+                      title="Hiring"
+                    />
+                  </div>
                   My Hire
                 </Link>
-								<Link
+                <Link
                   to="/worker/work-list/My Hire"
                   className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  <div>
+                    <FaBriefcase
+                      className="w-5 h-5 text-black-500"
+                      title="Work"
+                    />
+                  </div>
                   My Work
                 </Link>
-								<Link
+                <Link
                   to="/details"
                   className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                   <div>
+                    <FaGavel
+                      className="w-5 h-5 text-black-500"
+                      title="Hiring"
+                    />
+                  </div>
                   Disputes
                 </Link>
-								<Link
+                <Link
                   to="/details"
                   className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
                   onClick={() => setIsOpen(false)}
                 >
-                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                   <div>
+                    <FaTrophy
+                      className="w-5 h-5 text-black-500"
+                      title="Hiring"
+                    />
+                  </div>
                   Promotion
                 </Link>
                 <button

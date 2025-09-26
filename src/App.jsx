@@ -111,7 +111,7 @@ export default function App() {
         <Route path="/editworker/:id" element={<EditWorkerDetails />} />
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/filter-worker" element={<FilterWorker />} />
-        <Route path="/profile-details/:serviceProviderId" element={<ViewProfileDetails />} />
+        <Route path="/profile-details/:serviceProviderId/:type" element={<ViewProfileDetails />} />
 				<Route path="/profile-user-details/:userId" element={<ViewUserProfileDetails />} />
         <Route path="/chats" element={<Chat />} />
 

@@ -463,7 +463,7 @@ export default function ViewProfile() {
                       {provider?.location?.address || "No Address Provided"}
                     </p>
                     <Link
-                      to={`/service_provider/${provider._id}`}
+                      to={`/profile-details/${provider._id}/emergency`}
                       className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                     >
                       View Profile

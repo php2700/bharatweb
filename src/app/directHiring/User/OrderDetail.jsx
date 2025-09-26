@@ -623,7 +623,7 @@ export default function ViewProfile() {
                               "No Address Provided"}
                           </p>
                           <Link
-                            to={`/profile-details/${provider.provider_id._id}`}
+                            to={`/profile-details/${provider.provider_id._id}/direct`}
                             className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                           >
                             View Profile
@@ -814,7 +814,7 @@ export default function ViewProfile() {
                           {worker.location?.address || "No Address Provided"}
                         </p>
                         <Link
-                          to={`/profile-details/${worker._id}`}
+                          to={`/profile-details/${worker._id}/direct`}
                           className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                         >
                           View Profile

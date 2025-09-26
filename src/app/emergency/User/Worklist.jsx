@@ -236,8 +236,8 @@ export default function Worklist() {
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
-        <div className="text-xl sm:text-2xl max-w-5xl font-bold mx-auto">
-          My Work
+        <div className="text-xl sm:text-2xl max-w-5xl text-center mb-5 font-bold mx-auto">
+          My Hiring
         </div>
         {/* Tabs */}
         <div className="flex justify-center gap-[200px] bg-gray-100 p-2 mb-6">

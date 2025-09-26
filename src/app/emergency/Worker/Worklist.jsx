@@ -236,7 +236,7 @@ export default function Worklist() {
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
-        <div className="text-xl sm:text-2xl max-w-5xl font-bold mx-auto">
+        <div className="text-xl sm:text-2xl max-w-5xl text-center mb-5 font-bold mx-auto">
           My Work
         </div>
         {/* Tabs */}

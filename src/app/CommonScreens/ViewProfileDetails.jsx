@@ -16,7 +16,7 @@ import defaultPic from "../../assets/default-image.jpg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ViewProfileDetails() {
-  const { serviceProviderId } = useParams();
+  const { serviceProviderId, type } = useParams();
   const navigate = useNavigate();
   const [worker, setWorker] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,22 +37,29 @@ export default function ViewProfileDetails() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data?.success) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -99,7 +106,10 @@ export default function ViewProfileDetails() {
         if (response.data?.success) {
           setWorker(response.data.data);
         } else {
-          console.error("Failed to fetch worker profile:", response.data?.message);
+          console.error(
+            "Failed to fetch worker profile:",
+            response.data?.message
+          );
           toast.error("Failed to load worker profile.");
         }
       } catch (error) {
@@ -122,7 +132,9 @@ export default function ViewProfileDetails() {
     if (WorkerTab !== "work" || !memoizedWorker?.hiswork?.length) return;
 
     const interval = setInterval(() => {
-      setWorkIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.hiswork.length);
+      setWorkIndex(
+        (prevIndex) => (prevIndex + 1) % memoizedWorker.hiswork.length
+      );
     }, 2000);
 
     return () => clearInterval(interval);
@@ -130,10 +142,13 @@ export default function ViewProfileDetails() {
 
   // Review carousel
   useEffect(() => {
-    if (WorkerTab !== "review" || !memoizedWorker?.customerReview?.length) return;
+    if (WorkerTab !== "review" || !memoizedWorker?.customerReview?.length)
+      return;
 
     const interval = setInterval(() => {
-      setReviewIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.customerReview.length);
+      setReviewIndex(
+        (prevIndex) => (prevIndex + 1) % memoizedWorker.customerReview.length
+      );
     }, 2000);
 
     return () => clearInterval(interval);
@@ -141,10 +156,13 @@ export default function ViewProfileDetails() {
 
   // Business images carousel
   useEffect(() => {
-    if (WorkerTab !== "business" || !memoizedWorker?.businessImage?.length) return;
+    if (WorkerTab !== "business" || !memoizedWorker?.businessImage?.length)
+      return;
 
     const interval = setInterval(() => {
-      setWorkIndex((prevIndex) => (prevIndex + 1) % memoizedWorker.businessImage.length);
+      setWorkIndex(
+        (prevIndex) => (prevIndex + 1) % memoizedWorker.businessImage.length
+      );
     }, 2000);
 
     return () => clearInterval(interval);
@@ -153,6 +171,10 @@ export default function ViewProfileDetails() {
   // Handle document image click
   const handleDocumentClick = (image) => {
     setSelectedImage(image);
+  };
+
+  const handleHire = (serviceProviderId) => {
+    navigate(`/direct-hiring/${serviceProviderId}`);
   };
 
   // Close modal
@@ -198,16 +220,18 @@ export default function ViewProfileDetails() {
     totalReviews = 0,
   } = memoizedWorker;
 
-  const verifiedStatus = verificationStatus === "verified"
-    ? "Verified by Admin"
-    : verificationStatus === "rejected"
-    ? "Rejected"
-    : "Pending";
-  const statusClass = verificationStatus === "verified"
-    ? "bg-green-100 text-green-600"
-    : verificationStatus === "rejected"
-    ? "bg-red-100 text-red-600"
-    : "bg-yellow-100 text-yellow-600";
+  const verifiedStatus =
+    verificationStatus === "verified"
+      ? "Verified by Admin"
+      : verificationStatus === "rejected"
+      ? "Rejected"
+      : "Pending";
+  const statusClass =
+    verificationStatus === "verified"
+      ? "bg-green-100 text-green-600"
+      : verificationStatus === "rejected"
+      ? "bg-red-100 text-red-600"
+      : "bg-yellow-100 text-yellow-600";
 
   const testimage = profilePic && profilePic !== "Not Available";
 
@@ -224,7 +248,9 @@ export default function ViewProfileDetails() {
   };
 
   // Determine reviews to display
-  const displayedReviews = showAllReviews ? rateAndReviews : rateAndReviews.slice(0, 2);
+  const displayedReviews = showAllReviews
+    ? rateAndReviews
+    : rateAndReviews.slice(0, 2);
 
   return (
     <>
@@ -312,13 +338,15 @@ export default function ViewProfileDetails() {
                   </span>
                 )}
               </div>
-             {/* <div className="flex items-center gap-2 text-gray-600 font-semibold">
+              {/* <div className="flex items-center gap-2 text-gray-600 font-semibold">
                 <img src={Location} alt="Phone icon" className="w-5 h-5" />
                 <span>{phone}</span>
               </div> */}
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
                 <img src={Location} alt="Location icon" className="w-5 h-5" />
-                <span>{isShop ? businessAddress.address : location.address}</span>
+                <span>
+                  {isShop ? businessAddress.address : location.address}
+                </span>
               </div>
               <p className="text-base font-semibold text-gray-700">
                 <span className="font-semibold text-[#228B22]">Category-</span>{" "}
@@ -328,7 +356,8 @@ export default function ViewProfileDetails() {
                 <span className="font-semibold text-[#228B22]">
                   Sub-Categories-
                 </span>{" "}
-                {Array.isArray(subcategory_names) && subcategory_names.length > 0
+                {Array.isArray(subcategory_names) &&
+                subcategory_names.length > 0
                   ? subcategory_names.map((name, index) => (
                       <span key={index}>
                         {name.trim()}
@@ -345,7 +374,9 @@ export default function ViewProfileDetails() {
                   {emergencySubcategory_names.map((name, index) => (
                     <span key={index}>
                       {name.trim()}
-                      {index !== emergencySubcategory_names.length - 1 ? ", " : ""}
+                      {index !== emergencySubcategory_names.length - 1
+                        ? ", "
+                        : ""}
                     </span>
                   ))}
                 </p>
@@ -619,13 +650,29 @@ export default function ViewProfileDetails() {
               </div>
             </div>
           )}
+          {type === "direct" && (
+            <div className="flex justify-center mt-6">
+              <button
+                className="w-1/2 py-4 bg-[#228B22] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+                onClick={() => handleHire(worker._id)}
+              >
+                Hire
+              </button>
+            </div>
+          )}
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Rate & Reviews</h2>
               <div className="flex items-center gap-2">
-							<span className="text-2xl font-bold text-lead-600">Ratings</span>
-                <span className="text-2xl font-bold text-[#228B22]">{avgRating}</span>
-                <span className="text-sm text-gray-600">({totalReviews} reviews)</span>
+                <span className="text-2xl font-bold text-lead-600">
+                  Ratings
+                </span>
+                <span className="text-2xl font-bold text-[#228B22]">
+                  {avgRating}
+                </span>
+                <span className="text-sm text-gray-600">
+                  ({totalReviews} reviews)
+                </span>
               </div>
             </div>
             {displayedReviews.length > 0 ? (
@@ -639,9 +686,7 @@ export default function ViewProfileDetails() {
                       <span
                         key={i}
                         className={
-                          i < item.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300"
+                          i < item.rating ? "text-yellow-400" : "text-gray-300"
                         }
                       >
                         ★
@@ -661,7 +706,8 @@ export default function ViewProfileDetails() {
                   </div>
                   <p className="text-gray-600 text-sm mb-2">{item.review}</p>
                   <p className="text-xs text-gray-400 mb-2">
-                    {new Date(item.createdAt).toLocaleDateString()} • {item.order_type}
+                    {new Date(item.createdAt).toLocaleDateString()} •{" "}
+                    {item.order_type}
                   </p>
                   {item.images?.length > 0 && (
                     <div className="flex flex-wrap gap-2">
