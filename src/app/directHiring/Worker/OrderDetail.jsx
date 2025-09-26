@@ -640,6 +640,7 @@ export default function ViewProfile() {
               <div ref={acceptedSectionRef}>
                 <Accepted
                   serviceProvider={orderData?.user_id}
+									user_id={orderData?.service_provider_id._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
                   orderId={id}

@@ -15,6 +15,7 @@ export default function Accepted({
   paymentHistory,
   orderId,
   hireStatus,
+	user_id,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
@@ -234,8 +235,12 @@ export default function Accepted({
     toast.info("Form cleared!");
   };
 
-	 const handleChatOpen = (receiverId) => {
-    navigate(`/chats/${receiverId}`); // go to chat page
+	   const handleChatOpen = (receiverId, senderId) => {
+    // Save receiverId in localStorage
+    localStorage.setItem("receiverId", receiverId);
+    localStorage.setItem("senderId", senderId);
+    // Redirect to chat page
+    navigate("/chats");
   };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -268,16 +273,16 @@ export default function Accepted({
               <p className="text-lg font-semibold">
                 {serviceProvider.full_name || "Unknown Worker"}
               </p>
-              {hireStatus !== "completed" && (
+             
                 <div className="flex ml-auto items-center space-x-3 ml-6">
                   <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                     <img src={Call} alt="Call" className="w-5 h-5" />
                   </div>
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id)}>
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id, user_id)}>
                     <img src={Message} alt="Message" className="w-5 h-5" />
                   </div>
                 </div>
-              )}
+              
               <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
 							onClick={()=>navigate(`/profile-details/${serviceProvider._id}`)}
 							>

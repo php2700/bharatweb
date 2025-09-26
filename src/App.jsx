@@ -113,7 +113,7 @@ export default function App() {
         <Route path="/filter-worker" element={<FilterWorker />} />
         <Route path="/profile-details/:serviceProviderId" element={<ViewProfileDetails />} />
 				<Route path="/profile-user-details/:userId" element={<ViewUserProfileDetails />} />
-        <Route path="/chats/:receiverId" element={<Chat />} />
+        <Route path="/chats" element={<Chat />} />
 
         {/* Service Provider Routes */}
         <Route

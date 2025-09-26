@@ -752,6 +752,38 @@ export default function Header() {
                   <img src={Profile} alt="Profile" className="w-5 h-5" />
                   Profile
                 </Link>
+								<Link
+                  to="/user/work-list/My Hire"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  My Hire
+                </Link>
+								<Link
+                  to="/worker/work-list/My Hire"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  My Work
+                </Link>
+								<Link
+                  to="/details"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  Disputes
+                </Link>
+								<Link
+                  to="/details"
+                  className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img src={Profile} alt="Profile" className="w-5 h-5" />
+                  Promotion
+                </Link>
                 <button
                   onClick={logoutdestroy}
                   className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100 transition-colors duration-200"

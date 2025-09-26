@@ -10,19 +10,22 @@ export default function Accepted({
   assignedWorker,
   paymentHistory,
   orderId,
-  user,
+  user_id
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-  const service_provider_id = user;
-  const order_id = orderId;
+	
   const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const handleChatOpen = (receiverId) => {
-    navigate(`/chats/${receiverId}`); // go to chat page
+    const handleChatOpen = (receiverId, senderId) => {
+    // Save receiverId in localStorage
+    localStorage.setItem("receiverId", receiverId);
+    localStorage.setItem("senderId", senderId);
+    // Redirect to chat page
+    navigate("/chats");
   };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -51,7 +54,7 @@ export default function Accepted({
               </div>
               <div
                 className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                onClick={() => handleChatOpen(serviceProvider._id)}
+                onClick={() => handleChatOpen(serviceProvider._id, user_id)}
               >
                 <img src={Message} alt="Message" className="w-5 h-5" />
               </div>
