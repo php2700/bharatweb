@@ -17,70 +17,147 @@ const Chat = () => {
   const [files, setFiles] = useState([]); // Renamed from images to files for generality
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]); // For image previews only
+  const [isLoading, setIsLoading] = useState(true);
+  const [isChatInitialized, setIsChatInitialized] = useState(false); // Tracks full initialization
   const scrollRef = useRef();
   const fileInputRef = useRef(null);
 
-  // Fetch conversations and handle new room creation if receiverId is provided
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await axios.get(
-          `${Base_url}api/chat/conversations/${senderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        const conversationsWithUnread = res.data.conversations.map((conv) => ({
-          ...conv,
-          unreadCount: 0,
-        }));
-        setConversations(conversationsWithUnread || []);
+  // Fetch user details for a given member ID
+  const fetchUserDetails = async (memberId) => {
+    try {
+      const res = await axios.get(`${Base_url}api/users/${memberId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      return res.data.user;
+    } catch (err) {
+      console.error("Failed to fetch user details:", err);
+      return { _id: memberId, full_name: "Unknown User" }; // Fallback
+    }
+  };
 
-        // If receiverId is provided, check for existing conversation or create a new one
-        if (receiverId) {
-          const existingConv = conversationsWithUnread.find((conv) =>
-            conv.members.some((m) => m._id === receiverId)
-          );
-          if (existingConv) {
-            setCurrentChat(existingConv);
-          } else {
-            // Create new conversation (adjust body if backend expects different format, e.g., {receiverId} or {members: [senderId, receiverId]})
-            try {
-              const createRes = await axios.post(
-                `${Base_url}api/chat/conversations`,
-                { senderId, receiverId },
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                }
-              );
-              const newConv = {
-                ...createRes.data.conversation,
-                unreadCount: 0,
-              };
-              setConversations((prev) => [...prev, newConv]);
-              setCurrentChat(newConv);
-            } catch (createErr) {
-              console.error("Failed to create conversation:", createErr);
-              alert("Failed to start new conversation. Please check backend endpoint.");
+  // Enrich conversations with user details
+  const enrichConversations = async (convs) => {
+    const enriched = await Promise.all(
+      convs.map(async (conv) => {
+        const enrichedMembers = await Promise.all(
+          conv.members.map(async (member) => {
+            if (typeof member === "string") {
+              return await fetchUserDetails(member);
             }
-          }
-          // Clear receiverId from localStorage after handling to prevent repeated attempts
-          localStorage.removeItem("receiverId");
-        } else if (conversationsWithUnread.length > 0) {
-          setCurrentChat(conversationsWithUnread[0]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch conversations:", err);
-      }
-    };
-    fetchConversations();
-  }, [senderId, receiverId]); // Dependencies include receiverId to react if it changes (though typically on mount)
+            return member; // Already an object, use as is
+          })
+        );
+        return { ...conv, members: enrichedMembers };
+      })
+    );
+    return enriched;
+  };
 
-  // Join Socket for online users
+useEffect(() => {
+  const fetchConversations = async () => {
+    setIsLoading(true);
+    setIsChatInitialized(false); // Reset initialization state
+    try {
+      const res = await axios.get(
+        `${Base_url}api/chat/conversations/${senderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      let conversationsWithUnread = res.data.conversations.map((conv) => ({
+        ...conv,
+        unreadCount: 0,
+      }));
+
+      // Enrich conversations with user details
+      conversationsWithUnread = await enrichConversations(conversationsWithUnread);
+      setConversations(conversationsWithUnread || []);
+
+      let selectedChat = null;
+
+      // ✅ If receiverId is present in localStorage, start or continue that chat
+      if (receiverId) {
+        const existingConv = conversationsWithUnread.find((conv) =>
+          conv.members.some((m) => m._id === receiverId)
+        );
+
+        if (existingConv) {
+          // If conversation already exists, use it (don’t add duplicate)
+          selectedChat = existingConv;
+        } else {
+          // Otherwise, create a new conversation
+          const createRes = await axios.post(
+            `${Base_url}api/chat/conversations`,
+            { senderId, receiverId },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+
+          const newConv = {
+            ...createRes.data.conversation,
+            unreadCount: 0,
+          };
+
+          // Enrich members
+          const enrichedMembers = await Promise.all(
+            newConv.members.map(async (member) => {
+              if (typeof member === "string") {
+                return await fetchUserDetails(member);
+              }
+              return member;
+            })
+          );
+
+          const enrichedNewConv = { ...newConv, members: enrichedMembers };
+
+          // Only add if it doesn’t already exist
+          setConversations((prev) => {
+            if (prev.some((c) => c._id === enrichedNewConv._id)) {
+              return prev;
+            }
+            return [...prev, enrichedNewConv];
+          });
+
+          selectedChat = enrichedNewConv;
+        }
+
+        // ✅ clear receiverId only after using it
+        localStorage.removeItem("receiverId");
+      } else {
+        // If no receiver, load last selected or first conversation
+        const lastSelectedConvId = localStorage.getItem("lastSelectedConvId");
+        if (lastSelectedConvId) {
+          selectedChat = conversationsWithUnread.find(
+            (conv) => conv._id === lastSelectedConvId
+          );
+        }
+        if (!selectedChat && conversationsWithUnread.length > 0) {
+          selectedChat = conversationsWithUnread[0];
+        }
+      }
+
+      setCurrentChat(selectedChat);
+    } catch (err) {
+      console.error("Failed to fetch conversations:", err);
+      alert("Failed to load conversations. Please try again.");
+    } finally {
+      setIsLoading(false);
+      setIsChatInitialized(true);
+    }
+  };
+
+  if (senderId) {
+    fetchConversations();
+  }
+}, [senderId, receiverId]); // ✅ depend on receiverId too
+
+
   useEffect(() => {
     socket.emit("addUser", senderId);
     socket.on("getUsers", (users) => {
@@ -89,14 +166,12 @@ const Chat = () => {
     return () => socket.off("getUsers");
   }, [senderId]);
 
-  // Join Socket room for the current conversation (assuming backend supports rooms)
   useEffect(() => {
     if (currentChat) {
-      socket.emit("joinRoom", currentChat._id); // Join the room to receive targeted messages
+      socket.emit("joinRoom", currentChat._id);
     }
   }, [currentChat]);
 
-  // Fetch messages when chat is selected
   useEffect(() => {
     const fetchMessages = async () => {
       if (currentChat) {
@@ -115,10 +190,9 @@ const Chat = () => {
               conv._id === currentChat._id ? { ...conv, unreadCount: 0 } : conv
             )
           );
-          // Scroll to bottom after fetching messages
           setTimeout(() => {
             scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-          }, 100); // Small delay to ensure DOM update
+          }, 100);
         } catch (err) {
           console.error("Failed to fetch messages:", err);
         }
@@ -127,14 +201,11 @@ const Chat = () => {
     fetchMessages();
   }, [currentChat]);
 
-  // Receive message from socket
   useEffect(() => {
     socket.on("getMessage", (data) => {
       if (currentChat && data.conversationId === currentChat._id) {
         setMessages((prev) => [...prev, data]);
-      } else if (
-        conversations.some((conv) => conv._id === data.conversationId)
-      ) {
+      } else if (conversations.some((conv) => conv._id === data.conversationId)) {
         setConversations((prev) =>
           prev.map((conv) =>
             conv._id === data.conversationId
@@ -151,7 +222,12 @@ const Chat = () => {
     return () => socket.off("getMessage");
   }, [currentChat, conversations]);
 
-  // Handle file selection and preview
+  useEffect(() => {
+    if (currentChat) {
+      localStorage.setItem("lastSelectedConvId", currentChat._id);
+    }
+  }, [currentChat]);
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length > 5) {
@@ -159,7 +235,6 @@ const Chat = () => {
       return;
     }
 
-    // Deduplicate files based on name and size
     const uniqueFiles = [];
     const seen = new Set();
     selectedFiles.forEach((file) => {
@@ -172,21 +247,24 @@ const Chat = () => {
 
     setFiles(uniqueFiles);
 
-    // Generate previews only for images
     const previews = uniqueFiles
       .filter((file) => file.type.startsWith("image/"))
       .map((file) => URL.createObjectURL(file));
     setFilePreviews(previews);
 
-    // Clear file input
     if (fileInputRef.current) {
       fileInputRef.current.value = null;
     }
   };
 
-  // Send message (text or files)
   const sendMessage = async () => {
     if (!message.trim() && files.length === 0) return;
+
+    if (!currentChat || !isChatInitialized) {
+      alert("Please wait for the chat to fully load before sending a message.");
+      return;
+    }
+
     const chatReceiverId = currentChat.members.find((m) => m._id !== senderId)?._id;
     if (!chatReceiverId) {
       alert("Receiver ID not found in conversation");
@@ -197,11 +275,11 @@ const Chat = () => {
       let newMsg;
       if (files.length > 0) {
         const formData = new FormData();
-        files.forEach((file) => formData.append("images", file)); // Adjust if backend expects "files"
+        files.forEach((file) => formData.append("images", file));
         formData.append("senderId", senderId);
         formData.append("receiverId", chatReceiverId);
         formData.append("conversationId", currentChat._id);
-        formData.append("messageType", "image"); // Generic "file" type
+        formData.append("messageType", "image");
         if (message.trim()) formData.append("message", message);
 
         const res = await axios.post(`${Base_url}api/chat/messages`, formData, {
@@ -236,12 +314,10 @@ const Chat = () => {
     }
   };
 
-  // Auto-scroll to latest message
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Cleanup previews on unmount
   useEffect(() => {
     return () => {
       filePreviews.forEach((preview) => URL.revokeObjectURL(preview));
@@ -294,7 +370,11 @@ const Chat = () => {
       {/* Chat Box */}
       <div className="w-2/3 flex flex-col">
         <div className="flex-1 p-4 overflow-y-auto bg-white shadow-inner">
-          {messages.map((msg, index) => (
+          {isLoading ? (
+            <div className="flex justify-center items-center h-full">
+              Loading chat...
+            </div>
+          ) : messages.map((msg, index) => (
             <div
               key={msg._id}
               ref={index === messages.length - 1 ? scrollRef : null}
@@ -341,9 +421,7 @@ const Chat = () => {
                         />
                       );
                     })}
-                    {msg.message && (
-                      <div className="mt-2 text-sm">{msg.message}</div>
-                    )}
+                    {msg.message && <div className="mt-2 text-sm">{msg.message}</div>}
                   </div>
                 ) : (
                   <p className="text-sm">{msg.message}</p>
@@ -351,7 +429,6 @@ const Chat = () => {
               </div>
             </div>
           ))}
-          {/* Dummy element for scrolling to bottom when no messages */}
           <div ref={scrollRef}></div>
         </div>
 
@@ -365,16 +442,18 @@ const Chat = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                onKeyPress={(e) => !isLoading && isChatInitialized && e.key === "Enter" && sendMessage()}
+                disabled={isLoading || !isChatInitialized}
               />
               <label className="flex items-center p-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition duration-200">
                 <input
                   type="file"
-                  accept="image/*,.pdf,.doc,.docx,.txt,.zip" // Added common document types
+                  accept="image/*,.pdf,.doc,.docx,.txt,.zip"
                   multiple
                   onChange={handleFileChange}
                   ref={fileInputRef}
                   className="hidden"
+                  disabled={isLoading || !isChatInitialized}
                 />
                 <svg
                   className="w-5 h-5 text-gray-600"
@@ -393,6 +472,7 @@ const Chat = () => {
               <button
                 onClick={sendMessage}
                 className="p-2 bg-gradient-to-br from-blue-500 to-blue-400 text-white rounded-lg hover:from-blue-600 hover:to-blue-500 transition duration-200"
+                disabled={isLoading || !isChatInitialized}
               >
                 <svg
                   className="w-5 h-5"
@@ -409,7 +489,6 @@ const Chat = () => {
                 </svg>
               </button>
             </div>
-            {/* File Preview (images only) */}
             {filePreviews.length > 0 && (
               <div className="flex gap-2 overflow-x-auto p-2 bg-gray-50 rounded-lg">
                 {filePreviews.map((preview, index) => (
@@ -422,17 +501,12 @@ const Chat = () => {
                 ))}
               </div>
             )}
-            {/* Document Preview (file names) */}
-            {files.filter((file) => !file.type.startsWith("image/")).length >
-              0 && (
+            {files.filter((file) => !file.type.startsWith("image/")).length > 0 && (
               <div className="flex gap-2 overflow-x-auto p-2 bg-gray-50 rounded-lg">
                 {files
                   .filter((file) => !file.type.startsWith("image/"))
                   .map((file, index) => (
-                    <div
-                      key={index}
-                      className="p-2 bg-white rounded border text-xs"
-                    >
+                    <div key={index} className="p-2 bg-white rounded border text-xs">
                       📎 {file.name}
                     </div>
                   ))}

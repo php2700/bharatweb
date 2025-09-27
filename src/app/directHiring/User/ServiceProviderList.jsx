@@ -249,7 +249,7 @@ export default function ServiceProviderList() {
                         {capitalizeWords(worker?.location.address) || "Unknown"}
                       </div>
                       <div className="flex gap-4">
-                        <Link to={`/profile-details/${worker._id}`}>
+                        <Link to={`/profile-details/${worker._id}/direct`}>
                           <button className="text-[#228B22] py-1 px-4 border rounded-lg">
                             View Profile
                           </button>
