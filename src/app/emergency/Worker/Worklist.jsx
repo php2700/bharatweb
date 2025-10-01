@@ -110,12 +110,11 @@ export default function Worklist() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         // Map API response to the expected structure
         const mappedTasks = response.data.data.map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image || Work, // Fallback to Work image
+          image: task.image_urls?.[0] || task.image_url?.[0] || Work, // Fallback to Work image
           name: task.category_id?.name || task.title || "Unnamed Task",
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
@@ -289,11 +288,14 @@ export default function Worklist() {
                 className="flex bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Left Image Section */}
-                <div className="relative w-1/3">
+                <div className="relative w-[300px] h-auto bg-gray-100 flex items-center justify-center">
                   <img
                     src={task.image}
                     alt={task.name}
-                    className="h-full w-full object-cover"
+                    className="w-full h-auto max-h-[300px] object-full"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png";
+                    }}
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
                     {task.project_id}
@@ -341,7 +343,9 @@ export default function Worklist() {
                   </div>
                   <div className="flex justify-between items-center mt-4">
                     <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
-                      {task.location}
+                      {task.location.length > 20
+                        ? `${task.location.slice(0, 20)}...`
+                        : task.location}
                     </span>
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
@@ -351,7 +355,6 @@ export default function Worklist() {
                           "My Hire": "hire/worker",
                           "Emergency Tasks": "emergency/worker",
                         };
-
                         const route = tabRoutes[activeTab];
                         navigate(`/${route}/order-detail/${task.id}`);
                       }}
@@ -365,15 +368,17 @@ export default function Worklist() {
           )}
         </div>
 
-        {/* See All */}
-        <div className="flex justify-center my-8">
+        {/* See All
+					
+					 <div className="flex justify-center my-8">
           <button className="py-2 px-8 text-white rounded-full bg-[#228B22]">
             See All
           </button>
         </div>
+					*/}
 
         {/* Bottom Banner Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
               Loading banners...

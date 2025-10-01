@@ -2,7 +2,6 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import NotificationToast from "./component/NotificationToast";
 
-
 // Public Screens
 import Home from "./app/CommonScreens/Home";
 import LoginPage from "./app/CommonScreens/login";
@@ -91,15 +90,26 @@ import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
 import Chat from "./app/CommonScreens/Chat";
 
 export default function App() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .register("/firebase-messaging-sw.js")
+      .then((registration) => {
+        console.log("✅ Service Worker registered:", registration.scope);
+      })
+      .catch((err) => {
+        console.error("❌ Service Worker registration failed:", err);
+      });
+  }
   return (
     <>
       <NotificationToast />
+
       <Routes>
         {/* \-------------------------------------------------------------------------------------------------------/
              \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
               \-------------------------------------------------------------------------------------------------- /  */}
         <Route path="/" element={<Home />} />
-        
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/ourservices" element={<OurServices />} />
         <Route path="/subcategories" element={<OurSubCategories />} />
@@ -111,8 +121,14 @@ export default function App() {
         <Route path="/editworker/:id" element={<EditWorkerDetails />} />
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/filter-worker" element={<FilterWorker />} />
-        <Route path="/profile-details/:serviceProviderId/:type" element={<ViewProfileDetails />} />
-				<Route path="/profile-user-details/:userId" element={<ViewUserProfileDetails />} />
+        <Route
+          path="/profile-details/:serviceProviderId/:type"
+          element={<ViewProfileDetails />}
+        />
+        <Route
+          path="/profile-user-details/:userId"
+          element={<ViewUserProfileDetails />}
+        />
         <Route path="/chats" element={<Chat />} />
 
         {/* Service Provider Routes */}
@@ -137,7 +153,10 @@ export default function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/customer-care" element={<CustomerCare />} />
         {/* Direct Hiring Route */}
-        <Route path="/service-provider-list" element={<ServiceProviderList />} />
+        <Route
+          path="/service-provider-list"
+          element={<ServiceProviderList />}
+        />
         <Route
           path="/service-provider-hire-detail"
           element={<ServiceProviderHireDetail />}
@@ -158,8 +177,11 @@ export default function App() {
         <Route path="/bidding/newtask" element={<BiddingNewTask />} />
         <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
         <Route path="/bidding/myhire" element={<MyHireBidding />} />
-        <Route path="/bidding/getworkdetail/:id" element={<BiddinggetWorkDetail />} />
-              
+        <Route
+          path="/bidding/getworkdetail/:id"
+          element={<BiddinggetWorkDetail />}
+        />
+
         <Route path="/bidding/hiredetail/:id" element={<HireDetail />} />
         <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
         <Route path="/bidding/dispute" element={<BiddingDispute />} />
@@ -177,7 +199,10 @@ export default function App() {
         {/*  \-----------------------------------------------------------------------------------------------------------------------------/
               \                 ╔════════════════════════════════ Protected Routes Start ═══════════════════════════╗                      /
                \--------------------------------------------------------------------------------------------------------------------------/    */}
-        <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+        <Route
+          path="/profile"
+          element={<PrivateRoute element={<Profile />} />}
+        />
         <Route
           path="/verify-otp"
           element={
@@ -207,7 +232,10 @@ export default function App() {
           element={<EmergencyOrderDetails />}
         />
         {/* // Emergency Routes- Worker */}
-        <Route path="/emergency/worker/work-list" element={<WorkerWorklist />} />
+        <Route
+          path="/emergency/worker/work-list"
+          element={<WorkerWorklist />}
+        />
         <Route
           path="/emergency/worker/:id"
           element={<EmergencyWorkerAcceptReject />}
@@ -222,15 +250,17 @@ export default function App() {
         <Route path="/view-worker/:id" element={<ViewWorker />} />
         {/**Direct hiring  Routing */}
         {/**User */}
-        
+
         <Route
           path="/my-hire/order-detail/:id"
           element={<MyHireOrderDetails />}
         />
         {/**Provider */}
-       
-       <Route path="/hire/worker/order-detail/:id" element={<DirectProviderordetail />} />
 
+        <Route
+          path="/hire/worker/order-detail/:id"
+          element={<DirectProviderordetail />}
+        />
       </Routes>
     </>
   );
