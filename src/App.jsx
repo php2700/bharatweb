@@ -89,6 +89,7 @@ import DirectProviderordetail from "./app/directHiring/Worker/OrderDetail";
 //Directing
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
 import Chat from "./app/CommonScreens/Chat";
+import Promotion from "./app/CommonScreens/Promotion";
 
 export default function App() {
   return (
@@ -166,6 +167,7 @@ export default function App() {
         <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
         <Route path="/bidding/checknow" element={<Biddercheck />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/promotion" element={<Promotion/>} />
 
         <Route
           path="/review"
