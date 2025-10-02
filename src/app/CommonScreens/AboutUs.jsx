@@ -75,7 +75,7 @@ export default function AboutUs() {
   return (
     <>
       <Header />
-      <div className="mx-auto px-4 sm:px-10 md:px-20 py-10">
+      <div className="mx-auto px-4 sm:px-10 md:px-20 py-10 mt-20">
         {/* About Us Title */}
         <h2 className="text-center text-[30px] font-bold mb-10">About Us</h2>
 

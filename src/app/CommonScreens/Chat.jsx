@@ -2,14 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import defaultPic from "../../assets/default-image.jpg";
-
+import Header from "../../component/Header";
+import Footer from "../../component/footer";
 const Base_url = import.meta.env.VITE_SOCKET_URL;
 const socket = io("https://api.thebharatworks.com/");
 
 const Chat = () => {
   const senderId = localStorage.getItem("senderId");
   const receiverId = localStorage.getItem("receiverId"); // Assuming standard spelling; adjust if key is different
-  console.log("User ID from Redux:", senderId);
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -22,7 +22,6 @@ const Chat = () => {
   const scrollRef = useRef();
   const fileInputRef = useRef(null);
 
-  // Fetch user details for a given member ID
   const fetchUserDetails = async (memberId) => {
     try {
       const res = await axios.get(`${Base_url}api/users/${memberId}`, {
@@ -325,7 +324,9 @@ useEffect(() => {
   }, [filePreviews]);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-white">
+		<>
+		<Header />
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-white mt-20">
       {/* Sidebar */}
       <div className="w-1/3 bg-white border-r border-gray-200 shadow-md">
         <h3 className="p-4 text-lg font-semibold text-gray-800 bg-gradient-to-r from-gray-100 to-white">
@@ -516,6 +517,8 @@ useEffect(() => {
         )}
       </div>
     </div>
+		<Footer />
+		</>
   );
 };
 

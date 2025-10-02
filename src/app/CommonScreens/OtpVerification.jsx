@@ -48,7 +48,7 @@ export default function OtpVerification() {
         toast.success("OTP verified successfully!");
 
         localStorage.removeItem("mobileNumber");
-
+        
         setTimeout(() => {
           navigate("/select-role");
         }, 2000);

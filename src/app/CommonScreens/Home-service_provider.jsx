@@ -345,7 +345,7 @@ export default function ServiceProviderHome() {
       {token ? (
         <>
           {/* First Full Width Image with Slider */}
-          <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+          <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-20">
             {bannerLoading ? (
               <p className="absolute inset-0 flex items-center justify-center text-gray-500">
                 Loading banners...

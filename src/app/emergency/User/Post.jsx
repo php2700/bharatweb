@@ -27,6 +27,7 @@ const Post = () => {
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+	const [platformFee, setPlatformFee] = useState("");
   const [formData, setFormData] = useState({
     google_address: "",
     detailed_address: "",
@@ -77,7 +78,7 @@ const Post = () => {
 
       console.log("Banner API response:", response.data); // Debug response
 
-      if (response.data?.status) {
+      if (response.data?.success) {
         if (Array.isArray(response.data.images) && response.data.images.length > 0) {
           setBannerImages(response.data.images);
         } else {
@@ -101,7 +102,26 @@ const Post = () => {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
+ useEffect(() => {
+    const fetchPlatformFee = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/get-fee/emergency`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        // 🔹 Assuming response structure is { data: { fee: 200 } } or { fee: 200 }
+        // Adjust the path based on your API response structure
+        const fee = res.data.data?.fee  // Fallback to 200 if not found
+        setPlatformFee(fee);
+      } catch (error) {
+        console.error("Error fetching platform fee:", error);
+        setPlatformFee(200); // Fallback to default value
+      }
+    };
 
+    fetchPlatformFee();
+  }, []);
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -130,7 +150,7 @@ const Post = () => {
         setLoading(true);
         try {
           const response = await axios.get(
-            `${BASE_URL}/subcategories/${selectedCategory}`,
+            `${BASE_URL}/emergency/subcategories/${selectedCategory}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -651,7 +671,7 @@ const Post = () => {
 
             {/* Emergency Task Fees */}
             <p className="text-center text-green-700 font-medium">
-              Emergency Task Fees - Rs. 250/-
+              Emergency Task Fees - Rs. {platformFee || 250}/-
             </p>
 
             {/* Submit Button */}

@@ -49,6 +49,7 @@ import ServiceProviderHireDetail from "./app/directHiring/User/ServiceProviderHi
 import DirectHiring from "./app/directHiring/User/DirectHiring";
 import PaymentConfirmation from "./app/directHiring/User/PaymentConfirmation";
 import Biddercheck from "./app/Bidding/User/checknow";
+import DisputePage from "./app/CommonScreens/DisputesPage";
 
 import MyHire from "./app/directHiring/User/MyHire";
 
@@ -110,7 +111,6 @@ export default function App() {
              \         ╔════════════════════════════════ Public Routes Start ═══════════════════════════╗          /
               \-------------------------------------------------------------------------------------------------- /  */}
         <Route path="/" element={<Home />} />
-
         <Route path="/login" element={<LoginPage />} />
         <Route path="/ourservices" element={<OurServices />} />
         <Route path="/subcategories" element={<OurSubCategories />} />
@@ -263,6 +263,10 @@ export default function App() {
           path="/hire/worker/order-detail/:id"
           element={<DirectProviderordetail />}
         />
+				<Route 
+				path="/disputes"
+				element={<DisputePage />}
+				/>
       </Routes>
     </>
   );

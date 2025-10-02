@@ -195,7 +195,7 @@ console.log("images",bannerImages);
   return (
     <>
       <Header />
-      <div className="font-sans text-gray-800 mt-20">
+      <div className="font-sans text-gray-800 mt-35">
         {/* Hero Section with Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
           {bannerLoading ? (

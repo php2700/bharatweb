@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRole } from "../../redux/roleSlice";
 import { fetchUserProfile } from "../../redux/userSlice";
-import { fetchEmergencyStatus, updateEmergencyStatus } from "../../redux/emergencySlice";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
@@ -31,7 +30,6 @@ export default function Details() {
   const { profile, loading } = useSelector((state) => state.user);
   const selectedRole = useSelector(selectRole);
   const savedRole = localStorage.getItem("role");
-  const { status: isEmergencyOn } = useSelector((state) => state.emergency);
   const [activeTab, setActiveTab] = useState("user");
   const [WorkerTab, setWorkerTab] = useState("work");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,12 +38,11 @@ export default function Details() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
-
-  console.log("pppp", profile);
-	console.log("isss", isEmergencyOn)
+  const [isToggling, setIsToggling] = useState(false);
+  const [isEmergency, setIsEmergency] = useState(false);
 
   const getUserId = () => {
-    return profile?.userId || localStorage.getItem('userId') || 'default';
+    return profile?.userId || localStorage.getItem("userId") || "default";
   };
 
   // Fetch banner images
@@ -73,7 +70,8 @@ export default function Details() {
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -88,7 +86,6 @@ export default function Details() {
   useEffect(() => {
     window.scrollTo(0, 0);
     dispatch(fetchUserProfile());
-    dispatch(fetchEmergencyStatus());
     fetchBannerImages();
   }, [dispatch]);
 
@@ -106,7 +103,12 @@ export default function Details() {
   }, [loading, profile, savedRole, selectedRole, dispatch, navigate]);
 
   useEffect(() => {
-    if (activeTab !== "Worker" || WorkerTab !== "work" || workImages.length === 0) return;
+    if (
+      activeTab !== "Worker" ||
+      WorkerTab !== "work" ||
+      workImages.length === 0
+    )
+      return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % workImages.length);
@@ -138,6 +140,7 @@ export default function Details() {
   let isShop = false;
   let rating = "N/A";
   let referral_code = "N/A";
+  let isEmergencyOn = false;
 
   if (profile) {
     full_name = profile.full_name || "Not Available";
@@ -157,6 +160,7 @@ export default function Details() {
     isShop = profile.isShop || false;
     rating = profile.rating || "N/A";
     referral_code = profile.referral_code || "N/A";
+    isEmergencyOn = profile.isEmergency || false;
     if (profile.verificationStatus === "verified") {
       verifiedStatus = "Verified by Admin";
       statusClass = "bg-green-100 text-green-600";
@@ -171,9 +175,7 @@ export default function Details() {
     age = profile.age || "N/A";
     gender = profile.gender || "N/A";
   }
-
   const testimage = images && images !== "Not Available";
-
 
   const handleSwitchToWorker = () => {
     if (!profile) return;
@@ -181,7 +183,8 @@ export default function Details() {
     const userId = getUserId();
     const verificationStatus = profile?.verificationStatus || "pending";
     const requestedRole = profile?.requestStatus || null;
-    const rejectionReason = profile?.rejectionReason || "Please fill details properly.";
+    const rejectionReason =
+      profile?.rejectionReason || "Please fill details properly.";
 
     if (verificationStatus === "verified") {
       console.log("Profile verified, allowing Worker tab access");
@@ -197,7 +200,10 @@ export default function Details() {
           confirmButtonColor: "#228B22",
           confirmButtonText: "OK",
         }).then(() => {
-          localStorage.setItem(`workerVerifiedFirstSwitchShown_${userId}`, "true");
+          localStorage.setItem(
+            `workerVerifiedFirstSwitchShown_${userId}`,
+            "true"
+          );
         });
       }
     } else if (verificationStatus === "rejected") {
@@ -215,8 +221,13 @@ export default function Details() {
         dispatch(selectRole("user"));
         localStorage.setItem("role", "user");
       });
-    } else if (verificationStatus === "pending" && requestedRole === "service_provider") {
-      console.log("Profile pending with service_provider request, showing pending alert");
+    } else if (
+      verificationStatus === "pending" &&
+      requestedRole === "service_provider"
+    ) {
+      console.log(
+        "Profile pending with service_provider request, showing pending alert"
+      );
       Swal.fire({
         title: "Verification Pending",
         text: "Your verification by admin is pending, it will take 2-3 days.",
@@ -274,7 +285,9 @@ export default function Details() {
 
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
-      toast.error("Only JPG/PNG images are allowed!", { toastId: "profile-pic-error" });
+      toast.error("Only JPG/PNG images are allowed!", {
+        toastId: "profile-pic-error",
+      });
       return;
     }
 
@@ -297,14 +310,20 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Profile image updated successfully!", { toastId: "profile-pic-success" });
+        toast.success("Profile image updated successfully!", {
+          toastId: "profile-pic-success",
+        });
         dispatch(fetchUserProfile());
       } else {
-        toast.error(data.message || "Failed to update profile image.", { toastId: "profile-pic-fail" });
+        toast.error(data.message || "Failed to update profile image.", {
+          toastId: "profile-pic-fail",
+        });
       }
     } catch (err) {
       console.error("Error uploading profile pic:", err);
-      toast.error("Something went wrong while uploading the image!", { toastId: "profile-pic-error-catch" });
+      toast.error("Something went wrong while uploading the image!", {
+        toastId: "profile-pic-error-catch",
+      });
     }
   };
 
@@ -315,11 +334,12 @@ export default function Details() {
   const handleGalleryFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (selectedFiles.length === 0) return;
-    const totalImages = workImages.length + selectedFiles.length;
-    if (totalImages > 5) {
+
+    // Check if the number of selected files is between 1 and 5
+    if (selectedFiles.length > 5) {
       Swal.fire({
-        title: "Upload Limit Exceeded",
-        text: "You can only have a maximum of 5 images in total!",
+        title: "Too Many Images",
+        text: "You can upload up to 5 images at a time!",
         icon: "error",
         confirmButtonColor: "#228B22",
         confirmButtonText: "OK",
@@ -327,6 +347,23 @@ export default function Details() {
       return;
     }
 
+    // Validate file types
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    const invalidFiles = selectedFiles.filter(
+      (file) => !allowedTypes.includes(file.type)
+    );
+    if (invalidFiles.length > 0) {
+      Swal.fire({
+        title: "Invalid File Type",
+        text: "Only JPG/PNG images are allowed!",
+        icon: "error",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    // Prepare FormData for upload
     const formPayload = new FormData();
     selectedFiles.forEach((file, index) => {
       const uniqueFile = new File(
@@ -352,14 +389,20 @@ export default function Details() {
 
       const data = await response.json();
       if (response.ok) {
-        toast.success("Images updated successfully!", { toastId: "gallery-success" });
+        toast.success("Images updated successfully!", {
+          toastId: "gallery-success",
+        });
         dispatch(fetchUserProfile());
       } else {
-        toast.error(data.message || "Failed to update images", { toastId: "gallery-fail" });
+        toast.error(data.message || "Failed to update images", {
+          toastId: "gallery-fail",
+        });
       }
     } catch (err) {
       console.error("Error:", err);
-      toast.error("Something went wrong while uploading images!", { toastId: "gallery-error" });
+      toast.error("Something went wrong while uploading images!", {
+        toastId: "gallery-error",
+      });
     } finally {
       setIsUploading(false);
       e.target.value = null;
@@ -381,20 +424,62 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Image removed successfully!", { toastId: "remove-image-success" });
+        toast.success("Image removed successfully!", {
+          toastId: "remove-image-success",
+        });
         dispatch(fetchUserProfile());
       } else {
-        toast.error(data.message || "Failed to remove image.", { toastId: "remove-image-fail" });
+        toast.error(data.message || "Failed to remove image.", {
+          toastId: "remove-image-fail",
+        });
       }
     } catch (err) {
       console.error("Error removing image:", err);
-      toast.error("Something went wrong while removing the image!", { toastId: "remove-image-error" });
+      toast.error("Something went wrong while removing the image!", {
+        toastId: "remove-image-error",
+      });
     }
   };
 
-  const handleToggle = () => {
-    dispatch(updateEmergencyStatus(!isEmergencyOn));
-		window.location.reload();
+  const handleToggleEmergency = async () => {
+    if (isToggling) return;
+
+    const newStatus = !isEmergencyOn;
+    setIsToggling(true);
+
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch(`${BASE_URL}/user/emergency`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isEmergencyOn: newStatus }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(`Emergency Mode ${newStatus ? "turned on" : "turned off"}!`, {
+          toastId: "emergency-toggle-success",
+        });
+        dispatch(fetchUserProfile());
+      } else {
+        throw new Error(data.message || `HTTP error ${response.status}`);
+      }
+    } catch (err) {
+      console.error("Error toggling emergency status:", err);
+      toast.error(err.message || "Failed to update emergency status.", {
+        toastId: "emergency-toggle-error",
+      });
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const Editpage = () => {
@@ -442,14 +527,20 @@ export default function Details() {
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("Role upgrade requested successfully!", { toastId: "role-upgrade-success" });
+        toast.success("Role upgrade requested successfully!", {
+          toastId: "role-upgrade-success",
+        });
         dispatch(fetchUserProfile());
       } else {
-        toast.error(data.message || "Failed to request role upgrade.", { toastId: "role-upgrade-fail" });
+        toast.error(data.message || "Failed to request role upgrade.", {
+          toastId: "role-upgrade-fail",
+        });
       }
     } catch (err) {
       console.error("Error requesting role upgrade:", err);
-      toast.error("Something went wrong while requesting role upgrade!", { toastId: "role-upgrade-error" });
+      toast.error("Something went wrong while requesting role upgrade!", {
+        toastId: "role-upgrade-error",
+      });
     }
   };
 
@@ -610,7 +701,9 @@ export default function Details() {
                   className={`p-4 shadow-xl max-w-full sm:max-w-[600px] mt-6 sm:mt-10 rounded-xl bg-white h-[260px]`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg sm:text-xl">About My Skill</h3>
+                    <h3 className="font-semibold text-lg sm:text-xl">
+                      About My Skill
+                    </h3>
                   </div>
                   <p className="mt-2 text-gray-700 text-base leading-relaxed break-all">
                     {skill}
@@ -662,31 +755,39 @@ export default function Details() {
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
-                  {/*<span>Phone: {profile?.phone || "N/A"}</span>
-                  <span>Profile Complete: {isProfileComplete ? "Yes" : "No"}</span>*/}
                   <span>Shop Owner: {isShop ? "Yes" : "No"}</span>
                   <span>Referral Code: {referral_code}</span>
-                  <span>Rating: {rating} ({profile?.totalReview || 0} reviews)</span>
+                  <span>
+                    Rating: {rating} ({profile?.totalReview || 0} reviews)
+                  </span>
                 </div>
                 <p className="text-base font-semibold text-gray-700">
-                  <span className="font-semibold text-[#228B22]">Category: </span>
+                  <span className="font-semibold text-[#228B22]">
+                    Category:{" "}
+                  </span>
                   {category_name}
                 </p>
                 <p className="text-base font-semibold text-gray-700">
-                  <span className="font-semibold text-[#228B22]">Sub-Categories: </span>
+                  <span className="font-semibold text-[#228B22]">
+                    Sub-Categories:{" "}
+                  </span>
                   {Array.isArray(subcategory_names)
                     ? subcategory_names.join(", ")
                     : subcategory_names}
                 </p>
                 <p className="text-base font-semibold text-gray-700">
-                  <span className="font-semibold text-[#228B22]">Emergency Sub-Categories: </span>
+                  <span className="font-semibold text-[#228B22]">
+                    Emergency Sub-Categories:{" "}
+                  </span>
                   {Array.isArray(emergencySubcategory_names)
                     ? emergencySubcategory_names.join(", ")
                     : "None"}
                 </p>
                 <div className="p-4 shadow-xl max-w-full sm:max-w-[600px] rounded-xl bg-white">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg sm:text-xl">About My Skill</h3>
+                    <h3 className="font-semibold text-lg sm:text-xl">
+                      About My Skill
+                    </h3>
                   </div>
                   <p className="mt-2 text-gray-700 text-base leading-relaxed break-all">
                     {skill}
@@ -753,17 +854,27 @@ export default function Details() {
                           className="absolute top-2 right-2 w-10 sm:w-12 h-10 sm:h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
                         >
-                          <img src={Edit} alt="Edit" className="w-5 sm:w-6 h-5 sm:h-6" />
+                          <img
+                            src={Edit}
+                            alt="Edit"
+                            className="w-5 sm:w-6 h-5 sm:h-6"
+                          />
                         </div>
                       </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                        No work available.<br />You can upload up to 5 images here.
+                        No work available.
+                        <br />
+                        You can upload 1 to 5 images at a time.
                         <div
                           className="absolute top-2 right-2 w-10 sm:w-12 h-10 sm:h-12 bg-[#228B22] rounded-full flex items-center justify-center shadow-md cursor-pointer"
                           onClick={handleGalleryEditClick}
                         >
-                          <img src={Edit} alt="Edit" className="w-5 sm:w-6 h-5 sm:h-6" />
+                          <img
+                            src={Edit}
+                            alt="Edit"
+                            className="w-5 sm:w-6 h-5 sm:h-6"
+                          />
                         </div>
                       </div>
                     )}
@@ -785,7 +896,10 @@ export default function Details() {
                     <div className="mt-6 flex flex-col items-center gap-4">
                       <div className="flex flex-wrap gap-4 justify-center">
                         {workImages.map((img, index) => (
-                          <div key={index} className="relative w-20 sm:w-24 h-20 sm:h-24 overflow-hidden">
+                          <div
+                            key={index}
+                            className="relative w-20 sm:w-24 h-20 sm:h-24 overflow-hidden"
+                          >
                             <img
                               src={img}
                               alt={`Work sample ${index + 1}`}
@@ -802,7 +916,7 @@ export default function Details() {
                         ))}
                       </div>
                       <p className="text-gray-700 text-sm sm:text-base font-semibold">
-                        (You can upload up to 5 images here)
+                        (You can upload 1 to 5 images at a time)
                       </p>
                     </div>
                   )}
@@ -820,7 +934,8 @@ export default function Details() {
                               alt={`Customer review ${index + 1}`}
                               className="w-full h-[300px] sm:h-[400px] object-cover rounded-md shadow-md"
                               onError={(e) => {
-                                e.target.src = "/src/assets/profile/default.png";
+                                e.target.src =
+                                  "/src/assets/profile/default.png";
                               }}
                             />
                           </div>
@@ -832,7 +947,8 @@ export default function Details() {
                           Customer reviews are not available at this moment.
                         </p>
                         <p className="text-sm text-center mt-2">
-                          Please check back later for updates on customer feedback.
+                          Please check back later for updates on customer
+                          feedback.
                         </p>
                       </div>
                     )}
@@ -847,10 +963,14 @@ export default function Details() {
               {WorkerTab === "business" && (
                 <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-8 sm:py-10 rounded-xl">
                   <div className="w-full max-w-[700px] bg-white rounded-xl shadow-md p-4 sm:p-6">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-4">Business Details</h2>
+                    <h2 className="text-xl sm:text-2xl font-bold mb-4">
+                      Business Details
+                    </h2>
                     {businessAddress && (
                       <div className="mb-4 sm:mb-6">
-                        <h3 className="font-semibold text-lg sm:text-xl">Business Address</h3>
+                        <h3 className="font-semibold text-lg sm:text-xl">
+                          Business Address
+                        </h3>
                         <p className="text-gray-700 text-sm sm:text-base">
                           Address: {businessAddress.address || "N/A"}
                         </p>
@@ -864,12 +984,15 @@ export default function Details() {
                     )}
                     {bankdetail && (
                       <div className="mb-4 sm:mb-6">
-                        <h3 className="font-semibold text-lg sm:text-xl">Bank Details</h3>
+                        <h3 className="font-semibold text-lg sm:text-xl">
+                          Bank Details
+                        </h3>
                         <p className="text-gray-700 text-sm sm:text-base">
                           Account Number: {bankdetail.accountNumber || "N/A"}
                         </p>
                         <p className="text-gray-700 text-sm sm:text-base">
-                          Account Holder: {bankdetail.accountHolderName || "N/A"}
+                          Account Holder:{" "}
+                          {bankdetail.accountHolderName || "N/A"}
                         </p>
                         <p className="text-gray-700 text-sm sm:text-base">
                           Bank Name: {bankdetail.bankName || "N/A"}
@@ -884,7 +1007,9 @@ export default function Details() {
                     )}
                     {businessImage.length > 0 && (
                       <div className="mb-4 sm:mb-6">
-                        <h3 className="font-semibold text-lg sm:text-xl">Business Images</h3>
+                        <h3 className="font-semibold text-lg sm:text-xl">
+                          Business Images
+                        </h3>
                         <div className="flex flex-wrap gap-4 mt-2">
                           {businessImage.map((img, index) => (
                             <img
@@ -893,7 +1018,8 @@ export default function Details() {
                               alt={`Business image ${index + 1}`}
                               className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-md shadow-md"
                               onError={(e) => {
-                                e.target.src = "/src/assets/profile/default.png";
+                                e.target.src =
+                                  "/src/assets/profile/default.png";
                               }}
                             />
                           ))}
@@ -914,10 +1040,13 @@ export default function Details() {
                 </div>
                 <div className="toggle-wrapper mt-2 sm:mt-0">
                   <button
-                    onClick={handleToggle}
+                    onClick={handleToggleEmergency}
+                    disabled={isToggling}
                     className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${
-                      profile.isEmergency
-                        ? "bg-[#228B22] justify-end" 
+                      isToggling
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : isEmergencyOn
+                        ? "bg-[#228B22] justify-end"
                         : "bg-[#DF1414] justify-start"
                     }`}
                     style={{
@@ -928,8 +1057,8 @@ export default function Details() {
                     }}
                     aria-label={
                       isEmergencyOn
-                        ?  "Enable emergency task"
-                        : "Disable emergency task"
+                        ? "Disable emergency task"
+                        : "Enable emergency task"
                     }
                     aria-checked={isEmergencyOn}
                   >
@@ -951,7 +1080,10 @@ export default function Details() {
                 {documents.length > 0 ? (
                   <div className="space-y-6">
                     {documents.map((doc, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                      <div
+                        key={index}
+                        className="flex flex-col sm:flex-row justify-between items-start gap-4"
+                      >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 flex items-center justify-center rounded-lg">
                             <img
@@ -960,7 +1092,9 @@ export default function Details() {
                               className="w-9 h-9"
                             />
                           </div>
-                          <p className="font-medium text-sm sm:text-base">{doc.documentName || "Document"}</p>
+                          <p className="font-medium text-sm sm:text-base">
+                            {doc.documentName || "Document"}
+                          </p>
                         </div>
                         <div className="flex flex-wrap gap-4">
                           {doc.images && doc.images.length > 0 ? (
@@ -968,10 +1102,13 @@ export default function Details() {
                               <img
                                 key={imgIndex}
                                 src={img}
-                                alt={`${doc.documentName} image ${imgIndex + 1}`}
+                                alt={`${doc.documentName} image ${
+                                  imgIndex + 1
+                                }`}
                                 className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-md shadow"
                                 onError={(e) => {
-                                  e.target.src = "/src/assets/profile/default.png";
+                                  e.target.src =
+                                    "/src/assets/profile/default.png";
                                 }}
                               />
                             ))
@@ -994,10 +1131,15 @@ export default function Details() {
               </div>
             </div>
             <div className="container mx-auto max-w-[700px] px-4 sm:px-6 py-6">
-              <h2 className="text-xl sm:text-2xl font-bold mb-4">Rate & Reviews</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-4">
+                Rate & Reviews
+              </h2>
               {rateAndReviews && rateAndReviews.length > 0 ? (
                 <div className="space-y-4">
-                  {(showAllReviews ? rateAndReviews : rateAndReviews.slice(0, 2)).map((item, index) => (
+                  {(showAllReviews
+                    ? rateAndReviews
+                    : rateAndReviews.slice(0, 2)
+                  ).map((item, index) => (
                     <div
                       key={index}
                       className="bg-white rounded-xl shadow-md p-4 sm:p-6 transition-all duration-300 hover:shadow-lg border border-gray-100"
@@ -1007,19 +1149,25 @@ export default function Details() {
                           <span
                             key={i}
                             className={`text-lg sm:text-xl ${
-                              i < item.rating ? "text-yellow-400" : "text-gray-300"
+                              i < item.rating
+                                ? "text-yellow-400"
+                                : "text-gray-300"
                             }`}
                           >
                             ★
                           </span>
                         ))}
                       </div>
-                      <h3 className="font-semibold text-base sm:text-lg text-gray-800">Review</h3>
+                      <h3 className="font-semibold text-base sm:text-lg text-gray-800">
+                        Review
+                      </h3>
                       <p className="text-gray-600 text-sm sm:text-base mt-1 leading-relaxed">
                         {item.review || "No review provided"}
                       </p>
                       <p className="text-xs sm:text-sm text-gray-400 mt-2">
-                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Date not available"}
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : "Date not available"}
                       </p>
                       {item.images?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -1030,7 +1178,8 @@ export default function Details() {
                               alt={`Review image ${i + 1}`}
                               className="w-12 sm:w-16 h-12 sm:h-16 rounded-md border border-gray-200"
                               onError={(e) => {
-                                e.target.src = "/src/assets/profile/default.png";
+                                e.target.src =
+                                  "/src/assets/profile/default.png";
                               }}
                             />
                           ))}
