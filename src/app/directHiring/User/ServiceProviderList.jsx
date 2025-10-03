@@ -19,6 +19,7 @@ export default function ServiceProviderList() {
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
@@ -133,7 +134,16 @@ export default function ServiceProviderList() {
     const skill = worker.skill ? worker.skill.toLowerCase() : "";
     const query = searchQuery.toLowerCase();
     return fullName.includes(query) || skill.includes(query);
+  })
+  .sort((a, b) => {
+    if (sortOrder === "asc") {
+      return a.full_name.localeCompare(b.full_name);
+    } else {
+      return b.full_name.localeCompare(a.full_name);
+    }
   });
+
+
 
 
   // Slider settings for react-slick
@@ -151,7 +161,7 @@ export default function ServiceProviderList() {
   return (
     <>
       <Header />
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
+      <div className="min-h-screen p-4 mt-20 sm:p-6 bg-gray-50">
         <div className="container mx-auto px-4 py-4">
           <button
             className="flex items-center text-green-600 hover:text-green-800 font-semibold"
@@ -196,17 +206,26 @@ export default function ServiceProviderList() {
 
         <div className="container max-w-5xl mx-auto my-10">
           <div className="flex justify-between items-center p-3">
-            <div className="text-2xl font-bold">Direct Hiring</div>
-            <div>
-              <input
-                className="border rounded-lg p-2 w-64"
-                type="search"
-                placeholder="Search for services"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
+  <div className="text-2xl font-bold">Direct Hiring</div>
+  <div className="flex items-center gap-3">
+    <input
+      className="border rounded-lg p-2 w-64"
+      type="search"
+      placeholder="Search by name"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+
+    {/* Filter Button */}
+    <button
+      onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+      className="px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200"
+    >
+      {sortOrder === "asc" ? "▲ Asc" : "▼ Desc"}
+    </button>
+  </div>
+</div>
+
 
           {loading ? (
             <p className="text-center text-gray-500">Loading workers...</p>

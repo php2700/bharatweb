@@ -137,7 +137,7 @@ export default function ViewWorker() {
   return (
     <>
       <Header />
-      <div className="min-h-screen px-5 py-6 sm:px-6 lg:px-8">
+      <div className="min-h-screen px-5 mt-20 py-6 sm:px-6 lg:px-8">
         <ToastContainer position="top-right" autoClose={3000} />
 
         <div className="w-full max-w-[83rem] xl:max-w-[60rem] shadow-[0px_4px_4px_0px_#00000040] rounded-xl p-3 sm:p-20 space-y-4 lg:ml-[290px]">

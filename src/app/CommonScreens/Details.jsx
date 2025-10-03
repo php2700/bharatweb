@@ -583,7 +583,7 @@ export default function Details() {
         pauseOnHover
         limit={3}
       />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mt-20 mx-auto px-4 py-4">
         <Link
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"

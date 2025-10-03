@@ -258,8 +258,8 @@ const Post = () => {
       errors.detailed_address = "Detailed address is required";
     if (!formData.contact) errors.contact = "Contact number is required";
     if (!formData.deadline) errors.deadline = "Deadline is required";
-    if (formData.images.length === 0)
-      errors.images = "At least one image is required";
+    // if (formData.images.length === 0)
+    //   errors.images = "At least one image is required";
     return errors;
   };
 
@@ -421,7 +421,7 @@ const Post = () => {
   return (
     <>
       <Header />
-      <div className="w-full max-w-[1000px] mx-auto mt-8 px-4">
+      <div className="w-full max-w-[1000px] mx-auto mt-20 px-4">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-4 hover:underline"
@@ -610,8 +610,7 @@ const Post = () => {
             {/* Deadline */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                Task Completed by (Date & Time)
-              </label>
+Add Completion time              </label>
               <input
                 type="datetime-local"
                 name="deadline"
@@ -640,17 +639,14 @@ const Post = () => {
                 multiple
                 accept="image/*"
                 onChange={handleFileChange}
-                className={`w-full border ${
-                  validationErrors.images
-                    ? "border-red-500"
-                    : "border-gray-200 bg-gray-200"
-                } rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500`}
+                className={`w-full border
+                 rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500`}
               />
-              {validationErrors.images && (
+              {/* {validationErrors.images && (
                 <p className="text-red-500 text-sm">
                   {validationErrors.images}
                 </p>
-              )}
+              )} */}
               {formData.images.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.images.map((file, index) => (
@@ -670,9 +666,9 @@ const Post = () => {
             </div>
 
             {/* Emergency Task Fees */}
-            <p className="text-center text-green-700 font-medium">
+            {/* <p className="text-center text-green-700 font-medium">
               Emergency Task Fees - Rs. {platformFee || 250}/-
-            </p>
+            </p> */}
 
             {/* Submit Button */}
             <button
@@ -720,7 +716,7 @@ const Post = () => {
                 onClick={handlePayConfirm}
                 className="bg-[#008000] text-white py-2 px-4 rounded-md hover:bg-green-800"
               >
-                Pay
+                Proceed
               </button>
               <button
                 onClick={() => setShowPaymentModal(false)}

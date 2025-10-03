@@ -935,7 +935,7 @@ export default function EditProfile() {
   return (
     <>
       <Header />
-      <div className="mt-5">
+      <div className="mt-20">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-4 hover:underline ml-10"

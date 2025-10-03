@@ -117,7 +117,6 @@ export default function ViewProfile() {
         }
       );
 
-      console.log("fetchData response:", orderResponse.data);
 
       const order = orderResponse.data.data.order;
       setOrderData(order);
@@ -379,7 +378,7 @@ export default function ViewProfile() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-4 mt-20">
         <button
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
@@ -420,7 +419,15 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Category :- {orderData?.title || "Unknown Title"}</span>
+                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
+                 <div>
+  Description :{" "}
+  {orderData?.description.length > 50
+    ? orderData?.description.slice(0, 50) + "..."
+    : orderData?.description}
+</div>
+
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.address || "No Address Provided"}
@@ -512,7 +519,7 @@ export default function ViewProfile() {
                         <p className="text-lg font-semibold">
                           {orderData.user_id.full_name || "Unknown User"}
                         </p>
-                        <button
+                        {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
                             navigate(
@@ -521,7 +528,7 @@ export default function ViewProfile() {
                           }
                         >
                           View Profile
-                        </button>
+                        </button> */}
                       </div>
                     </div>
 

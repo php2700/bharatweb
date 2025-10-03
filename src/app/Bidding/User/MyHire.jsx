@@ -69,7 +69,7 @@ export default function MyHireBidding() {
       <Header />
 
       {/* Back Button */}
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto mt-20 px-4 py-4">
         <div
           onClick={handleBack}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold cursor-pointer"
