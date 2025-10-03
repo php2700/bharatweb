@@ -295,7 +295,7 @@ export default function BiddingNewTask() {
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-4 mt-20">
         <div
           onClick={() => navigate(-1)}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold cursor-pointer"

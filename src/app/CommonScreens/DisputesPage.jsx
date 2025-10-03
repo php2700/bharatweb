@@ -204,7 +204,7 @@ export default function DisputesPage() {
   return (
     <>
       <Header />
-      <div className="mt-5 mx-4 sm:mx-8">
+      <div className="mt-20 mx-4 sm:mx-8">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-6 hover:underline"

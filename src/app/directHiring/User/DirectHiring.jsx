@@ -3,6 +3,7 @@ import { Calendar, MapPin } from "lucide-react";
 import Header from "../../../component/Header";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 // 🔹 Load Google Maps script
 const loadGoogleMapsScript = (callback) => {
@@ -11,7 +12,9 @@ const loadGoogleMapsScript = (callback) => {
     return;
   }
   const script = document.createElement("script");
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  }&libraries=places`;
   script.async = true;
   script.onload = callback;
   document.body.appendChild(script);
@@ -23,9 +26,11 @@ const token = localStorage.getItem("bharat_token");
 
 const DirectHiring = () => {
   const navigate = useNavigate();
+  const { profile } = useSelector((state) => state.user);
+  const [showOptions, setShowOptions] = useState();
   const { id } = useParams();
   const [title, setTitle] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState();
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
   const [images, setImages] = useState([]);
@@ -33,7 +38,7 @@ const DirectHiring = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-	const [platformFee, setPlatformFee] = useState("");
+  const [platformFee, setPlatformFee] = useState("");
   const mapRef = useRef(null);
   const autocompleteRef = useRef(null);
   const mapAutocompleteRef = useRef(null); // 🔹 Ref for modal autocomplete
@@ -42,7 +47,7 @@ const DirectHiring = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-	 useEffect(() => {
+  useEffect(() => {
     const fetchPlatformFee = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/get-fee/direct`, {
@@ -52,7 +57,7 @@ const DirectHiring = () => {
         });
         // 🔹 Assuming response structure is { data: { fee: 200 } } or { fee: 200 }
         // Adjust the path based on your API response structure
-        const fee = res.data.data?.fee  // Fallback to 200 if not found
+        const fee = res.data.data?.fee; // Fallback to 200 if not found
         setPlatformFee(fee);
       } catch (error) {
         console.error("Error fetching platform fee:", error);
@@ -94,11 +99,16 @@ const DirectHiring = () => {
           streetViewControl: false,
         });
 
-        const autocompleteInput = document.getElementById("map-autocomplete-input");
-        const mapAutocomplete = new window.google.maps.places.Autocomplete(autocompleteInput, {
-          types: ["address"],
-          componentRestrictions: { country: "in" },
-        });
+        const autocompleteInput = document.getElementById(
+          "map-autocomplete-input"
+        );
+        const mapAutocomplete = new window.google.maps.places.Autocomplete(
+          autocompleteInput,
+          {
+            types: ["address"],
+            componentRestrictions: { country: "in" },
+          }
+        );
         mapAutocompleteRef.current = mapAutocomplete;
 
         // 🔹 Update map and marker when place is selected in modal
@@ -131,8 +141,8 @@ const DirectHiring = () => {
                 }
               );
             });
-        };
-			});
+          }
+        });
         // 🔹 Add marker on map click
         map.addListener("click", (event) => {
           if (markerRef.current) {
@@ -203,7 +213,7 @@ const DirectHiring = () => {
   const validate = () => {
     const newErrors = {};
     if (!title) newErrors.title = "Title is required";
-    if (!address) newErrors.address = "Address is required";
+    // if (!address) newErrors.address = "Address is required";
     if (!description) newErrors.description = "Description is required";
     if (!deadline) newErrors.deadline = "Deadline is required";
     if (images.length === 0)
@@ -273,7 +283,9 @@ const DirectHiring = () => {
               }
             );
             if (verifyRes.status === 200) {
-              navigate("/user/work-list/My Hire");
+              // console.log(verifyRes.data?.order?._id, "ssss");
+              navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
+              // navigate("/user/work-list/My Hire");
             } else {
               setErrors({ general: "Payment verification failed." });
             }
@@ -307,10 +319,25 @@ const DirectHiring = () => {
     setIsMapModalOpen(false);
   };
 
+  const updateAddress = async (location) => {
+    try {
+      let obj = {
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        address: location?.address,
+      };
+      let res = await axios.put(`${BASE_URL}/user/updateLocation`, obj, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (error) {
+      console.log(error, "gg");
+    }
+  };
+
   return (
     <>
       <Header />
-      <div className="w-full max-w-6xl mx-auto flex justify-start mt-4 px-4">
+      <div className="w-full max-w-6xl mx-auto flex justify-start mt-4 mt-20 px-4">
         <button
           onClick={handleBack}
           className="text-[#228B22] text-sm hover:underline"
@@ -347,7 +374,7 @@ const DirectHiring = () => {
             )}
           </label>
 
-          <label className="block">
+          {/* <label className="block">
             <span className="text-sm font-medium text-gray-600">
               Platform Fees
             </span>
@@ -358,7 +385,7 @@ const DirectHiring = () => {
               className="mt-1 block w-full rounded-lg bg-gray-100 border border-gray-300 px-4 py-2 text-base text-gray-600"
               aria-disabled="true"
             />
-          </label>
+          </label> */}
 
           <label className="block">
             <span className="text-sm font-medium text-gray-600">
@@ -376,26 +403,62 @@ const DirectHiring = () => {
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
             )}
           </label>
-
           <label className="block">
             <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
               Address
-              <span className="text-[#228B22] cursor-pointer" onClick={openMapModal}>
-                Select on Map
-              </span>
+              {/* <span
+      className="text-[#228B22] cursor-pointer"
+      onClick={openMapModal}
+    >
+      Select on Map
+    </span> */}
             </span>
+
             <div className="relative">
               <input
                 id="address-input"
                 type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                readOnly
+                value={address || profile?.location?.address}
                 placeholder="Enter or select address"
                 className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.address ? "true" : "false"}
               />
-              <MapPin className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+
+              {/* Toggle button */}
+              <button
+                type="button"
+                onClick={() => setShowOptions(!showOptions)}
+                className="absolute right-3 top-2 px-2 py-1 text-sm rounded-lg border bg-gray-100 hover:bg-gray-200"
+              >
+                {showOptions ? "▲" : "▼"}
+              </button>
+
+              {showOptions && (
+                <div className="absolute top-full left-0 mt-2 w-full rounded-lg border border-gray-300 bg-white shadow-lg p-3 z-50">
+                  {profile?.full_address?.map((loc) => (
+                    <label
+                      key={loc.address}
+                      className="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 rounded"
+                    >
+                      <input
+                        type="radio"
+                        name="address"
+                        value={loc.address}
+                        checked={address === loc.address}
+                        onClick={() => {
+                          setAddress(loc.address);
+                          setShowOptions(false);
+                          updateAddress(loc);
+                        }}
+                      />
+                      {loc.address}
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
+
             {errors.address && (
               <p className="text-red-500 text-sm mt-1">{errors.address}</p>
             )}
@@ -431,11 +494,11 @@ const DirectHiring = () => {
 
           <label className="block">
             <span className="text-sm font-medium text-gray-600">
-              Add deadline and time
+              Add Completion time
             </span>
             <div className="relative">
               <input
-                type="date"
+                type="datetime-local"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"

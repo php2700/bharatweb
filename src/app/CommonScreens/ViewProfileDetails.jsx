@@ -267,7 +267,7 @@ export default function ViewProfileDetails() {
         pauseOnHover
         limit={3}
       />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto mt-20 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"

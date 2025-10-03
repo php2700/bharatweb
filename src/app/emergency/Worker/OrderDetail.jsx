@@ -88,7 +88,7 @@ export default function ViewProfile() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mt-20 mx-auto px-4 py-4">
         <button
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}

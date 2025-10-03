@@ -22,6 +22,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ViewProfile() {
   const navigate = useNavigate();
   const { id } = useParams();
+ 
   const [orderData, setOrderData] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -165,7 +166,7 @@ export default function ViewProfile() {
             },
           }
         );
-        console.log("Order Response:", orderResponse.data);
+        console.log("Order Response:", orderResponse.data,"sssss------------------------");
         setOrderData(orderResponse.data.data.order);
         setAssignedWorker(orderResponse.data.data.assignedWorker || null);
         setServiceProviders(orderResponse.data.data.order.offer_history || []);
@@ -480,7 +481,7 @@ export default function ViewProfile() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto mt-20 px-4 py-4">
         <button
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
@@ -521,7 +522,14 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Category :- {orderData?.title || "Unknown Title"}</span>
+                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
+<div>
+  Description :{" "}
+  {orderData?.description.length > 50
+    ? orderData?.description.slice(0, 50) + "..."
+    : orderData?.description}
+</div>
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.address || "No Address Provided"}
