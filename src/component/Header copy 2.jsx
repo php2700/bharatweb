@@ -2,18 +2,38 @@ import { useState, useEffect, useRef } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link, useNavigate } from "react-router-dom";
+import AddressIcon from "../assets/location.svg";
+import Profile from "../assets/profile.svg";
+import Logout from "../assets/logout.svg";
+import Account from "../assets/account.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, clearUserProfile } from "../redux/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Notification from "../assets/notifications.svg";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 import { FaBriefcase, FaGavel, FaTrophy, FaUserTie } from "react-icons/fa";
-import Profile from "../assets/profile.svg";
-import Logout from "../assets/logout.svg";
-import Account from "../assets/account.svg";
+
+// Fix for default marker icon in react-leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+});
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+// Component to handle map centering on location change
+function MapController({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(position, 13);
+  }, [position, map]);
+  return null;
+}
 
 export default function Header() {
   const role = localStorage.getItem("role");
@@ -45,9 +65,7 @@ export default function Header() {
   const [selectedAddress, setSelectedAddress] = useState(
     localStorage.getItem("selectedAddressTitle") || "Location"
   );
-  const mapRef = useRef(null);
   const markerRef = useRef(null);
-  const autocompleteRef = useRef(null);
   const addressDropdownRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -108,137 +126,6 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Load Google Maps script
-  useEffect(() => {
-    const loadGoogleMapsScript = () => {
-      if (!window.google) {
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        script.addEventListener("load", initializeMap);
-        document.head.appendChild(script);
-        return () => {
-          document.head.removeChild(script);
-        };
-      } else {
-        initializeMap();
-      }
-    };
-
-    if (isModalOpen) {
-      loadGoogleMapsScript();
-    }
-  }, [isModalOpen]);
-
-  // Initialize Google Map and Autocomplete
-  const initializeMap = () => {
-    if (!mapRef.current) return;
-
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: { lat: currentAddress.latitude, lng: currentAddress.longitude },
-      zoom: 13,
-      mapTypeControl: false,
-      streetViewControl: false,
-    });
-
-    const marker = new window.google.maps.Marker({
-      position: { lat: currentAddress.latitude, lng: currentAddress.longitude },
-      map: map,
-      draggable: true,
-    });
-
-    markerRef.current = marker;
-
-    // Handle marker drag
-    window.google.maps.event.addListener(marker, "dragend", () => {
-      const position = marker.getPosition();
-      setCurrentAddress((prev) => ({
-        ...prev,
-        latitude: position.lat(),
-        longitude: position.lng(),
-      }));
-      reverseGeocode(position.lat(), position.lng());
-    });
-
-    // Handle map click
-    map.addListener("click", (e) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-      marker.setPosition({ lat, lng });
-      setCurrentAddress((prev) => ({
-        ...prev,
-        latitude: lat,
-        longitude: lng,
-      }));
-      reverseGeocode(lat, lng);
-    });
-
-    // Initialize Autocomplete
-    const input = document.getElementById("address");
-    if (input) {
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(input, {
-        fields: ["formatted_address", "geometry", "address_components"],
-        types: ["address"],
-      });
-
-      autocompleteRef.current.addListener("place_changed", () => {
-        const place = autocompleteRef.current.getPlace();
-        if (place.geometry) {
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-          marker.setPosition({ lat, lng });
-          map.setCenter({ lat, lng });
-          setCurrentAddress((prev) => ({
-            ...prev,
-            latitude: lat,
-            longitude: lng,
-            address: place.formatted_address,
-            pincode:
-              place.address_components.find((c) => c.types.includes("postal_code"))?.long_name || prev.pincode,
-            houseno:
-              place.address_components.find((c) => c.types.includes("street_number"))?.long_name || prev.houseno,
-            street:
-              place.address_components.find((c) => c.types.includes("route"))?.long_name || prev.street,
-            area:
-              place.address_components.find((c) =>
-                c.types.includes("sublocality") || c.types.includes("locality")
-              )?.long_name || prev.area,
-          }));
-        } else {
-          toast.error("Please select a valid address from the suggestions.");
-        }
-      });
-    }
-  };
-
-  // Reverse geocode to get address from lat/lng
-  const reverseGeocode = (lat, lng) => {
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      if (status === "OK" && results[0]) {
-        const addressComponents = results[0].address_components;
-        setCurrentAddress((prev) => ({
-          ...prev,
-          address: results[0].formatted_address,
-          pincode:
-            addressComponents.find((c) => c.types.includes("postal_code"))?.long_name || prev.pincode,
-          houseno:
-            addressComponents.find((c) => c.types.includes("street_number"))?.long_name || prev.houseno,
-          street:
-            addressComponents.find((c) => c.types.includes("route"))?.long_name || prev.street,
-          area:
-            addressComponents.find((c) =>
-              c.types.includes("sublocality") || c.types.includes("locality")
-            )?.long_name || prev.area,
-        }));
-      } else {
-        toast.error("Failed to fetch address details.");
-        setCurrentAddress((prev) => ({ ...prev, address: "" }));
-      }
-    });
-  };
 
   // Fetch user profile and sync selected address
   useEffect(() => {
@@ -338,7 +225,29 @@ export default function Header() {
           const { latitude, longitude } = pos.coords;
           setCurrentAddress((prev) => ({ ...prev, latitude, longitude }));
           setMapError(null);
-          reverseGeocode(latitude, longitude);
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+            );
+            const data = await response.json();
+            if (data && data.address) {
+              const addressParts = [];
+              if (data.address.road) addressParts.push(data.address.road);
+              if (data.address.suburb) addressParts.push(data.address.suburb);
+              if (data.address.city) addressParts.push(data.address.city);
+              const address = addressParts.join(", ") || "Current Location";
+              setCurrentAddress((prev) => ({
+                ...prev,
+                address,
+                pincode: data.address.postcode || prev.pincode,
+              }));
+            } else {
+              setCurrentAddress((prev) => ({ ...prev, address: "" }));
+            }
+          } catch (err) {
+            setCurrentAddress((prev) => ({ ...prev, address: "" }));
+            toast.error("Failed to fetch address details.");
+          }
         },
         (err) => {
           setMapError("Unable to fetch your location. Please select manually.");
@@ -347,6 +256,75 @@ export default function Header() {
       );
     }
   }, [isModalOpen, editingAddress]);
+
+  // Handle map click
+  const handleMapClick = async (e) => {
+    const newPosition = [e.latlng.lat, e.latlng.lng];
+    setCurrentAddress((prev) => ({
+      ...prev,
+      latitude: newPosition[0],
+      longitude: newPosition[1],
+    }));
+    setMapError(null);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPosition[0]}&lon=${newPosition[1]}&zoom=18&addressdetails=1`
+      );
+      const data = await response.json();
+      if (data && data.address) {
+        const addressParts = [];
+        if (data.address.road) addressParts.push(data.address.road);
+        if (data.address.suburb) addressParts.push(data.address.suburb);
+        if (data.address.city) addressParts.push(data.address.city);
+        const address = addressParts.join(", ") || "Selected Location";
+        setCurrentAddress((prev) => ({
+          ...prev,
+          address,
+          pincode: data.address.postcode || prev.pincode,
+        }));
+      } else {
+        setCurrentAddress((prev) => ({ ...prev, address: "" }));
+      }
+    } catch (err) {
+      setCurrentAddress((prev) => ({ ...prev, address: "" }));
+      toast.error("Failed to fetch address details.");
+    }
+  };
+
+  // Handle marker drag
+  const handleMarkerDrag = async (e) => {
+    const marker = e.target;
+    const newPosition = marker.getLatLng();
+    setCurrentAddress((prev) => ({
+      ...prev,
+      latitude: newPosition.lat,
+      longitude: newPosition.lng,
+    }));
+    setMapError(null);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPosition.lat}&lon=${newPosition.lng}&zoom=18&addressdetails=1`
+      );
+      const data = await response.json();
+      if (data && data.address) {
+        const addressParts = [];
+        if (data.address.road) addressParts.push(data.address.road);
+        if (data.address.suburb) addressParts.push(data.address.suburb);
+        if (data.address.city) addressParts.push(data.address.city);
+        const address = addressParts.join(", ") || "Selected Location";
+        setCurrentAddress((prev) => ({
+          ...prev,
+          address,
+          pincode: data.address.postcode || prev.pincode,
+        }));
+      } else {
+        setCurrentAddress((prev) => ({ ...prev, address: "" }));
+      }
+    } catch (err) {
+      setCurrentAddress((prev) => ({ ...prev, address: "" }));
+      toast.error("Failed to fetch address details.");
+    }
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -463,7 +441,7 @@ export default function Header() {
       const data = await response.json();
       if (response.ok && data.success) {
         toast.success("Address deleted successfully!");
-        window.location.reload();
+				window.location.reload();
         const updatedAddresses = savedAddresses.filter((_, idx) => idx !== index);
         setSavedAddresses(updatedAddresses);
         let newLocation = profile.location;
@@ -549,10 +527,11 @@ export default function Header() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          latitude: selectedAddr.latitude,
-          longitude: selectedAddr.longitude,
-          address: selectedAddr.address,
+            latitude: selectedAddr.latitude,
+            longitude: selectedAddr.longitude,
+            address: selectedAddr.address,
         }),
+
       });
       const data = await response.json();
       if (response.ok) {
@@ -855,92 +834,92 @@ export default function Header() {
                   </div>
                 )}
               </div>
-             <div className="relative lg:flex hidden" ref={dropdownRef}>
-														 {fullName ? (
-															 <button
-																 onClick={() => setIsOpen(!isOpen)}
-																 className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
-															 >
-																 <span className="truncate max-w-[120px] sm:max-w-[150px]">
-																	 {fullName}
-																 </span>
-																 <img
-																	 src={Dropdown}
-																	 alt="Dropdown"
-																	 className={`w-5 h-5 transition-transform duration-300 ${
-																		 isOpen ? "rotate-180" : "rotate-0"
-																	 }`}
-																 />
-															 </button>
-														 ) : (
-															 <Link
-																 to="/login"
-																 className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
-															 >
-																 Login / Signup
-																 <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
-															 </Link>
-														 )}
-														 {isOpen && fullName && (
-															 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-																 <Link
-																	 to="/account"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <img src={Account} alt="Account" className="w-5 h-5" />
-																	 Account
-																 </Link>
-																 <Link
-																	 to="/details"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <img src={Profile} alt="Profile" className="w-5 h-5" />
-																	 Profile
-																 </Link>
-																 <Link
-																	 to="/user/work-list/My Hire"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaUserTie className="w-5 h-5" />
-																	 My Hire
-																 </Link>
-																 <Link
-																	 to="/worker/work-list/My Hire"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaBriefcase className="w-5 h-5" />
-																	 My Work
-																 </Link>
-																 <Link
-																	 to="/disputes"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaGavel className="w-5 h-5" />
-																	 Disputes
-																 </Link>
-																 <Link
-																	 to="/promotion"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaTrophy className="w-5 h-5" />
-																	 Promotion
-																 </Link>
-																 <button
-																	 onClick={logoutdestroy}
-																	 className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																 >
-																	 <img src={Logout} alt="Logout" className="w-5 h-5" />
-																	 Logout
-																 </button>
-															 </div>
-														 )}
-													 </div>
+              <div className="relative lg:flex hidden" ref={dropdownRef}>
+                {fullName ? (
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                  >
+                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                      {fullName}
+                    </span>
+                    <img
+                      src={Dropdown}
+                      alt="Dropdown"
+                      className={`w-5 h-5 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                  >
+                    Login / Signup
+                    <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+                  </Link>
+                )}
+                {isOpen && fullName && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                    <Link
+                      to="/account"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <img src={Account} alt="Account" className="w-5 h-5" />
+                      Account
+                    </Link>
+                    <Link
+                      to="/details"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <img src={Profile} alt="Profile" className="w-5 h-5" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/user/work-list/My Hire"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaUserTie className="w-5 h-5" />
+                      My Hire
+                    </Link>
+                    <Link
+                      to="/worker/work-list/My Hire"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaBriefcase className="w-5 h-5" />
+                      My Work
+                    </Link>
+                    <Link
+                      to="/disputes"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaGavel className="w-5 h-5" />
+                      Disputes
+                    </Link>
+                    <Link
+                      to="/promotion"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaTrophy className="w-5 h-5" />
+                      Promotion
+                    </Link>
+                    <button
+                      onClick={logoutdestroy}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                    >
+                      <img src={Logout} alt="Logout" className="w-5 h-5" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           )}
           <button
@@ -1180,6 +1159,16 @@ export default function Header() {
                 </div>
               </>
             )}
+            {!isLoggedIn && (
+              <Link
+                to="/login"
+                className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Login/Signup
+                <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -1268,7 +1257,7 @@ export default function Header() {
                 value={currentAddress.address}
                 onChange={handleInputChange}
                 className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
-                placeholder="Enter or select address"
+                placeholder="Select location on map"
               />
             </div>
             <div className="mb-4">
@@ -1340,7 +1329,31 @@ export default function Header() {
               />
             </div>
             <div className="h-64 mb-4 rounded-lg overflow-hidden shadow-md border border-gray-200">
-              <div ref={mapRef} style={{ height: "100%", width: "100%" }}></div>
+              <MapContainer
+                center={[currentAddress.latitude, currentAddress.longitude]}
+                zoom={13}
+                style={{ height: "100%", width: "100%" }}
+                onClick={handleMapClick}
+              >
+                <MapController
+                  position={[currentAddress.latitude, currentAddress.longitude]}
+                />
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker
+                  position={[currentAddress.latitude, currentAddress.longitude]}
+                  draggable={true}
+                  eventHandlers={{ dragend: handleMarkerDrag }}
+                  ref={markerRef}
+                >
+                  <Popup>
+                    Selected Location: {currentAddress.latitude.toFixed(4)},{" "}
+                    {currentAddress.longitude.toFixed(4)}
+                  </Popup>
+                </Marker>
+              </MapContainer>
             </div>
             <div className="flex justify-end gap-2">
               <button
