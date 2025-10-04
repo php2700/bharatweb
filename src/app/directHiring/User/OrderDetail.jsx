@@ -6,6 +6,8 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Warning from "../../../assets/ViewProfile/warning.svg";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
+import CallIcon from "../../../assets/call.png";
+import ChatIcon from "../../../assets/chat.png";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -22,7 +24,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function ViewProfile() {
   const navigate = useNavigate();
   const { id } = useParams();
- 
+
   const [orderData, setOrderData] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -166,7 +168,11 @@ export default function ViewProfile() {
             },
           }
         );
-        console.log("Order Response:", orderResponse.data,"sssss------------------------");
+        console.log(
+          "Order Response:",
+          orderResponse.data,
+          "sssss------------------------"
+        );
         setOrderData(orderResponse.data.data.order);
         setAssignedWorker(orderResponse.data.data.assignedWorker || null);
         setServiceProviders(orderResponse.data.data.order.offer_history || []);
@@ -498,7 +504,7 @@ export default function ViewProfile() {
               showArrows={true}
               showThumbs={false}
               infiniteLoop={true}
-              autoPlay={false}
+              autoPlay={true}
               className="w-full h-[360px]"
             >
               {orderData.image_url.map((url, index) => (
@@ -524,18 +530,17 @@ export default function ViewProfile() {
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
-<div>
-  Description :{" "}
-  {orderData?.description.length > 50
-    ? orderData?.description.slice(0, 50) + "..."
-    : orderData?.description}
-</div>
+                <div>
+                  Description :{" "}
+                  {orderData?.description.length > 50
+                    ? orderData?.description.slice(0, 50) + "..."
+                    : orderData?.description}
+                </div>
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.address || "No Address Provided"}
                   <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                    {orderData?.user_id?.location?.address ||
-                      "Unknown Location"}
+                    {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
               </div>
@@ -637,6 +642,38 @@ export default function ViewProfile() {
                             View Profile
                           </Link>
                         </div>
+                        {/* <div className="flex flex-col items-center justify-center flex-1">
+                          <p className="text-gray-600 font-medium">Contact</p>
+                          <div className="flex space-x-2 mt-2">
+                            <button
+                              className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                              title="Call"
+                          //      onClick={() =>
+                          //   window.open(
+                          //     `tel:${provider.user_id.phone}`,
+                          //     "_self"
+                          //   )
+                          // }
+                            >
+                              <img
+                                src={CallIcon}
+                                alt="Call"
+                                className="w-6 h-6"
+                              />
+                            </button>
+                            <button
+                              className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                              title="Chat"
+                            >
+                              <img
+                                src={ChatIcon}
+                                alt="Chat"
+                                className="w-6 h-6"
+                              />
+                            </button>
+                          </div>
+                        </div> */}
+
                         <div className="flex flex-col gap-2">
                           {offerStatuses[provider.provider_id._id] ===
                           "pending" ? (
@@ -715,7 +752,7 @@ export default function ViewProfile() {
               <div ref={acceptedSectionRef}>
                 <Accepted
                   serviceProvider={orderData?.service_provider_id}
-									user_id={orderData?.user_id._id}
+                  user_id={orderData?.user_id._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
                   orderId={id}

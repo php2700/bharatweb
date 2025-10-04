@@ -20,7 +20,7 @@ import Swal from "sweetalert2"; // Import SweetAlert2
 
 const libraries = ["places"];
 
-export default function BiddingNewTask() {
+export default function   BiddingNewTask() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -337,7 +337,7 @@ export default function BiddingNewTask() {
                 options={categories}
                 value={categories.find((c) => c.value === formData.category)}
                 onChange={handleCategoryChange}
-                placeholder="Search or select category..."
+                placeholder="Select category"
                 isClearable
                 className="border-2 rounded-lg"
               />
@@ -355,7 +355,7 @@ export default function BiddingNewTask() {
                 )}
                 onChange={handleSubcategoryChange}
                 isMulti
-                placeholder="Search or select subcategories..."
+                placeholder="Select subcategory"
                 isDisabled={!formData.category}
                 className="border-2 rounded-lg"
               />
@@ -366,7 +366,7 @@ export default function BiddingNewTask() {
               <label className="block text-[17px] font-[500] mb-1">Location</label>
               <input
                 type="text"
-                placeholder="Location not available"
+                placeholder="Search location"
                 value={profile?.data?.full_address[0]?.address || ""}
                 readOnly
                 className="w-full border-2 rounded-lg px-3 py-2 cursor-pointer"

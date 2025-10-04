@@ -44,6 +44,10 @@ export default function Profile() {
     title: "",
     landmark: "",
     address: "",
+    houseNo: "",
+    street: "",
+    area: "",
+    pincode: "",
     latitude: null,
     longitude: null,
   });
@@ -56,7 +60,7 @@ export default function Profile() {
   });
 
   const ProfileComplete = () => {
-    localStorage.setItem('isProfileComplete','true');
+    localStorage.setItem("isProfileComplete", "true");
     const role = localStorage.getItem("role");
     if (role === "service_provider") navigate("/homeservice");
     if (role === "user") navigate("/homeuser");
@@ -141,7 +145,8 @@ export default function Profile() {
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    else if (formData.name.length < 3) newErrors.name = "Name must be at least 3 characters";
+    else if (formData.name.length < 3)
+      newErrors.name = "Name must be at least 3 characters";
     if (!formData.age) newErrors.age = "Age is required";
     else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100)
       newErrors.age = "Enter a valid age between 1 and 100";
@@ -175,6 +180,10 @@ export default function Profile() {
             address: formData.address,
             landmark: tempAddress.landmark,
             title: tempAddress.title,
+            houseno: tempAddress?.houseNo,
+            street: tempAddress?.street,
+            area: tempAddress?.area,
+            pincode: tempAddress?.pincode,
           },
         ],
         referral_code: formData.referral,
@@ -197,7 +206,9 @@ export default function Profile() {
     }
   };
 
-  const defaultCenter = markerLocationGPS || markerLocationAddress || currentLocation || { lat: 28.6139, lng: 77.209 };
+  const defaultCenter = markerLocationGPS ||
+    markerLocationAddress ||
+    currentLocation || { lat: 28.6139, lng: 77.209 };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -213,12 +224,16 @@ export default function Profile() {
 
       <div className="flex justify-center items-center bg-white px-4 py-8">
         <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow">
-          <h2 className="text-center text-[24px] font-[700] mb-6">Complete Profile</h2>
+          <h2 className="text-center text-[24px] font-[700] mb-6">
+            Complete Profile
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="font-[700] block text-center">What's your Name?</label>
+              <label className="font-[700] block text-center">
+                What's your Name?
+              </label>
               <input
                 type="text"
                 name="name"
@@ -227,27 +242,31 @@ export default function Profile() {
                 onChange={handleChange}
                 className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
               />
-              {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name}</p>
+              )}
             </div>
 
             {/* Age */}
-             <div>
-  <label className="font-[700] block text-center">Your Age</label>
-  <input
-    type="text"   // ✅ ab text hi hai
-    name="age"
-    placeholder="Enter Your Age"
-    value={formData.age}
-    onChange={(e) => {
-      let value = e.target.value;
-      // ✅ sirf number hi allow + max 2 digit
-      value = value.replace(/[^0-9]/g, "").slice(0, 2);
-      handleChange({ target: { name: "age", value } });
-    }}
-    className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
-  />
-  {errors.age && <p className="text-red-500 text-sm">{errors.age}</p>}
-</div>
+            <div>
+              <label className="font-[700] block text-center">Your Age</label>
+              <input
+                type="text" // ✅ ab text hi hai
+                name="age"
+                placeholder="Enter Your Age"
+                value={formData.age}
+                onChange={(e) => {
+                  let value = e.target.value;
+                  // ✅ sirf number hi allow + max 2 digit
+                  value = value.replace(/[^0-9]/g, "").slice(0, 2);
+                  handleChange({ target: { name: "age", value } });
+                }}
+                className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] placeholder:text-center"
+              />
+              {errors.age && (
+                <p className="text-red-500 text-sm">{errors.age}</p>
+              )}
+            </div>
 
             {/* Gender */}
             <div>
@@ -263,7 +282,9 @@ export default function Profile() {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
-              {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
+              {errors.gender && (
+                <p className="text-red-500 text-sm">{errors.gender}</p>
+              )}
             </div>
 
             {/* Location Gps */}
@@ -285,7 +306,9 @@ export default function Profile() {
 
             {/* Full Address */}
             <div>
-              <label className="font-[700] block text-center">Full Address</label>
+              <label className="font-[700] block text-center">
+                Full Address
+              </label>
               <input
                 type="text"
                 placeholder="Click to enter address"
@@ -294,12 +317,16 @@ export default function Profile() {
                 onClick={() => setAddressModalOpen(true)}
                 className="w-full border-2 border-[#C6C6C6] rounded-[15px] p-[15px] cursor-pointer placeholder:text-center"
               />
-              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+              {errors.address && (
+                <p className="text-red-500 text-sm">{errors.address}</p>
+              )}
             </div>
 
             {/* Referral */}
             <div>
-              <label className="font-[700] block text-center">Referral Code (Optional)</label>
+              <label className="font-[700] block text-center">
+                Referral Code (Optional)
+              </label>
               <input
                 type="text"
                 name="referral"
@@ -329,14 +356,54 @@ export default function Profile() {
               type="text"
               placeholder="Title"
               value={tempAddress.title}
-              onChange={(e) => setTempAddress({ ...tempAddress, title: e.target.value })}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, title: e.target.value })
+              }
               className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
             />
             <input
               type="text"
               placeholder="Landmark"
               value={tempAddress.landmark}
-              onChange={(e) => setTempAddress({ ...tempAddress, landmark: e.target.value })}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, landmark: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="House No"
+              value={tempAddress.houseNo}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, houseNo: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Street"
+              value={tempAddress.street}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, street: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Area"
+              value={tempAddress.area}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, area: e.target.value })
+              }
+              className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
+            />
+            <input
+              type="text"
+              placeholder="Pincode"
+              value={tempAddress.pincode}
+              onChange={(e) =>
+                setTempAddress({ ...tempAddress, pincode: e.target.value })
+              }
               className="w-full border-2 border-gray-300 rounded-lg p-2 mb-3"
             />
             <input
@@ -359,7 +426,10 @@ export default function Profile() {
               </button>
               <button
                 onClick={() => {
-                  setFormData((prev) => ({ ...prev, address: tempAddress.address }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    address: tempAddress.address,
+                  }));
                   setAddressModalOpen(false);
                 }}
                 className="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg"
@@ -379,13 +449,18 @@ export default function Profile() {
               <h1 className="text-black text-[20px] font-semibold">
                 {mapFor === "location" ? "GPS Location" : "Full Address"}
               </h1>
-              <button onClick={() => setIsMapOpen(false)} className="text-red-500 font-bold">
+              <button
+                onClick={() => setIsMapOpen(false)}
+                className="text-red-500 font-bold"
+              >
                 X
               </button>
             </div>
 
             <p className="text-center mb-2 text-sm text-gray-600">
-              {mapFor === "location" ? formData.location : formData.address || "Not selected"}
+              {mapFor === "location"
+                ? formData.location
+                : formData.address || "Not selected"}
             </p>
 
             <Autocomplete
@@ -407,7 +482,9 @@ export default function Profile() {
               onClick={handleMapClick}
             >
               {markerLocationGPS && <Marker position={markerLocationGPS} />}
-              {markerLocationAddress && <Marker position={markerLocationAddress} />}
+              {markerLocationAddress && (
+                <Marker position={markerLocationAddress} />
+              )}
             </GoogleMap>
 
             <div className="flex mt-2 gap-2 justify-center">
@@ -441,7 +518,7 @@ export default function Profile() {
               You have successfully completed your registration!
             </p>
             <button
-             onClick={() => ProfileComplete()}
+              onClick={() => ProfileComplete()}
               className="bg-[#228B22] hover:bg-green-700 text-white px-16 py-2 rounded-[8px] font-semibold"
             >
               OK

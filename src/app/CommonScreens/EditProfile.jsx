@@ -33,10 +33,10 @@ export default function EditProfile() {
   console.log("prof", profile);
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
+    // category: "",
     subcategory: [],
     emergencysubcategory: [],
-    about: "",
+    aboutUs: "",
     documents: [],
     businessImage: [],
     age: "",
@@ -44,7 +44,7 @@ export default function EditProfile() {
     address: "",
     full_address: [],
     customDocName: "",
-    willingToVisitShop: "",
+    // willingToVisitShop: "",
     hasShop: "",
     shopAddress: "",
     shopFullAddress: [],
@@ -198,8 +198,8 @@ export default function EditProfile() {
         setFormData((prev) => ({
           ...prev,
           name: profile.full_name || "",
-          about: profile.skill || "",
-          category: profile.category_id || "",
+          aboutUs: profile.aboutUs || "",
+          // category: profile.category_id || "",
           subcategory: Array.isArray(profile.subcategory_ids) ? profile.subcategory_ids : [],
           emergencysubcategory: Array.isArray(profile.emergencysubcategory_ids) ? profile.emergencysubcategory_ids : [],
           age: profile.age ? profile.age.toString() : "",
@@ -208,7 +208,7 @@ export default function EditProfile() {
           full_address: Array.isArray(profile.full_address) ? profile.full_address : [],
           documents: validDocuments,
           businessImage: validBusinessImage,
-          willingToVisitShop: profile.willingToVisitShop || "",
+          // willingToVisitShop: profile.willingToVisitShop || "",
           hasShop: profile.isShop ? "yes" : "no",
           shopAddress: profile.businessAddress?.address || "",
           shopFullAddress: profile.businessAddress?.address
@@ -235,10 +235,10 @@ export default function EditProfile() {
     } else {
       setFormData({
         name: "",
-        category: "",
+        // category: "",
         subcategory: [],
         emergencysubcategory: [],
-        about: "",
+        aboutUs: "",
         documents: [],
         businessImage: [],
         age: "",
@@ -246,7 +246,7 @@ export default function EditProfile() {
         address: "",
         full_address: [],
         customDocName: "",
-        willingToVisitShop: "",
+        // willingToVisitShop: "",
         hasShop: "",
         shopAddress: "",
         shopFullAddress: [],
@@ -743,9 +743,9 @@ export default function EditProfile() {
     if (!formData.age) return toast.error("Age is required!", { toastId: "ageRequiredError" });
     if (!formData.gender) return toast.error("Gender is required!", { toastId: "genderRequiredError" });
     if (!formData.address.trim()) return toast.error("Address is required!", { toastId: "addressRequiredError" });
-    if (activeTab === "user" && !formData.willingToVisitShop) {
-      return toast.error("Please select if you are willing to visit the shop!", { toastId: "willingToVisitShopError" });
-    }
+    // if (activeTab === "user" && !formData.willingToVisitShop) {
+    //   return toast.error("Please select if you are willing to visit the shop!", { toastId: "willingToVisitShopError" });
+    // }
     if (activeTab === "worker") {
       if (!formData.category) return toast.error("Category is required!", { toastId: "categoryRequiredError" });
       if (!formData.subcategory.length) return toast.error("Select at least one subcategory!", { toastId: "subcategoryRequiredError" });
@@ -774,7 +774,7 @@ export default function EditProfile() {
           category_id: formData.category,
           subcategory_ids: formData.subcategory,
           emergencySubcategory_ids: formData.emergencysubcategory,
-          skill: formData.about,
+          aboutUs: formData.aboutUs,
           age: formData.age,
           gender: formData.gender,
           documents: formData.documents,
@@ -805,7 +805,7 @@ export default function EditProfile() {
         fd.append("category_id", formData.category);
         fd.append("subcategory_ids", JSON.stringify(formData.subcategory));
         fd.append("emergencySubcategory_ids", JSON.stringify(formData.emergencysubcategory));
-        fd.append("skill", formData.about);
+        fd.append("aboutUs", formData.aboutUs);
         fd.append("age", formData.age);
         fd.append("gender", formData.gender);
         fd.append("isShop", formData.hasShop === "yes" ? "true" : "false");
@@ -885,11 +885,11 @@ export default function EditProfile() {
       if (activeTab === "user") {
         const payload = {
           full_name: formData.name,
-          skill: formData.about,
+          aboutUs: formData.aboutUs,
           age: formData.age,
           gender: formData.gender,
           full_address: formData.full_address,
-          willingToVisitShop: formData.willingToVisitShop,
+          // willingToVisitShop: formData.willingToVisitShop,
           category_id: formData.category,
           subcategory_ids: formData.subcategory,
           emergencysubcategory_ids: formData.emergencysubcategory,
@@ -1023,7 +1023,7 @@ export default function EditProfile() {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block mb-2 font-semibold text-gray-700">Category</label>
             <Select
               options={categories}
@@ -1032,9 +1032,9 @@ export default function EditProfile() {
               placeholder="Search or select category..."
               isClearable
             />
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <label className="block mb-2 font-semibold text-gray-700">Subcategory</label>
             <Select
               options={subcategories}
@@ -1044,9 +1044,9 @@ export default function EditProfile() {
               placeholder="Search or select subcategories..."
               isDisabled={!formData.category}
             />
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <label className="block mb-2 font-semibold text-gray-700">Emergency Subcategory</label>
             <Select
               options={emergencysubcategories}
@@ -1056,7 +1056,7 @@ export default function EditProfile() {
               placeholder="Search or select emergency subcategories..."
               isDisabled={!formData.category}
             />
-          </div>
+          </div> */}
 
           {/*activeTab === "user" && (
             <div>
@@ -1271,15 +1271,15 @@ export default function EditProfile() {
           <div>
             <label className="block mb-2 font-semibold text-gray-700">About My Skill</label>
             <textarea
-              name="about"
-              value={formData.about}
+              name="aboutUs"
+              value={formData.aboutUs}
               onChange={handleChange}
               placeholder="Describe your skill..."
               maxLength={500}
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
               rows="4"
             ></textarea>
-            <p className="text-sm text-gray-500 mt-1">{formData.about.length}/500 characters</p>
+            <p className="text-sm text-gray-500 mt-1">{formData.aboutUs.length}/500 characters</p>
           </div>
 
           <button

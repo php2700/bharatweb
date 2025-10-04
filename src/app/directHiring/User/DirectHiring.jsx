@@ -238,11 +238,12 @@ const DirectHiring = () => {
       return;
     }
 
+    
     try {
       const formData = new FormData();
       formData.append("first_provider_id", id);
       formData.append("title", title);
-      formData.append("address", address);
+      formData.append("address", address || profile?.location?.address);
       formData.append("description", description);
       formData.append("deadline", deadline);
       formData.append("isShopVisited", isShopVisited);
@@ -333,7 +334,7 @@ const DirectHiring = () => {
       console.log(error, "gg");
     }
   };
-
+  console.log(profile?.full_address, "fffffffffff");
   return (
     <>
       <Header />
@@ -452,7 +453,42 @@ const DirectHiring = () => {
                           updateAddress(loc);
                         }}
                       />
-                      {loc.address}
+                      <div className="flex flex-col bg-gray-50 rounded-lg p-2 w-full">
+                        <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                          <div>
+                            <span className="block font-semibold text-xs ">
+                              Title
+                            </span>
+                            <span className=" text-[12px] text-gray-800">
+                              {loc.title}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block font-semibold text-xs ">
+                              House No
+                            </span>
+                            <span className="text-gray-700 text-[12px]">
+                              {loc.houseno ? loc?.houseno : "N/A"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block font-semibold text-xs ">
+                              Area
+                            </span>
+                            <span className="text-gray-700 text-[12px]">
+                              {loc.area ? loc.area : "N/A"}
+                            </span>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="block font-semibold text-xs ">
+                              Full Address
+                            </span>
+                            <span className="text-gray-600 text-[12px]">
+                              {loc.address}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </label>
                   ))}
                 </div>

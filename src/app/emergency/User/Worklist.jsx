@@ -115,7 +115,7 @@ export default function Worklist() {
         const mappedTasks = response.data.data.map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image || Work, // Fallback to Work image
+          image: task.image_urls?.[0] || task.image || Work , // Fallback to Work image
           name: task.category_id?.name || task.title || "Unnamed Task",
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
@@ -142,6 +142,7 @@ export default function Worklist() {
         }));
 
         setTaskData(mappedTasks);
+        console.log(mappedTasks,'fffffffffffff')
         setError(null);
       } catch (err) {
         console.error(err);
@@ -153,6 +154,7 @@ export default function Worklist() {
 
     fetchTasks();
   }, [activeTab, token]);
+
 
   // Handle search input change
   const handleSearchChange = (e) => {

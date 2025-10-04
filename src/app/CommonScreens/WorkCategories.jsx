@@ -69,13 +69,12 @@ const [directHiring, setDirectHiring] = useState([]);
 				});
 	
 				const data = await res.json();
-				// console.log("Direct Hiring API response:", data);
 	
 				if (res.ok) {
 					if (Array.isArray(data.data)) {
 						setDirectHiring(data.data.map(item => ({
 							id:item._id || "",
-							image: item.image_url[0] || Hiring,
+							image: item.image_url[0] || 'Hiring',
 							work: item.title || "Make a chair",
 							description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
 							amount: item.platform_fee || "₹200",

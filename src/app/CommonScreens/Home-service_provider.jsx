@@ -17,7 +17,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
 
 export default function ServiceProviderHome() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const [isEmergencyOn, setIsEmergencyOn] = useState(true);
   const token = localStorage.getItem("bharat_token");
   const [bannerImages, setBannerImages] = useState([]);

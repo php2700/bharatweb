@@ -102,6 +102,7 @@ export default function App() {
         console.error("❌ Service Worker registration failed:", err);
       });
   }
+  
   return (
     <>
       <NotificationToast />

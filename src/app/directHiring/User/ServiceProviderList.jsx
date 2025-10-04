@@ -90,6 +90,7 @@ export default function ServiceProviderList() {
           }
         );
         if (response.data?.status) {
+          console.log(response.data.data,'ffffffff')
           setWorkers(response.data.data || []);
         } else {
           console.error("Failed to fetch workers:", response.data?.message);

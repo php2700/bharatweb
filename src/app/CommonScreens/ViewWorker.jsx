@@ -79,6 +79,7 @@ export default function ViewWorker() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+        console.log(data,"ffffffffffffffffffffffffffffffffff")
         if (data.success) {
           const worker = data.worker;
           const dobValue = worker.dob

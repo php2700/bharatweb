@@ -133,6 +133,7 @@ const Post = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(response,"ggggggggg")
         setCategories(response.data.data || []);
         setLoading(false);
       } catch (err) {

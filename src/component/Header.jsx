@@ -68,6 +68,7 @@ export default function Header() {
 
   // Handle unauthorized access (401)
   const handleUnauthorized = () => {
+      // localStorage.clear();
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
