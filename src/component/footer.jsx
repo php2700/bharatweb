@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import Logo from "../assets/logo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // import social icons (make sure these are SVGs or PNGs)
 import Whatsapp from "../assets/whatsapp.svg";
@@ -9,6 +9,7 @@ import Instagram from "../assets/instagram.svg";
 import Twitter from "../assets/twitter.svg";
 
 export default function Footer() {
+  const navigate=useNavigate();
   const role = localStorage.getItem("role");
 
   // Decide route based on role
@@ -29,7 +30,9 @@ export default function Footer() {
         {/* Logo Section */}
         <div className="md:flex justify-center md:justify-start">
           <div className="bg-white w-[120px] h-[60px] sm:w-[140px] sm:h-[70px] md:w-[160px] md:h-[75px] lg:w-[185px] lg:h-[90px] flex items-center justify-center mx-auto md:mx-0">
-            <img
+            <img onClick={()=>{
+navigate('/homeuser')
+            }}
               src={Logo}
               alt="The Bharat Works"
               className="w-[100px] h-[32px] sm:w-[120px] sm:h-[38px] md:w-[140px] md:h-[44px] lg:w-[150px] lg:h-[48px] object-contain"

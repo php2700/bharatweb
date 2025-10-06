@@ -212,12 +212,16 @@ const DirectHiring = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!title) newErrors.title = "Title is required";
+    if (!title) newErrors.title = "Title is required.";
+    else if (title?.length < 3)
+      newErrors.title = "Min 3 charater title is required.";
     // if (!address) newErrors.address = "Address is required";
-    if (!description) newErrors.description = "Description is required";
-    if (!deadline) newErrors.deadline = "Deadline is required";
+    if (!description) newErrors.description = "Description is required.";
+    else if (description?.length < 5)
+      newErrors.description = "Min 5 character description is required.";
+    if (!deadline) newErrors.deadline = "Deadline is required.";
     if (images.length === 0)
-      newErrors.images = "At least one image is required";
+      newErrors.images = "At least one image is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -238,7 +242,6 @@ const DirectHiring = () => {
       return;
     }
 
-    
     try {
       const formData = new FormData();
       formData.append("first_provider_id", id);

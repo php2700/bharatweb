@@ -740,6 +740,7 @@ export default function EditProfile() {
 
     // Validation
     if (!formData.name.trim()) return toast.error("Name is required!", { toastId: "nameRequiredError" });
+    else if(formData?.name?.trim()?.length <3 )return toast.error("Min 3 charater is required!", { toastId: "nameRequiredError" });
     if (!formData.age) return toast.error("Age is required!", { toastId: "ageRequiredError" });
     if (!formData.gender) return toast.error("Gender is required!", { toastId: "genderRequiredError" });
     if (!formData.address.trim()) return toast.error("Address is required!", { toastId: "addressRequiredError" });

@@ -374,7 +374,8 @@ export default function ViewProfile() {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-
+  
+  console.log(orderData,"dddddddddddd")
   return (
     <>
       <Header />
@@ -472,7 +473,7 @@ export default function ViewProfile() {
                           : ""
                       }
                       ${
-                        orderData?.hire_status === "cancelldispute"
+                        orderData?.hire_status === "cancelledDispute"
                           ? "bg-[#FF0000]"
                           : ""
                       }

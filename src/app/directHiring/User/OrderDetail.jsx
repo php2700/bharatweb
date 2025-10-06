@@ -18,13 +18,15 @@ import Swal from "sweetalert2";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useSelector } from "react-redux";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function ViewProfile() {
   const navigate = useNavigate();
   const { id } = useParams();
-
+  const [mapRef, setMapRef] = useState(null);
   const [orderData, setOrderData] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -44,6 +46,18 @@ export default function ViewProfile() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [markerLocationAddress, setMarkerLocationAddress] = useState(null);
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
+  });
+
+  const [defaultCenter, setDefaultCenter] = useState({
+    lat: 28.6139,
+    lng: 77.209,
+  });
+  const user = useSelector((state) => state.user.profile);
+  const userId = user?._id;
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -148,73 +162,73 @@ export default function ViewProfile() {
   };
 
   // Fetch order data
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        setError("Authentication token not found. Please log in.");
-        setLoading(false);
-        return;
-      }
+  const fetchData = async () => {
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      setError("Authentication token not found. Please log in.");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        setLoading(true);
-        const orderResponse = await axios.get(
-          `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(
-          "Order Response:",
-          orderResponse.data,
-          "sssss------------------------"
-        );
-        setOrderData(orderResponse.data.data.order);
-        setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-        setServiceProviders(orderResponse.data.data.order.offer_history || []);
-        setIsHired(orderResponse.data.data.order.hire_status !== "pending");
-
-        // Initialize offer statuses and assigned provider IDs
-        const initialStatuses = {};
-        const providerIds = [];
-        orderResponse.data.data.order.offer_history?.forEach((provider) => {
-          initialStatuses[provider.provider_id._id] =
-            provider.status[0] || "sent";
-          providerIds.push(provider.provider_id._id);
-        });
-        setOfferStatuses(initialStatuses);
-        setAssignedProviderIds(providerIds);
-
-        // Extract category_id and subcategory_ids
-        if (
-          orderResponse.data.data.order.offer_history &&
-          orderResponse.data.data.order.offer_history.length > 0
-        ) {
-          setCategory_id(
-            orderResponse.data.data.order.offer_history[0].provider_id
-              .category_id._id || null
-          );
-          setSubcategory_ids(
-            orderResponse.data.data.order.offer_history[0].provider_id.subcategory_ids.map(
-              (sub) => sub._id
-            ) || []
-          );
-        } else {
-          setCategory_id(null);
-          setSubcategory_ids([]);
+    try {
+      setLoading(true);
+      const orderResponse = await axios.get(
+        `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (err) {
-        setError("Failed to fetch data. Please try again later.");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
+      console.log(
+        "Order Response:",
+        orderResponse.data,
+        "sssss------------------------"
+      );
+      setOrderData(orderResponse.data.data.order);
+      setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+      setServiceProviders(orderResponse.data.data.order.offer_history || []);
+      setIsHired(orderResponse.data.data.order.hire_status !== "pending");
 
+      // Initialize offer statuses and assigned provider IDs
+      const initialStatuses = {};
+      const providerIds = [];
+      orderResponse.data.data.order.offer_history?.forEach((provider) => {
+        initialStatuses[provider.provider_id._id] =
+          provider.status[0] || "sent";
+        providerIds.push(provider.provider_id._id);
+      });
+      setOfferStatuses(initialStatuses);
+      setAssignedProviderIds(providerIds);
+
+      // Extract category_id and subcategory_ids
+      if (
+        orderResponse.data.data.order.offer_history &&
+        orderResponse.data.data.order.offer_history.length > 0
+      ) {
+        setCategory_id(
+          orderResponse.data.data.order.offer_history[0].provider_id.category_id
+            ._id || null
+        );
+        setSubcategory_ids(
+          orderResponse.data.data.order.offer_history[0].provider_id.subcategory_ids.map(
+            (sub) => sub._id
+          ) || []
+        );
+      } else {
+        setCategory_id(null);
+        setSubcategory_ids([]);
+      }
+    } catch (err) {
+      setError("Failed to fetch data. Please try again later.");
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [id]);
 
@@ -484,6 +498,35 @@ export default function ViewProfile() {
     );
   }
 
+  const handleChatOpen = (receiverId, senderId) => {
+    localStorage.setItem("receiverId", receiverId);
+    localStorage.setItem("senderId", senderId);
+    navigate("/chats");
+  };
+
+  const openMap = (address) => {
+    if (!isLoaded) return;
+    if (!address) return;
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const location = results[0].geometry.location;
+        const coords = { lat: location.lat(), lng: location.lng() };
+
+        setDefaultCenter(coords);
+        setMarkerLocationAddress(coords);
+        setIsMapOpen(true);
+        const bounds = results[0].geometry.viewport;
+        if (mapRef) {
+          mapRef.fitBounds(bounds);
+        }
+      } else {
+        console.error("Geocode failed: " + status);
+      }
+    });
+  };
+
   return (
     <>
       <Header />
@@ -539,7 +582,12 @@ export default function ViewProfile() {
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.address || "No Address Provided"}
-                  <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                  <div
+                    onClick={() => {
+                      openMap(orderData?.address);
+                    }}
+                    className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                  >
                     {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
@@ -642,18 +690,15 @@ export default function ViewProfile() {
                             View Profile
                           </Link>
                         </div>
-                        {/* <div className="flex flex-col items-center justify-center flex-1">
+                        <div className="flex flex-col items-center justify-center flex-1">
                           <p className="text-gray-600 font-medium">Contact</p>
                           <div className="flex space-x-2 mt-2">
                             <button
                               className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
                               title="Call"
-                          //      onClick={() =>
-                          //   window.open(
-                          //     `tel:${provider.user_id.phone}`,
-                          //     "_self"
-                          //   )
-                          // }
+                              onClick={() => {
+                                window.open(`tel:${provider.phone}`, "_self");
+                              }}
                             >
                               <img
                                 src={CallIcon}
@@ -664,6 +709,12 @@ export default function ViewProfile() {
                             <button
                               className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
                               title="Chat"
+                              onClick={() =>
+                                handleChatOpen(
+                                  provider?.provider_id?._id,
+                                  userId
+                                )
+                              }
                             >
                               <img
                                 src={ChatIcon}
@@ -672,7 +723,7 @@ export default function ViewProfile() {
                               />
                             </button>
                           </div>
-                        </div> */}
+                        </div>
 
                         <div className="flex flex-col gap-2">
                           {offerStatuses[provider.provider_id._id] ===
@@ -787,7 +838,10 @@ export default function ViewProfile() {
                       </button>
                       <ReviewModal
                         show={showCompletedModal}
-                        onClose={() => setShowCompletedModal(false)}
+                        onClose={() => {
+                          setShowCompletedModal(false);
+                          fetchData();
+                        }}
                         service_provider_id={orderData?.service_provider_id._id}
                         orderId={id}
                         type="direct"
@@ -940,6 +994,35 @@ export default function ViewProfile() {
                 Yes
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isMapOpen && isLoaded && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
+            <div className="flex justify-between mb-2">
+              <h1 className="text-black text-[20px] font-semibold">
+                Selected Address on Map
+              </h1>
+              <button
+                onClick={() => setIsMapOpen(false)}
+                className="text-red-500 font-bold"
+              >
+                X
+              </button>
+            </div>
+
+            <GoogleMap
+              mapContainerStyle={{ height: "350px", width: "100%" }}
+              center={defaultCenter}
+              zoom={12}
+              onLoad={(map) => setMapRef(map)}
+            >
+              {markerLocationAddress && (
+                <Marker position={markerLocationAddress} />
+              )}
+            </GoogleMap>
           </div>
         </div>
       )}
