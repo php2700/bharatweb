@@ -28,6 +28,7 @@ export default function EditProfile() {
   const location = useLocation();
   const { activeTab } = location.state || { activeTab: "user" };
   const role = profile?.role;
+	const verificationStatus = profile?.verificationStatus; // New field
   const fileInputRef = useRef(null);
   const autoCompleteRef = useRef(null);
   console.log("prof", profile);
@@ -1029,7 +1030,7 @@ export default function EditProfile() {
         }
 
         // Handle role upgrade if necessary
-        if (role === "user") {
+        if (role === "user" || verificationStatus === "rejected") {
           const upgradeRes = await fetch(
             `${BASE_URL}/user/request-role-upgrade`,
             {
@@ -1038,7 +1039,7 @@ export default function EditProfile() {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify({ role: "worker" }),
+              // body: JSON.stringify({ role: "worker" }),
             }
           );
 

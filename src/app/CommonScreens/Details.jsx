@@ -1108,7 +1108,7 @@ export default function Details() {
                                 className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-md shadow"
                                 onError={(e) => {
                                   e.target.src =
-                                    "/src/assets/profile/default.png";
+                                    "/src/assets/directHiring/his-work.png";
                                 }}
                               />
                             ))
