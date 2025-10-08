@@ -20,6 +20,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import defaultWorkImage from "../../../assets/directHiring/his-work.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -562,7 +563,7 @@ export default function ViewProfile() {
             </Carousel>
           ) : (
             <img
-              src="https://via.placeholder.com/800x400"
+              src={defaultWorkImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />

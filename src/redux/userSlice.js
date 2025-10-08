@@ -18,7 +18,7 @@ export const fetchUserProfile = createAsyncThunk(
       return rejectWithValue("Invalid token format");
     }
 
-    console.log("fetchUserProfile: Attempting API call with token:", token.slice(0, 10) + "...");
+    // console.log("fetchUserProfile: Attempting API call with token:", token.slice(0, 10) + "...");
     try {
       const res = await fetch(`${BASE_URL}/user/getUserProfileData`, {
         method: "GET",

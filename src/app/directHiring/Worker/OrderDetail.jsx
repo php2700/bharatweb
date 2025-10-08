@@ -19,6 +19,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import callIcon from "../../../assets/directHiring/call.png";
 import messageIcon from "../../../assets/directHiring/message.png";
+import defaultWorkImage from "../../../assets/directHiring/his-work.png";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -116,7 +118,6 @@ export default function ViewProfile() {
           },
         }
       );
-
 
       const order = orderResponse.data.data.order;
       setOrderData(order);
@@ -239,7 +240,7 @@ export default function ViewProfile() {
         }
       );
 
-      console.log("acceptOffer response:", response);
+      // console.log("acceptOffer response:", response);
 
       if (response.status === 200) {
         setOfferStatus("accepted");
@@ -374,8 +375,7 @@ export default function ViewProfile() {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-  
-  console.log(orderData,"dddddddddddd")
+
   return (
     <>
       <Header />
@@ -411,7 +411,7 @@ export default function ViewProfile() {
             </Carousel>
           ) : (
             <img
-              src="https://via.placeholder.com/800x400"
+              src={defaultWorkImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
@@ -422,21 +422,19 @@ export default function ViewProfile() {
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
-                 <div>
-  Description :{" "}
-  {orderData?.description.length > 50
-    ? orderData?.description.slice(0, 50) + "..."
-    : orderData?.description}
-</div>
+                <div>
+                  Description :{" "}
+                  {orderData?.description.length > 50
+                    ? orderData?.description.slice(0, 50) + "..."
+                    : orderData?.description}
+                </div>
 
                 <div>
-                  Detailed Address :-{" "}
-                  {orderData?.address || "No Address Provided"}
-                  <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                    {orderData?.user_id?.location?.address ||
+                  <div className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
+                  <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" /> {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
                   </div>
-                </div>
+                </div> 
               </div>
               <div className="text-right space-y-2 tracking-tight">
                 <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
@@ -502,7 +500,8 @@ export default function ViewProfile() {
                 {orderData?.description}
               </p>
             </div>
-            {orderData?.hire_status === "pending" ? (
+            {orderData?.hire_status === "pending" ||
+            orderData?.hire_status === "cancelled" ? (
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-black mb-4">
                   User Details
@@ -518,7 +517,7 @@ export default function ViewProfile() {
                       />
                       <div>
                         <p className="text-lg font-semibold">
-                          {orderData.user_id.full_name || "Unknown User"}
+                          {orderData?.user_id?.full_name || "Unknown User"}
                         </p>
                         {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
@@ -551,56 +550,58 @@ export default function ViewProfile() {
                         <button
                           className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
                           title="Chat"
-                          onClick={() => handleChatOpen(orderData.user_id._id, userId)}
+                          onClick={() =>
+                            handleChatOpen(orderData.user_id._id, userId)
+                          }
                         >
                           <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center space-y-2">
-                      {offerStatus === "accepted" ? (
-                        <>
-                          <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
-                            Accepted
-                          </span>
-                          <button
-                            type="button"
-                            className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                            onClick={handleAssignWork}
-                          >
-                            Assign Work
-                          </button>
-                        </>
-                      ) : offerStatus === "rejected" ? (
-                        <span className="px-4 py-2 bg-[#FF0000] text-white rounded-lg text-sm font-medium">
-                          Rejected
+                    {orderData?.hire_status === "cancelled" ? (
+                      <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">Project is Cancelled by User</div>
+                    ) : offerStatus === "accepted" ? (
+                      <>
+                        <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
+                          Accepted
                         </span>
-                      ) : offerStatus === "assigned" ? (
-                        <span className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-                          Work Assigned
-                        </span>
-                      ) : (
-                        <div className="flex space-x-2">
-                          <button
-                            type="button"
-                            className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                            onClick={handleAcceptOffer}
-                            disabled={isAccepting}
-                          >
-                            {isAccepting ? "Accepting..." : "Accept"}
-                          </button>
-                          <button
-                            type="button"
-                            className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
-                            onClick={handleRejectOffer}
-                            disabled={isRejecting}
-                          >
-                            {isRejecting ? "Rejecting..." : "Reject"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                        <button
+                          type="button"
+                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                          onClick={handleAssignWork}
+                        >
+                          Assign Work
+                        </button>
+                      </>
+                    ) : offerStatus === "rejected" ? (
+                      <span className="px-4 py-2 bg-[#FF0000] text-white rounded-lg text-sm font-medium">
+                        Rejected
+                      </span>
+                    ) : offerStatus === "assigned" ? (
+                      <span className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
+                        Work Assigned
+                      </span>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                          onClick={handleAcceptOffer}
+                          disabled={isAccepting}
+                        >
+                          {isAccepting ? "Accepting..." : "Accept"}
+                        </button>
+                        <button
+                          type="button"
+                          className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
+                          onClick={handleRejectOffer}
+                          disabled={isRejecting}
+                        >
+                          {isRejecting ? "Rejecting..." : "Reject"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center text-gray-600">

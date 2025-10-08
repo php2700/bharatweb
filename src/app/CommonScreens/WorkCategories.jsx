@@ -74,7 +74,7 @@ const [directHiring, setDirectHiring] = useState([]);
 					if (Array.isArray(data.data)) {
 						setDirectHiring(data.data.map(item => ({
 							id:item._id || "",
-							image: item.image_url[0] || 'Hiring',
+							image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
 							work: item.title || "Make a chair",
 							description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
 							amount: item.platform_fee || "₹200",
@@ -190,7 +190,7 @@ const fetchBannerImages = async () => {
     autoplaySpeed: 3000,
     arrows: true,
   };
-console.log("images",bannerImages);
+// console.log("images",bannerImages);
   return (
     <>
       <Header />

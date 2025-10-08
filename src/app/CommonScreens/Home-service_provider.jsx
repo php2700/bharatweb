@@ -88,14 +88,14 @@ export default function ServiceProviderHome() {
       });
 
       const data = await res.json();
-      console.log("Direct Hiring API response:", data);
+      // console.log("Direct Hiring API response:", data);
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_url[0] || Hiring,
+              image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -137,7 +137,7 @@ export default function ServiceProviderHome() {
       );
 
       const data = await res.json();
-      console.log("Bidding API response:", data);
+      // console.log("Bidding API response:", data);
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
@@ -146,7 +146,7 @@ export default function ServiceProviderHome() {
               id: item._id,
               image: item.image_urls
                 ? `${IMAGE_URL}/${item.image_url}`
-                : Bidding,
+                : "/src/assets/directHiring/his-work.png",
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -188,14 +188,14 @@ export default function ServiceProviderHome() {
       );
 
       const data = await res.json();
-      console.log("Emergency API response:", data);
+      // console.log("Emergency API response:", data);
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
           setEmergency(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_urls || Emergency,
+              image: item.image_urls || "/src/assets/directHiring/his-work.png",
               work: item.title || "Emergency task",
               // description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
               amount: item.platform_fee || "₹200",
@@ -584,7 +584,7 @@ export default function ServiceProviderHome() {
                     >
                       <div className="relative w-full">
                         <img
-                          src={card.image}
+                          src={card.image ? card.image : "/src/assets/directHiring/his-work.png"}
                           alt={capitalizeFirst(card.work)}
                           className="w-full h-36 object-cover rounded-2xl"
                         />
@@ -666,7 +666,7 @@ export default function ServiceProviderHome() {
                       >
                         <div className="relative w-full">
                           <img
-                            src={card.image}
+                            src={card.image ? card.image : "/src/assets/directHiring/his-work.png"}
                             alt={capitalizeFirst(card.work)}
                             className="w-full h-36 object-cover rounded-2xl"
                           />

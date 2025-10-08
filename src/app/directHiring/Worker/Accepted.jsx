@@ -168,7 +168,7 @@ export default function Accepted({
               </div>
             ))
           ) : (
-            <div className="text-center font-semibold">No Payment </div>
+            <div className="text-center font-semibold">No Payment History </div>
           )}
         </div>
       )}

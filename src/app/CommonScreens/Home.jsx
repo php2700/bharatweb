@@ -25,6 +25,20 @@ import { Link } from "react-router-dom";
 export default function Home() {
   const navigate = useNavigate();
 
+
+  // 🔹 1. If user is already logged in, redirect to home (or dashboard)
+  useEffect(() => {
+    const token = localStorage.getItem("bharat_token"); // change key as per your login storage
+    if (token) {
+      const role = localStorage.getItem("role");
+      if (role == "user") {
+        navigate("/homeuser");
+      } else {
+        navigate("/homeservice");
+      }
+    }
+  }, [navigate]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

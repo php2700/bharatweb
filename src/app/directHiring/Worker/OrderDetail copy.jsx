@@ -31,15 +31,15 @@ export default function ViewProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [serviceProviders, setServiceProviders] = useState([]);
-  const [offerStatus, setOfferStatus] = useState("pending"); // Changed to string for single status
+  const [offerStatus, setOfferStatus] = useState("pending");
   const acceptedSectionRef = useRef(null);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
   const [isHired, setIsHired] = useState(false);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
-  const [isRejecting, setIsRejecting] = useState(false); // Added for loading state
-	
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
 
   const user = useSelector((state) => state.user.profile);
   const userId = user?._id;
@@ -86,10 +86,8 @@ export default function ViewProfile() {
   };
 
   const handleChatOpen = (receiverId, senderId) => {
-    // Save receiverId in localStorage
     localStorage.setItem("receiverId", receiverId);
     localStorage.setItem("senderId", senderId);
-    // Redirect to chat page
     navigate("/chats");
   };
 
@@ -98,102 +96,56 @@ export default function ViewProfile() {
     fetchBannerImages();
   }, []);
 
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       const token = localStorage.getItem("bharat_token");
-  //       if (!token) {
-  //         setError("Authentication token not found. Please log in.");
-  //         setLoading(false);
-  //         return;
-  //       }
+  const fetchData = async (showLoading = true) => {
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      setError("Authentication token not found. Please log in.");
+      if (showLoading) setLoading(false);
+      return;
+    }
 
-  //       try {
-  //         setLoading(true);
-  //         const orderResponse = await axios.get(
-  //           `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-  //           {
-  //             headers: {
-  //               "Content-Type": "application/json",
-  //               Authorization: `Bearer ${token}`,
-  //             },
-  //           }
-  //         );
-  //         setOrderData(orderResponse.data.data.order);
-  //         setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-  //         setServiceProviders(orderResponse.data.data.order.offer_history || []);
-  //         console.log("jdjdjd", orderResponse.data.data.order.offer_history);
+    if (showLoading) setLoading(true);
 
-  //        const matchedOffer = orderResponse.data.data.order.offer_history?.find(
-  //   (provider) => provider.provider_id._id === userId
-  // );
-  //         console.log(matchedOffer?.status);
-  //         setOfferStatus(matchedOffer?.status || "pending");
+    try {
+      const orderResponse = await axios.get(
+        `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  //         setIsHired(orderResponse.data.data.order.hire_status !== "pending");
-  //       } catch (err) {
-  //         setError("Failed to fetch data. Please try again later.");
-  //         console.error("Error:", err);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
 
-  //     fetchData();
-  //   }, [id]);
+      const order = orderResponse.data.data.order;
+      setOrderData(order);
+      setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+      setServiceProviders(order.offer_history || []);
+
+      const matchedOffer = Array.isArray(order.offer_history)
+        ? order.offer_history.find((provider) =>
+            provider.provider_id?._id
+              ? provider.provider_id._id === userId
+              : provider.provider_id === userId
+          )
+        : null;
+
+      setOfferStatus(matchedOffer?.status || "pending");
+      setIsHired(order.hire_status !== "pending");
+    } catch (err) {
+      setError("Failed to fetch data. Please try again later.");
+      console.error("Error in fetchData:", err);
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        setError("Authentication token not found. Please log in.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const orderResponse = await axios.get(
-          `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const order = orderResponse.data.data.order;
-        setOrderData(order);
-        setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-        setServiceProviders(order.offer_history || []);
-
-        console.log("offer_history:", order.offer_history);
-        console.log("userId:", userId);
-
-        const matchedOffer = Array.isArray(order.offer_history)
-          ? order.offer_history.find((provider) =>
-              provider.provider_id?._id
-                ? provider.provider_id._id === userId
-                : provider.provider_id === userId
-            )
-          : null;
-
-        console.log("matchedOffer:", matchedOffer);
-        setOfferStatus(matchedOffer?.status || "pending");
-        setIsHired(order.hire_status !== "pending");
-      } catch (err) {
-        setError("Failed to fetch data. Please try again later.");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [id, userId]);
 
   const handleCancelOffer = async () => {
-    // Removed providerId since not needed
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await axios.post(
@@ -266,55 +218,62 @@ export default function ViewProfile() {
       });
     }
   };
-  
- const handleAcceptOffer = async (e) => {
-  e.preventDefault();
-  try {
-    const token = localStorage.getItem("bharat_token");
-    if (!token) {
-      throw new Error("Authentication token not found");
-    }
 
-    const response = await axios.post(
-      `${BASE_URL}/direct-order/accept-offer`,
-      { order_id: id },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+  const handleAcceptOffer = async (e) => {
+    e.preventDefault();
+    setIsAccepting(true);
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("Authentication token not found");
       }
-    );
 
-    if (response) {
-      setOfferStatus("accepted");
-      setOrderData((prev) => ({
-        ...prev,
-        hire_status: "accepted",
-      }));
-      setIsHired(true);
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/accept-offer`,
+        { order_id: id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("acceptOffer response:", response);
+
+      if (response.status === 200) {
+        setOfferStatus("accepted");
+        setOrderData((prev) => ({
+          ...prev,
+          hire_status: "accepted",
+        }));
+        setIsHired(true);
+        await Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Offer accepted successfully!",
+          confirmButtonColor: "#228B22",
+          showConfirmButton: false,
+          timer: 2000, // Auto-close after 2 seconds
+        });
+        await fetchData(false);
+      }
+    } catch (err) {
+      console.error("Error accepting offer:", err);
       await Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Offer accepted successfully!",
-        confirmButtonColor: "#228B22",
-				allowOutsideClick: false,
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to accept offer. Please try again.",
+        confirmButtonColor: "#FF0000",
+        showConfirmButton: false,
+        timer: 2000, // Auto-close after 2 seconds
       });
-			window.location.reload();
+    } finally {
+      setIsAccepting(false);
     }
-  } catch (err) {
-    console.error("Error accepting offer:", err);
-    await Swal.fire({
-      icon: "error",
-      title: "Oops!",
-      text: "Failed to accept offer. Please try again.",
-      confirmButtonColor: "#FF0000",
-    });
-  }
-};
+  };
 
   const handleRejectOffer = async () => {
-    // Removed providerId
     setIsRejecting(true);
     try {
       const token = localStorage.getItem("bharat_token");
@@ -354,7 +313,6 @@ export default function ViewProfile() {
   };
 
   const handleAssignWork = async () => {
-    // Use userId as provider_id
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await axios.post(
@@ -391,7 +349,7 @@ export default function ViewProfile() {
     }
   };
 
-  if (loading) {
+  if (loading || isAccepting) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-lg font-semibold">Loading...</div>
@@ -416,11 +374,12 @@ export default function ViewProfile() {
     autoplay: true,
     autoplaySpeed: 3000,
   };
- 
+  
+  console.log(orderData,"dddddddddddd")
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-4 mt-20">
         <button
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
@@ -461,7 +420,15 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Category :- {orderData?.title || "Unknown Title"}</span>
+                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
+                 <div>
+  Description :{" "}
+  {orderData?.description.length > 50
+    ? orderData?.description.slice(0, 50) + "..."
+    : orderData?.description}
+</div>
+
                 <div>
                   Detailed Address :-{" "}
                   {orderData?.address || "No Address Provided"}
@@ -506,7 +473,7 @@ export default function ViewProfile() {
                           : ""
                       }
                       ${
-                        orderData?.hire_status === "cancelldispute"
+                        orderData?.hire_status === "cancelledDispute"
                           ? "bg-[#FF0000]"
                           : ""
                       }
@@ -543,7 +510,6 @@ export default function ViewProfile() {
 
                 {orderData?.user_id ? (
                   <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-md">
-                    {/* --- Left: User Info --- */}
                     <div className="flex items-center space-x-4">
                       <img
                         src={orderData.user_id.profile_pic || Profile}
@@ -552,9 +518,9 @@ export default function ViewProfile() {
                       />
                       <div>
                         <p className="text-lg font-semibold">
-                          {orderData.user_id.full_name || "Unknown User"}
+                          {orderData?.user_id?.full_name || "Unknown User"}
                         </p>
-                        <button
+                        {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
                             navigate(
@@ -563,11 +529,10 @@ export default function ViewProfile() {
                           }
                         >
                           View Profile
-                        </button>
+                        </button> */}
                       </div>
                     </div>
 
-                    {/* --- Middle: Contact Buttons --- */}
                     <div className="text-center">
                       <p className="text-gray-600 font-medium mb-2">Contact</p>
                       <div className="flex space-x-2 justify-center mt-1">
@@ -586,21 +551,19 @@ export default function ViewProfile() {
                         <button
                           className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
                           title="Chat"
-                          onClick={() => handleChatOpen(orderData.user_id._id, userId,)}
+                          onClick={() => handleChatOpen(orderData.user_id._id, userId)}
                         >
                           <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                         </button>
                       </div>
                     </div>
 
-                    {/* --- Right: Action / Status Buttons --- */}
                     <div className="flex flex-col items-center space-y-2">
                       {offerStatus === "accepted" ? (
                         <>
                           <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
                             Accepted
                           </span>
-
                           <button
                             type="button"
                             className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
@@ -623,8 +586,9 @@ export default function ViewProfile() {
                             type="button"
                             className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                             onClick={handleAcceptOffer}
+                            disabled={isAccepting}
                           >
-                            Accept
+                            {isAccepting ? "Accepting..." : "Accept"}
                           </button>
                           <button
                             type="button"
@@ -654,7 +618,7 @@ export default function ViewProfile() {
               <div ref={acceptedSectionRef}>
                 <Accepted
                   serviceProvider={orderData?.user_id}
-                  user_id={orderData?.service_provider_id._id}
+                  user_id={orderData?.service_provider_id?._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
                   orderId={id}

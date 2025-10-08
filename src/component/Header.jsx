@@ -67,18 +67,49 @@ export default function Header() {
   }
 
   // Handle unauthorized access (401)
-  const handleUnauthorized = () => {
-      // localStorage.clear();
+  // const handleUnauthorized = () => {
+  //     // localStorage.clear();
+  //   localStorage.removeItem("bharat_token");
+  //   localStorage.removeItem("isProfileComplete");
+  //   localStorage.removeItem("role");
+  //   localStorage.removeItem("otp");
+  //   localStorage.removeItem("selectedAddressId");
+  //   localStorage.removeItem("selectedAddressTitle");
+  //   dispatch(clearUserProfile());
+  //   toast.error("Session expired, please log in again");
+  //   navigate("/login");
+  // };
+
+
+const handleUnauthorized = async () => {
+  try {
+    const token = localStorage.getItem("bharat_token");
+
+    // Call logout API
+    await fetch(`${BASE_URL}/user/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error("Logout API failed:", error);
+  } finally {
+    // Clear localStorage and navigate
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
     localStorage.removeItem("otp");
     localStorage.removeItem("selectedAddressId");
     localStorage.removeItem("selectedAddressTitle");
+
     dispatch(clearUserProfile());
     toast.error("Session expired, please log in again");
     navigate("/login");
-  };
+  }
+};
+
 
   // Prevent body scrolling when modal is open
   useEffect(() => {

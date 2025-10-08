@@ -76,106 +76,106 @@ const DirectHiring = () => {
     document.body.appendChild(razorpayScript);
 
     // 🔹 Initialize Google Maps Autocomplete for address input
-    loadGoogleMapsScript(() => {
-      const input = document.getElementById("address-input");
-      const autocomplete = new window.google.maps.places.Autocomplete(input, {
-        types: ["address"],
-        componentRestrictions: { country: "in" }, // 🔹 Restrict to India
-      });
-      autocompleteRef.current = autocomplete;
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (place.formatted_address) {
-          setAddress(place.formatted_address);
-        }
-      });
+    // loadGoogleMapsScript(() => {
+    //   const input = document.getElementById("address-input");
+    //   const autocomplete = new window.google.maps.places.Autocomplete(input, {
+    //     types: ["address"],
+    //     componentRestrictions: { country: "in" }, // 🔹 Restrict to India
+    //   });
+    //   autocompleteRef.current = autocomplete;
+    //   autocomplete.addListener("place_changed", () => {
+    //     const place = autocomplete.getPlace();
+    //     if (place.formatted_address) {
+    //       setAddress(place.formatted_address);
+    //     }
+    //   });
 
-      // 🔹 Initialize map and autocomplete in modal
-      if (isMapModalOpen && mapRef.current) {
-        const map = new window.google.maps.Map(mapRef.current, {
-          center: { lat: 20.5937, lng: 78.9629 }, // 🔹 Default center (India)
-          zoom: 5,
-          mapTypeControl: false,
-          streetViewControl: false,
-        });
+    //   // 🔹 Initialize map and autocomplete in modal
+    //   if (isMapModalOpen && mapRef.current) {
+    //     const map = new window.google.maps.Map(mapRef.current, {
+    //       center: { lat: 20.5937, lng: 78.9629 }, // 🔹 Default center (India)
+    //       zoom: 5,
+    //       mapTypeControl: false,
+    //       streetViewControl: false,
+    //     });
 
-        const autocompleteInput = document.getElementById(
-          "map-autocomplete-input"
-        );
-        const mapAutocomplete = new window.google.maps.places.Autocomplete(
-          autocompleteInput,
-          {
-            types: ["address"],
-            componentRestrictions: { country: "in" },
-          }
-        );
-        mapAutocompleteRef.current = mapAutocomplete;
+    //     const autocompleteInput = document.getElementById(
+    //       "map-autocomplete-input"
+    //     );
+    //     const mapAutocomplete = new window.google.maps.places.Autocomplete(
+    //       autocompleteInput,
+    //       {
+    //         types: ["address"],
+    //         componentRestrictions: { country: "in" },
+    //       }
+    //     );
+    //     mapAutocompleteRef.current = mapAutocomplete;
 
-        // 🔹 Update map and marker when place is selected in modal
-        mapAutocomplete.addListener("place_changed", () => {
-          const place = mapAutocomplete.getPlace();
-          if (place.geometry) {
-            map.setCenter(place.geometry.location);
-            map.setZoom(15);
-            if (markerRef.current) {
-              markerRef.current.setMap(null);
-            }
-            markerRef.current = new window.google.maps.Marker({
-              position: place.geometry.location,
-              map,
-              draggable: true,
-              title: "Selected Location",
-            });
+    //     // 🔹 Update map and marker when place is selected in modal
+    //     mapAutocomplete.addListener("place_changed", () => {
+    //       const place = mapAutocomplete.getPlace();
+    //       if (place.geometry) {
+    //         map.setCenter(place.geometry.location);
+    //         map.setZoom(15);
+    //         if (markerRef.current) {
+    //           markerRef.current.setMap(null);
+    //         }
+    //         markerRef.current = new window.google.maps.Marker({
+    //           position: place.geometry.location,
+    //           map,
+    //           draggable: true,
+    //           title: "Selected Location",
+    //         });
 
-            setAddress(place.formatted_address);
+    //         setAddress(place.formatted_address);
 
-            // 🔹 Update address on marker drag
-            markerRef.current.addListener("dragend", () => {
-              const geocoder = new window.google.maps.Geocoder();
-              geocoder.geocode(
-                { location: markerRef.current.getPosition() },
-                (results, status) => {
-                  if (status === "OK" && results[0]) {
-                    setAddress(results[0].formatted_address);
-                  }
-                }
-              );
-            });
-          }
-        });
-        // 🔹 Add marker on map click
-        map.addListener("click", (event) => {
-          if (markerRef.current) {
-            markerRef.current.setMap(null);
-          }
-          markerRef.current = new window.google.maps.Marker({
-            position: event.latLng,
-            map,
-            draggable: true,
-            title: "Selected Location",
-          });
+    //         // 🔹 Update address on marker drag
+    //         markerRef.current.addListener("dragend", () => {
+    //           const geocoder = new window.google.maps.Geocoder();
+    //           geocoder.geocode(
+    //             { location: markerRef.current.getPosition() },
+    //             (results, status) => {
+    //               if (status === "OK" && results[0]) {
+    //                 setAddress(results[0].formatted_address);
+    //               }
+    //             }
+    //           );
+    //         });
+    //       }
+    //     });
+    //     // 🔹 Add marker on map click
+    //     map.addListener("click", (event) => {
+    //       if (markerRef.current) {
+    //         markerRef.current.setMap(null);
+    //       }
+    //       markerRef.current = new window.google.maps.Marker({
+    //         position: event.latLng,
+    //         map,
+    //         draggable: true,
+    //         title: "Selected Location",
+    //       });
 
-          const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: event.latLng }, (results, status) => {
-            if (status === "OK" && results[0]) {
-              setAddress(results[0].formatted_address);
-            }
-          });
+    //       const geocoder = new window.google.maps.Geocoder();
+    //       geocoder.geocode({ location: event.latLng }, (results, status) => {
+    //         if (status === "OK" && results[0]) {
+    //           setAddress(results[0].formatted_address);
+    //         }
+    //       });
 
-          // 🔹 Update address on marker drag
-          markerRef.current.addListener("dragend", () => {
-            geocoder.geocode(
-              { location: markerRef.current.getPosition() },
-              (results, status) => {
-                if (status === "OK" && results[0]) {
-                  setAddress(results[0].formatted_address);
-                }
-              }
-            );
-          });
-        });
-      }
-    });
+    //       // 🔹 Update address on marker drag
+    //       markerRef.current.addListener("dragend", () => {
+    //         geocoder.geocode(
+    //           { location: markerRef.current.getPosition() },
+    //           (results, status) => {
+    //             if (status === "OK" && results[0]) {
+    //               setAddress(results[0].formatted_address);
+    //             }
+    //           }
+    //         );
+    //       });
+    //     });
+    //   }
+    // });
 
     return () => {
       document.body.removeChild(razorpayScript);
