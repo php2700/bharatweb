@@ -220,8 +220,8 @@ const DirectHiring = () => {
     else if (description?.length < 5)
       newErrors.description = "Min 5 character description is required.";
     if (!deadline) newErrors.deadline = "Deadline is required.";
-    if (images.length === 0)
-      newErrors.images = "At least one image is required.";
+    // if (images.length === 0)
+    //   newErrors.images = "At least one image is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -566,9 +566,9 @@ const DirectHiring = () => {
                 />
               </label>
             </div>
-            {errors.images && (
+            {/* {errors.images && (
               <p className="text-red-500 text-sm mt-1">{errors.images}</p>
-            )}
+            )} */}
             {images.length > 0 && (
               <div className="flex gap-3 flex-wrap mt-4 justify-start">
                 {images.map((file, index) => (

@@ -581,8 +581,8 @@ export default function ViewProfile() {
                     : orderData?.description}
                 </div>
                 <div>
-                  Detailed Address :-{" "}
-                  {orderData?.address || "No Address Provided"}
+                  {/* Detailed Address :-{" "}
+                  {orderData?.address || "No Address Provided"} */}
                   <div
                     onClick={() => {
                       openMap(orderData?.address);
