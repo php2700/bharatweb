@@ -283,7 +283,7 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-6">
+      <div className="container mx-auto mt-20 px-4 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-6">
         {/* Left Content */}
         <div className="text-center md:text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">

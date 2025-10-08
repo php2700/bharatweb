@@ -138,7 +138,7 @@ export default function OurSubCategories() {
   return (
     <>
       <Header />
-      <div className="py-10 px-4 sm:px-10 md:px-20">
+      <div className="py-10 px-4 mt-20 sm:px-10 md:px-20">
         <h2 className="text-[37px] font-bold text-center mb-2">
           {service.name} Sub-Categories
         </h2>
