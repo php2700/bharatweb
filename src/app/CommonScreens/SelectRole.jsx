@@ -39,7 +39,7 @@ export default function RoleSelection() {
       });
 
       const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
+      // console.log("Banner API response:", data); // Debug response
 
       if (res.ok) {
         if (Array.isArray(data.images) && data.images.length > 0) {

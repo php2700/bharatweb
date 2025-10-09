@@ -423,13 +423,6 @@ export default function ViewProfile() {
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
                 <div>
-                  Description :{" "}
-                  {orderData?.description.length > 50
-                    ? orderData?.description.slice(0, 50) + "..."
-                    : orderData?.description}
-                </div>
-
-                <div>
                   <div className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
                   <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" /> {orderData?.user_id?.location?.address ||
                       "Unknown Location"}

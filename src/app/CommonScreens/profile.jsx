@@ -62,8 +62,8 @@ export default function Profile() {
   const ProfileComplete = () => {
     localStorage.setItem("isProfileComplete", "true");
     const role = localStorage.getItem("role");
-    if (role === "service_provider") navigate("/homeservice");
-    if (role === "user") navigate("/homeuser");
+    if (role === "service_provider") window.location.href = "/homeservice";
+    if (role === "user") window.location.href = "/homeuser";
   };
 
   const handleChange = (e) =>

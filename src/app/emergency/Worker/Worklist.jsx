@@ -9,6 +9,7 @@ import Search from "../../../assets/search-normal.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -342,11 +343,17 @@ export default function Worklist() {
                     </p>
                   </div>
                   <div className="flex justify-between items-center mt-4">
-                    <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
+                    <span className="text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
+                      <FaMapMarkerAlt
+                        size={25}
+                        color="#228B22"
+                        className="mr-2"
+                      />{" "}
                       {task.location.length > 20
                         ? `${task.location.slice(0, 20)}...`
                         : task.location}
                     </span>
+
                     <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() => {

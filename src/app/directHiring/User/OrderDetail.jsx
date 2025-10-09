@@ -21,6 +21,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import defaultWorkImage from "../../../assets/directHiring/his-work.png";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -182,11 +183,11 @@ export default function ViewProfile() {
           },
         }
       );
-      console.log(
-        "Order Response:",
-        orderResponse.data,
-        "sssss------------------------"
-      );
+      // console.log(
+      //   "Order Response:",
+      //   orderResponse.data,
+      //   "sssss------------------------"
+      // );
       setOrderData(orderResponse.data.data.order);
       setAssignedWorker(orderResponse.data.data.assignedWorker || null);
       setServiceProviders(orderResponse.data.data.order.offer_history || []);
@@ -461,6 +462,9 @@ export default function ViewProfile() {
     provider.provider_id?.full_name?.toLowerCase().includes(searchQuery)
   );
 
+const hasPendingProvider = serviceProviders.some(
+  (provider) => provider?.status === "pending"
+);
   // Filter related workers based on search query and exclude all assigned/offered providers
   const filteredRelatedWorkers = relatedWorkers.filter(
     (worker) =>
@@ -470,6 +474,8 @@ export default function ViewProfile() {
         (provider) => provider.provider_id._id === worker._id
       )
   );
+
+	console.log("serviceProviders", serviceProviders);
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -575,21 +581,13 @@ export default function ViewProfile() {
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
                 <div>
-                  Description :{" "}
-                  {orderData?.description.length > 50
-                    ? orderData?.description.slice(0, 50) + "..."
-                    : orderData?.description}
-                </div>
-                <div>
-                  {/* Detailed Address :-{" "}
-                  {orderData?.address || "No Address Provided"} */}
                   <div
                     onClick={() => {
                       openMap(orderData?.address);
                     }}
-                    className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit"
                   >
-                    {orderData?.address || "Unknown Location"}
+                    <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" /> {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
               </div>
@@ -864,6 +862,7 @@ export default function ViewProfile() {
       {/* Related Workers Section */}
       {orderData?.hire_status !== "cancelled" &&
         orderData?.hire_status !== "cancelled task" &&
+				!hasPendingProvider &&
         !isHired &&
         filteredRelatedWorkers.length > 0 && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">

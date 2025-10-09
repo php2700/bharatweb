@@ -3,18 +3,19 @@ import { useSelector } from "react-redux";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import images from "../../assets/workcategory/image.png";
-import hire1 from "../../assets/workcategory/hire1.png";
-import hire2 from "../../assets/workcategory/hire2.png";
-import hire3 from "../../assets/workcategory/hire3.png";
+import hire1 from "../../assets/workcategory/hire1.jpg";
+import hire2 from "../../assets/workcategory/hire2.jpg";
+import hire3 from "../../assets/workcategory/hire3.jpeg";
 import banner1 from "../../assets/workcategory/banner1.png";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
-	  const token = localStorage.getItem("bharat_token");
+  const token = localStorage.getItem("bharat_token");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -23,13 +24,13 @@ export default function WorkCategories() {
   const socket = useSelector((state) => state.socket?.socket);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null); // New state for error message
-const [directHiring, setDirectHiring] = useState([]);
-	const [directHiringLoading, setDirectHiringLoading] = useState(false);
-	const [directHiringError, setDirectHiringError] = useState(null);
+  const [directHiring, setDirectHiring] = useState([]);
+  const [directHiringLoading, setDirectHiringLoading] = useState(false);
+  const [directHiringError, setDirectHiringError] = useState(null);
   // Fetch categories
-	 const visibleDirectHiring = directHiring.slice(0, 4);
-	 console.log("visibleDirectHiring" ,visibleDirectHiring)
-	  const capitalizeFirst = (str) => {
+  const visibleDirectHiring = directHiring.slice(0, 4);
+  console.log("visibleDirectHiring", visibleDirectHiring);
+  const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -48,7 +49,10 @@ const [directHiring, setDirectHiring] = useState([]);
       if (res.ok && data.status) {
         setCategories(data.data || []);
       } else {
-        console.error("Failed to fetch categories:", data.message || "Unknown error");
+        console.error(
+          "Failed to fetch categories:",
+          data.message || "Unknown error"
+        );
       }
     } catch (err) {
       console.error("Error fetching categories:", err.message);
@@ -57,94 +61,100 @@ const [directHiring, setDirectHiring] = useState([]);
     }
   };
 
-	// Fetch direct hiring
-		const fetchDirectHiring = async () => {
-			try {
-				setDirectHiringLoading(true);
-				const res = await fetch(`${BASE_URL}/direct-order/getOrdersByUser`, {
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
-				});
-	
-				const data = await res.json();
-	
-				if (res.ok) {
-					if (Array.isArray(data.data)) {
-						setDirectHiring(data.data.map(item => ({
-							id:item._id || "",
-							image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
-							work: item.title || "Make a chair",
-							description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-							amount: item.platform_fee || "₹200",
-							location: item.address || "Indore M.P.",
-						})));
-					} else {
-						setDirectHiring([]);
-						setDirectHiringError("No direct hiring tasks available");
-					}
-				} else {
-					const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
-					console.error("Failed to fetch direct hiring:", errorMessage);
-					setDirectHiringError(errorMessage);
-				}
-			} catch (err) {
-				console.error("Error fetching direct hiring:", err.message);
-				setDirectHiringError(err.message);
-			} finally {
-				setDirectHiringLoading(false);
-			}
-		};
+  // Fetch direct hiring
+  const fetchDirectHiring = async () => {
+    try {
+      setDirectHiringLoading(true);
+      const res = await fetch(`${BASE_URL}/direct-order/getOrdersByUser`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  // Fetch banner images
-  // Fetch banner images
-const fetchBannerImages = async () => {
-  try {
-    const token = localStorage.getItem("bharat_token");
-    if (!token) {
-      throw new Error("No authentication token found");
-    }
+      const data = await res.json();
 
-    const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await res.json();
-    // console.log("Banner API response:", data); // 🔍 Debug response
-
-    // ✅ Flexible handling of different API structures
-    if (res.ok) {
-      if (Array.isArray(data.images) && data.images.length > 0) {
-        // Case 1: data.data contains banners
-        setBannerImages(data.images);
-      }  else {
-        // Case 3: No banners found
-        setBannerImages([]);
-        setBannerError("No banners available");
+      if (res.ok) {
+        if (Array.isArray(data.data)) {
+          setDirectHiring(
+            data.data.map((item) => ({
+              id: item._id || "",
+              image:
+                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+              work: item.title || "Make a chair",
+              description:
+                item.description ||
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+              amount: item.platform_fee || "₹200",
+              location: item.address || "Indore M.P.",
+            }))
+          );
+        } else {
+          setDirectHiring([]);
+          setDirectHiringError("No direct hiring tasks available");
+        }
+      } else {
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch direct hiring:", errorMessage);
+        setDirectHiringError(errorMessage);
       }
-    } else {
-      const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
-      console.error("Failed to fetch banner images:", errorMessage);
-      setBannerError(errorMessage);
+    } catch (err) {
+      console.error("Error fetching direct hiring:", err.message);
+      setDirectHiringError(err.message);
+    } finally {
+      setDirectHiringLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching banner images:", err.message);
-    setBannerError(err.message);
-  } finally {
-    setBannerLoading(false);
-  }
-};
+  };
 
+  // Fetch banner images
+  // Fetch banner images
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      // console.log("Banner API response:", data); // 🔍 Debug response
+
+      // ✅ Flexible handling of different API structures
+      if (res.ok) {
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          // Case 1: data.data contains banners
+          setBannerImages(data.images);
+        } else {
+          // Case 3: No banners found
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchCategories();
     fetchBannerImages();
-		fetchDirectHiring();
+    fetchDirectHiring();
   }, []);
 
   const SeeAll = () => {
@@ -168,15 +178,15 @@ const fetchBannerImages = async () => {
   };
 
   const postWork = () => {
-    navigate('/bidding/newtask');
+    navigate("/bidding/newtask");
   };
 
   const handleBidding = () => {
-    navigate('/bidding/myhire');
+    navigate("/user/work-list/My Bidding");
   };
 
   const postEmergencyWork = () => {
-    navigate('/emergency/userpost');
+    navigate("/emergency/userpost");
   };
 
   // Slider settings for react-slick
@@ -190,7 +200,7 @@ const fetchBannerImages = async () => {
     autoplaySpeed: 3000,
     arrows: true,
   };
-// console.log("images",bannerImages);
+  // console.log("images",bannerImages);
   return (
     <>
       <Header />
@@ -219,7 +229,6 @@ const fetchBannerImages = async () => {
                   />
                 </div>
               ))}
-
             </Slider>
           ) : (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -282,9 +291,11 @@ const fetchBannerImages = async () => {
         {/* Direct Hiring Section */}
         <div className="w-full bg-[#EDFFF3] py-10">
           <div className="mx-auto px-4 sm:px-10">
-                         <div className="max-w-[90%] mx-auto">
+            <div className="max-w-[90%] mx-auto">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-black max-md:text-lg">Direct Hiring</h2>
+                <h2 className="text-xl font-bold text-black max-md:text-lg">
+                  Direct Hiring
+                </h2>
                 {directHiring.length > 4 && (
                   <button
                     onClick={() => navigate("/user/work-list/My Hire")}
@@ -296,13 +307,20 @@ const fetchBannerImages = async () => {
               </div>
 
               {directHiringLoading ? (
-                <p className="text-gray-500 text-center">Loading direct hiring tasks...</p>
+                <p className="text-gray-500 text-center">
+                  Loading direct hiring tasks...
+                </p>
               ) : directHiringError ? (
-                <p className="text-red-500 text-center">Error: {directHiringError}</p>
+                <p className="text-red-500 text-center">
+                  Error: {directHiringError}
+                </p>
               ) : directHiring.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {visibleDirectHiring.map((card, index) => (
-                    <div key={index} className="bg-white rounded-xl shadow-md p-2">
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl shadow-md p-2"
+                    >
                       <div className="relative w-full">
                         <img
                           src={card.image}
@@ -317,26 +335,46 @@ const fetchBannerImages = async () => {
                         </div> */}
                       </div>
                       <div className="flex items-center justify-between mt-2">
-                        <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">{capitalizeFirst(card.work)}</h3>
-                        <p className="text-black font-medium max-md:text-sm">₹{card.amount}</p>
+                        <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">
+                          {capitalizeFirst(card.work)}
+                        </h3>
+                        <p className="text-black font-medium max-md:text-sm">
+                          ₹{card.amount}
+                        </p>
                       </div>
-                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">{capitalizeFirst(card.description)}</p>
+                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">
+                        {(() => {
+                          const words = card.description?.split(" ") || [];
+                          const limitedText = words.slice(0, 20).join(" ");
+                          return capitalizeFirst(
+                            words.length > 20
+                              ? `${limitedText}...`
+                              : limitedText
+                          );
+                        })()}
+                      </p>
+
                       <div
                         className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
                         style={{ backgroundColor: "#F27773", width: "100px" }}
                       >
                         {capitalizeFirst(card.location)}
                       </div>
-                      <div className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
-											onClick={() => navigate(`/my-hire/order-detail/${card.id}`)}
-											>
+                      <div
+                        className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
+                        onClick={() =>
+                          navigate(`/my-hire/order-detail/${card.id}`)
+                        }
+                      >
                         View Details
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center">No direct hiring tasks available</p>
+                <p className="text-gray-500 text-center">
+                  No direct hiring tasks available
+                </p>
               )}
             </div>
           </div>
@@ -350,7 +388,16 @@ const fetchBannerImages = async () => {
               Post Work with bidder
             </h2>
             <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into
+              electronic typesetting, remaining essentially unchanged. It was
+              popularised in the 1960s with the release of Letraset sheets
+              containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of
+              Lorem Ipsum.
             </p>
             <button
               onClick={postWork}
@@ -369,7 +416,16 @@ const fetchBannerImages = async () => {
                 Emergency Work
               </h2>
               <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. Lorem Ipsum has been the industry's standard dummy
+                text ever since the 1500s, when an unknown printer took a galley
+                of type and scrambled it to make a type specimen book. It has
+                survived not only five centuries, but also the leap into
+                electronic typesetting, remaining essentially unchanged. It was
+                popularised in the 1960s with the release of Letraset sheets
+                containing Lorem Ipsum passages, and more recently with desktop
+                publishing software like Aldus PageMaker including versions of
+                Lorem Ipsum.
               </p>
               <button
                 onClick={postEmergencyWork}
@@ -394,7 +450,7 @@ const fetchBannerImages = async () => {
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
               <button
                 onClick={() => {
-                  
+                  navigate("/user/work-list/My Hire");
                 }}
                 className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
               >
@@ -430,7 +486,7 @@ const fetchBannerImages = async () => {
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
               <button
                 className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
-                onClick={() => navigate('/emergency/userPost')}
+                onClick={() => navigate("/user/work-list/My Emergency")}
               >
                 Emergency
               </button>

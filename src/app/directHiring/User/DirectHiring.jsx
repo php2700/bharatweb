@@ -47,6 +47,7 @@ const DirectHiring = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   useEffect(() => {
     const fetchPlatformFee = async () => {
       try {
@@ -55,8 +56,6 @@ const DirectHiring = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // 🔹 Assuming response structure is { data: { fee: 200 } } or { fee: 200 }
-        // Adjust the path based on your API response structure
         const fee = res.data.data?.fee; // Fallback to 200 if not found
         setPlatformFee(fee);
       } catch (error) {
@@ -74,108 +73,6 @@ const DirectHiring = () => {
     razorpayScript.src = "https://checkout.razorpay.com/v1/checkout.js";
     razorpayScript.async = true;
     document.body.appendChild(razorpayScript);
-
-    // 🔹 Initialize Google Maps Autocomplete for address input
-    // loadGoogleMapsScript(() => {
-    //   const input = document.getElementById("address-input");
-    //   const autocomplete = new window.google.maps.places.Autocomplete(input, {
-    //     types: ["address"],
-    //     componentRestrictions: { country: "in" }, // 🔹 Restrict to India
-    //   });
-    //   autocompleteRef.current = autocomplete;
-    //   autocomplete.addListener("place_changed", () => {
-    //     const place = autocomplete.getPlace();
-    //     if (place.formatted_address) {
-    //       setAddress(place.formatted_address);
-    //     }
-    //   });
-
-    //   // 🔹 Initialize map and autocomplete in modal
-    //   if (isMapModalOpen && mapRef.current) {
-    //     const map = new window.google.maps.Map(mapRef.current, {
-    //       center: { lat: 20.5937, lng: 78.9629 }, // 🔹 Default center (India)
-    //       zoom: 5,
-    //       mapTypeControl: false,
-    //       streetViewControl: false,
-    //     });
-
-    //     const autocompleteInput = document.getElementById(
-    //       "map-autocomplete-input"
-    //     );
-    //     const mapAutocomplete = new window.google.maps.places.Autocomplete(
-    //       autocompleteInput,
-    //       {
-    //         types: ["address"],
-    //         componentRestrictions: { country: "in" },
-    //       }
-    //     );
-    //     mapAutocompleteRef.current = mapAutocomplete;
-
-    //     // 🔹 Update map and marker when place is selected in modal
-    //     mapAutocomplete.addListener("place_changed", () => {
-    //       const place = mapAutocomplete.getPlace();
-    //       if (place.geometry) {
-    //         map.setCenter(place.geometry.location);
-    //         map.setZoom(15);
-    //         if (markerRef.current) {
-    //           markerRef.current.setMap(null);
-    //         }
-    //         markerRef.current = new window.google.maps.Marker({
-    //           position: place.geometry.location,
-    //           map,
-    //           draggable: true,
-    //           title: "Selected Location",
-    //         });
-
-    //         setAddress(place.formatted_address);
-
-    //         // 🔹 Update address on marker drag
-    //         markerRef.current.addListener("dragend", () => {
-    //           const geocoder = new window.google.maps.Geocoder();
-    //           geocoder.geocode(
-    //             { location: markerRef.current.getPosition() },
-    //             (results, status) => {
-    //               if (status === "OK" && results[0]) {
-    //                 setAddress(results[0].formatted_address);
-    //               }
-    //             }
-    //           );
-    //         });
-    //       }
-    //     });
-    //     // 🔹 Add marker on map click
-    //     map.addListener("click", (event) => {
-    //       if (markerRef.current) {
-    //         markerRef.current.setMap(null);
-    //       }
-    //       markerRef.current = new window.google.maps.Marker({
-    //         position: event.latLng,
-    //         map,
-    //         draggable: true,
-    //         title: "Selected Location",
-    //       });
-
-    //       const geocoder = new window.google.maps.Geocoder();
-    //       geocoder.geocode({ location: event.latLng }, (results, status) => {
-    //         if (status === "OK" && results[0]) {
-    //           setAddress(results[0].formatted_address);
-    //         }
-    //       });
-
-    //       // 🔹 Update address on marker drag
-    //       markerRef.current.addListener("dragend", () => {
-    //         geocoder.geocode(
-    //           { location: markerRef.current.getPosition() },
-    //           (results, status) => {
-    //             if (status === "OK" && results[0]) {
-    //               setAddress(results[0].formatted_address);
-    //             }
-    //           }
-    //         );
-    //       });
-    //     });
-    //   }
-    // });
 
     return () => {
       document.body.removeChild(razorpayScript);
@@ -214,14 +111,11 @@ const DirectHiring = () => {
     const newErrors = {};
     if (!title) newErrors.title = "Title is required.";
     else if (title?.length < 3)
-      newErrors.title = "Min 3 charater title is required.";
-    // if (!address) newErrors.address = "Address is required";
+      newErrors.title = "Min 3 character title is required.";
     if (!description) newErrors.description = "Description is required.";
     else if (description?.length < 5)
       newErrors.description = "Min 5 character description is required.";
     if (!deadline) newErrors.deadline = "Deadline is required.";
-    // if (images.length === 0)
-    //   newErrors.images = "At least one image is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -287,9 +181,7 @@ const DirectHiring = () => {
               }
             );
             if (verifyRes.status === 200) {
-              // console.log(verifyRes.data?.order?._id, "ssss");
               navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
-              // navigate("/user/work-list/My Hire");
             } else {
               setErrors({ general: "Payment verification failed." });
             }
@@ -337,7 +229,7 @@ const DirectHiring = () => {
       console.log(error, "gg");
     }
   };
-  console.log(profile?.full_address, "fffffffffff");
+
   return (
     <>
       <Header />
@@ -378,19 +270,6 @@ const DirectHiring = () => {
             )}
           </label>
 
-          {/* <label className="block">
-            <span className="text-sm font-medium text-gray-600">
-              Platform Fees
-            </span>
-            <input
-              type="text"
-              value={`₹ ${platformFee}`}
-              disabled
-              className="mt-1 block w-full rounded-lg bg-gray-100 border border-gray-300 px-4 py-2 text-base text-gray-600"
-              aria-disabled="true"
-            />
-          </label> */}
-
           <label className="block">
             <span className="text-sm font-medium text-gray-600">
               Description
@@ -407,17 +286,11 @@ const DirectHiring = () => {
               <p className="text-red-500 text-sm mt-1">{errors.description}</p>
             )}
           </label>
+
           <label className="block">
             <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
               Address
-              {/* <span
-      className="text-[#228B22] cursor-pointer"
-      onClick={openMapModal}
-    >
-      Select on Map
-    </span> */}
             </span>
-
             <div className="relative">
               <input
                 id="address-input"
@@ -428,8 +301,6 @@ const DirectHiring = () => {
                 className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.address ? "true" : "false"}
               />
-
-              {/* Toggle button */}
               <button
                 type="button"
                 onClick={() => setShowOptions(!showOptions)}
@@ -437,7 +308,6 @@ const DirectHiring = () => {
               >
                 {showOptions ? "▲" : "▼"}
               </button>
-
               {showOptions && (
                 <div className="absolute top-full left-0 mt-2 w-full rounded-lg border border-gray-300 bg-white shadow-lg p-3 z-50">
                   {profile?.full_address?.map((loc) => (
@@ -459,15 +329,15 @@ const DirectHiring = () => {
                       <div className="flex flex-col bg-gray-50 rounded-lg p-2 w-full">
                         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
                           <div>
-                            <span className="block font-semibold text-xs ">
+                            <span className="block font-semibold text-xs">
                               Title
                             </span>
-                            <span className=" text-[12px] text-gray-800">
+                            <span className="text-[12px] text-gray-800">
                               {loc.title}
                             </span>
                           </div>
                           <div>
-                            <span className="block font-semibold text-xs ">
+                            <span className="block font-semibold text-xs">
                               House No
                             </span>
                             <span className="text-gray-700 text-[12px]">
@@ -475,7 +345,7 @@ const DirectHiring = () => {
                             </span>
                           </div>
                           <div>
-                            <span className="block font-semibold text-xs ">
+                            <span className="block font-semibold text-xs">
                               Area
                             </span>
                             <span className="text-gray-700 text-[12px]">
@@ -483,7 +353,7 @@ const DirectHiring = () => {
                             </span>
                           </div>
                           <div className="col-span-2">
-                            <span className="block font-semibold text-xs ">
+                            <span className="block font-semibold text-xs">
                               Full Address
                             </span>
                             <span className="text-gray-600 text-[12px]">
@@ -497,7 +367,6 @@ const DirectHiring = () => {
                 </div>
               )}
             </div>
-
             {errors.address && (
               <p className="text-red-500 text-sm mt-1">{errors.address}</p>
             )}
@@ -543,7 +412,20 @@ const DirectHiring = () => {
                 className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.deadline ? "true" : "false"}
               />
-              <Calendar className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              <Calendar
+                className="absolute left-3 top-3 h-5 w-5 text-gray-400 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById("deadline-input").focus();
+                }}
+              />
+              <input
+                id="deadline-input"
+                type="datetime-local"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="hidden"
+              />
             </div>
             {errors.deadline && (
               <p className="text-red-500 text-sm mt-1">{errors.deadline}</p>
@@ -552,7 +434,7 @@ const DirectHiring = () => {
 
           <div>
             <span className="text-sm font-medium text-gray-600">
-              Upload (5 Max photos)
+              Upload Images (Optional, 5 Max)
             </span>
             <div className="border border-gray-300 rounded-lg p-6 text-center mb-4 bg-gray-50">
               <label className="cursor-pointer text-[#228B22] text-sm font-medium">
@@ -566,9 +448,9 @@ const DirectHiring = () => {
                 />
               </label>
             </div>
-            {/* {errors.images && (
+            {errors.images && (
               <p className="text-red-500 text-sm mt-1">{errors.images}</p>
-            )} */}
+            )}
             {images.length > 0 && (
               <div className="flex gap-3 flex-wrap mt-4 justify-start">
                 {images.map((file, index) => (
@@ -606,7 +488,6 @@ const DirectHiring = () => {
         </form>
       </div>
 
-      {/* 🔹 Map Modal */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col">

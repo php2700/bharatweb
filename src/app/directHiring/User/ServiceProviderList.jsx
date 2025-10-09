@@ -9,6 +9,7 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -32,24 +33,31 @@ export default function ServiceProviderList() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      console.log("Banner API response:", response.data); // Debug response
+      // console.log("Banner API response:", response.data); // Debug response
 
       if (response.data?.success) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -90,7 +98,7 @@ export default function ServiceProviderList() {
           }
         );
         if (response.data?.status) {
-          console.log(response.data.data,'ffffffff')
+          // console.log(response.data.data,'ffffffff')
           setWorkers(response.data.data || []);
         } else {
           console.error("Failed to fetch workers:", response.data?.message);
@@ -130,22 +138,20 @@ export default function ServiceProviderList() {
   };
 
   // Filter workers based on search query
-  const filteredWorkers = workers.filter((worker) => {
-    const fullName = worker.full_name ? worker.full_name.toLowerCase() : "";
-    const skill = worker.skill ? worker.skill.toLowerCase() : "";
-    const query = searchQuery.toLowerCase();
-    return fullName.includes(query) || skill.includes(query);
-  })
-  .sort((a, b) => {
-    if (sortOrder === "asc") {
-      return a.full_name.localeCompare(b.full_name);
-    } else {
-      return b.full_name.localeCompare(a.full_name);
-    }
-  });
-
-
-
+  const filteredWorkers = workers
+    .filter((worker) => {
+      const fullName = worker.full_name ? worker.full_name.toLowerCase() : "";
+      const skill = worker.skill ? worker.skill.toLowerCase() : "";
+      const query = searchQuery.toLowerCase();
+      return fullName.includes(query) || skill.includes(query);
+    })
+    .sort((a, b) => {
+      if (sortOrder === "asc") {
+        return a.full_name.localeCompare(b.full_name);
+      } else {
+        return b.full_name.localeCompare(a.full_name);
+      }
+    });
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -207,26 +213,27 @@ export default function ServiceProviderList() {
 
         <div className="container max-w-5xl mx-auto my-10">
           <div className="flex justify-between items-center p-3">
-  <div className="text-2xl font-bold">Direct Hiring</div>
-  <div className="flex items-center gap-3">
-    <input
-      className="border rounded-lg p-2 w-64"
-      type="search"
-      placeholder="Search by name"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-    />
+            <div className="text-2xl font-bold">Direct Hiring</div>
+            <div className="flex items-center gap-3">
+              <input
+                className="border rounded-lg p-2 w-64"
+                type="search"
+                placeholder="Search by name"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
 
-    {/* Filter Button */}
-    <button
-      onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-      className="px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200"
-    >
-      {sortOrder === "asc" ? "▲ Asc" : "▼ Desc"}
-    </button>
-  </div>
-</div>
-
+              {/* Filter Button */}
+              <button
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                className="px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200"
+              >
+                {sortOrder === "asc" ? "▲ Asc" : "▼ Desc"}
+              </button>
+            </div>
+          </div>
 
           {loading ? (
             <p className="text-center text-gray-500">Loading workers...</p>
@@ -265,9 +272,18 @@ export default function ServiceProviderList() {
                     </div>
 
                     <div className="flex justify-between items-center my-4">
-                      <div className="text-white bg-[#f27773] text-sm px-8 rounded-full max-w-[50%] truncate">
-                        {capitalizeWords(worker?.location.address) || "Unknown"}
+                      <div className="flex items-center text-gray-600 text-sm px-4 py-2 rounded-full bg-[#F5F5F5] max-w-[55%] truncate">
+                        <FaMapMarkerAlt
+                          size={18}
+                          color="#228B22"
+                          className="mr-2 flex-shrink-0"
+                        />
+                        <span className="truncate">
+                          {capitalizeWords(worker?.location?.address) ||
+                            "Unknown"}
+                        </span>
                       </div>
+
                       <div className="flex gap-4">
                         <Link to={`/profile-details/${worker._id}/direct`}>
                           <button className="text-[#228B22] py-1 px-4 border rounded-lg">
