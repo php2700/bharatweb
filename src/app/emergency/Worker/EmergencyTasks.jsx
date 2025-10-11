@@ -38,7 +38,7 @@ export default function EmergencyTasks() {
 
       console.log("Banner API response:", response.data); // Debug response
 
-      if (response.data?.status) {
+      if (response.data?.success) {
         if (Array.isArray(response.data.images) && response.data.images.length > 0) {
           setBannerImages(response.data.images);
         } else {
@@ -95,7 +95,7 @@ export default function EmergencyTasks() {
           id: item._id,
           project_id: item.project_id,
           name: item.category_id.name,
-          image: item.image_urls[0] || "https://via.placeholder.com/150",
+          image: item.image_urls[0],
           date: new Date(item.createdAt).toLocaleDateString("en-GB"),
           completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
           price: item.platform_fee

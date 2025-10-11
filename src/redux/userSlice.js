@@ -44,7 +44,8 @@ export const fetchUserProfile = createAsyncThunk(
       }
 
       const data = await res.json();
-      console.log("fetchUserProfile: Success, data received");
+      // console.log("fetchUserProfile: Success, data received", data );
+			localStorage.setItem('user_id',data.data._id);
       return data.data;
     } catch (err) {
       console.error("fetchUserProfile: Error:", err.message);

@@ -178,11 +178,7 @@ export default function App() {
         {/* Bidding Route Of user */}
         <Route path="/bidding/newtask" element={<BiddingNewTask />} />
         <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
-        <Route path="/bidding/myhire" element={<MyHireBidding />} />
-        <Route
-          path="/bidding/getworkdetail/:id"
-          element={<BiddinggetWorkDetail />}
-        />
+        <Route path="/getavailablebiddingtask" element={<MyHireBidding />} />
 
         <Route path="/bidding/hiredetail/:id" element={<HireDetail />} />
         <Route path="/bidding/workdetail" element={<BiddingWorkerDetail />} />
@@ -268,6 +264,12 @@ export default function App() {
 				path="/disputes"
 				element={<DisputePage />}
 				/>
+        
+				 <Route
+          path="/bidding/order-detail/:id"
+          element={<BiddinggetWorkDetail />}
+        />
+
       </Routes>
     </>
   );

@@ -11,7 +11,7 @@ import EditBidModal from "./EditBidModel";
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
-
+  const service_provider = localStorage.getItem("user_id");
   // Modal States
   const [isBidModel, setIsBidModel] = useState(false);
   const [isEditBidModel, setIsEditBidModel] = useState(false);
@@ -57,10 +57,10 @@ export default function Bid() {
 
         const result = await response.json();
         const data = result.data;
-
+      //  console.log("Fetched Work Details:", data); // Debug log
         setWorker({
           _id: data._id,
-          order_id: data.order_id,
+          order_id: data._id,
           project_id: data.project_id,
           workName: data.title,
           location: data.address,
@@ -71,11 +71,11 @@ export default function Bid() {
           completionDate: data.deadline,
           skills: data.description,
           service_provider: data.service_provider,
-          user: data.user,
+          user: data.user_id._id,
           category_id: data.category_id || null, // ✅ ensure available
           sub_category_ids: data.sub_category_ids || [], // ✅ correct naming
         });
-console.log(data.sub_category_ids);
+// console.log(data.sub_category_ids);
 
         setLoading(false);
       } catch (err) {
@@ -96,7 +96,7 @@ console.log(data.sub_category_ids);
     const fetchNegotiation = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/negotiations/getLatestNegotiation/${worker.order_id}`,
+          `${BASE_URL}/negotiations/getLatestNegotiation/${worker.order_id}/service_provider`,
           {
             method: "GET",
             headers: {
@@ -105,10 +105,11 @@ console.log(data.sub_category_ids);
             },
           }
         );
-
+  
         if (!res.ok) throw new Error("Failed to fetch negotiation");
 
         const result = await res.json();
+				// console.log("Fetched Negotiation Data:", result); // Debug log
         setData(result);
       } catch (err) {
         console.error(err);
@@ -137,7 +138,7 @@ console.log(data.sub_category_ids);
         body: JSON.stringify({
           order_id: worker?.order_id,
           bidding_offer_id: data?._id,
-          service_provider: worker?.service_provider,
+          service_provider: service_provider,
           user: worker?.user,
           initiator: "service_provider",
           offer_amount: Number(offer),
@@ -146,9 +147,10 @@ console.log(data.sub_category_ids);
       });
 
       const result = await response.json();
-      console.log("Negotiation API Response:", result);
+      // console.log("Negotiation API Response:", result);
 
       if (response.ok) {
+					setOffer(" ");
         toast.success(`You sent ₹${offer} Amount For Negotiation`);
       } else {
         toast.error(result.message || "Something went wrong ❌");

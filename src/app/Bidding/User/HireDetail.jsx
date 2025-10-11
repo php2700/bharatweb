@@ -29,22 +29,24 @@ export default function HireDetail() {
   const [loading, setLoading] = useState(true);
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
+	const [data, setData] = useState(null);
+	 const [error, setError] = useState(null);
   const dispatch = useDispatch();
  
   const { profile} = useSelector((state) => state.user);
-
+// console.log("User Profile from Redux:", profile); // Debugging line
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch])
   if(profile && profile.data){
-    localStorage.setItem('user_id',profile.data._id);
+    localStorage.setItem('user_id',profile._id);
   }
   
 useEffect(() => {
     const token = localStorage.getItem("bharat_token");
     
 
-    fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${id}`, {
+    fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${order_id}/user`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -59,6 +61,7 @@ useEffect(() => {
       })
       .then((data) => {
         setData(data);
+
       })
       .catch((err) => {
         setError(err.message);
@@ -151,9 +154,10 @@ useEffect(() => {
       });
 
       const data = await response.json();
-      console.log("Negotiation API Response:", data);
+      // console.log("Negotiation API Response:", data);
 
       if (response.ok) {
+				setOffer(" ");
         toast.success(`You sent ₹${offer} Amount For Negotiation`);
       } else {
         alert(`Error: ${data.message || "Something went wrong"}`);
@@ -250,14 +254,14 @@ useEffect(() => {
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-center gap-4">
+             {/* <div className="flex justify-center gap-4">
                 <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-4 rounded-lg">
                   💬 Message
                 </button>
                 <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-8 rounded-lg">
                   📞 Call
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -345,7 +349,7 @@ useEffect(() => {
                     : "border border-green-600 text-green-600"
                 }`}
               >
-                Offer Price (0)
+                Offer Price ({data?.offer_amount || 0})
               </button>
               <button
                 onClick={() => setIsOfferActive(false)}

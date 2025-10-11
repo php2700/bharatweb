@@ -93,7 +93,7 @@ export default function Worklist() {
         let endpoint;
         switch (activeTab) {
           case "My Bidding":
-            endpoint = `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`;
+            endpoint = `${BASE_URL}/bidding-order/getAllBiddingOrdersForUser`;
             break;
           case "My Hire":
             endpoint = `${BASE_URL}/direct-order/getOrdersByUser`;
@@ -360,7 +360,7 @@ export default function Worklist() {
                       />{" "}
                       {task.location}
                     </span>
-                    <button
+                    {/*<button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() =>
                         navigate(
@@ -373,14 +373,14 @@ export default function Worklist() {
                       }
                     >
                       View Details
-                    </button>
-                    {/**<button
+                    </button>*/}
+                    <button
                       className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() => {
                         const tabRoutes = {
-                          "My Bidding": "bidding/worker",
-                          "My Hire": "hire/worker",
-                          "Emergency Tasks": "emergency/worker",
+                          "My Bidding": "bidding",
+                          "My Hire": "my-hire",
+                          "Emergency Tasks": "emergency",
                         };
 
                         const route = tabRoutes[activeTab];
@@ -388,7 +388,7 @@ export default function Worklist() {
                       }}
                     >
                       View Details
-                    </button> */}
+                    </button> 
                   </div>
                 </div>
               </div>

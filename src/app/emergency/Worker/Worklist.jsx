@@ -93,7 +93,8 @@ export default function Worklist() {
         let endpoint;
         switch (activeTab) {
           case "My Bidding":
-            endpoint = `${BASE_URL}/bidding-order/apiGetAllBiddingOrdersForProvider`; // Placeholder, update with actual endpoint
+            endpoint = `${BASE_URL}/bidding-order/getAllBiddingOrdersForProvider`; // Placeholder, update with actual endpoint
+
             break;
           case "My Hire":
             endpoint = `${BASE_URL}/direct-order/getOrdersByProvider`; // Placeholder, update with actual endpoint
@@ -111,11 +112,12 @@ export default function Worklist() {
             Authorization: `Bearer ${token}`,
           },
         });
+				console.log(response.data);
         // Map API response to the expected structure
         const mappedTasks = response.data.data.map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image_url?.[0] || Work, // Fallback to Work image
+          image: task.image_urls?.[0] || task.image_url[0] || Work, // Fallback to Work image
           name: task.category_id?.name || task.title || "Unnamed Task",
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()

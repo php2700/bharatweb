@@ -127,7 +127,7 @@ export default function ServiceProviderHome() {
     try {
       setBiddingLoading(true);
       const res = await fetch(
-        `${BASE_URL}/bidding-order/apiGetAllBiddingOrders`,
+        `${BASE_URL}/bidding-order/getAvailableBiddingOrders`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -144,9 +144,7 @@ export default function ServiceProviderHome() {
           setBidding(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_urls
-                ? `${IMAGE_URL}/${item.image_url}`
-                : "/src/assets/directHiring/his-work.png",
+              image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -178,7 +176,7 @@ export default function ServiceProviderHome() {
     try {
       setEmergencyLoading(true);
       const res = await fetch(
-        `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`,
+        `${BASE_URL}/emergency-order/filtered-emergency-orders`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -195,7 +193,7 @@ export default function ServiceProviderHome() {
           setEmergency(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_urls || "/src/assets/directHiring/his-work.png",
+              image: item.image_urls[0] || "/src/assets/directHiring/his-work.png",
               work: item.title || "Emergency task",
               // description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
               amount: item.platform_fee || "₹200",
@@ -559,7 +557,7 @@ export default function ServiceProviderHome() {
                 </h2>
                 {bidding.length > 4 && (
                   <button
-                    onClick={() => handleSeeAll("/worker/work-list/My Bidding")}
+                    onClick={() => handleSeeAll("/bidding/recent-post")}
                     className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                   >
                     See All
@@ -640,7 +638,7 @@ export default function ServiceProviderHome() {
                   {emergency.length > 4 && (
                     <button
                       onClick={() =>
-                        handleSeeAll("/worker/work-list/Emergency Tasks")
+                        handleSeeAll("/emergency/tasks")
                       }
                       className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                     >
@@ -691,7 +689,7 @@ export default function ServiceProviderHome() {
                         <div
                           className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
                           onClick={() =>
-                            navigate(`emergency/worker/order-detail/${card.id}`)
+                            navigate(`/emergency/worker/${card.id}`)
                           }
                         >
                           View Details
