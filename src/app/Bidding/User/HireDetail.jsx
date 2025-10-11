@@ -2,7 +2,7 @@ import Header from "../../../component/Header";
 import banner from "../../../assets/banner.png";
 import Footer from "../../../component/footer";
 import serviceProviderImg from "../../../assets/directHiring/service-provider.png";
-import NoPicAvailable from '../../../assets/bidding/No_Image_Available.jpg';
+import NoPicAvailable from "../../../assets/bidding/No_Image_Available.jpg";
 
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
@@ -15,36 +15,87 @@ import { fetchUserProfile } from "../../../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function HireDetail() {
-  useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
   const { id } = useParams();
-  const location=useLocation();
-    const { bidding_offer_id, order_id } = location.state || {};
-    
+  const location = useLocation();
+  const { bidding_offer_id, order_id } = location.state || {};
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [providerDetail, setProviderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
-	const [data, setData] = useState(null);
-	 const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
   const dispatch = useDispatch();
- 
-  const { profile} = useSelector((state) => state.user);
-// console.log("User Profile from Redux:", profile); // Debugging line
+
+  const { profile } = useSelector((state) => state.user);
+  // console.log("User Profile from Redux:", profile); // Debugging line
   useEffect(() => {
     dispatch(fetchUserProfile());
-  }, [dispatch])
-  if(profile && profile.data){
-    localStorage.setItem('user_id',profile._id);
+  }, [dispatch]);
+  if (profile && profile.data) {
+    localStorage.setItem("user_id", profile._id);
   }
-  
-useEffect(() => {
+
+  const fetchBannerImages = async () => {
     const token = localStorage.getItem("bharat_token");
-    
+    try {
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.data?.success) {
+        setBannerImages(response.data.images || []);
+        setBannerError(
+          response.data.images.length === 0 ? "No banners available" : null
+        );
+      } else {
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchBannerImages();
+  }, []);
+
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("bharat_token");
 
     fetch(`${BASE_URL}/negotiations/getLatestNegotiation/${order_id}/user`, {
       method: "GET",
@@ -61,7 +112,6 @@ useEffect(() => {
       })
       .then((data) => {
         setData(data);
-
       })
       .catch((err) => {
         setError(err.message);
@@ -126,7 +176,7 @@ useEffect(() => {
   if (!providerDetail) {
     return <div className="text-center py-10">No Provider Found</div>;
   }
-  const handleNagotiation=async(offer)=>{
+  const handleNagotiation = async (offer) => {
     const userId = localStorage.getItem("user_id"); // user id from localStorage
     const token = localStorage.getItem("bharat_token"); // bearer token from localStorage
 
@@ -157,7 +207,7 @@ useEffect(() => {
       // console.log("Negotiation API Response:", data);
 
       if (response.ok) {
-				setOffer(" ");
+        setOffer(" ");
         toast.success(`You sent ₹${offer} Amount For Negotiation`);
       } else {
         alert(`Error: ${data.message || "Something went wrong"}`);
@@ -166,24 +216,50 @@ useEffect(() => {
       console.error("API Error:", error);
       alert("Failed to start negotiation ❌");
     }
-  }
+  };
 
   return (
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 mt-35">
         {/* Banner */}
-        <div className="w-full mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-103 mt-5">
-          <img
-            src={banner}
-            alt="Banner"
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-          />
+        {/* Top Banner Slider */}
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[200px] sm:h-[300px] md:h-[400px] mt-5">
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              Error: {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, index) => (
+                <div key={index}>
+                  <img
+                    src={banner || "/src/assets/profile/default.png"}
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/profile/default.png";
+                    }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
         </div>
 
         <div className="container max-w-6xl mx-auto my-10">
-          <div className="text-xl sm:text-2xl font-bold mb-6">Direct Hiring</div>
+          <div className="text-xl sm:text-2xl font-bold mb-6">
+            Direct Hiring
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
             {/* Profile Pic */}
@@ -254,7 +330,7 @@ useEffect(() => {
               </div>
 
               {/* Buttons */}
-             {/* <div className="flex justify-center gap-4">
+              {/* <div className="flex justify-center gap-4">
                 <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-4 rounded-lg">
                   💬 Message
                 </button>
@@ -325,9 +401,7 @@ useEffect(() => {
                 >
                   <div className="flex text-yellow-500 mb-1">{"★★★★☆"}</div>
                   <div className="font-medium">{review.title}</div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {review.comment}
-                  </p>
+                  <p className="text-sm text-gray-600 mb-2">{review.comment}</p>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <span>{new Date(review.date).toDateString()}</span>
                   </div>
@@ -364,33 +438,31 @@ useEffect(() => {
             </div>
 
             {!isOfferActive && (
-  <input
-    type="number"
-    placeholder="Enter your offer amount"
-    value={offer}
-    onChange={(e) => setOffer(e.target.value)}
-    className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-  />
-)}
+              <input
+                type="number"
+                placeholder="Enter your offer amount"
+                value={offer}
+                onChange={(e) => setOffer(e.target.value)}
+                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+              />
+            )}
+          </div>
 
-</div>
-
-{/* Accept / Send Request */}
-<div className="text-center">
-  <button
-    className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
-    onClick={() => {
-      if (isOfferActive) {
-        alert("Request Accepted ✅");
-      } else {
-        handleNagotiation(offer);
-      }
-    }}
-  >
-    {isOfferActive ? "Accept Request" : "Send Request"}
-  </button>
-</div>
-
+          {/* Accept / Send Request */}
+          <div className="text-center">
+            <button
+              className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
+              onClick={() => {
+                if (isOfferActive) {
+                  alert("Request Accepted ✅");
+                } else {
+                  handleNagotiation(offer);
+                }
+              }}
+            >
+              {isOfferActive ? "Accept Request" : "Send Request"}
+            </button>
+          </div>
         </div>
       </div>
       <Footer />

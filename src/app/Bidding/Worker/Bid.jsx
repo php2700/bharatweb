@@ -106,10 +106,8 @@ export default function Bid() {
           }
         );
   
-        if (!res.ok) throw new Error("Failed to fetch negotiation");
-
         const result = await res.json();
-				// console.log("Fetched Negotiation Data:", result); // Debug log
+				console.log("Fetched Negotiation Data:", result); // Debug log
         setData(result);
       } catch (err) {
         console.error(err);
