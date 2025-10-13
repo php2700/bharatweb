@@ -46,6 +46,21 @@ export default function HireDetail() {
     localStorage.setItem("user_id", profile._id);
   }
 
+	const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
+
+
   const fetchBannerImages = async () => {
     const token = localStorage.getItem("bharat_token");
     try {
@@ -219,47 +234,252 @@ export default function HireDetail() {
     }
   };
 
-  const handleAcceptNegotiation = async (id, role) => {
-    const token = localStorage.getItem("bharat_token");
-    if (!id) {
-      toast.error("Negotiation ID is missing ❗");
+  // const handleAcceptNegotiation = async (id, role) => {
+  //   const token = localStorage.getItem("bharat_token");
+  //   if (!id) {
+  //     toast.error("Negotiation ID is missing ❗");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/negotiations/accept/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         role: role,
+  //       }),
+  //     });
+
+  //     const result = await response.json();
+  //     console.log("Accept Negotiation API Response:", result);
+
+  //     if (response.ok) {
+  //       toast.success("You accepted the negotiation ✅");
+  //       // Optionally, refresh negotiation data here
+  //     } else {
+  //       toast.error(result.message || "Something went wrong ❌");
+  //     }
+  //   } catch (error) {
+  //     console.error("API Error:", error);
+  //     toast.error("Failed to accept negotiation ❌");
+  //   }
+  // };
+
+const handleAcceptNegotiation = async (
+  negotiationId,
+  role,
+  orderId,
+  serviceProviderId
+) => {
+  const token = localStorage.getItem("bharat_token");
+
+  if (!negotiationId || !orderId || !serviceProviderId) {
+    toast.error("Required IDs are missing ❗");
+    return;
+  }
+
+  try {
+    // 1️⃣ Accept Negotiation
+    const acceptResponse = await fetch(`${BASE_URL}/negotiations/accept/${negotiationId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ role }),
+    });
+
+    const acceptResult = await acceptResponse.json();
+    if (!acceptResponse.ok) {
+      toast.error(acceptResult.message || "Failed to accept negotiation ❌");
+      return;
+    }
+    toast.success("Negotiation accepted ✅");
+
+    // 2️⃣ Create Platform Fee Order
+    const orderResponse = await fetch(`${BASE_URL}/bidding-order/createPlatformFeeOrder/${orderId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const orderResult = await orderResponse.json();
+    if (!orderResponse.ok || !orderResult.status) {
+      toast.error(orderResult.message || "Failed to create platform fee order ❌");
       return;
     }
 
-    try {
-      const response = await fetch(`${BASE_URL}/negotiations/accept/${id}`, {
-        method: "PUT",
+    const { razorpay_order_id, total_cost, currency } = orderResult;
+
+    const res = await loadRazorpayScript();
+    if (!res) {
+      toast.error("Failed to load Razorpay SDK ❌");
+      return;
+    }
+
+    // 4️⃣ Razorpay Checkout
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: total_cost * 100,
+      currency: currency || "INR",
+      name: "TheBharatworks",
+      description: "Platform Fee Payment",
+      order_id: razorpay_order_id,
+      handler: async function (paymentResponse) {
+        toast.success("Payment Successful ✅");
+
+        // 5️⃣ Verify Payment
+        try {
+          const verifyResponse = await fetch(
+            `${BASE_URL}/bidding-order/verifyPlatformFeePayment`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                serviceProviderId,
+              }),
+            }
+          );
+
+          const verifyResult = await verifyResponse.json();
+          if (verifyResponse.ok && verifyResult.status) {
+            toast.success("Payment verified successfully ✅");
+            console.log("Verify Response:", verifyResult);
+          } else {
+            toast.error(verifyResult.message || "Payment verification failed ❌");
+          }
+        } catch (err) {
+          console.error("Verify API error:", err);
+          toast.error("Payment verification failed ❌");
+        }
+      },
+      theme: { color: "#228B22" },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error("Payment Failed ❌");
+    });
+  } catch (error) {
+    console.error("Error in negotiation/payment flow:", error);
+    toast.error("Something went wrong ❌");
+  }
+};
+
+
+
+const handlePayment = async (order_id, serviceProviderId) => {
+  const token = localStorage.getItem("bharat_token");
+
+  if (!order_id) {
+    toast.error("Order ID is missing ❗");
+    return;
+  }
+
+  // 1️⃣ Load Razorpay script dynamically
+  const res = await loadRazorpayScript();
+
+  if (!res) {
+    toast.error("Failed to load Razorpay SDK ❌");
+    return;
+  }
+
+  try {
+    // 2️⃣ Create order on backend
+    const response = await fetch(
+      `${BASE_URL}/bidding-order/createPlatformFeeOrder/${order_id}`,
+      {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          role: role,
-        }),
-      });
-
-      const result = await response.json();
-      console.log("Accept Negotiation API Response:", result);
-
-      if (response.ok) {
-        toast.success("You accepted the negotiation ✅");
-        // Optionally, refresh negotiation data here
-      } else {
-        toast.error(result.message || "Something went wrong ❌");
       }
-    } catch (error) {
-      console.error("API Error:", error);
-      toast.error("Failed to accept negotiation ❌");
+    );
+
+    const result = await response.json();
+    if (!response.ok || !result.status) {
+      toast.error(result.message || "Something went wrong ❌");
+      return;
     }
-  };
 
-	const handlePayment = (order_id) => {
-		if(!order_id) {
-			toast.error("Order ID is missing ❗");
-			return;
-		}	
+    const { razorpay_order_id, total_cost, currency } = result;
 
-	};
+    // 3️⃣ Razorpay options
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: total_cost * 100,
+      currency: currency || "INR",
+      name: "TheBharatworks",
+      description: "Platform Fee Payment",
+      order_id: razorpay_order_id,
+      handler: async function (paymentResponse) {
+        console.log("Payment Successful:", paymentResponse);
+        toast.success("Payment Successful ✅");
+
+        // 4️⃣ Call your verify API
+        try {
+          const verifyResponse = await fetch(
+            `${BASE_URL}/bidding-order/verifyPlatformFeePayment`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                serviceProviderId,
+              }),
+            }
+          );
+
+          const verifyResult = await verifyResponse.json();
+          if (verifyResponse.ok && verifyResult.status) {
+            toast.success("Payment verified successfully ✅");
+            console.log("Verify Response:", verifyResult);
+            // Optionally refresh UI or update state
+          } else {
+            toast.error(
+              verifyResult.message || "Payment verification failed ❌"
+            );
+          }
+        } catch (err) {
+          console.error("Verify API error:", err);
+          toast.error("Payment verification failed ❌");
+        }
+      },
+      theme: { color: "#228B22" },
+    };
+
+    // 5️⃣ Open Razorpay checkout
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error("Payment Failed ❌");
+    });
+  } catch (error) {
+    console.error("API Error:", error);
+    toast.error("Failed to initiate payment ❌");
+  }
+};
+
 
   return (
     <>
@@ -500,7 +720,7 @@ export default function HireDetail() {
                 className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
                 onClick={() => {
                   if (isOfferActive) {
-                    handleAcceptNegotiation(data._id, "user");
+                    handleAcceptNegotiation(data._id, "user", order_id, id);
                   } else {
                     handleNagotiation(offer);
                   }
@@ -516,7 +736,7 @@ export default function HireDetail() {
               <button
                 className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
                 onClick={() => {
-                  handlePayment(order_id);
+                  handlePayment(order_id, id);
                 }}
               >
                 Pay Now

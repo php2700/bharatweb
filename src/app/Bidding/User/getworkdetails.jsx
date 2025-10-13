@@ -43,7 +43,7 @@ export default function BiddinggetWorkDetail() {
 	console.log("Order Detail:", orderDetail); // Debug log
   const handleView = (serviceproviderid, bidding_offer_id, order_id) => {
     navigate(`/bidding/hiredetail/${serviceproviderid}`, {
-      state: { bidding_offer_id, order_id, hire_status: orderDetail?.hire_status || null, platFormFee: orderDetail?.platform_fee_paid},
+      state: { bidding_offer_id, order_id, hire_status: orderDetail?.hire_status || null, platFormFee: orderDetail?.platform_fee_paid },
     });
   };
 
@@ -356,7 +356,7 @@ export default function BiddinggetWorkDetail() {
       ${orderDetail?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
       ${orderDetail?.hire_status === "completed" ? "bg-[#228B22]" : ""}
       ${orderDetail?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
-      ${orderDetail?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+      ${orderDetail?.hire_status === "accepted" ? "bg-blue-500" : ""}`}
                   >
                     {orderDetail?.hire_status
                       ? orderDetail.hire_status
