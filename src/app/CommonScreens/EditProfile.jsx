@@ -79,11 +79,11 @@ export default function EditProfile() {
   });
 
   const docTypeOptions = [
-    { value: "aadharCard", label: "Aadhaar Card" },
-    { value: "panCard", label: "PAN Card" },
-    { value: "passport", label: "Passport" },
-    { value: "drivingLicense", label: "Driving License" },
-    { value: "other", label: "Any Other Government ID Proof" },
+    { value: "AadharCard", label: "Aadhaar Card" },
+    { value: "PanCard", label: "PAN Card" },
+    { value: "Passport", label: "Passport" },
+    { value: "DrivingLicense", label: "Driving License" },
+    { value: "Other", label: "Any Other Government ID Proof" },
   ];
 
   const handleUnauthorized = () => {

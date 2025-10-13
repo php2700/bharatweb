@@ -10,8 +10,6 @@ export default function EditBidModal({
   orderId,
   initialAmount,
   initialDescription,
-  categoryId,          // ✅ received from parent
-  subCategoryIds = [], // ✅ received from parent
   onEditSuccess,
 }) {
   const [amount, setAmount] = useState(initialAmount || "");
@@ -33,22 +31,16 @@ export default function EditBidModal({
 
     const payload = {
   order_id: orderId,
-  title: "Updated Bid",
-category_id: categoryId?._id || categoryId, // send only the ID
-sub_category_ids: subCategoryIds.map(sub => sub._id || sub).join(","), // send string of IDs
-  address: "Some Address",
-  google_address: "Google Address here",
-  description,
-  cost: amount,
-  deadline: "2025-09-15",
-  images: [],
+  message: description,
+  bid_amount: amount,
+	duration: " ",
 };
 
     console.log("Payload being sent:", payload);
 
     try {
       const response = await fetch(
-        `${BASE_URL}/bidding-order/edit`,
+        `${BASE_URL}/bidding-order/updateBiddingOffer`,
         {
           method: "PUT",
           headers: {

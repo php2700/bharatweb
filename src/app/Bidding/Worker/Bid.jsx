@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BidModal from "./BidModel";
 import EditBidModal from "./EditBidModel";
+import cancel from "../../../assets/bidding/cancel.png";
 
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -33,8 +34,8 @@ export default function Bid() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+    window.scrollTo(0, 0);
+  }, []);
   // Fetch Work Details
   useEffect(() => {
     const fetchWorkDetails = async () => {
@@ -57,7 +58,7 @@ export default function Bid() {
 
         const result = await response.json();
         const data = result.data;
-      //  console.log("Fetched Work Details:", data); // Debug log
+        //  console.log("Fetched Work Details:", data); // Debug log
         setWorker({
           _id: data._id,
           order_id: data._id,
@@ -74,8 +75,9 @@ export default function Bid() {
           user: data.user_id._id,
           category_id: data.category_id || null, // ✅ ensure available
           sub_category_ids: data.sub_category_ids || [], // ✅ correct naming
+          hire_status: data.hire_status, // ✅ ensure available
         });
-// console.log(data.sub_category_ids);
+        // console.log(data.sub_category_ids);
 
         setLoading(false);
       } catch (err) {
@@ -105,9 +107,9 @@ export default function Bid() {
             },
           }
         );
-  
+
         const result = await res.json();
-				console.log("Fetched Negotiation Data:", result); // Debug log
+        // console.log("Fetched Negotiation Data:", result); // Debug log
         setData(result);
       } catch (err) {
         console.error(err);
@@ -148,7 +150,7 @@ export default function Bid() {
       // console.log("Negotiation API Response:", result);
 
       if (response.ok) {
-					setOffer(" ");
+        setOffer(" ");
         toast.success(`You sent ₹${offer} Amount For Negotiation`);
       } else {
         toast.error(result.message || "Something went wrong ❌");
@@ -173,6 +175,42 @@ export default function Bid() {
     setBidDescription(description);
     setIsEditBidModel(false);
   };
+
+	const handleAcceptNegotiation = async (id, role) => {
+		const token = localStorage.getItem("bharat_token");
+		if (!id) {
+			toast.error("Negotiation ID is missing ❗");
+			return;
+		}
+
+		try {
+			const response = await fetch(`${BASE_URL}/negotiations/accept/${id}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					role: role,
+				}),
+			});
+
+			const result = await response.json();
+			console.log("Accept Negotiation API Response:", result);
+
+			if (response.ok) {
+				toast.success("You accepted the negotiation ✅");
+				// Optionally, refresh negotiation data here
+			} else {
+				toast.error(result.message || "Something went wrong ❌");
+			}
+		} catch (error) {
+			console.error("API Error:", error);
+			toast.error("Failed to accept negotiation ❌");	
+		}
+	}
+
+	// console.log("Current Negotiation Data:", data); // Debug log
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
   if (error)
@@ -221,6 +259,27 @@ export default function Bid() {
                       )}
                     </span>
                   </p>
+                  <span className="text-gray-600 font-semibold block">
+                    Status:{" "}
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium
+      ${worker?.hire_status === "pending" ? "bg-yellow-500" : ""}
+      ${worker?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
+      ${worker?.hire_status === "completed" ? "bg-[#228B22]" : ""}
+      ${worker?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
+      ${worker?.hire_status === "accepted" ? "bg-blue-500" : ""}`}
+                    >
+                      {worker?.hire_status
+                        ? worker.hire_status
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        : "Unknown Status"}
+                    </span>
+                  </span>
                 </div>
               </div>
 
@@ -229,71 +288,87 @@ export default function Bid() {
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{worker.skills}</p>
               </div>
+              
+            <div className="flex justify-center gap-6">
+  {(worker.hire_status === "cancelled" && (
+                // 🔴 Only show cancelled message
+                <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
+                  <img src={cancel} alt="Cancelled" className="w-5 h-5" />
+                  Cancelled Task By User
+                </div>
+              ))}
+            </div>
 
-              <div
-                onClick={() => {
-                  if (bidPlaced) {
-                    setIsEditBidModel(true);
-                  } else {
-                    setIsBidModel(true);
-                  }
-                }}
-                className={`text-lg font-semibold text-white text-center py-1 border rounded-lg w-1/4 mx-auto cursor-pointer bg-[#008000] hover:bg-green-700`}
-              >
-                {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
-              </div>
+              {worker?.hire_status === "pending" && (
+                <button
+                  onClick={() => {
+                    if (bidPlaced) {
+                      setIsEditBidModel(true);
+                    } else {
+                      setIsBidModel(true);
+                    }
+                  }}
+                  className="text-lg font-semibold text-white text-center py-2 px-4 rounded-lg w-1/4 mx-auto bg-[#008000] hover:bg-green-700"
+                >
+                  {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
+                </button>
+              )}
             </div>
           )}
 
-          <div className="flex flex-col items-center p-6">
-            <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
+          {worker.hire_status === "pending" && (
+            <div className="flex flex-col items-center p-6">
+              <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
+                <button
+                  onClick={() => setIsOfferActive(true)}
+                  className={`px-16 py-2 rounded-full font-medium shadow-sm ${
+                    isOfferActive
+                      ? "bg-[#228B22] text-white border border-green-600"
+                      : "border border-green-600 text-green-600"
+                  }`}
+                >
+                  Offer Price ({data?.offer_amount || 0})
+                </button>
+                <button
+                  onClick={() => setIsOfferActive(false)}
+                  className={`px-16 py-2 rounded-full font-medium shadow-md ${
+                    !isOfferActive
+                      ? "bg-[#228B22] text-white hover:bg-[#228B22]"
+                      : "border border-green-600 text-green-600"
+                  }`}
+                >
+                  Negotiate
+                </button>
+              </div>
+
+              {!isOfferActive && (
+                <input
+                  type="number"
+                  placeholder="Enter your offer amount"
+                  value={offer}
+                  onChange={(e) => setOffer(e.target.value)}
+                  className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                />
+              )}
+            </div>
+          )}
+
+          {worker.hire_status === "pending" && (
+            <div className="text-center">
               <button
-                onClick={() => setIsOfferActive(true)}
-                className={`px-16 py-2 rounded-full font-medium shadow-sm ${
-                  isOfferActive
-                    ? "bg-[#228B22] text-white border border-green-600"
-                    : "border border-green-600 text-green-600"
-                }`}
+                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
+                onClick={() => {
+                  if (isOfferActive) {
+                    handleAcceptNegotiation(data._id, "service_provider");
+                  } else {
+                    handleNegotiation(offer);
+                  }
+                }}
               >
-                Offer Price ({data?.offer_amount || 0})
-              </button>
-              <button
-                onClick={() => setIsOfferActive(false)}
-                className={`px-16 py-2 rounded-full font-medium shadow-md ${
-                  !isOfferActive
-                    ? "bg-[#228B22] text-white hover:bg-[#228B22]"
-                    : "border border-green-600 text-green-600"
-                }`}
-              >
-                Negotiate
+                {isOfferActive ? "Accept Request" : "Send Request"}
               </button>
             </div>
-
-            {!isOfferActive && (
-              <input
-                type="number"
-                placeholder="Enter your offer amount"
-                value={offer}
-                onChange={(e) => setOffer(e.target.value)}
-                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-              />
-            )}
-          </div>
-
-          <div className="text-center">
-            <button
-              className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
-              onClick={() => {
-                if (isOfferActive) {
-                  alert("Request Accepted ✅");
-                } else {
-                  handleNegotiation(offer);
-                }
-              }}
-            >
-              {isOfferActive ? "Accept Request" : "Send Request"}
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
@@ -315,10 +390,8 @@ export default function Bid() {
           isOpen={isEditBidModel}
           onClose={() => setIsEditBidModel(false)}
           orderId={worker?._id}
-          initialAmount={bidAmount || worker?.amount}
-          initialDescription={bidDescription || worker?.skills}
-          categoryId={worker?.category_id} // ✅ pass category_id
-          subCategoryIds={worker?.sub_category_ids || []} // ✅ pass subCategoryIds
+          initialAmount={bidAmount}
+          initialDuration={bidDescription}
           onEditSuccess={handleEditBidSuccess}
         />
       )}

@@ -23,7 +23,7 @@ import "slick-carousel/slick/slick-theme.css";
 export default function HireDetail() {
   const { id } = useParams();
   const location = useLocation();
-  const { bidding_offer_id, order_id } = location.state || {};
+  const { bidding_offer_id, order_id, hire_status, platFormFee } = location.state || {};
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [providerDetail, setProviderDetail] = useState(null);
@@ -132,6 +132,7 @@ export default function HireDetail() {
         });
 
         const data = await res.json();
+        console.log("Service Provider Data:", data); // Debugging line
         if (res.ok) {
           setProviderDetail(data.data);
         } else {
@@ -217,6 +218,48 @@ export default function HireDetail() {
       alert("Failed to start negotiation ❌");
     }
   };
+
+  const handleAcceptNegotiation = async (id, role) => {
+    const token = localStorage.getItem("bharat_token");
+    if (!id) {
+      toast.error("Negotiation ID is missing ❗");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/negotiations/accept/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          role: role,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Accept Negotiation API Response:", result);
+
+      if (response.ok) {
+        toast.success("You accepted the negotiation ✅");
+        // Optionally, refresh negotiation data here
+      } else {
+        toast.error(result.message || "Something went wrong ❌");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Failed to accept negotiation ❌");
+    }
+  };
+
+	const handlePayment = (order_id) => {
+		if(!order_id) {
+			toast.error("Order ID is missing ❗");
+			return;
+		}	
+
+	};
 
   return (
     <>
@@ -413,56 +456,73 @@ export default function HireDetail() {
           </div>
 
           {/* Offer/Negotiate Section */}
-          <div className="flex flex-col items-center  p-6 ">
-            <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
-              <button
-                onClick={() => setIsOfferActive(true)}
-                className={`px-16 py-2 rounded-full font-medium shadow-sm ${
-                  isOfferActive
-                    ? "bg-[#228B22] text-white border border-green-600"
-                    : "border border-green-600 text-green-600"
-                }`}
-              >
-                Offer Price ({data?.offer_amount || 0})
-              </button>
-              <button
-                onClick={() => setIsOfferActive(false)}
-                className={`px-16 py-2 rounded-full font-medium shadow-md ${
-                  !isOfferActive
-                    ? "bg-[#228B22] text-white hover:bg-[#228B22]"
-                    : "border border-green-600 text-green-600"
-                }`}
-              >
-                Negotiate
-              </button>
-            </div>
+          {hire_status === "pending" && (
+            <div className="flex flex-col items-center  p-6 ">
+              <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
+                <button
+                  onClick={() => setIsOfferActive(true)}
+                  className={`px-16 py-2 rounded-full font-medium shadow-sm ${
+                    isOfferActive
+                      ? "bg-[#228B22] text-white border border-green-600"
+                      : "border border-green-600 text-green-600"
+                  }`}
+                >
+                  Offer Price ({data?.offer_amount || 0})
+                </button>
+                <button
+                  onClick={() => setIsOfferActive(false)}
+                  className={`px-16 py-2 rounded-full font-medium shadow-md ${
+                    !isOfferActive
+                      ? "bg-[#228B22] text-white hover:bg-[#228B22]"
+                      : "border border-green-600 text-green-600"
+                  }`}
+                >
+                  Negotiate
+                </button>
+              </div>
 
-            {!isOfferActive && (
-              <input
-                type="number"
-                placeholder="Enter your offer amount"
-                value={offer}
-                onChange={(e) => setOffer(e.target.value)}
-                className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-              />
-            )}
-          </div>
+              {!isOfferActive && (
+                <input
+                  type="number"
+                  placeholder="Enter your offer amount"
+                  value={offer}
+                  onChange={(e) => setOffer(e.target.value)}
+                  className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                />
+              )}
+            </div>
+          )}
 
           {/* Accept / Send Request */}
-          <div className="text-center">
-            <button
-              className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
-              onClick={() => {
-                if (isOfferActive) {
-                  alert("Request Accepted ✅");
-                } else {
-                  handleNagotiation(offer);
-                }
-              }}
-            >
-              {isOfferActive ? "Accept Request" : "Send Request"}
-            </button>
-          </div>
+          {hire_status === "pending" && (
+            <div className="text-center">
+              <button
+                className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
+                onClick={() => {
+                  if (isOfferActive) {
+                    handleAcceptNegotiation(data._id, "user");
+                  } else {
+                    handleNagotiation(offer);
+                  }
+                }}
+              >
+                {isOfferActive ? "Accept Request" : "Send Request"}
+              </button>
+            </div>
+          )}
+
+          {hire_status === "accepted" && !platFormFee && (
+            <div className="text-center">
+              <button
+                className="bg-[#228B22] text-white w-full px-10 py-3 rounded-md font-semibold"
+                onClick={() => {
+                  handlePayment(order_id);
+                }}
+              >
+                Pay Now
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

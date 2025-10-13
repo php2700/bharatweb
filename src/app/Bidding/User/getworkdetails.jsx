@@ -17,11 +17,12 @@ import { ToastContainer, toast } from "react-toastify";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function BiddinggetWorkDetail() {
   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+    window.scrollTo(0, 0);
+  }, []);
   const { id } = useParams();
   localStorage.setItem("order_id", id);
   const [isCancelled, setIsCancelled] = useState(false);
@@ -39,9 +40,10 @@ export default function BiddinggetWorkDetail() {
 
   const [activeTab, setActiveTab] = useState("Bidder");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+	console.log("Order Detail:", orderDetail); // Debug log
   const handleView = (serviceproviderid, bidding_offer_id, order_id) => {
     navigate(`/bidding/hiredetail/${serviceproviderid}`, {
-      state: { bidding_offer_id, order_id },
+      state: { bidding_offer_id, order_id, hire_status: orderDetail?.hire_status || null, platFormFee: orderDetail?.platform_fee_paid},
     });
   };
 
@@ -311,9 +313,10 @@ export default function BiddinggetWorkDetail() {
                 <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
                 <span
                   onClick={() => setShowMap(true)}
-                  className="cursor-pointer inline-block bg-red-500 text-white text-sm font-semibold px-3 rounded-full mt-2 hover:bg-red-600 transition"
+                  className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
                 >
-                  {address}
+                  <FaMapMarkerAlt size={18} color="#228B22" />
+                  <span className="truncate">{address}</span>
                 </span>
                 {showMap && (
                   <div className="mt-4 w-full h-96 rounded-xl overflow-hidden shadow-lg">
@@ -345,9 +348,29 @@ export default function BiddinggetWorkDetail() {
                     Completion Date: {deadline}
                   </span>
                 </p>
+                <span className="text-gray-600 font-semibold block">
+                  Status:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
+      ${orderDetail?.hire_status === "pending" ? "bg-yellow-500" : ""}
+      ${orderDetail?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
+      ${orderDetail?.hire_status === "completed" ? "bg-[#228B22]" : ""}
+      ${orderDetail?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
+      ${orderDetail?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+                  >
+                    {orderDetail?.hire_status
+                      ? orderDetail.hire_status
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
+                      : "Unknown Status"}
+                  </span>
+                </span>
               </div>
             </div>
-
             <h3 className="text-lg font-semibold">Work Title</h3>
 
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
@@ -542,14 +565,16 @@ export default function BiddinggetWorkDetail() {
                       </div>
 
                       {/* Status + Invite */}
-                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                        <span className="text-lg font-semibold text-gray-800 mb-2">
-                          ₹{offer.bid_amount}
-                        </span>
-                        <button className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700">
-                          Accept
-                        </button>
-                      </div>
+                      {hire_status === "pending" && (
+                        <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                          <span className="text-lg font-semibold text-gray-800 mb-2">
+                            ₹{offer.bid_amount}
+                          </span>
+                          <button className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700">
+                            Accept
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (

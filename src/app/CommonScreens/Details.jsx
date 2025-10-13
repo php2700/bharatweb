@@ -121,6 +121,7 @@ export default function Details() {
   let address = "N/A";
   let images = "";
   let skill = "Not Available";
+	let aboutus = "Not Available";
   let category_name = "Not Available";
   let subcategory_names = "Not Available";
   let documents = [];
@@ -141,11 +142,12 @@ export default function Details() {
   let rating = "N/A";
   let referral_code = "N/A";
   let isEmergencyOn = false;
-
+console.log("Profile Object:", profile); // Debugging line
   if (profile) {
     full_name = profile.full_name || "Not Available";
     images = profile.profilePic || "Not Available";
     skill = profile.skill || "No Skill Available";
+    aboutus = profile.aboutUs || "Not Available";
     category_name = profile.category_name || "Not Available";
     subcategory_names = profile.subcategory_names || ["Not Available"];
     documents = profile.documents || [];
@@ -176,18 +178,19 @@ export default function Details() {
     gender = profile.gender || "N/A";
   }
   const testimage = images && images !== "Not Available";
-
-  const handleSwitchToWorker = () => {
+    const handleSwitchToWorker = () => {
     if (!profile) return;
 
     const userId = getUserId();
     const verificationStatus = profile?.verificationStatus || "pending";
+    const verificationRole = profile?.role;
+    const categoryId = profile?.category_id || null;
     const requestedRole = profile?.requestStatus || null;
     const rejectionReason =
       profile?.rejectionReason || "Please fill details properly.";
 
     if (verificationStatus === "verified") {
-      console.log("Profile verified, allowing Worker tab access");
+      // console.log("Profile verified, allowing Worker tab access");
       setActiveTab("Worker");
       dispatch(selectRole("service_provider"));
       localStorage.setItem("role", "service_provider");
@@ -207,7 +210,7 @@ export default function Details() {
         });
       }
     } else if (verificationStatus === "rejected") {
-      console.log("Profile rejected, showing rejection alert");
+      // console.log("Profile rejected, showing rejection alert");
       Swal.fire({
         title: "Oops! Admin rejected your profile",
         text: rejectionReason,
@@ -240,10 +243,45 @@ export default function Details() {
         dispatch(selectRole("user"));
         localStorage.setItem("role", "user");
       });
+    } else if (
+      verificationStatus === "pending" &&
+      verificationRole === "service_provider" &&
+      categoryId
+    ) {
+      Swal.fire({
+        title: "Verification Pending",
+        text: "Your verification by admin is pending, it will take 2-3 days.",
+        icon: "info",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      }).then(() => {
+        toast.dismiss();
+        setActiveTab("user");
+        requestRoleUpgrade();
+        dispatch(selectRole("user"));
+        localStorage.setItem("role", "user");
+      });
+    } else if (
+      verificationStatus === "pending" &&
+      verificationRole === "both" &&
+      categoryId
+    ) {
+      Swal.fire({
+        title: "Verification Pending",
+        text: "Your verification by admin is pending, it will take 2-3 days.",
+        icon: "info",
+        confirmButtonColor: "#228B22",
+        confirmButtonText: "OK",
+      }).then(() => {
+        toast.dismiss();
+        setActiveTab("user");
+        dispatch(selectRole("user"));
+        localStorage.setItem("role", "user");
+      });
     } else if (verificationStatus === "pending") {
-      console.log("Profile pending without request");
+      // console.log("Profile pending without request");
       if (!validateWorkerProfile()) {
-        console.log("Profile incomplete, showing incomplete alert");
+        // console.log("Profile incomplete, showing incomplete alert");
         Swal.fire({
           title: "Your Worker profile is not completed",
           text: "Please complete your profile to be eligible for the Worker role.",
@@ -266,7 +304,6 @@ export default function Details() {
           confirmButtonText: "OK",
         }).then(() => {
           toast.dismiss();
-          requestRoleUpgrade();
           setActiveTab("user");
           dispatch(selectRole("user"));
           localStorage.setItem("role", "user");
@@ -465,9 +502,12 @@ export default function Details() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(`Emergency Mode ${newStatus ? "turned on" : "turned off"}!`, {
-          toastId: "emergency-toggle-success",
-        });
+        toast.success(
+          `Emergency Mode ${newStatus ? "turned on" : "turned off"}!`,
+          {
+            toastId: "emergency-toggle-success",
+          }
+        );
         dispatch(fetchUserProfile());
       } else {
         throw new Error(data.message || `HTTP error ${response.status}`);
@@ -706,7 +746,7 @@ export default function Details() {
                     </h3>
                   </div>
                   <p className="mt-2 text-gray-700 text-base leading-relaxed break-all">
-                    {skill}
+                    {aboutus}
                   </p>
                 </div>
               </div>
