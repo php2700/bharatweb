@@ -152,10 +152,10 @@ export default function BiddinggetWorkDetail() {
       );
       // console.log("Order Response:", response);
       if (response.status === 200) {
+				setAssignedWorker(response.data.assignedWorker || null);
         const order = response.data.data;
         setOrderDetail(order);
         setCategoryId(order?.category_id?._id || null);
-        setAssignedWorker(order?.assignedWorker || null);
         setSubCategoryIds(
           Array.isArray(order?.sub_category_ids)
             ? order.sub_category_ids.map((sub) => sub._id)
@@ -417,7 +417,7 @@ export default function BiddinggetWorkDetail() {
             }
           );
 
-          if (response.data?.success) {
+          if (response) {
             setIsCancelled(true);
             Swal.fire("Cancelled!", "Task has been cancelled.", "success");
           } else {

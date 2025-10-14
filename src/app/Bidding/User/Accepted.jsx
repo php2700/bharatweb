@@ -89,7 +89,7 @@ export default function Accepted({
       };
 
       const response = await fetch(
-        `${BASE_URL}/direct-order/order/payment-stage/${orderId}`,
+        `${BASE_URL}/bidding-order/addPaymentStage/${orderId}`,
         {
           method: "POST",
           headers: {
@@ -124,7 +124,7 @@ export default function Accepted({
     };
 
     const response = await fetch(
-      `${BASE_URL}/direct-order/order/payment-stage/${orderId}`,
+      `${BASE_URL}/bidding-order/addPaymentStage/${orderId}`,
       {
         method: "POST",
         headers: {
@@ -156,7 +156,7 @@ export default function Accepted({
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await axios.post(
-        `${BASE_URL}/direct-order/user/request-release/${orderId}/${paymentId}`,
+        `${BASE_URL}/bidding-order/user/request-release/${orderId}/${paymentId}`,
         {},
         {
           headers: {
@@ -284,7 +284,7 @@ export default function Accepted({
                 </div>
               
               <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-							onClick={()=>navigate(`/profile-details/${serviceProvider._id}/direct`)}
+							onClick={()=>navigate(`/profile-details/${serviceProvider._id}/bidding`)}
 							>
                 View Profile
               </button>
