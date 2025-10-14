@@ -173,9 +173,9 @@ export default function Dispute() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-4 mt-25">
         <Link
-          to="/"
+          to={-1}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
