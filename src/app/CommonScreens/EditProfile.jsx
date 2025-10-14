@@ -28,16 +28,15 @@ export default function EditProfile() {
   const location = useLocation();
   const { activeTab } = location.state || { activeTab: "user" };
   const role = profile?.role;
-	const verificationStatus = profile?.verificationStatus; // New field
+  const verificationStatus = profile?.verificationStatus;
   const fileInputRef = useRef(null);
   const autoCompleteRef = useRef(null);
-  console.log("prof", profile);
   const [formData, setFormData] = useState({
     name: "",
-    // category: "",
     subcategory: [],
     emergencysubcategory: [],
     aboutUs: "",
+    skill: "",
     documents: [],
     businessImage: [],
     age: "",
@@ -45,7 +44,6 @@ export default function EditProfile() {
     address: "",
     full_address: [],
     customDocName: "",
-    // willingToVisitShop: "",
     hasShop: "",
     shopAddress: "",
     shopFullAddress: [],
@@ -87,9 +85,6 @@ export default function EditProfile() {
   ];
 
   const handleUnauthorized = () => {
-    console.log(
-      "handleUnauthorized: Clearing localStorage and redirecting to login"
-    );
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
@@ -107,7 +102,6 @@ export default function EditProfile() {
       window.location.hostname === "localhost" ||
       window.location.hostname === "127.0.0.1"
     ) {
-      console.log(`Skipping URL validation for ${url} in local development`);
       return true;
     }
     try {
@@ -116,6 +110,67 @@ export default function EditProfile() {
     } catch (error) {
       console.error(`Failed to validate URL ${url}:`, error);
       return false;
+    }
+  };
+
+  const handleDeleteDocument = async (index, preview) => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        handleUnauthorized();
+        return;
+      }
+
+      const doc = formData.documents[index];
+      console.log(
+        "Deleting document:",
+        doc,
+        "at index:",
+        index,
+        "with preview:",
+        preview
+      );
+
+      if (!(doc.images[0] instanceof File)) {
+        const res = await fetch(`${BASE_URL}/user/deleteDocumentImage`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            documentName: doc.documentName,
+            imagePath: doc.images[0]?.replace(
+              "http://api.thebharatworks.com/",
+              ""
+            ),
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 401) {
+            handleUnauthorized();
+            return;
+          }
+          throw new Error(data.message || "Failed to delete document");
+        }
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        documents: prev.documents.filter((_, i) => i !== index),
+      }));
+      setDocumentPreviews((prev) => prev.filter((_, i) => i !== index));
+      toast.success("Document deleted successfully!", {
+        toastId: `deleteDocumentSuccess-${index}`,
+      });
+      dispatch(fetchUserProfile());
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      toast.error(error.message || "Failed to delete document", {
+        toastId: `deleteDocumentError-${index}`,
+      });
     }
   };
 
@@ -136,10 +191,11 @@ export default function EditProfile() {
         }
       });
     } else {
-      console.log("useEffect: No valid token, redirecting to login");
       handleUnauthorized();
     }
   }, [dispatch]);
+
+  console.log("EditProfile Rendered: ", profile);
 
   useEffect(() => {
     if (profile) {
@@ -169,13 +225,13 @@ export default function EditProfile() {
       const processDocuments = async () => {
         const validDocuments = [];
         const validPreviews = [];
-        const validBusinessImage = [];
+        const validBusinessImages = [];
         const validBusinessImagePreviews = [];
         const seenUrls = new Set();
         const inaccessibleDocs = [];
 
+        // Process documents from profile.documents
         for (const [index, doc] of (profile.documents || []).entries()) {
-          console.log(`Processing profile document ${index}:`, doc);
           if (doc && Array.isArray(doc.images) && doc.images.length > 0) {
             for (const image of doc.images) {
               if (
@@ -187,7 +243,7 @@ export default function EditProfile() {
                 const isAccessible = await isValidUrl(image);
                 if (isAccessible) {
                   if (doc.documentName === "businessImage") {
-                    validBusinessImage.push({
+                    validBusinessImages.push({
                       documentName: "businessImage",
                       images: [image],
                     });
@@ -219,6 +275,38 @@ export default function EditProfile() {
           }
         }
 
+        // Process businessImage from profile.businessImage
+        if (Array.isArray(profile.businessImage)) {
+          for (const image of profile.businessImage) {
+            if (
+              typeof image === "string" &&
+              image.trim() &&
+              !["null", "undefined"].includes(image.toLowerCase()) &&
+              !seenUrls.has(image)
+            ) {
+              const isAccessible = await isValidUrl(image);
+              if (isAccessible) {
+                validBusinessImages.push({
+                  documentName: "businessImage",
+                  images: [image],
+                });
+                validBusinessImagePreviews.push(image);
+                seenUrls.add(image);
+              } else {
+                console.warn(
+                  `Skipping inaccessible business image URL: ${image}`
+                );
+                inaccessibleDocs.push({
+                  docName: "businessImage",
+                  url: image,
+                });
+              }
+            } else {
+              console.warn(`Invalid or duplicate business image:`, image);
+            }
+          }
+        }
+
         if (inaccessibleDocs.length > 0) {
           toast.error(
             `The following documents are inaccessible and will not be displayed: ${inaccessibleDocs
@@ -231,8 +319,8 @@ export default function EditProfile() {
         setFormData((prev) => ({
           ...prev,
           name: profile.full_name || "",
-          aboutUs: profile?.aboutUs || profile?.skill || "",
-          // category: profile.category_id || "",
+          aboutUs: activeTab === "user" ? profile?.aboutUs || "" : "",
+          skill: activeTab === "worker" ? profile?.skill || "" : "",
           subcategory: Array.isArray(profile.subcategory_ids)
             ? profile.subcategory_ids
             : [],
@@ -246,8 +334,7 @@ export default function EditProfile() {
             ? profile.full_address
             : [],
           documents: validDocuments,
-          businessImage: validBusinessImage,
-          // willingToVisitShop: profile.willingToVisitShop || "",
+          businessImage: validBusinessImages,
           hasShop: profile.isShop ? "yes" : "no",
           shopAddress: profile.businessAddress?.address || "",
           shopFullAddress: profile.businessAddress?.address
@@ -276,10 +363,10 @@ export default function EditProfile() {
     } else {
       setFormData({
         name: "",
-        // category: "",
         subcategory: [],
         emergencysubcategory: [],
         aboutUs: "",
+        skill: "",
         documents: [],
         businessImage: [],
         age: "",
@@ -287,7 +374,6 @@ export default function EditProfile() {
         address: "",
         full_address: [],
         customDocName: "",
-        // willingToVisitShop: "",
         hasShop: "",
         shopAddress: "",
         shopFullAddress: [],
@@ -298,14 +384,13 @@ export default function EditProfile() {
       setBusinessImagePreviews([]);
       setProfilePic(null);
     }
-  }, [profile]);
+  }, [profile, activeTab]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
         if (!token) {
-          console.log("fetchCategories: No token, redirecting to login");
           handleUnauthorized();
           return;
         }
@@ -321,9 +406,6 @@ export default function EditProfile() {
             }))
           );
         } else if (res.status === 401) {
-          console.log(
-            "fetchCategories: 401 Unauthorized, redirecting to login"
-          );
           handleUnauthorized();
         }
       } catch (error) {
@@ -359,7 +441,6 @@ export default function EditProfile() {
     try {
       const token = localStorage.getItem("bharat_token");
       if (!token) {
-        console.log("handleCategoryChange: No token, redirecting to login");
         handleUnauthorized();
         return;
       }
@@ -413,9 +494,6 @@ export default function EditProfile() {
           }));
         }
       } else if (subRes.status === 401) {
-        console.log(
-          "handleCategoryChange: 401 Unauthorized (subcategories), redirecting to login"
-        );
         handleUnauthorized();
         return;
       }
@@ -427,7 +505,6 @@ export default function EditProfile() {
         }
       );
       const emerData = await emerRes.json();
-      console.log("emer", emerData);
       if (emerRes.ok) {
         let fetchedEmergencysubcategories = (emerData.data || []).map(
           (emer) => ({
@@ -483,9 +560,6 @@ export default function EditProfile() {
           }));
         }
       } else if (emerRes.status === 401) {
-        console.log(
-          "handleCategoryChange: 401 Unauthorized (emergencysubcategories), redirecting to login"
-        );
         handleUnauthorized();
       }
     } catch (error) {
@@ -518,6 +592,9 @@ export default function EditProfile() {
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results[0]) {
         const address = results[0].formatted_address;
+        console.log(
+          `Geocoded address for lat: ${lat}, lng: ${lng} -> ${address}`
+        );
         if (mapFor === "address") {
           setFormData((prev) => ({ ...prev, address }));
           setTempAddress((prev) => ({
@@ -537,6 +614,11 @@ export default function EditProfile() {
           }));
           setMarkerLocationShop({ lat, lng });
         }
+      } else {
+        console.error("Geocoding failed:", status);
+        toast.error("Failed to fetch address from location", {
+          toastId: "geocodeError",
+        });
       }
     });
   };
@@ -546,6 +628,7 @@ export default function EditProfile() {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          console.log("Current location fetched:", loc);
           setCurrentLocation(loc);
           if (mapFor === "address") setMarkerLocationAddress(loc);
           else if (mapFor === "shopAddress") setMarkerLocationShop(loc);
@@ -571,11 +654,15 @@ export default function EditProfile() {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
         const loc = { lat, lng };
+        console.log("Place selected:", place.formatted_address, loc);
         setCurrentLocation(loc);
         if (mapFor === "address") setMarkerLocationAddress(loc);
         else if (mapFor === "shopAddress") setMarkerLocationShop(loc);
         getAddressFromLatLng(lat, lng);
         if (map) map.panTo(loc);
+      } else {
+        console.error("No geometry available for selected place");
+        toast.error("Invalid place selected", { toastId: "invalidPlaceError" });
       }
     }
   };
@@ -583,6 +670,7 @@ export default function EditProfile() {
   const handleMapClick = (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
+    console.log(`Map clicked at lat: ${lat}, lng: ${lng}`);
     if (mapFor === "address") setMarkerLocationAddress({ lat, lng });
     else if (mapFor === "shopAddress") setMarkerLocationShop({ lat, lng });
     getAddressFromLatLng(lat, lng);
@@ -590,10 +678,27 @@ export default function EditProfile() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    console.log(`handleChange: name=${name}, value=${value}, files=`, files);
+
+    if (name === "name") {
+      const validName = value.replace(/[^a-zA-Z\s]/g, "");
+      if (value !== validName) {
+        toast.error("Name can only contain letters and spaces!", {
+          toastId: "nameFormatError",
+        });
+      }
+      setFormData({ ...formData, name: validName });
+      return;
+    }
+
+    if (name === "age") {
+      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 2);
+      setFormData({ ...formData, age: numericValue });
+      return;
+    }
 
     if (name === "documents" && files) {
       const allowedTypes = [
-        "application/pdf",
         "image/jpeg",
         "image/png",
         "image/avif",
@@ -604,23 +709,23 @@ export default function EditProfile() {
         allowedTypes.includes(file.type)
       );
 
-      const maxFileSize = 5 * 1024 * 1024; // 5MB
+      const maxFileSize = 20 * 1024 * 1024; // 20MB
       if (validFiles.some((file) => file.size > maxFileSize)) {
-        toast.error("File size exceeds 5MB limit!", {
+        toast.error("File size exceeds 20MB limit!", {
           toastId: "fileSizeError",
         });
         return;
       }
 
-      if (newFiles.length < 1 || newFiles.length > 5) {
-        toast.error("Please upload between 1 and 5 documents at a time!", {
+      if (newFiles.length !== 2) {
+        toast.error("Exactly 2 images are required for documents!", {
           toastId: "documentCountError",
         });
         return;
       }
 
       if (validFiles.length !== newFiles.length) {
-        toast.error("Only PDF or image files are allowed!", {
+        toast.error("Only image files (JPEG, PNG, AVIF, GIF) are allowed!", {
           toastId: "fileTypeError",
         });
         return;
@@ -640,10 +745,8 @@ export default function EditProfile() {
         return;
       }
 
-      const totalDocsAfterUpload =
-        formData.documents.length + validFiles.length;
-      if (totalDocsAfterUpload > 5) {
-        toast.error("Total documents cannot exceed 5!", {
+      if (formData.documents.length + validFiles.length > 2) {
+        toast.error("Total documents cannot exceed 2!", {
           toastId: "maxDocumentsError",
         });
         return;
@@ -683,9 +786,9 @@ export default function EditProfile() {
         allowedTypes.includes(file.type)
       );
 
-      const maxFileSize = 5 * 1024 * 1024; // 5MB
+      const maxFileSize = 20 * 1024 * 1024; // 20MB
       if (validFiles.some((file) => file.size > maxFileSize)) {
-        toast.error("File size exceeds 5MB limit!", {
+        toast.error("File size exceeds 20MB limit!", {
           toastId: "fileSizeError",
         });
         return;
@@ -694,7 +797,9 @@ export default function EditProfile() {
       if (newFiles.length < 1 || newFiles.length > 5) {
         toast.error(
           "Please upload between 1 and 5 business images at a time!",
-          { toastId: "businessImageCountError" }
+          {
+            toastId: "businessImageCountError",
+          }
         );
         return;
       }
@@ -705,7 +810,6 @@ export default function EditProfile() {
         });
         return;
       }
-
       const totalBusinessImagesAfterUpload =
         formData.businessImage.length + validFiles.length;
       if (totalBusinessImagesAfterUpload > 5) {
@@ -732,17 +836,46 @@ export default function EditProfile() {
     }
 
     if (name === "customDocName") {
-      setFormData({ ...formData, customDocName: value });
+      const validCustomDocName = value.replace(/[^a-zA-Z\s]/g, "");
+      if (value !== validCustomDocName) {
+        toast.error("Document name can only contain letters and spaces!", {
+          toastId: "customDocNameFormatError",
+        });
+      }
+      setFormData({ ...formData, customDocName: validCustomDocName });
       return;
     }
 
-    if (name === "hasShop" && value === "no") {
-      setFormData((prev) => ({
-        ...prev,
-        hasShop: value,
-        shopAddress: "",
-        shopFullAddress: [],
-      }));
+    if (name === "hasShop") {
+      console.log(`hasShop changed to: ${value}`);
+      if (value === "no") {
+        setFormData((prev) => ({
+          ...prev,
+          hasShop: value,
+          shopAddress: "",
+          shopFullAddress: [],
+        }));
+        setMarkerLocationShop(null);
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          hasShop: value,
+        }));
+      }
+      return;
+    }
+
+    if (name === "aboutUs") {
+      if (value.length > 500) {
+        toast.error("About Us/Skill cannot exceed 500 characters!", {
+          toastId: "aboutUsLengthError",
+        });
+        return;
+      }
+      setFormData({
+        ...formData,
+        [activeTab === "worker" ? "skill" : "aboutUs"]: value,
+      });
       return;
     }
 
@@ -756,7 +889,6 @@ export default function EditProfile() {
     if (docType !== "other") {
       setFormData((prev) => ({ ...prev, customDocName: "" }));
     }
-    // Reset documents and previews when a new document type is selected
     setFormData((prev) => ({ ...prev, documents: [] }));
     setDocumentPreviews([]);
   };
@@ -780,7 +912,6 @@ export default function EditProfile() {
     try {
       const token = localStorage.getItem("bharat_token");
       if (!token) {
-        console.log("handleProfilePicChange: No token, redirecting to login");
         handleUnauthorized();
         return;
       }
@@ -794,9 +925,6 @@ export default function EditProfile() {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 401) {
-          console.log(
-            "handleProfilePicChange: 401 Unauthorized, redirecting to login"
-          );
           handleUnauthorized();
           return;
         }
@@ -832,6 +960,7 @@ export default function EditProfile() {
       return;
     }
 
+    console.log(`Saving address for ${mapFor}:`, tempAddress);
     if (mapFor === "address") {
       setFormData((prev) => ({
         ...prev,
@@ -870,64 +999,128 @@ export default function EditProfile() {
       latitude: null,
       longitude: null,
     });
+    setIsMapOpen(false);
+  };
+
+  const handleOpenAddressModal = (type) => {
+    console.log(`Opening address modal for: ${type}`);
+    setMapFor(type);
+    setTempAddress({
+      title: "",
+      landmark: "",
+      address: type === "address" ? formData.address : formData.shopAddress,
+      latitude: null,
+      longitude: null,
+    });
+    setAddressModalOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.name.trim())
-      return toast.error("Name is required!", { toastId: "nameRequiredError" });
-    else if (formData?.name?.trim()?.length < 3)
-      return toast.error("Min 3 charater is required!", {
-        toastId: "nameRequiredError",
+    // Hard validation
+    if (!formData.name.trim()) {
+      toast.error("Name is required!", { toastId: "nameRequiredError" });
+      return;
+    }
+    if (formData.name.trim().length < 3) {
+      toast.error("Name must be at least 3 characters long!", {
+        toastId: "nameLengthError",
       });
-    if (!formData.age)
-      return toast.error("Age is required!", { toastId: "ageRequiredError" });
-    if (!formData.gender)
-      return toast.error("Gender is required!", {
-        toastId: "genderRequiredError",
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
+      toast.error("Name can only contain letters and spaces!", {
+        toastId: "nameFormatError",
       });
-    if (!formData.address.trim())
-      return toast.error("Address is required!", {
-        toastId: "addressRequiredError",
+      return;
+    }
+
+    if (!formData.age) {
+      toast.error("Age is required!", { toastId: "ageRequiredError" });
+      return;
+    }
+    const ageNum = parseInt(formData.age);
+    if (isNaN(ageNum) || ageNum < 18 || ageNum > 99) {
+      toast.error("Age must be a number between 18 and 99!", {
+        toastId: "ageRangeError",
       });
-    // if (activeTab === "user" && !formData.willingToVisitShop) {
-    //   return toast.error("Please select if you are willing to visit the shop!", { toastId: "willingToVisitShopError" });
-    // }
+      return;
+    }
+
+    if (!formData.gender) {
+      toast.error("Gender is required!", { toastId: "genderRequiredError" });
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      toast.error("Address is required!", { toastId: "addressRequiredError" });
+      return;
+    }
+
     if (activeTab === "worker") {
-      if (!formData.category)
-        return toast.error("Category is required!", {
+      if (!formData.category) {
+        toast.error("Category is required!", {
           toastId: "categoryRequiredError",
         });
-      if (!formData.subcategory.length)
-        return toast.error("Select at least one subcategory!", {
+        return;
+      }
+      if (!formData.subcategory.length) {
+        toast.error("Select at least one subcategory!", {
           toastId: "subcategoryRequiredError",
         });
-      if (!formData.emergencysubcategory.length)
-        return toast.error("Select at least one emergency subcategory!", {
+        return;
+      }
+      if (!formData.emergencysubcategory.length) {
+        toast.error("Select at least one emergency subcategory!", {
           toastId: "emergencysubcategoryRequiredError",
         });
-      if (!formData.documents.length)
-        return toast.error(
-          "At least one document is required for worker profile!",
-          { toastId: "documentsRequiredError" }
-        );
-      if (!formData.hasShop)
-        return toast.error("Please select if you have a shop!", {
+        return;
+      }
+      if (formData.documents.length !== 2) {
+        toast.error("Exactly 2 document images are required!", {
+          toastId: "documentsRequiredError",
+        });
+        return;
+      }
+      if (!formData.hasShop) {
+        toast.error("Please select if you have a shop!", {
           toastId: "hasShopError",
         });
+        return;
+      }
       if (formData.hasShop === "yes" && !formData.shopAddress.trim()) {
-        return toast.error("Shop address is required if you have a shop!", {
+        toast.error("Shop address is required if you have a shop!", {
           toastId: "shopAddressError",
         });
+        return;
       }
+    }
+
+    const aboutField =
+      activeTab === "worker" ? formData.skill : formData.aboutUs;
+    if (!aboutField.trim()) {
+      toast.error(
+        activeTab === "worker"
+          ? "Skill description is required!"
+          : "About Us is required!",
+        { toastId: "aboutRequiredError" }
+      );
+      return;
+    }
+    if (aboutField.trim().length < 10) {
+      toast.error(
+        activeTab === "worker"
+          ? "Skill description must be at least 10 characters!"
+          : "About Us must be at least 10 characters!",
+        { toastId: "aboutLengthError" }
+      );
+      return;
     }
 
     try {
       const token = localStorage.getItem("bharat_token");
       if (!token) {
-        console.log("handleSubmit: No token, redirecting to login");
         handleUnauthorized();
         return;
       }
@@ -935,22 +1128,6 @@ export default function EditProfile() {
       if (activeTab === "worker") {
         const fd = new FormData();
 
-        // Log form data for debugging
-        console.log("FormData before submission:", {
-          full_name: formData.name,
-          category_id: formData.category,
-          subcategory_ids: formData.subcategory,
-          emergencySubcategory_ids: formData.emergencysubcategory,
-          aboutUs: formData.aboutUs,
-          age: formData.age,
-          gender: formData.gender,
-          documents: formData.documents,
-          businessImage: formData.businessImage,
-          isShop: formData.hasShop === "yes",
-          businessAddress: formData.shopFullAddress[0] || {},
-        });
-
-        // Handle documents (assuming one document type, as per reset logic)
         formData.documents.forEach((doc) => {
           if (doc.images[0] instanceof File) {
             fd.append("documents", doc.images[0]);
@@ -963,14 +1140,12 @@ export default function EditProfile() {
           );
         }
 
-        // Handle business images
         formData.businessImage.forEach((img) => {
           if (img.images[0] instanceof File) {
-            fd.append("businessImage", img.images[0]); // Use "businessImage" as per backend
+            fd.append("businessImage", img.images[0]);
           }
         });
 
-        // Append text fields
         fd.append("full_name", formData.name);
         fd.append("category_id", formData.category);
         fd.append("subcategory_ids", JSON.stringify(formData.subcategory));
@@ -978,7 +1153,7 @@ export default function EditProfile() {
           "emergencySubcategory_ids",
           JSON.stringify(formData.emergencysubcategory)
         );
-        fd.append("aboutUs", formData.aboutUs);
+        fd.append("skill", formData.skill);
         fd.append("age", formData.age);
         fd.append("gender", formData.gender);
         fd.append("isShop", formData.hasShop === "yes" ? "true" : "false");
@@ -1000,12 +1175,6 @@ export default function EditProfile() {
           fd.append("businessAddress", JSON.stringify(businessAddress));
         }
 
-        // Log FormData entries
-        for (let [key, value] of fd.entries()) {
-          console.log(`FormData entry: ${key}=${value}`);
-        }
-
-        // Send request to updateUserDetails
         const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
           method: "PUT",
           headers: {
@@ -1015,11 +1184,8 @@ export default function EditProfile() {
         });
 
         const data = await res.json();
-        console.log("Server response (updateUserDetails):", data);
-
         if (!res.ok) {
           if (res.status === 401) {
-            console.log("handleSubmit: 401 Unauthorized, redirecting to login");
             handleUnauthorized();
             return;
           }
@@ -1029,7 +1195,6 @@ export default function EditProfile() {
           );
         }
 
-        // Handle role upgrade if necessary
         if (role === "user" || verificationStatus === "rejected") {
           const upgradeRes = await fetch(
             `${BASE_URL}/user/request-role-upgrade`,
@@ -1039,18 +1204,12 @@ export default function EditProfile() {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              // body: JSON.stringify({ role: "worker" }),
             }
           );
 
           const upgradeData = await upgradeRes.json();
-          console.log("Server response (request-role-upgrade):", upgradeData);
-
           if (!upgradeRes.ok) {
             if (upgradeRes.status === 401) {
-              console.log(
-                "handleSubmit: 401 Unauthorized (role upgrade), redirecting to login"
-              );
               handleUnauthorized();
               return;
             }
@@ -1065,7 +1224,6 @@ export default function EditProfile() {
           }
         }
 
-        // Refresh user profile
         await dispatch(fetchUserProfile());
 
         toast.success("Worker profile updated successfully!", {
@@ -1081,18 +1239,10 @@ export default function EditProfile() {
           age: formData.age,
           gender: formData.gender,
           full_address: formData.full_address,
-          // willingToVisitShop: formData.willingToVisitShop,
           category_id: formData.category,
           subcategory_ids: formData.subcategory,
           emergencysubcategory_ids: formData.emergencysubcategory,
         };
-        if (activeTab == "user") {
-          payload.aboutUs = formData.aboutUs;
-        } else if (activeTab == "worker") {
-          payload.skill = formData.aboutUs;
-        }
-
-        console.log("User profile payload:", payload);
 
         const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
           method: "PUT",
@@ -1104,11 +1254,8 @@ export default function EditProfile() {
         });
 
         const data = await res.json();
-        console.log("Server response (user profile):", data);
-
         if (!res.ok) {
           if (res.status === 401) {
-            console.log("handleSubmit: 401 Unauthorized, redirecting to login");
             handleUnauthorized();
             return;
           }
@@ -1133,6 +1280,7 @@ export default function EditProfile() {
   const defaultCenter = markerLocationAddress ||
     markerLocationShop ||
     currentLocation || { lat: 28.6139, lng: 77.209 };
+
   return (
     <>
       <Header />
@@ -1187,11 +1335,8 @@ export default function EditProfile() {
               type="text"
               name="age"
               value={formData.age}
-              onChange={(e) => {
-                let value = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
-                setFormData({ ...formData, age: value });
-              }}
-              placeholder="Enter your age"
+              onChange={handleChange}
+              placeholder="Enter your age (18-99)"
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
               required
             />
@@ -1216,27 +1361,24 @@ export default function EditProfile() {
               <option value="other">Other</option>
             </select>
           </div>
-          {/* 
-          <div>
+
+          {/* <div>
             <label className="block mb-2 font-semibold text-gray-700">
-              Full Address
+              Address
             </label>
             <input
               type="text"
               name="address"
               value={formData.address}
               readOnly
-              onClick={() => {
-                setMapFor("address");
-                setAddressModalOpen(true);
-              }}
+              onClick={() => handleOpenAddressModal("address")}
               placeholder="Click to enter address"
               className="w-full px-4 py-2 rounded-lg border border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               required
             />
-          </div> */}
+          </div>*/}
 
-          {activeTab == "worker" && (
+          {activeTab === "worker" && (
             <>
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
@@ -1285,45 +1427,10 @@ export default function EditProfile() {
                   isDisabled={!formData.category}
                 />
               </div>
-            </>
-          )}
-          {/*activeTab === "user" && (
-            <div>
-              <label className="block mb-2 font-semibold text-gray-700">
-                Are you willing to go to the shop of the service provider?
-              </label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="willingToVisitShop"
-                    value="yes"
-                    checked={formData.willingToVisitShop === "yes"}
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  Yes
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="willingToVisitShop"
-                    value="no"
-                    checked={formData.willingToVisitShop === "no"}
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  No
-                </label>
-              </div>
-            </div>
-          )*/}
 
-          {activeTab === "worker" && (
-            <>
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
-                  Upload Documents (1-5 at a time, max 5 total)
+                  Upload Documents (Exactly 2 images)
                 </label>
                 <div className="space-y-3">
                   <Select
@@ -1347,11 +1454,25 @@ export default function EditProfile() {
                     />
                   )}
                   {selectedDocType && (
-                    <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
-                      <span className="text-gray-700">
+                    <label className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#228b22] to-[#32cd32] text-white font-semibold rounded-lg cursor-pointer hover:from-green-600 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      <span>
                         {formData.documents.length > 0
-                          ? `${formData.documents.length} file(s) selected`
-                          : "Choose files (1-5)"}
+                          ? `${formData.documents.length} image(s) selected`
+                          : "Upload exactly 2 images"}
                       </span>
                       <input
                         type="file"
@@ -1359,7 +1480,7 @@ export default function EditProfile() {
                         onChange={handleChange}
                         className="hidden"
                         multiple
-                        accept="application/pdf,image/jpeg,image/png,image/avif,image/gif"
+                        accept="image/jpeg,image/png,image/avif,image/gif"
                       />
                     </label>
                   )}
@@ -1370,49 +1491,49 @@ export default function EditProfile() {
                     <h3 className="text-lg font-semibold text-gray-800">
                       Document Previews
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2 gap-4">
                       {documentPreviews.map((preview, index) => (
                         <div
                           key={`${preview}-${index}`}
-                          className="relative w-32 h-32"
+                          className="relative w-32 h-32 group"
                         >
-                          {/\.pdf$/i.test(preview) ? (
-                            <a
-                              href={preview}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="w-full h-full flex items-center justify-center bg-gray-200 rounded-lg shadow-md text-gray-700"
-                            >
-                              View PDF
-                            </a>
-                          ) : (
-                            <img
-                              src={preview}
-                              alt={`Document Preview ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg shadow-md"
-                              onError={(e) => {
-                                console.error(
-                                  `Error loading preview for document ${
-                                    index + 1
-                                  }, URL:`,
-                                  preview
-                                );
-                                // toast.error(
-                                //   `Failed to load document ${
-                                //     formData?.documents[index]?.documentName ||
-                                //     "Unknown"
-                                //   }. Please re-upload.`,
-                                //   {
-                                //     toastId: `previewError-${index}`,
-                                //   }
-                                // );
-                              }}
-                            />
-                          )}
+                          <img
+                            src={preview}
+                            alt={`Document Preview ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg shadow-md"
+                            onError={(e) => {
+                              console.error(
+                                `Error loading preview for document ${
+                                  index + 1
+                                }, URL:`,
+                                preview
+                              );
+                            }}
+                          />
                           <div className="absolute top-0 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded-br-lg">
                             {formData?.documents[index]?.documentName ||
                               "Unknown"}
                           </div>
+                          <button
+                            onClick={() => handleDeleteDocument(index, preview)}
+                            className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1.5  transition-opacity bg-red-700"
+                            title="Delete document"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -1425,8 +1546,22 @@ export default function EditProfile() {
                   Upload Business Images (1-5 at a time, max 5 total)
                 </label>
                 <div className="space-y-3">
-                  <label className="w-full flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
-                    <span className="text-gray-700">
+                  <label className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#228b22] to-[#32cd32] text-white font-semibold rounded-lg cursor-pointer hover:from-green-600 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <span>
                       {formData.businessImage.length > 0
                         ? `${formData.businessImage.length} image(s) selected`
                         : "Choose images (1-5)"}
@@ -1442,13 +1577,13 @@ export default function EditProfile() {
                   </label>
                 </div>
 
-                {profile?.businessImage?.length > 0 && (
+                {businessImagePreviews.length > 0 && (
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold text-gray-800">
                       Business Image Previews
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2">
-                      {profile.businessImage.map((preview, index) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2 gap-4">
+                      {businessImagePreviews.map((preview, index) => (
                         <div
                           key={`${preview}-${index}`}
                           className="relative w-32 h-32"
@@ -1524,10 +1659,7 @@ export default function EditProfile() {
                     name="shopAddress"
                     value={formData.shopAddress}
                     readOnly
-                    onClick={() => {
-                      setMapFor("shopAddress");
-                      setAddressModalOpen(true);
-                    }}
+                    onClick={() => handleOpenAddressModal("shopAddress")}
                     placeholder="Click to enter shop address"
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                     required
@@ -1539,25 +1671,34 @@ export default function EditProfile() {
 
           <div>
             <label className="block mb-2 font-semibold text-gray-700">
-              About My Skill
+              {activeTab === "worker" ? "About My Skill" : "About Us"}
             </label>
             <textarea
               name="aboutUs"
-              value={formData.aboutUs}
+              value={activeTab === "worker" ? formData.skill : formData.aboutUs}
               onChange={handleChange}
-              placeholder="Describe your skill..."
+              placeholder={
+                activeTab === "worker"
+                  ? "Describe your skill (min 10 characters)..."
+                  : "Tell us about yourself (min 10 characters)..."
+              }
               maxLength={500}
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
               rows="4"
+              required
             ></textarea>
             <p className="text-sm text-gray-500 mt-1">
-              {formData.aboutUs.length}/500 characters
+              {
+                (activeTab === "worker" ? formData.skill : formData.aboutUs)
+                  .length
+              }
+              /500 characters
             </p>
           </div>
 
           <button
             type="submit"
-            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition shadow-md hover:shadow-lg block"
+            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition shadow-md hover:shadow-lg block"
           >
             Submit
           </button>
@@ -1600,7 +1741,16 @@ export default function EditProfile() {
             />
             <div className="mt-4 flex justify-between">
               <button
-                onClick={() => setAddressModalOpen(false)}
+                onClick={() => {
+                  setAddressModalOpen(false);
+                  setTempAddress({
+                    title: "",
+                    landmark: "",
+                    address: "",
+                    latitude: null,
+                    longitude: null,
+                  });
+                }}
                 className="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
               >
                 Cancel

@@ -18,6 +18,7 @@ import Default from "../../assets/default-image.jpg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Phone } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -44,6 +45,8 @@ export default function Details() {
   const getUserId = () => {
     return profile?.userId || localStorage.getItem("userId") || "default";
   };
+
+
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -139,6 +142,7 @@ export default function Details() {
   let emergencySubcategory_names = [];
   let isProfileComplete = false;
   let isShop = false;
+	let phone = "N/A";
   let rating = "N/A";
   let referral_code = "N/A";
   let isEmergencyOn = false;
@@ -157,6 +161,7 @@ console.log("Profile Object:", profile); // Debugging line
     businessAddress = profile.businessAddress || null;
     businessImage = profile.businessImage || [];
     customerReview = profile.customerReview || [];
+		phone = profile.phone || "N/A";
     emergencySubcategory_names = profile.emergencySubcategory_names || [];
     isProfileComplete = profile.isProfileComplete || false;
     isShop = profile.isShop || false;
@@ -736,6 +741,7 @@ console.log("Profile Object:", profile); // Debugging line
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
+                  <span>Phone: {phone}</span>
                 </div>
                 <div
                   className={`p-4 shadow-xl max-w-full sm:max-w-[600px] mt-6 sm:mt-10 rounded-xl bg-white h-[260px]`}
@@ -795,6 +801,7 @@ console.log("Profile Object:", profile); // Debugging line
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
+                  <span>Phone: {phone}</span>
                   <span>Shop Owner: {isShop ? "Yes" : "No"}</span>
                   <span>Referral Code: {referral_code}</span>
                   <span>
