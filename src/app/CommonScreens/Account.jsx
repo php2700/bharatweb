@@ -138,11 +138,11 @@ export default function Account() {
               {bannerImages.map((banner, index) => (
                 <div key={index}>
                   <img
-                    src={banner || "/src/assets/default.png"} // Fallback image
+                    src={banner || "/src/assets/banner.png"} // Fallback image
                     alt={`Banner ${index + 1}`}
                     className="w-full h-[400px] object-cover"
                     onError={(e) => {
-                      e.target.src = "/src/assets/default.png"; // Fallback on image load error
+                      e.target.src = "/src/assets/banner.png"; // Fallback on image load error
                     }}
                   />
                 </div>

@@ -22,6 +22,7 @@ export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
+	const bidding_offer_id = localStorage.getItem("bidding_offer_id");
 
   // Modal States
   const [isBidModal, setIsBidModal] = useState(false); // Fixed typo (isBidModel to isBidModal)
@@ -163,7 +164,7 @@ export default function Bid() {
         );
 
         const result = await res.json();
-        // console.log("Fetch Negotiation Result:", result);
+        console.log("Fetch Negotiation Result:", result);
 
         if (result) {
           // ✅ Negotiation found
@@ -192,13 +193,23 @@ export default function Bid() {
 
     try {
       const token = localStorage.getItem("bharat_token");
+			console.log("worker", worker)
+			console.log("payload", {
+          order_id: worker?.order_id,
+          bidding_offer_id,
+          service_provider,
+          user: worker?.user_id?._id,
+          initiator: "service_provider",
+          offer_amount: Number(offerAmount),
+          message: `Can you do it for ${offerAmount}?`,
+        }, )
       const response = await axios.post(
         `${BASE_URL}/negotiations/start`,
         {
           order_id: worker?.order_id,
-          bidding_offer_id: data?._id,
+          bidding_offer_id,
           service_provider,
-          user: worker?.user,
+          user: worker?.user_id?._id,
           initiator: "service_provider",
           offer_amount: Number(offerAmount),
           message: `Can you do it for ${offerAmount}?`,
@@ -210,6 +221,8 @@ export default function Bid() {
           },
         }
       );
+
+
 
       if (response.status == 201) {
         setOffer("");

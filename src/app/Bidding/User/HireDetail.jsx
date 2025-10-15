@@ -502,11 +502,11 @@ const handlePayment = async (order_id, serviceProviderId) => {
               {bannerImages.map((banner, index) => (
                 <div key={index}>
                   <img
-                    src={banner || "/src/assets/profile/default.png"}
+                    src={banner || "/src/assets/banner.png"}
                     alt={`Banner ${index + 1}`}
                     className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover"
                     onError={(e) => {
-                      e.target.src = "/src/assets/profile/default.png";
+                      e.target.src = "/src/assets/banner.png";
                     }}
                   />
                 </div>
@@ -521,7 +521,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
 
         <div className="container max-w-6xl mx-auto my-10">
           <div className="text-xl sm:text-2xl font-bold mb-6">
-            Direct Hiring
+            Bidding Hiring
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">

@@ -37,9 +37,9 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
       );
 
       const data = await response.json();
-
       if (response.ok) {
         toast.success("Bid placed successfully ✅");
+				localStorage.setItem("bidding_offer_id", data?.data?._id);
         onBidSuccess(amount, description);
         onClose();
       } else {

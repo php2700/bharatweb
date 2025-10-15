@@ -35,7 +35,7 @@ export default function BiddinggetWorkDetail() {
   const [error, setError] = useState(null);
   const [categoryId, setCategoryId] = useState(null);
   const [subCategoryIds, setSubCategoryIds] = useState([]);
-	const [assignedWorker, setAssignedWorker] = useState(null);
+  const [assignedWorker, setAssignedWorker] = useState(null);
   const [providers, setProviders] = useState([]);
   const [tab, setTab] = useState("bidder");
   const [orderDetail, setOrderDetail] = useState(null);
@@ -152,7 +152,7 @@ export default function BiddinggetWorkDetail() {
       );
       // console.log("Order Response:", response);
       if (response.status === 200) {
-				setAssignedWorker(response.data.assignedWorker || null);
+        setAssignedWorker(response.data.assignedWorker || null);
         const order = response.data.data;
         setOrderDetail(order);
         setCategoryId(order?.category_id?._id || null);
@@ -912,15 +912,17 @@ export default function BiddinggetWorkDetail() {
             </div>
           </div>
         )}
-
-        <Accepted
-          serviceProvider={orderDetail?.service_provider_id}
-          user_id={orderDetail?.user_id._id}
-          assignedWorker={assignedWorker}
-          paymentHistory={orderDetail?.service_payment?.payment_history}
-          orderId={id}
-          hireStatus={orderDetail?.hire_status}
-        />
+        {orderDetail?.hire_status === "accepted" &&
+          orderDetail?.platform_fee_paid && (
+            <Accepted
+              serviceProvider={orderDetail?.service_provider_id}
+              user_id={orderDetail?.user_id._id}
+              assignedWorker={assignedWorker}
+              paymentHistory={orderDetail?.service_payment?.payment_history}
+              orderId={id}
+              hireStatus={orderDetail?.hire_status}
+            />
+          )}
 
         {orderDetail?.hire_status === "accepted" &&
           orderDetail?.platform_fee_paid && (
