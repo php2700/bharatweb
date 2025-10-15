@@ -15,19 +15,24 @@ import paymentConfirmationImage from "../../../assets/paymentconfirmation.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useSelector } from "react-redux";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
 
 const Post = () => {
   const navigate = useNavigate();
+  const { profile } = useSelector((state) => state.user);
+  const [showOptions, setShowOptions] = useState();
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [address, setAddress] = useState();
+
   const [error, setError] = useState(null);
-	const [platformFee, setPlatformFee] = useState("");
+  const [platformFee, setPlatformFee] = useState("");
   const [formData, setFormData] = useState({
     google_address: "",
     detailed_address: "",
@@ -69,24 +74,31 @@ const Post = () => {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log("Banner API response:", response.data); // Debug response
 
       if (response.data?.success) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -102,7 +114,7 @@ const Post = () => {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
- useEffect(() => {
+  useEffect(() => {
     const fetchPlatformFee = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/get-fee/emergency`, {
@@ -112,7 +124,7 @@ const Post = () => {
         });
         // 🔹 Assuming response structure is { data: { fee: 200 } } or { fee: 200 }
         // Adjust the path based on your API response structure
-        const fee = res.data.data?.fee  // Fallback to 200 if not found
+        const fee = res.data.data?.fee; // Fallback to 200 if not found
         setPlatformFee(fee);
       } catch (error) {
         console.error("Error fetching platform fee:", error);
@@ -133,7 +145,7 @@ const Post = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response,"ggggggggg")
+        console.log(response, "ggggggggg");
         setCategories(response.data.data || []);
         setLoading(false);
       } catch (err) {
@@ -174,31 +186,31 @@ const Post = () => {
   }, [selectedCategory]);
 
   // Handle map click
-  const handleMapClick = async (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-    setFormData((prev) => ({
-      ...prev,
-      coordinates: { lat, lng },
-    }));
+  // const handleMapClick = async (event) => {
+  //   const lat = event.latLng.lat();
+  //   const lng = event.latLng.lng();
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     coordinates: { lat, lng },
+  //   }));
 
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4`
-      );
-      if (response.data.results.length > 0) {
-        const address = response.data.results[0].formatted_address;
-        setFormData((prev) => ({
-          ...prev,
-          google_address: address,
-        }));
-      } else {
-        setError("Could not fetch address for the selected location");
-      }
-    } catch (err) {
-      setError("Error fetching address");
-    }
-  };
+  //   try {
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4`
+  //     );
+  //     if (response.data.results.length > 0) {
+  //       const address = response.data.results[0].formatted_address;
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         google_address: address,
+  //       }));
+  //     } else {
+  //       setError("Could not fetch address for the selected location");
+  //     }
+  //   } catch (err) {
+  //     setError("Error fetching address");
+  //   }
+  // };
 
   // Handle place selection
   const handlePlaceChanged = () => {
@@ -253,10 +265,10 @@ const Post = () => {
     if (!selectedCategory) errors.category_id = "Category is required";
     if (selectedSubcategories.length === 0)
       errors.sub_category_ids = "At least one subcategory is required";
-    if (!formData.google_address)
-      errors.google_address = "Google address is required";
-    if (!formData.detailed_address)
-      errors.detailed_address = "Detailed address is required";
+    // if (!formData.google_address)
+    //   errors.google_address = "Google address is required";
+    // if (!formData.detailed_address)
+    //   errors.detailed_address = "Detailed address is required";
     if (!formData.contact) errors.contact = "Contact number is required";
     if (!formData.deadline) errors.deadline = "Deadline is required";
     // if (formData.images.length === 0)
@@ -281,7 +293,12 @@ const Post = () => {
       "sub_category_ids",
       selectedSubcategories.map((option) => option.value).join(",")
     );
-    submissionData.append("google_address", formData.google_address);
+    // submissionData.append("google_address", formData.google_address);
+    submissionData.append(
+      "google_address",
+      address || profile?.location?.address
+    );
+    submissionData.append("address", address || profile?.location?.address);
     submissionData.append("detailed_address", formData.detailed_address);
     submissionData.append("contact", formData.contact);
     submissionData.append("deadline", formData.deadline);
@@ -300,12 +317,14 @@ const Post = () => {
           },
         }
       );
-      if (response.data.razorpay_order) {
-        const { id, amount } = response.data.razorpay_order;
-        setRazorpayOrder({ id, amount: amount / 100 }); // Convert paise to INR
-        setShowPaymentModal(true); // Trigger payment modal
+      console.log("response=======", response);
+      if (response.data) {
+        navigate(`/emergency/order-detail/${response.data?.order?._id}`);
+        // const { id, amount } = response.data.razorpay_order;
+        // setRazorpayOrder({ id, amount: amount / 100 }); // Convert paise to INR
+        // setShowPaymentModal(true); // Trigger payment modal
       } else {
-        setError("No Razorpay order found in response");
+        setError("Not add a post");
       }
     } catch (err) {
       setError(
@@ -419,6 +438,21 @@ const Post = () => {
       })
     : "N/A";
 
+  const updateAddress = async (location) => {
+    try {
+      let obj = {
+        latitude: location?.latitude,
+        longitude: location?.longitude,
+        address: location?.address,
+      };
+      let res = await axios.put(`${BASE_URL}/user/updateLocation`, obj, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (error) {
+      console.log(error, "gg");
+    }
+  };
+
   return (
     <>
       <Header />
@@ -471,7 +505,7 @@ const Post = () => {
             {/* SubCategories */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                SubCategories
+                Emergency SubCategories
               </label>
               <Select
                 isMulti
@@ -480,7 +514,7 @@ const Post = () => {
                 onChange={handleSubcategoryChange}
                 className="w-full"
                 classNamePrefix="select"
-                placeholder="Select Multiple/Single SubCategories"
+                placeholder="Select Emergency SubCategories"
                 styles={{
                   control: (base) => ({
                     ...base,
@@ -495,7 +529,7 @@ const Post = () => {
                   }),
                 }}
               />
-              {validationErrors.sub_category_ids && (
+              {validationErrors?.sub_category_ids && (
                 <p className="text-red-500 text-sm">
                   {validationErrors.sub_category_ids}
                 </p>
@@ -503,7 +537,7 @@ const Post = () => {
             </div>
 
             {/* Google Address */}
-            <div>
+            {/* <div>
               <label className="block text-sm mb-1 font-bold">
                 Google Address (Search or Click on Map)
               </label>
@@ -560,10 +594,97 @@ const Post = () => {
                   {validationErrors.google_address}
                 </p>
               )}
-            </div>
+            </div> */}
+
+            <label className="block">
+              <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
+                Address
+              </span>
+              <div className="relative">
+                <input
+                  id="address-input"
+                  type="text"
+                  readOnly
+                  value={address || profile?.location?.address}
+                  placeholder="Enter or select address"
+                  className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
+                  aria-invalid={validationErrors.address ? "true" : "false"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowOptions(!showOptions)}
+                  className="absolute right-3 top-2 px-2 py-1 text-sm rounded-lg border bg-gray-100 hover:bg-gray-200"
+                >
+                  {showOptions ? "▲" : "▼"}
+                </button>
+                {showOptions && (
+                  <div className="absolute top-full left-0 mt-2 w-full rounded-lg border border-gray-300 bg-white shadow-lg p-3 z-50">
+                    {profile?.full_address?.map((loc) => (
+                      <label
+                        key={loc.address}
+                        className="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 rounded"
+                      >
+                        <input
+                          type="radio"
+                          name="address"
+                          value={loc.address}
+                          checked={address === loc?.address}
+                          onClick={() => {
+                            setAddress(loc.address);
+                            setShowOptions(false);
+                            updateAddress(loc);
+                          }}
+                        />
+                        <div className="flex flex-col bg-gray-50 rounded-lg p-2 w-full">
+                          <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                            <div>
+                              <span className="block font-semibold text-xs">
+                                Title
+                              </span>
+                              <span className="text-[12px] text-gray-800">
+                                {loc.title}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="block font-semibold text-xs">
+                                House No
+                              </span>
+                              <span className="text-gray-700 text-[12px]">
+                                {loc.houseno ? loc?.houseno : "N/A"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="block font-semibold text-xs">
+                                Area
+                              </span>
+                              <span className="text-gray-700 text-[12px]">
+                                {loc.area ? loc.area : "N/A"}
+                              </span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="block font-semibold text-xs">
+                                Full Address
+                              </span>
+                              <span className="text-gray-600 text-[12px]">
+                                {loc.address}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {validationErrors.address && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.address}
+                </p>
+              )}
+            </label>
 
             {/* Detailed Address */}
-            <div>
+            {/* <div>
               <label className="block text-sm mb-1 font-bold">
                 Detailed Address (Landmark)
               </label>
@@ -584,7 +705,7 @@ const Post = () => {
                   {validationErrors.detailed_address}
                 </p>
               )}
-            </div>
+            </div>  */}
 
             {/* Contact */}
             <div>
@@ -594,7 +715,7 @@ const Post = () => {
                 name="contact"
                 value={formData.contact}
                 onChange={handleInputChange}
-                placeholder="0123456789"
+                placeholder="Enter Contact Number"
                 className={`w-full border ${
                   validationErrors.contact
                     ? "border-red-500"
@@ -609,9 +730,10 @@ const Post = () => {
             </div>
 
             {/* Deadline */}
-            <div>
+            {/* <div>
               <label className="block text-sm mb-1 font-bold">
-Add Completion time              </label>
+                Add Completion time{" "}
+              </label>
               <input
                 type="datetime-local"
                 name="deadline"
@@ -628,6 +750,36 @@ Add Completion time              </label>
                   {validationErrors.deadline}
                 </p>
               )}
+            </div> */}
+            <div>
+              <label className="block text-sm mb-1 font-bold">
+                Add Completion time
+              </label>
+
+              <div
+                className={`w-full border rounded-md px-3 py-2 cursor-pointer ${
+                  validationErrors.deadline
+                    ? "border-red-500"
+                    : "border-green-500"
+                }`}
+                onClick={() =>
+                  document.getElementById("deadlineInput").showPicker?.()
+                }
+              >
+                <input
+                  id="deadlineInput"
+                  type="datetime-local"
+                  name="deadline"
+                  value={formData.deadline}
+                  onChange={handleInputChange}
+                  className="w-full bg-transparent outline-none cursor-pointer"
+                />
+                {validationErrors.deadline && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.deadline}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Upload Image */}

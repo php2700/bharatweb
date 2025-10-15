@@ -33,6 +33,11 @@ export default function ViewProfile() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [assignData, setAssignData] = useState();
+
+  const token = localStorage.getItem("bharat_token");
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -41,24 +46,29 @@ export default function ViewProfile() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      console.log("Banner API response:", response.data); // Debug response
-
-      if (response.data?.status) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
-          setBannerImages(response.data.images);
+      if (response.data?.success) {
+        if (
+          Array.isArray(response?.data?.images) &&
+          response.data.images?.length > 0
+        ) {
+          setBannerImages(response.data?.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -122,9 +132,61 @@ export default function ViewProfile() {
     fetchData();
   }, [id, orderData?.hire_status]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => console.log("Razorpay script loaded");
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  console.log(orderData, "gggggggg");
+
+  // const handleHire = async (providerId) => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${BASE_URL}/emergency-order/assignEmergencyOrder/${id}`,
+  //       {
+  //         service_provider_id: providerId,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("Hire Response:", response.data);
+  //     setIsHired(true);
+  //     setServiceProviders([]);
+  //     // Refresh order data after hiring
+  //     const orderResponse = await axios.get(
+  //       `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+  //         },
+  //       }
+  //     );
+  //     setOrderData(orderResponse.data.data);
+  //     setAssignedWorker(orderResponse.data.assignedWorker || null);
+  //   } catch (err) {
+  //     setError("Failed to hire provider. Please try again later.");
+  //     console.error("Error:", err);
+  //   }
+  // };
+
   const handleHire = async (providerId) => {
+    setIsSubmitting(true);
+    setError("");
+
     try {
-      const response = await axios.post(
+      const assignRes = await axios.post(
         `${BASE_URL}/emergency-order/assignEmergencyOrder/${id}`,
         {
           service_provider_id: providerId,
@@ -136,24 +198,177 @@ export default function ViewProfile() {
           },
         }
       );
-      console.log("Hire Response:", response.data);
-      setIsHired(true);
-      setServiceProviders([]);
-      // Refresh order data after hiring
-      const orderResponse = await axios.get(
-        `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
-          },
-        }
-      );
-      setOrderData(orderResponse.data.data);
-      setAssignedWorker(orderResponse.data.assignedWorker || null);
+
+      console.log("Assign Response:", assignRes.data);
+      const { razorpay_order } = assignRes.data?.data;
+      if (!razorpay_order) {
+        throw new Error("Razorpay order not received from backend");
+      }
+      // 2️⃣ Configure Razorpay checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpay_order.amount,
+        currency: "INR",
+        name: "Bharat App",
+        description: "Emergency Hiring Payment",
+        order_id: razorpay_order.id,
+        theme: { color: "#228B22" },
+
+        handler: async function (paymentResponse) {
+          try {
+            console.log(paymentResponse, "paymentres");
+            const verifyRes = await axios.post(
+              `${BASE_URL}/emergency-order/verify-platform-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "bharat_token"
+                  )}`,
+                },
+              }
+            );
+
+            console.log("Verify Response:", verifyRes.data);
+
+            if (verifyRes.status === 200) {
+              // 4️⃣ Payment verified successfully → refresh order data
+              const orderResponse = await axios.get(
+                `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem(
+                      "bharat_token"
+                    )}`,
+                  },
+                }
+              );
+
+              setOrderData(orderResponse.data.data);
+              setAssignedWorker(orderResponse.data.assignedWorker || null);
+              setIsHired(true);
+              setServiceProviders([]);
+
+              // navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
+            }
+          } catch (err) {
+            console.error("Error verifying payment:", err);
+            setError("Payment verification failed. Please try again.");
+          }
+        },
+        prefill: {
+          name: "Rahul",
+          email: "rahul@example.com",
+          contact: "9999999999",
+        },
+      };
+
+      // 5️⃣ Open Razorpay payment window
+      if (window.Razorpay) {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        setError("Razorpay SDK not loaded. Please refresh the page.");
+      }
     } catch (err) {
-      setError("Failed to hire provider. Please try again later.");
-      console.error("Error:", err);
+      console.error("Error during hire:", err);
+      setError("Failed to assign provider. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePayment = async () => {
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const razorpay_order = {
+        amount: orderData?.platform_fee,
+        id: orderData?.razorOrderIdPlatform,
+      };
+      if (!razorpay_order) {
+        throw new Error("Razorpay order not received from backend");
+      }
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpay_order.amount,
+        currency: "INR",
+        name: "Bharat App",
+        description: "Emergency Hiring Payment",
+        order_id: razorpay_order.id,
+        theme: { color: "#228B22" },
+
+        handler: async function (paymentResponse) {
+          try {
+            console.log(paymentResponse, "paymentres");
+            const verifyRes = await axios.post(
+              `${BASE_URL}/emergency-order/verify-platform-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "bharat_token"
+                  )}`,
+                },
+              }
+            );
+
+            console.log("Verify Response:", verifyRes.data);
+
+            if (verifyRes.status === 200) {
+              const orderResponse = await axios.get(
+                `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem(
+                      "bharat_token"
+                    )}`,
+                  },
+                }
+              );
+
+              setOrderData(orderResponse.data.data);
+              setAssignedWorker(orderResponse.data.assignedWorker || null);
+              setIsHired(true);
+              setServiceProviders([]);
+
+              // navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
+            }
+          } catch (err) {
+            console.error("Error verifying payment:", err);
+            setError("Payment verification failed. Please try again.");
+          }
+        },
+        prefill: {
+          name: "Rahul",
+          email: "rahul@example.com",
+          contact: "9999999999",
+        },
+      };
+
+      // 5️⃣ Open Razorpay payment window
+      if (window.Razorpay) {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        setError("Razorpay SDK not loaded. Please refresh the page.");
+      }
+    } catch (err) {
+      console.error("Error during hire:", err);
+      setError("Failed to assign provider. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -245,6 +460,7 @@ export default function ViewProfile() {
     );
   }
 
+  console.log(orderData, "gggggggggggggg***", filteredProviders);
   return (
     <>
       <Header />
@@ -351,9 +567,7 @@ export default function ViewProfile() {
                   Cancelled by User
                 </span>
               ) : orderData?.hire_status === "completed" ? (
-                <span
-                  className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer"
-                >
+                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
                   Task Completed
                 </span>
               ) : orderData?.hire_status !== "assigned" ? (
@@ -366,125 +580,143 @@ export default function ViewProfile() {
               ) : null}
             </div>
 
-            {(orderData?.hire_status === "assigned" || orderData?.hire_status === "completed") && (
-              <>
-                <Accepted
-                  serviceProvider={orderData?.service_provider_id}
-                  assignedWorker={assignedWorker}
-                  paymentHistory={orderData?.service_payment?.payment_history}
-                  orderId={id}
-                  hireStatus={orderData?.hire_status}
-                />
+            {(orderData?.hire_status === "assigned" ||
+              orderData?.hire_status === "completed") &&
+              orderData.platform_fee_paid && (
+                <>
+                  <Accepted
+                    serviceProvider={orderData?.service_provider_id}
+                    assignedWorker={assignedWorker}
+                    paymentHistory={orderData?.service_payment?.payment_history}
+                    orderId={id}
+                    hireStatus={orderData?.hire_status}
+                  />
 
-                {orderData?.hire_status === "assigned" && (
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    <div className="relative max-w-2xl mx-auto">
-                      <div className="relative z-10">
-                        <img
-                          src={Warning}
-                          alt="Warning"
-                          className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
-                        />
+                  {orderData?.hire_status === "assigned" && (
+                    <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                      <div className="relative max-w-2xl mx-auto">
+                        <div className="relative z-10">
+                          <img
+                            src={Warning}
+                            alt="Warning"
+                            className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                          />
+                        </div>
+                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+                          <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                            Warning Message
+                          </h2>
+                          <p className="text-gray-700 text-sm md:text-base">
+                            Lorem Ipsum is simply dummy text...
+                          </p>
+                        </div>
                       </div>
-                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
-                        <h2 className="text-[#FE2B2B] font-bold -mt-2">Warning Message</h2>
-                        <p className="text-gray-700 text-sm md:text-base">
-                          Lorem Ipsum is simply dummy text...
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="flex space-x-4">
-                      <button
-                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                        onClick={handleMarkComplete}
-                      >
-                        Mark as Complete
-                      </button>
-                      <ReviewModal
-                        show={showCompletedModal}
-                        onClose={() => setShowCompletedModal(false)}
-                        service_provider_id={orderData?.service_provider_id._id}
-                        orderId={id}
-                        type="emergency"
-                      />
-                      <Link to={`/dispute/${id}/emergency`}>
+                      <div className="flex space-x-4">
                         <button
-                          className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                          className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                          onClick={handleMarkComplete}
                         >
-                          Cancel Task and Create Dispute
+                          Mark as Complete
                         </button>
-                      </Link>
+                        <ReviewModal
+                          show={showCompletedModal}
+                          onClose={() => setShowCompletedModal(false)}
+                          service_provider_id={
+                            orderData?.service_provider_id._id
+                          }
+                          orderId={id}
+                          type="emergency"
+                        />
+                        <Link to={`/dispute/${id}/emergency`}>
+                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                            Cancel Task and Create Dispute
+                          </button>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
           </div>
         </div>
       </div>
 
-      {!isHired && orderData?.hire_status !== "cancelled" && (
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <div className="relative mb-4">
-            <input
-              type="text"
-              placeholder="Search providers by name..."
-              className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
-              value={searchQuery}
-              onChange={handleSearch}
-            />
-            <span className="absolute left-3 top-2.5">
-              <img
-                src={Search}
-                alt="Search"
-                className="w-5 h-5 text-gray-400"
+      {!isHired &&
+        orderData?.hire_status !== "cancelled" &&
+        !orderData?.platform_fee_paid && (
+          <div className="container mx-auto px-4 py-6 max-w-4xl">
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Search providers by name..."
+                className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
+                value={searchQuery}
+                onChange={handleSearch}
               />
-            </span>
-          </div>
+              <span className="absolute left-3 top-2.5">
+                <img
+                  src={Search}
+                  alt="Search"
+                  className="w-5 h-5 text-gray-400"
+                />
+              </span>
+            </div>
 
-          {filteredProviders.length > 0 ? (
-            <div className="space-y-4">
-              {filteredProviders.map((provider) => (
-                <div
-                  key={provider._id}
-                  className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
-                >
-                  <img
-                    src={provider.profile_pic || Profile}
-                    alt={`Profile of ${provider.full_name || "Provider"}`}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <p className="text-lg font-semibold">
-                      {provider.full_name || "Unknown Provider"}
-                    </p>
-                    <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                      {provider?.location?.address || "No Address Provided"}
-                    </p>
-                    <Link
-                      to={`/profile-details/${provider._id}/emergency`}
-                      className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
-                    >
-                      View Profile
-                    </Link>
-                  </div>
-                  <button
-                    className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
-                    onClick={() => handleHire(provider._id)}
+            {filteredProviders.length > 0 ? (
+              <div className="space-y-4">
+                {filteredProviders?.map((provider) => (
+                  <div
+                    key={provider._id}
+                    className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
                   >
-                    Hire
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-600">
-              No service providers found.
-            </div>
-          )}
-        </div>
-      )}
+                    <img
+                      src={provider.profile_pic || Profile}
+                      alt={`Profile of ${provider.full_name || "Provider"}`}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <p className="text-lg font-semibold">
+                        {provider.full_name || "Unknown Provider"}
+                      </p>
+                      <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                        {provider?.location?.address || "No Address Provided"}
+                      </p>
+                      <Link
+                        to={`/profile-details/${provider._id}/emergency`}
+                        className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                      >
+                        View Profile
+                      </Link>
+                    </div>
+                    <button
+                      className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+                      onClick={() => handleHire(provider?._id)}
+                    >
+                      Hire
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-600">
+                No service providers found.
+              </div>
+            )}
+          </div>
+        )}
+
+      {!orderData?.platform_fee_paid &&
+        orderData?.hire_status === "assigned" && (
+          <div className="flex justify-center">
+            <button
+              className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+              onClick={handlePayment}
+            >
+              Pay
+            </button>
+          </div>
+        )}
 
       {/* Bottom Banner Slider */}
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
