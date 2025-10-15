@@ -190,11 +190,12 @@ export default function ServiceProviderHome() {
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
+          console.log(data.data,"ffff")
           setEmergency(
-            data.data.map((item) => ({
+            data?.data.map((item) => ({
               id: item._id,
               image: item.image_urls[0] || "/src/assets/directHiring/his-work.png",
-              work: item.title || "Emergency task",
+              work: item.category_id?.name || "Emergency task",
               // description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
               amount: item.platform_fee || "₹200",
               location: item.google_address || "Indore M.P.",
@@ -336,7 +337,7 @@ export default function ServiceProviderHome() {
   const visibleDirectHiring = directHiring.slice(0, 4);
   const visibleBidding = bidding.slice(0, 4);
   const visibleEmergency = emergency.slice(0, 4);
-
+console.log(visibleEmergency,"gggggggg")
   return (
     <>
       <Header />
