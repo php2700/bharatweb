@@ -270,6 +270,8 @@ const Post = () => {
     // if (!formData.detailed_address)
     //   errors.detailed_address = "Detailed address is required";
     if (!formData.contact) errors.contact = "Contact number is required";
+    else if (formData.contact.trim()?.length != 10)
+      errors.contact = "Contact should be 10 digits.";
     if (!formData.deadline) errors.deadline = "Deadline is required";
     // if (formData.images.length === 0)
     //   errors.images = "At least one image is required";
@@ -477,7 +479,7 @@ const Post = () => {
             {/* Work Category */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                Work Category
+                Work Category<span className="text-red-500">*</span>
               </label>
               <select
                 value={selectedCategory}
@@ -505,7 +507,7 @@ const Post = () => {
             {/* SubCategories */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                Emergency SubCategories
+                Emergency SubCategories<span className="text-red-500">*</span>
               </label>
               <Select
                 isMulti
@@ -597,7 +599,7 @@ const Post = () => {
             </div> */}
 
             <label className="block">
-              <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
+              <span className="text-sm font-bold flex items-center justify-between">
                 Address
               </span>
               <div className="relative">
@@ -709,12 +711,19 @@ const Post = () => {
 
             {/* Contact */}
             <div>
-              <label className="block text-sm mb-1 font-bold">Contact</label>
+              <label className="block text-sm mb-1 font-bold">
+                Contact <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="contact"
+               
                 value={formData.contact}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
+                   onChange={(e) => {
+      const onlyNums = e.target.value.replace(/\D/g, "");
+      handleInputChange({ target: { name: "contact", value: onlyNums } });
+    }}
                 placeholder="Enter Contact Number"
                 className={`w-full border ${
                   validationErrors.contact
@@ -753,7 +762,7 @@ const Post = () => {
             </div> */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                Add Completion time
+                Add Completion time<span className="text-red-500">*</span>
               </label>
 
               <div
@@ -774,27 +783,52 @@ const Post = () => {
                   onChange={handleInputChange}
                   className="w-full bg-transparent outline-none cursor-pointer"
                 />
-                {validationErrors.deadline && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {validationErrors.deadline}
-                  </p>
-                )}
               </div>
+              {validationErrors.deadline && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.deadline}
+                </p>
+              )}
             </div>
 
-            {/* Upload Image */}
             <div>
               <label className="block text-sm mb-1 font-bold">
-                Upload Image (Max 5)
+                Upload Image (Optional, 5 Max)
               </label>
-              <input
+              {/* <input
                 type="file"
                 multiple
                 accept="image/*"
                 onChange={handleFileChange}
                 className={`w-full border
                  rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500`}
-              />
+              /> */}
+              <label
+                htmlFor="fileInput"
+                className="
+    flex flex-col items-center justify-center
+    w-full h-28
+    border border-gray-300
+    text-green-700 text-base font-medium text-center
+    rounded-lg
+    bg-gray-50
+    cursor-pointer
+    hover:bg-green-50 hover:border-green-500
+    focus-within:ring-2 focus-within:ring-green-500
+    transition-all duration-200
+  "
+              >
+                Upload image
+                <input
+                  id="fileInput"
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </label>
+
               {/* {validationErrors.images && (
                 <p className="text-red-500 text-sm">
                   {validationErrors.images}
