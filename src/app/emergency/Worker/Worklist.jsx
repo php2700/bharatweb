@@ -112,12 +112,11 @@ export default function Worklist() {
             Authorization: `Bearer ${token}`,
           },
         });
-				console.log(response.data);
         // Map API response to the expected structure
-        const mappedTasks = response.data.data.map((task) => ({
+        const mappedTasks = response.data.data?.map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image_url[0] || Work, // Fallback to Work image
+          image: task.image_urls?.[0] || task.image_url?.[0] || Work, // Fallback to Work image
           name: task.category_id?.name || task.title || "Unnamed Task",
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
@@ -143,6 +142,7 @@ export default function Worklist() {
             "Unknown Location",
         }));
 
+        console.log(mappedTasks, "maoppedtasks");
         setTaskData(mappedTasks);
         setError(null);
       } catch (err) {

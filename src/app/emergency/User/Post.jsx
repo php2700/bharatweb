@@ -51,10 +51,10 @@ const Post = () => {
   const [razorpayOrder, setRazorpayOrder] = useState(null);
 
   // Load Google Maps API
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
-    libraries: ["places"],
-  });
+  // const { isLoaded } = useJsApiLoader({
+  //   googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
+  //   libraries: ["places"],
+  // });
 
   // Load Razorpay SDK dynamically
   useEffect(() => {

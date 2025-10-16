@@ -17,7 +17,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
 
 export default function ServiceProviderHome() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [isEmergencyOn, setIsEmergencyOn] = useState(true);
   const token = localStorage.getItem("bharat_token");
   const [bannerImages, setBannerImages] = useState([]);
@@ -95,7 +95,8 @@ export default function ServiceProviderHome() {
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
+              image:
+                item.image_url[0] || "/src/assets/directHiring/his-work.png",
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -144,7 +145,8 @@ export default function ServiceProviderHome() {
           setBidding(
             data.data.map((item) => ({
               id: item._id,
-              image: item.image_url[0] || "/src/assets/directHiring/his-work.png",
+              image:
+                item.image_url[0] || "/src/assets/directHiring/his-work.png",
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -190,11 +192,12 @@ export default function ServiceProviderHome() {
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
-          console.log(data.data,"ffff")
+          console.log(data.data, "ffff");
           setEmergency(
             data?.data.map((item) => ({
               id: item._id,
-              image: item.image_urls[0] || "/src/assets/directHiring/his-work.png",
+              image:
+                item.image_urls[0] || "/src/assets/directHiring/his-work.png",
               work: item.category_id?.name || "Emergency task",
               // description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
               amount: item.platform_fee || "₹200",
@@ -276,23 +279,22 @@ export default function ServiceProviderHome() {
 
     const newEmergencyState = !isEmergencyOn;
     try {
-      const response = await fetch(
-        `${BASE_URL}/emergency-order/filtered-emergency-orders`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ isEmergencyOn: newEmergencyState }),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/user/emergency`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isEmergencyOn: newEmergencyState }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update emergency status");
       }
 
       setIsEmergencyOn(newEmergencyState);
+      console.log(response, "ffffffffffff");
+      fetchEmergency();
     } catch (error) {
       console.error("Error updating emergency status:", error);
       Swal.fire({
@@ -337,7 +339,7 @@ export default function ServiceProviderHome() {
   const visibleDirectHiring = directHiring.slice(0, 4);
   const visibleBidding = bidding.slice(0, 4);
   const visibleEmergency = emergency.slice(0, 4);
-console.log(visibleEmergency,"gggggggg")
+  console.log(isEmergencyOn, "gggggggg");
   return (
     <>
       <Header />
@@ -583,7 +585,11 @@ console.log(visibleEmergency,"gggggggg")
                     >
                       <div className="relative w-full">
                         <img
-                          src={card.image ? card.image : "/src/assets/directHiring/his-work.png"}
+                          src={
+                            card.image
+                              ? card.image
+                              : "/src/assets/directHiring/his-work.png"
+                          }
                           alt={capitalizeFirst(card.work)}
                           className="w-full h-36 object-cover rounded-2xl"
                         />
@@ -630,7 +636,7 @@ console.log(visibleEmergency,"gggggggg")
             </div>
 
             {/* Emergency */}
-            {isEmergencyOn && (
+            {isEmergencyOn ? (
               <div className="max-w-[90%] mx-auto mt-[100px]">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-black max-md:text-lg">
@@ -638,9 +644,7 @@ console.log(visibleEmergency,"gggggggg")
                   </h2>
                   {emergency.length > 4 && (
                     <button
-                      onClick={() =>
-                        handleSeeAll("/emergency/tasks")
-                      }
+                      onClick={() => handleSeeAll("/emergency/tasks")}
                       className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
                     >
                       See All
@@ -652,11 +656,12 @@ console.log(visibleEmergency,"gggggggg")
                   <p className="text-gray-500 text-center">
                     Loading emergency tasks...
                   </p>
-                ) : emergencyError ? (
-                  <p className="text-red-500 text-center">
-                    Error: {emergencyError}
-                  </p>
-                ) : emergency.length > 0 ? (
+                ) : // : emergencyError ? (
+                //   <p className="text-red-500 text-center">
+                //     Please Turn on Emergency Button to get Emergency Task
+                //   </p>
+                // )
+                emergency.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {visibleEmergency.map((card, index) => (
                       <div
@@ -665,7 +670,11 @@ console.log(visibleEmergency,"gggggggg")
                       >
                         <div className="relative w-full">
                           <img
-                            src={card.image ? card.image : "/src/assets/directHiring/his-work.png"}
+                            src={
+                              card.image
+                                ? card.image
+                                : "/src/assets/directHiring/his-work.png"
+                            }
                             alt={capitalizeFirst(card.work)}
                             className="w-full h-36 object-cover rounded-2xl"
                           />
@@ -703,6 +712,17 @@ console.log(visibleEmergency,"gggggggg")
                     No emergency tasks available
                   </p>
                 )}
+              </div>
+            ) : (
+              <div className="max-w-[90%] mx-auto mt-[100px]">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-black max-md:text-lg">
+                    Emergency
+                  </h2>
+                </div>
+                <p className="text-red-500 text-center">
+                  Please Turn on Emergency Button to get Emergency Task
+                </p>
               </div>
             )}
           </div>
