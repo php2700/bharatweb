@@ -85,50 +85,50 @@ export default function ViewProfile() {
     fetchBannerImages();
   }, []);
 
+  const fetchData = async () => {
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      setError("Authentication token not found. Please log in.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const [orderResponse, providersResponse] = await Promise.all([
+        axios.get(`${BASE_URL}/emergency-order/getEmergencyOrder/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        orderData?.hire_status === "pending"
+          ? axios.get(
+              `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
+          : { data: { providers: [] } }, // Skip provider fetch if not pending
+      ]);
+      console.log("Order Response:", orderResponse.data);
+      console.log("Providers Response:", providersResponse.data);
+      setAssignedWorker(orderResponse.data.assignedWorker || null);
+      setOrderData(orderResponse.data.data);
+      setServiceProviders(providersResponse.data.providers || []);
+      setIsHired(!!orderResponse.data.data?.service_provider_id);
+    } catch (err) {
+      setError("Failed to fetch data. Please try again later.");
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        setError("Authentication token not found. Please log in.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const [orderResponse, providersResponse] = await Promise.all([
-          axios.get(`${BASE_URL}/emergency-order/getEmergencyOrder/${id}`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }),
-          orderData?.hire_status === "pending"
-            ? axios.get(
-                `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              )
-            : { data: { providers: [] } }, // Skip provider fetch if not pending
-        ]);
-        console.log("Order Response:", orderResponse.data);
-        console.log("Providers Response:", providersResponse.data);
-        setAssignedWorker(orderResponse.data.assignedWorker || null);
-        setOrderData(orderResponse.data.data);
-        setServiceProviders(providersResponse.data.providers || []);
-        setIsHired(!!orderResponse.data.data?.service_provider_id);
-      } catch (err) {
-        setError("Failed to fetch data. Please try again later.");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [id, orderData?.hire_status]);
 
@@ -389,6 +389,7 @@ export default function ViewProfile() {
           confirmButtonColor: "#228B22",
         }).then(() => {
           setShowCompletedModal(true);
+          fetchData();
         });
       }
     } catch (err) {
@@ -418,7 +419,7 @@ export default function ViewProfile() {
           },
         }
       );
-      navigate("/emergency/user/work-list");
+      fetchData();
     } catch (err) {
       setError("Failed to cancel order. Please try again later.");
     }
@@ -561,6 +562,7 @@ export default function ViewProfile() {
               </p>
             </div>
 
+            {console.log(orderData, "hhhhhhhhhhhhhhhh")}
             <div className="text-center mb-6">
               {orderData?.hire_status === "cancelled" ? (
                 <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
@@ -570,6 +572,10 @@ export default function ViewProfile() {
                 <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
                   Task Completed
                 </span>
+              ) : orderData?.hire_status == "cancelledDispute" ? (
+                <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                  Cancelled Dispute
+                </button>
               ) : orderData?.hire_status !== "assigned" ? (
                 <button
                   className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"

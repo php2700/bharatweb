@@ -462,9 +462,9 @@ export default function ViewProfile() {
     provider.provider_id?.full_name?.toLowerCase().includes(searchQuery)
   );
 
-const hasPendingProvider = serviceProviders.some(
-  (provider) => provider?.status === "pending"
-);
+  const hasPendingProvider = serviceProviders.some(
+    (provider) => provider?.status === "pending"
+  );
   // Filter related workers based on search query and exclude all assigned/offered providers
   const filteredRelatedWorkers = relatedWorkers.filter(
     (worker) =>
@@ -475,7 +475,7 @@ const hasPendingProvider = serviceProviders.some(
       )
   );
 
-	console.log("serviceProviders", serviceProviders);
+  console.log("serviceProviders", serviceProviders);
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -587,7 +587,12 @@ const hasPendingProvider = serviceProviders.some(
                     }}
                     className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit"
                   >
-                    <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" /> {orderData?.address || "Unknown Location"}
+                    <FaMapMarkerAlt
+                      size={25}
+                      color="#228B22"
+                      className="mr-2"
+                    />{" "}
+                    {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
               </div>
@@ -641,6 +646,12 @@ const hasPendingProvider = serviceProviders.some(
                           .join(" ")
                       : "Unknown Status"}
                   </span>
+                </span>
+                <span className="text-gray-600 font-semibold block">
+                  Deadline Date:{" "}
+                  {orderData?.deadline
+                    ? new Date(orderData.deadline).toLocaleDateString()
+                    : "N/A"}
                 </span>
               </div>
             </div>
@@ -862,7 +873,7 @@ const hasPendingProvider = serviceProviders.some(
       {/* Related Workers Section */}
       {orderData?.hire_status !== "cancelled" &&
         orderData?.hire_status !== "cancelled task" &&
-				!hasPendingProvider &&
+        !hasPendingProvider &&
         !isHired &&
         filteredRelatedWorkers.length > 0 && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
