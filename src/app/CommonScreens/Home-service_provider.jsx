@@ -12,14 +12,16 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Swal from "sweetalert2";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "../../redux/userSlice";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
-
 export default function ServiceProviderHome() {
   const navigate = useNavigate();
-  const [isEmergencyOn, setIsEmergencyOn] = useState(true);
   const token = localStorage.getItem("bharat_token");
+  const { profile } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(false);
   const [bannerError, setBannerError] = useState(null);
@@ -261,6 +263,11 @@ export default function ServiceProviderHome() {
     fetchEmergency();
   }, [navigate, token]);
 
+  let isEmergencyOn = false;
+  if (profile) {
+    isEmergencyOn = profile.isEmergency || false;
+  }
+
   const handleToggle = async () => {
     if (!token) {
       Swal.fire({
@@ -292,8 +299,7 @@ export default function ServiceProviderHome() {
         throw new Error("Failed to update emergency status");
       }
 
-      setIsEmergencyOn(newEmergencyState);
-      console.log(response, "ffffffffffff");
+      dispatch(fetchUserProfile());
       fetchEmergency();
     } catch (error) {
       console.error("Error updating emergency status:", error);

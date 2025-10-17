@@ -393,13 +393,25 @@ export default function ViewProfile() {
         });
       }
     } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to mark order as complete. Please try again.",
-        confirmButtonColor: "#FF0000",
-      });
+      console.log(err.response?.data?.message, "gg");
+      if (
+        err.response?.data?.message ==
+        "Cannot complete the order because no payment records exist for this order."
+      ) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Cannot complete the order because no payment records exist for this order",
+          confirmButtonColor: "#FF0000",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Failed to mark order as complete. Please try again.",
+          confirmButtonColor: "#FF0000",
+        });
+      }
     }
   };
 
