@@ -5,7 +5,7 @@ import Message from "../../../assets/ViewProfile/msg.svg";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,11 +15,12 @@ export default function Accepted({
   paymentHistory,
   orderId,
   hireStatus,
+  user_id,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -101,7 +102,7 @@ const navigate = useNavigate();
       if (!response.ok) throw new Error("Failed to add payment stage");
 
       toast.success("✅ Online payment processed successfully!");
-			window.location.reload();
+      window.location.reload();
       setShowForm(false);
     } catch (error) {
       console.error("Error adding payment stage:", error);
@@ -111,43 +112,42 @@ const navigate = useNavigate();
 
   // Add payment method (COD)
   const addPaymentMethod = async () => {
-  try {
-    const payload = {
-      amount: parseFloat(amount),
-      tax: parseFloat(amount) * 0.09,
-      description,
-      method: "cod",
-      status: "success",
-      collected_by: serviceProvider?.full_name || "Unknown",
-    };
+    try {
+      const payload = {
+        amount: parseFloat(amount),
+        tax: parseFloat(amount) * 0.09,
+        description,
+        method: "cod",
+        status: "success",
+        collected_by: serviceProvider?.full_name || "Unknown",
+      };
 
-    const response = await fetch(
-      `${BASE_URL}/emergency-order/addPaymentStage/${orderId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
-        },
-        body: JSON.stringify(payload),
+      const response = await fetch(
+        `${BASE_URL}/emergency-order/addPaymentStage/${orderId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json(); // 👈 always parse the response body
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add COD payment stage");
       }
-    );
 
-    const data = await response.json(); // 👈 always parse the response body
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to add COD payment stage");
+      toast.success("✅ COD payment added successfully!");
+      window.location.reload();
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error adding COD payment:", error);
+      toast.error(error.message || "Something went wrong");
     }
-
-    toast.success("✅ COD payment added successfully!");
-    window.location.reload();
-    setShowForm(false);
-  } catch (error) {
-    console.error("Error adding COD payment:", error);
-    toast.error(error.message || "Something went wrong");
-  }
-};
-
+  };
 
   // Handle payment release
   const handlePay = async (paymentId) => {
@@ -166,7 +166,7 @@ const navigate = useNavigate();
 
       if (response.status === 200) {
         toast.success("Payment release requested successfully!");
-				window.location.reload();
+        window.location.reload();
       } else {
         toast.error("Payment release request failed, please try again.");
       }
@@ -233,8 +233,14 @@ const navigate = useNavigate();
     toast.info("Form cleared!");
   };
 
-	 const handleChatOpen = (receiverId) => {
-    navigate(`/chats/${receiverId}`); // go to chat page
+
+
+  const handleChatOpen = (receiverId, senderId) => {
+    // Save receiverId in localStorage
+    localStorage.setItem("receiverId", receiverId);
+    localStorage.setItem("senderId", senderId);
+    // Redirect to chat page
+    navigate("/chats");
   };
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -272,14 +278,24 @@ const navigate = useNavigate();
                   <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                     <img src={Call} alt="Call" className="w-5 h-5" />
                   </div>
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id)}>
+                  <div
+                    className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                    onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+                  >
                     <img src={Message} alt="Message" className="w-5 h-5" />
                   </div>
                 </div>
               )}
-              <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
-                View Profile
-              </button>
+              <Link
+                to={`/profile-details/${serviceProvider?._id}/emergency`}
+                className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+              >
+                <button
+                // className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                >
+                  View Profile
+                </button>
+              </Link>
             </div>
           </div>
         </div>

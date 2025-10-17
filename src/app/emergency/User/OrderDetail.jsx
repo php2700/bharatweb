@@ -549,7 +549,7 @@ export default function ViewProfile() {
       ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
       ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
       ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
-      ${orderData?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
+      ${orderData?.hire_status === "cancelledDispute" ? "bg-[#FF0000]" : ""}
       ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
                   >
                     {orderData?.hire_status
@@ -599,7 +599,9 @@ export default function ViewProfile() {
             </div>
 
             {(orderData?.hire_status === "assigned" ||
-              orderData?.hire_status === "completed") &&
+              orderData?.hire_status === "completed" || 
+              orderData?.hire_status ==='cancelledDispute'
+             ) &&
               orderData.platform_fee_paid && (
                 <>
                   <Accepted
@@ -608,6 +610,7 @@ export default function ViewProfile() {
                     paymentHistory={orderData?.service_payment?.payment_history}
                     orderId={id}
                     hireStatus={orderData?.hire_status}
+                    user_id={orderData?.user_id?._id}
                   />
 
                   {orderData?.hire_status === "assigned" && (

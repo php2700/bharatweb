@@ -102,7 +102,7 @@ export default function App() {
         console.error("❌ Service Worker registration failed:", err);
       });
   }
-  
+
   return (
     <>
       <NotificationToast />
@@ -186,7 +186,7 @@ export default function App() {
         <Route path="/bidding/edittask/:id" element={<BiddingEditTask />} />
         <Route path="/bidding/checknow" element={<Biddercheck />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/promotion" element={<Promotion/>} />
+        <Route path="/promotion" element={<Promotion />} />
 
         <Route
           path="/review"
@@ -260,16 +260,12 @@ export default function App() {
           path="/hire/worker/order-detail/:id"
           element={<DirectProviderordetail />}
         />
-				<Route 
-				path="/disputes"
-				element={<DisputePage />}
-				/>
-        
-				 <Route
+        <Route path="/disputes" element={<DisputePage />} />
+
+        <Route
           path="/bidding/order-detail/:id"
           element={<BiddinggetWorkDetail />}
         />
-
       </Routes>
     </>
   );
