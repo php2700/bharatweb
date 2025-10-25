@@ -409,26 +409,23 @@ const DirectHiring = () => {
               Add Completion time
             </span>
             <div className="relative">
+              {/* Visible input */}
               <input
+                id="deadlineInput"
                 type="datetime-local"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
+                className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer"
                 aria-invalid={errors.deadline ? "true" : "false"}
+                readOnly // Makes input readonly, picker opens only via showPicker
               />
+              {/* Calendar icon */}
               <Calendar
                 className="absolute left-3 top-3 h-5 w-5 text-gray-400 cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("deadline-input").focus();
+                  document.getElementById("deadlineInput")?.showPicker?.();
                 }}
-              />
-              <input
-                id="deadline-input"
-                type="datetime-local"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="hidden"
               />
             </div>
             {errors.deadline && (

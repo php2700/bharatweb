@@ -295,7 +295,7 @@ const Post = () => {
       "sub_category_ids",
       selectedSubcategories.map((option) => option.value).join(",")
     );
-    submissionData.append("google_address", formData.detailed_address);
+    // submissionData.append("google_address", formData.detailed_address);
     submissionData.append(
       "google_address",
       address || profile?.location?.address
