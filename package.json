@@ -16,6 +16,7 @@
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "firebase": "^12.1.0",
+    "jspdf": "^3.0.3",
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^3.3.0",
     "lucide-react": "^0.540.0",
