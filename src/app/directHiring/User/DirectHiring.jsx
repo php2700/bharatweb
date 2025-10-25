@@ -409,22 +409,24 @@ const DirectHiring = () => {
               Add Completion time
             </span>
             <div className="relative">
-              {/* Visible input */}
               <input
-                id="deadlineInput"
+                id="deadline-input"
                 type="datetime-local"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer"
                 aria-invalid={errors.deadline ? "true" : "false"}
-                readOnly // Makes input readonly, picker opens only via showPicker
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Ye calendar icon jaisa open karega
+                  document.getElementById("deadline-input").showPicker?.();
+                }}
               />
-              {/* Calendar icon */}
               <Calendar
                 className="absolute left-3 top-3 h-5 w-5 text-gray-400 cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById("deadlineInput")?.showPicker?.();
+                  document.getElementById("deadline-input").showPicker?.();
                 }}
               />
             </div>

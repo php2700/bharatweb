@@ -102,7 +102,7 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
-
+  console.log("orderdata", orderData);
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
@@ -340,7 +340,7 @@ export default function ViewProfile() {
     }
   };
 
-  const handleCancelOffer = async (providerId) => {
+  const handleCancelOffer = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
       const response = await axios.post(
@@ -355,15 +355,7 @@ export default function ViewProfile() {
           },
         }
       );
-      console.log("Cancel Offer Response:", response.data);
-
-      setOfferStatuses((prev) => ({
-        ...prev,
-        [providerId]: "pending",
-      }));
-
-      // Remove provider from assignedProviderIds
-      setAssignedProviderIds((prev) => prev.filter((id) => id !== providerId));
+      // console.log("Cancel Offer Response:", response.data);
 
       Swal.fire({
         icon: "success",
@@ -371,6 +363,7 @@ export default function ViewProfile() {
         text: "Order has been cancelled successfully!",
         confirmButtonColor: "#228B22",
       });
+      window.location.reload();
     } catch (err) {
       console.error("Error cancelling offer:", err);
       Swal.fire({
@@ -661,6 +654,16 @@ export default function ViewProfile() {
                 {orderData?.description}
               </p>
             </div>
+            {/*orderData?.hire_status == "pending" && (
+              <div className="flex justify-center mt-4">
+                <button
+                  className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
+                  onClick={handleCancelOffer} // remove extra arrow function wrapping
+                >
+                  Cancel Project
+                </button>
+              </div>
+            )*/}
 
             {/* Service Providers from Offer History */}
             {orderData?.hire_status !== "cancelled" &&
@@ -763,14 +766,6 @@ export default function ViewProfile() {
                                     provider.status.slice(1)
                                   : ""}
                               </button>
-                              <button
-                                className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
-                                onClick={() =>
-                                  handleCancelOffer(provider.provider_id._id)
-                                }
-                              >
-                                Cancel Project
-                              </button>
                             </>
                           )}
                         </div>
@@ -782,29 +777,54 @@ export default function ViewProfile() {
 
             {/* Task Status / Cancel Button */}
             <div className="text-center mb-6">
-              {[
-                "accepted",
-                "completed",
-                "cancelled",
-                "cancelledDispute",
-              ].includes(orderData?.hire_status) ? (
-                orderData?.hire_status === "cancelled" ? (
-                  <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                    Cancelled Task
-                  </span>
-                ) : orderData?.hire_status === "completed" ? (
-                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
+              {/* Show buttons depending on hire_status */}
+              {orderData?.hire_status === "cancelled" ? (
+                <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                  Cancelled Task
+                </span>
+              ) : orderData?.hire_status === "completed" ? (
+                <div className="flex justify-center gap-4 flex-wrap">
+                  {/* ✅ Task Completed */}
+                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
                     Task Completed
                   </span>
-                ) : orderData?.hire_status === "pending" ? (
-                  <button
-                    className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
-                    onClick={() => setShowModal(true)}
-                  >
-                    Cancel Task
-                  </button>
-                ) : null
+
+                  {/* ✅ Review Buttons */}
+                  {orderData?.isReviewedByUser ? (
+                    <span className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer">
+                      See Review
+                    </span>
+                  ) : (
+                    <span
+                      className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowCompletedModal(true)}
+                    >
+                      Add Review
+                    </span>
+                  )}
+                </div>
+              ) : orderData?.hire_status === "pending" ? (
+                <button
+                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                  onClick={handleCancelOffer}
+                >
+                  Cancel Task
+                </button>
+              ) : orderData?.hire_status === "cancelledDispute" ? (
+                <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                  Cancelled (Dispute)
+                </span>
               ) : null}
+              <ReviewModal
+                show={showCompletedModal}
+                onClose={() => {
+                  setShowCompletedModal(false);
+                  fetchData(); // refresh data after closing
+                }}
+                service_provider_id={orderData?.service_provider_id?._id}
+                orderId={id}
+                type="direct"
+              />
             </div>
 
             {(orderData?.hire_status === "accepted" ||
