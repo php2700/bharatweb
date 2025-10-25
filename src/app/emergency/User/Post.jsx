@@ -84,7 +84,7 @@ const Post = () => {
         }
       );
 
-      console.log("Banner API response:", response.data); // Debug response
+      // console.log("Banner API response:", response.data); // Debug response
 
       if (response.data?.success) {
         if (
@@ -262,17 +262,17 @@ const Post = () => {
   // Validate form
   const validateForm = () => {
     const errors = {};
-    if (!selectedCategory) errors.category_id = "Category is required";
+    if (!selectedCategory) errors.category_id = "Category is required.";
     if (selectedSubcategories.length === 0)
-      errors.sub_category_ids = "At least one subcategory is required";
+      errors.sub_category_ids = "At least one subcategory is required.";
     // if (!formData.google_address)
     //   errors.google_address = "Google address is required";
     // if (!formData.detailed_address)
     //   errors.detailed_address = "Detailed address is required";
-    if (!formData.contact) errors.contact = "Contact number is required";
+    if (!formData.contact) errors.contact = "Contact number is required.";
     else if (formData.contact.trim()?.length != 10)
       errors.contact = "Contact should be 10 digits.";
-    if (!formData.deadline) errors.deadline = "Deadline is required";
+    if (!formData.deadline) errors.deadline = "Deadline is required.";
     // if (formData.images.length === 0)
     //   errors.images = "At least one image is required";
     return errors;
@@ -295,7 +295,7 @@ const Post = () => {
       "sub_category_ids",
       selectedSubcategories.map((option) => option.value).join(",")
     );
-    // submissionData.append("google_address", formData.google_address);
+    submissionData.append("google_address", formData.detailed_address);
     submissionData.append(
       "google_address",
       address || profile?.location?.address

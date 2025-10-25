@@ -54,8 +54,13 @@ export default function Profile() {
 
   const autoCompleteRef = useRef(null);
 
+  // const { isLoaded } = useJsApiLoader({
+  //   googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
+  //   libraries,
+  // });
+
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
@@ -147,13 +152,15 @@ export default function Profile() {
     if (!formData.name.trim()) newErrors.name = "Name is required";
     else if (formData.name.length < 3)
       newErrors.name = "Name must be at least 3 characters";
+    else if (!/^[A-Za-z\s]+$/.test(formData.name))
+      newErrors.name = "Name must contain only alphabets";
     if (!formData.age) newErrors.age = "Age is required";
     else if (isNaN(formData.age) || formData.age <= 0 || formData.age > 100)
       newErrors.age = "Enter a valid age between 1 and 100";
     if (!formData.gender.trim()) newErrors.gender = "Gender is required";
     // if (!formData.location.trim()) newErrors.location = "Please select your location";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    setErrors(newErrors);
+    // if (!formData.address.trim()) newErrors.address = "Address is required";
+    // setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
