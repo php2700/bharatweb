@@ -15,6 +15,8 @@ import Swal from "sweetalert2";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
+import workImage from "../../../assets/workcategory/image.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -36,6 +38,7 @@ export default function ViewProfile() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [assignData, setAssignData] = useState();
+	const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
 
   const token = localStorage.getItem("bharat_token");
 
@@ -473,7 +476,7 @@ export default function ViewProfile() {
     );
   }
 
-  console.log(orderData, "gggggggggggggg***", filteredProviders);
+  // console.log(orderData, "gggggggggggggg***", filteredProviders);
   return (
     <>
       <Header />
@@ -509,7 +512,7 @@ export default function ViewProfile() {
             </Carousel>
           ) : (
             <img
-              src="https://via.placeholder.com/800x400"
+              src={workImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
@@ -581,9 +584,42 @@ export default function ViewProfile() {
                   Cancelled by User
                 </span>
               ) : orderData?.hire_status === "completed" ? (
-                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold cursor-pointer">
-                  Task Completed
-                </span>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  {/* ✅ Task Completed */}
+                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                    Task Completed
+                  </span>
+
+                  {/* ✅ Review Buttons */}
+                  {orderData?.isReviewedByUser ? (
+                    <span
+                      className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowOrderReviewModal(true)}
+                    >
+                      See Review
+                    </span>
+                  ) : (
+                    <span
+                      className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowCompletedModal(true)}
+                    >
+                      Add Review
+                    </span>
+                  )}
+                  <ReviewModal
+                    show={showCompletedModal}
+                    onClose={() => setShowCompletedModal(false)}
+                    service_provider_id={orderData?.service_provider_id._id}
+                    orderId={id}
+                    type="emergency"
+                  />
+                  <OrderReviewModal
+                    show={showOrderReviewModal}
+                    onClose={() => setShowOrderReviewModal(false)}
+                    orderId={id}
+                    type="emergency"
+                  />
+                </div>
               ) : orderData?.hire_status == "cancelledDispute" ? (
                 <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                   Cancelled Dispute
@@ -599,9 +635,8 @@ export default function ViewProfile() {
             </div>
 
             {(orderData?.hire_status === "assigned" ||
-              orderData?.hire_status === "completed" || 
-              orderData?.hire_status ==='cancelledDispute'
-             ) &&
+              orderData?.hire_status === "completed" ||
+              orderData?.hire_status === "cancelledDispute") &&
               orderData.platform_fee_paid && (
                 <>
                   <Accepted

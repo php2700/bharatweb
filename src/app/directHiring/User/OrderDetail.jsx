@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import defaultWorkImage from "../../../assets/directHiring/his-work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -50,6 +51,7 @@ export default function ViewProfile() {
   const [bannerError, setBannerError] = useState(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [markerLocationAddress, setMarkerLocationAddress] = useState(null);
+  const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -791,7 +793,10 @@ export default function ViewProfile() {
 
                   {/* ✅ Review Buttons */}
                   {orderData?.isReviewedByUser ? (
-                    <span className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer">
+                    <span
+                      className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowOrderReviewModal(true)}
+                    >
                       See Review
                     </span>
                   ) : (
@@ -822,6 +827,12 @@ export default function ViewProfile() {
                   fetchData(); // refresh data after closing
                 }}
                 service_provider_id={orderData?.service_provider_id?._id}
+                orderId={id}
+                type="direct"
+              />
+              <OrderReviewModal
+                show={showOrderReviewModal}
+                onClose={() => setShowOrderReviewModal(false)}
                 orderId={id}
                 type="direct"
               />

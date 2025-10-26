@@ -373,8 +373,8 @@ export default function Bid() {
                             : ""
                         }
                         ${
-                          worker.hire_status === "cancelldispute"
-                            ? "bg-[#FF0000]"
+                          worker.hire_status === "cancelledDispute"
+                            ? "bg-[#FF8C00]"
                             : ""
                         }
                         ${
@@ -405,6 +405,20 @@ export default function Bid() {
                   <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
                     <img src={cancel} alt="Cancelled" className="w-5 h-5" />
                     Cancelled Task By User
+                  </div>
+                )}
+								{worker.hire_status === "completed" && (
+                  <div className="flex items-center justify-center gap-2 bg-[#228B22] text-white px-6 py-3 rounded-lg font-medium">
+                    <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                    Task Completed
+                  </span>
+                  </div>
+                )}
+								{worker.hire_status === "cancelledDispute" && (
+                  <div className="flex items-center justify-center gap-2 bg-[#FF8C00] text-white px-6 py-3 rounded-lg font-medium">
+                   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                  Cancelled (Dispute)
+                </span>
                   </div>
                 )}
 

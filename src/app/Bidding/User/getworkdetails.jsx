@@ -24,6 +24,7 @@ import ReviewModal from "../../CommonScreens/ReviewModal";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
+import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
@@ -43,6 +44,7 @@ export default function BiddinggetWorkDetail() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
+	const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -548,7 +550,7 @@ export default function BiddinggetWorkDetail() {
       pending: "bg-yellow-500",
       cancelled: "bg-[#FF0000]",
       completed: "bg-[#228B22]",
-      cancelldispute: "bg-[#FF0000]",
+      cancelledDispute: "bg-[#FF8C00]",
       accepted: "bg-blue-500",
     };
     return statusStyles[status] || "bg-gray-500";
@@ -712,6 +714,57 @@ export default function BiddinggetWorkDetail() {
                   </div>
                 ) : null}
               </div>
+            </div>
+            {/* Task Status / Cancel Button */}
+            <div className="text-center mb-6">
+              {/* Show buttons depending on hire_status */}
+              {orderDetail?.hire_status === "completed" ? (
+                <div className="flex justify-center gap-4 flex-wrap">
+                  {/* ✅ Task Completed */}
+                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                    Task Completed
+                  </span>
+
+                  {/* ✅ Review Buttons */}
+                  {orderDetail?.isReviewedByUser ? (
+                    <span
+                      className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowOrderReviewModal(true)}
+                    >
+                      See Review
+                    </span>
+                  ) : (
+                    <span
+                      className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                      onClick={() => setShowCompletedModal(true)}
+                    >
+                      Add Review
+                    </span>
+                  )}
+                </div>
+              ) : orderDetail?.hire_status === "cancelledDispute" ? (
+                <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                  Cancelled (Dispute)
+                </span>
+              ) : null}
+              <ReviewModal
+                  show={showCompletedModal}
+                  onClose={() => {
+                    setShowCompletedModal(false);
+                    fetchOrder();
+                  }}
+                  service_provider_id={
+                    orderDetail?.service_provider_id?._id || null
+                  }
+                  orderId={id}
+                  type="bidding"
+                />
+              <OrderReviewModal
+                show={showOrderReviewModal}
+                onClose={() => setShowOrderReviewModal(false)}
+                orderId={id}
+                type="bidding"
+              />
             </div>
           </div>
         </div>
@@ -912,7 +965,9 @@ export default function BiddinggetWorkDetail() {
             </div>
           </div>
         )}
-        {orderDetail?.hire_status === "accepted" &&
+        {(orderDetail?.hire_status === "accepted" ||
+          orderDetail?.hire_status === "completed" ||
+          orderDetail?.hire_status === "cancelledDispute") &&
           orderDetail?.platform_fee_paid && (
             <Accepted
               serviceProvider={orderDetail?.service_provider_id}

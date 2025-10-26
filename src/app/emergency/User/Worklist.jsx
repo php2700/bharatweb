@@ -339,6 +339,8 @@ export default function Worklist() {
         ? "bg-orange-200 text-orange-800"
         : task.status === "accepted"
         ? "bg-blue-200 text-blue-800"
+				: task.status === "assigned"
+        ? "bg-blue-200 text-blue-800"
         : ""
     }`}
                     >

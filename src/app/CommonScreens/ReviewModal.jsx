@@ -15,13 +15,13 @@ export default function ReviewModal({
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [images, setImages] = useState([]);
-  console.log("ReviewModal props:", {
-    show,
-    onClose,
-    orderId,
-    service_provider_id,
-    type,
-  });
+  // console.log("ReviewModal props:", {
+  //   show,
+  //   onClose,
+  //   orderId,
+  //   service_provider_id,
+  //   type,
+  // });
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

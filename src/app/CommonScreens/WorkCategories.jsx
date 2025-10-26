@@ -12,6 +12,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import defaultWork from "../../assets/directHiring/Work.png";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
@@ -21,7 +22,7 @@ export default function WorkCategories() {
   const [categories, setCategories] = useState([]);
   const [bannerImages, setBannerImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const socket = useSelector((state) => state.socket?.socket);
+  // const socket = useSelector((state) => state.socket?.socket);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null); // New state for error message
   const [directHiring, setDirectHiring] = useState([]);
@@ -29,7 +30,7 @@ export default function WorkCategories() {
   const [directHiringError, setDirectHiringError] = useState(null);
   // Fetch categories
   const visibleDirectHiring = directHiring.slice(0, 4);
-  console.log("visibleDirectHiring", visibleDirectHiring);
+  // console.log("visibleDirectHiring", visibleDirectHiring);
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -79,8 +80,7 @@ export default function WorkCategories() {
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id || "",
-              image:
-                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+              image: item.image_url[0] || defaultWork,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -323,8 +323,8 @@ export default function WorkCategories() {
                     >
                       <div className="relative w-full">
                         <img
-                          src={card.image}
-                          alt={capitalizeFirst(card.work)}
+                          src={card?.image}
+                          alt={capitalizeFirst(card?.work || "Work")}
                           className="w-full h-36 object-cover rounded-2xl"
                         />
                         {/* <div
