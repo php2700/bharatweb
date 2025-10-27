@@ -10,67 +10,66 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import pdf from "../../../assets/directHiring/pdficon2.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
   const { task } = useParams(); // e.g., "My%20Bidding"
-  const [activeTab, setActiveTab] = useState(task); // Default tab
+  const [activeTab, setActiveTab] = useState(task ? decodeURIComponent(task) : "Emergency Tasks");
   const [taskData, setTaskData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [downloadingIds, setDownloadingIds] = useState([]); // Track downloading tasks
+
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
+
+  // Helper: Map tab to download type
+  const downloadTypeFromTab = (tab) => {
+    const map = {
+      "My Bidding": "bidding",
+      "My Hire": "my-hire",
+      "Emergency Tasks": "emergency",
+    };
+    return map[tab] || "bidding";
+  };
 
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+      if (!token) throw new Error("No authentication token found");
 
-      const response = await axios.get(
-        `${BASE_URL}/banner/getAllBannerImages`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      if (response.data?.success) {
-        if (
-          Array.isArray(response.data.images) &&
-          response.data.images.length > 0
-        ) {
-          setBannerImages(response.data.images);
-        } else {
-          setBannerImages([]);
-          setBannerError("No banners available");
-        }
+      if (response.data?.success && Array.isArray(response.data.images) && response.data.images.length > 0) {
+        setBannerImages(response.data.images);
       } else {
-        const errorMessage =
-          response.data?.message || "Failed to fetch banner images";
-        console.error("Failed to fetch banner images:", errorMessage);
-        setBannerError(errorMessage);
+        setBannerImages([]);
+        setBannerError("No banners available");
       }
     } catch (err) {
       console.error("Error fetching banner images:", err.message);
-      setBannerError(err.message);
+      setBannerError(err.message || "Failed to load banners");
     } finally {
       setBannerLoading(false);
     }
   };
 
-  // Set activeTab based on route parameter and fetch banners
+  // Initialize tab and fetch banners
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
+
     if (task) {
       const decodedTask = decodeURIComponent(task);
       const validTabs = ["My Bidding", "My Hire", "Emergency Tasks"];
@@ -78,8 +77,11 @@ export default function Worklist() {
         setActiveTab(decodedTask);
       } else {
         setActiveTab("Emergency Tasks");
-        navigate("/user/work-list/Emergency%20Tasks");
+        navigate("/user/work-list/Emergency%20Tasks", { replace: true });
       }
+    } else {
+      setActiveTab("Emergency Tasks");
+      navigate("/user/work-list/Emergency%20Tasks", { replace: true });
     }
   }, [task, navigate]);
 
@@ -88,23 +90,27 @@ export default function Worklist() {
     if (!activeTab || !token) return;
 
     const fetchTasks = async () => {
-      try {
-        setLoading(true);
-        let endpoint;
-        switch (activeTab) {
-          case "My Bidding":
-            endpoint = `${BASE_URL}/bidding-order/getAllBiddingOrdersForUser`;
-            break;
-          case "My Hire":
-            endpoint = `${BASE_URL}/direct-order/getOrdersByUser`;
-            break;
-          case "Emergency Tasks":
-            endpoint = `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`;
-            break;
-          default:
-            throw new Error("Invalid tab selected");
-        }
+      setLoading(true);
+      setError(null);
 
+      let endpoint;
+      switch (activeTab) {
+        case "My Bidding":
+          endpoint = `${BASE_URL}/bidding-order/getAllBiddingOrdersForUser`;
+          break;
+        case "My Hire":
+          endpoint = `${BASE_URL}/direct-order/getOrdersByUser`;
+          break;
+        case "Emergency Tasks":
+          endpoint = `${BASE_URL}/emergency-order/getAllEmergencyOrdersByRole`;
+          break;
+        default:
+          setError("Invalid tab selected");
+          setLoading(false);
+          return;
+      }
+
+      try {
         const response = await axios.get(endpoint, {
           headers: {
             "Content-Type": "application/json",
@@ -112,11 +118,10 @@ export default function Worklist() {
           },
         });
 
-        // Map API response to the expected structure
-        const mappedTasks = response.data.data.map((task) => ({
+        const mappedTasks = (response.data.data || []).map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image || Work, // Fallback to Work image
+          image: task.image_urls?.[0] || task.image || Work,
           name: task.category_id?.name || task.title || "Unnamed Task",
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
@@ -134,20 +139,15 @@ export default function Worklist() {
           completiondate: task.deadline
             ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
-          status: task.hire_status || "N/A",
+          status: task.hire_status || task.status || "N/A",
           location:
-            task.google_address ||
-            task.location ||
-            task.address ||
-            "Unknown Location",
+            task.google_address || task.location || task.address || "Unknown Location",
         }));
 
         setTaskData(mappedTasks);
-        console.log(mappedTasks, "fffffffffffff");
-        setError(null);
       } catch (err) {
-        console.error(err);
-        setError(`Failed to fetch ${activeTab} data. Please try again later.`);
+        console.error(`Error fetching ${activeTab}:`, err);
+        setError(`Failed to fetch ${activeTab}. Please try again later.`);
       } finally {
         setLoading(false);
       }
@@ -156,29 +156,65 @@ export default function Worklist() {
     fetchTasks();
   }, [activeTab, token]);
 
-  // Handle search input change
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  // Handle search input
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+
+  // Handle PDF download
+  const handledownload = async (id, type) => {
+    if (!id) return alert("Invalid task ID");
+    if (!token) return alert("User not authenticated");
+
+    setDownloadingIds((prev) => [...prev, id]);
+
+    try {
+      let endpoint = "";
+      if (type === "bidding") {
+        endpoint = `${BASE_URL}/user/invoice/bidding/${id}`;
+      } else if (type === "my-hire") {
+        endpoint = `${BASE_URL}/user/invoice/direct/${id}`;
+      } else if (type === "emergency") {
+        endpoint = `${BASE_URL}/user/invoice/emergency/${id}`;
+      } else {
+        throw new Error("Invalid invoice type");
+      }
+
+      const response = await axios.get(endpoint, {
+        responseType: "blob",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoice_${type}_${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("PDF download failed:", error);
+      alert("Failed to download PDF. Please try again.");
+    } finally {
+      setDownloadingIds((prev) => prev.filter((tid) => tid !== id));
+    }
   };
 
-  // Filter tasks based on search query
+  // Filter tasks
   const filteredTasks = taskData.filter(
     (task) =>
       task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.skills.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle tab click and update URL
+  // Handle tab click
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    const formattedTab = encodeURIComponent(tab); // e.g., "My Bidding" to "My%20Bidding"
-    navigate(`/user/work-list/${formattedTab}`);
+    navigate(`/user/work-list/${encodeURIComponent(tab)}`);
   };
 
-  // Slider settings for react-slick
+  // Slider settings
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -193,13 +229,14 @@ export default function Worklist() {
   return (
     <>
       <Header />
+
       {/* Back Button */}
       <div className="container mx-auto px-4 py-4 mt-20">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
         >
-          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
+          <img src={Arrow} alt="Back" className="w-6 h-6 mr-2" />
           Back
         </button>
       </div>
@@ -212,18 +249,18 @@ export default function Worklist() {
           </p>
         ) : bannerError ? (
           <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
+            {bannerError}
           </p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner}
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = Work; // fallback to default work image
                   }}
                 />
               </div>
@@ -238,20 +275,21 @@ export default function Worklist() {
 
       {/* Work Section */}
       <div className="container max-w-full mx-auto my-10">
-        <div className="text-xl sm:text-2xl max-w-5xl text-center mb-5 font-bold mx-auto">
+        <h1 className="text-xl sm:text-2xl max-w-5xl text-center mb-5 font-bold mx-auto">
           My Hiring
-        </div>
+        </h1>
+
         {/* Tabs */}
-        <div className="flex justify-center gap-[200px] bg-gray-100 p-2 mb-6">
+        <div className="flex justify-center gap-8 sm:gap-[200px] bg-gray-100 p-2 mb-6 flex-wrap">
           {["My Bidding", "My Hire", "Emergency Tasks"].map((tab) => (
             <button
               key={tab}
-              className={`px-9 py-1 rounded-full font-semibold ${
+              onClick={() => handleTabClick(tab)}
+              className={`px-6 sm:px-9 py-2 rounded-full font-semibold text-sm sm:text-base transition-all ${
                 activeTab === tab
                   ? "bg-[#228B22] text-white"
-                  : "text-[#228B22] border border-[#228b22]"
+                  : "text-[#228B22] border border-[#228B22] hover:bg-[#228B22] hover:text-white"
               }`}
-              onClick={() => handleTabClick(tab)}
             >
               {tab}
             </button>
@@ -267,130 +305,105 @@ export default function Worklist() {
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500"
             />
             <input
-              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none"
               type="search"
               placeholder="Search for services"
               value={searchQuery}
               onChange={handleSearchChange}
+              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
         </div>
 
-        {/* Dynamic Task List */}
-        <div className="space-y-6 max-w-5xl justify-center mx-auto">
+        {/* Task List */}
+        <div className="space-y-6 max-w-5xl mx-auto">
           {loading ? (
-            <div className="text-center">Loading...</div>
+            <p className="text-center">Loading tasks...</p>
           ) : error ? (
-            <div className="text-center text-red-500">{error}</div>
+            <p className="text-center text-red-500">{error}</p>
           ) : filteredTasks.length === 0 ? (
-            <div className="text-center">No {activeTab} available.</div>
+            <p className="text-center">No {activeTab.toLowerCase()} available.</p>
           ) : (
             filteredTasks.map((task) => (
               <div
                 key={task.id}
-                className="flex bg-white rounded-xl shadow-md overflow-hidden"
+                className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
               >
-                {/* Left Image Section */}
-                <div className="relative w-1/3">
+                {/* Left Image */}
+                <div className="relative w-full sm:w-1/3 h-48 sm:h-auto">
                   <img
                     src={task.image}
                     alt={task.name}
-                    className="h-full w-full object-cover"
+                    className="w-full h-full object-cover"
                   />
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
                     {task.project_id}
                   </span>
                 </div>
 
-                {/* Right Content Section */}
-                <div className="w-2/3 p-4 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      {task.name}
-                    </h2>
-                    <p className="text-sm text-[#334247] font-semibold">
-                      Posted Date: {task.date}
+                {/* Right Content */}
+                <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800">{task.name}</h2>
+                    <p className="text-sm text-[#334247] font-medium">
+                      Posted: {task.date}
                     </p>
                   </div>
-                  <p className="text-sm text-[#334247] mt-2">
-                    {(() => {
-                      const words = task.skills?.split(" ") || [];
-                      const limitedText = words.slice(0, 40).join(" ");
-                      return words.length > 40
-                        ? `${limitedText}...`
-                        : limitedText;
-                    })()}
+                  <p className="text-sm flex justify-between text-[#334247] mt-2 line-clamp-2">
+                    {task.skills}
+										<button
+                      onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
+                      disabled={downloadingIds.includes(task.id)}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs"
+                      title="Download Invoice"
+                    >
+                      <img src={pdf} alt="PDF" className="w-5 h-5" />
+                      {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
+                    </button>
                   </p>
-                  <p className="text-green-600 font-bold mt-3">{task.price}</p>
-                  <div className="flex justify-between items-start">
-                    <p className="text-sm text-[#334247] mt-1 font-semibold">
-                      Completion Date: {task.completiondate}
+
+                  <p className="text-green-600 font-bold mt-2">{task.price}</p>
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
+                    <p className="text-sm text-[#334247] font-medium">
+                      Completion: {task.completiondate}
                     </p>
                     <p
-                      className={`text-sm font-semibold px-2 py-1 rounded 
-    ${
-      task.status === "pending"
-        ? "bg-yellow-200 text-yellow-800"
-        : task.status === "cancelled"
-        ? "bg-red-200 text-red-800"
-        : task.status === "completed"
-        ? "bg-green-200 text-green-800"
-        : task.status === "cancelledDispute"
-        ? "bg-orange-200 text-orange-800"
-        : task.status === "accepted"
-        ? "bg-blue-200 text-blue-800"
-				: task.status === "assigned"
-        ? "bg-blue-200 text-blue-800"
-        : ""
-    }`}
+                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${
+                        task.status === "pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : task.status === "cancelled"
+                          ? "bg-red-100 text-red-800"
+                          : task.status === "completed"
+                          ? "bg-green-100 text-green-800"
+                          : task.status === "cancelledDispute"
+                          ? "bg-orange-100 text-orange-800"
+                          : task.status === "accepted" || task.status === "assigned"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
                     >
-                      Project Status:{" "}
-                      {task.status
-                        .replace(/([A-Z])/g, " $1") // split camelCase (CancelledDispute → Cancelled Dispute)
-                        .trim()
-                        .replace(/\b\w/g, (char) => char.toUpperCase())}{" "}
-                      {/* Capitalize each word */}
+                      Status: {task.status.replace(/([A-Z])/g, " $1").trim()}
                     </p>
                   </div>
-                  <div className="mt-3"></div>
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
-                      <FaMapMarkerAlt
-                        size={25}
-                        color="#228B22"
-                        className="mr-2"
-                      />{" "}
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
+                    <span className="flex items-center text-gray-700 text-sm">
+                      <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
                       {task.location}
                     </span>
-                    {/*<button
-                      className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
-                      onClick={() =>
-                        navigate(
-                          `/${
-                            activeTab === "Emergency Tasks"
-                              ? "emergency"
-                              : activeTab.toLowerCase().replace(" ", "-")
-                          }/order-detail/${task.id}`
-                        )
-                      }
-                    >
-                      View Details
-                    </button>*/}
                     <button
-                      className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
                       onClick={() => {
-                        const tabRoutes = {
+                        const routes = {
                           "My Bidding": "bidding",
                           "My Hire": "my-hire",
                           "Emergency Tasks": "emergency",
                         };
-
-                        const route = tabRoutes[activeTab];
-                        navigate(`/${route}/order-detail/${task.id}`);
+                        navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
                       }}
+                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
                     >
                       View Details
-                    </button> 
+                    </button>
                   </div>
                 </div>
               </div>
@@ -398,41 +411,41 @@ export default function Worklist() {
           )}
         </div>
 
-        {/* See All */}
-        <div className="flex justify-center my-8">
-          <button className="py-2 px-8 text-white rounded-full bg-[#228B22]">
-            See All
-          </button>
-        </div>
+        {/* See All Button */}
+        {filteredTasks.length > 0 && (
+          <div className="flex justify-center my-10">
+            <button className="py-2 px-8 text-white rounded-full bg-[#228B22] hover:bg-[#1a6d1a] transition">
+              See All
+            </button>
+          </div>
+        )}
 
-        {/* Bottom Banner Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+        {/* Bottom Banner */}
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
+              Loading...
             </p>
           ) : bannerError ? (
             <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              Error: {bannerError}
+              {bannerError}
             </p>
           ) : bannerImages.length > 0 ? (
             <Slider {...sliderSettings}>
               {bannerImages.map((banner, index) => (
                 <div key={index}>
                   <img
-                    src={banner || "/src/assets/profile/default.png"} // Fallback image
+                    src={banner}
                     alt={`Banner ${index + 1}`}
                     className="w-full h-[400px] object-cover"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
-                    }}
+                    onError={(e) => (e.target.src = Work)}
                   />
                 </div>
               ))}
             </Slider>
           ) : (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
+              No banners
             </p>
           )}
         </div>

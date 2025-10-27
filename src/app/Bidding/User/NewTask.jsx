@@ -167,17 +167,7 @@ export default function BiddingNewTask() {
 
     const token = localStorage.getItem("bharat_token");
     if (!token) {
-      Swal.fire({
-        title: "Login Required",
-        text: "You need to login first to post a task!",
-        icon: "warning",
-        confirmButtonText: "Go to Login",
-        confirmButtonColor: "#228B22",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login");
-        }
-      });
+      navigate("/login");
       return;
     }
 

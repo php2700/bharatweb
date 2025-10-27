@@ -244,17 +244,7 @@ export default function ServiceProviderHome() {
   useEffect(() => {
     window.scrollTo(0, 0);
     if (!token) {
-      Swal.fire({
-        title: "Login Required",
-        text: "You need to login to access this page!",
-        icon: "warning",
-        confirmButtonText: "Go to Login",
-        confirmButtonColor: "#228B22",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login");
-        }
-      });
+      navigate("/login");
       return;
     }
     fetchBannerImages();

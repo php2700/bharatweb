@@ -13,13 +13,16 @@ export default function Accepted({
   serviceProvider,
   assignedWorker,
   paymentHistory,
+  fullPaymentHistory,
   orderId,
   hireStatus,
-	user_id,
+  user_id,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
+  if (!fullPaymentHistory) return null;
+
   const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -61,8 +64,8 @@ export default function Accepted({
           },
         }
       );
-      console.log("razor", response);
-      console.log("razor", response.status);
+      // console.log("razor", response);
+      // console.log("razor", response.status);
       if (response.status === 200) {
         console.log("razor", response.data.razorOrder);
         return response.data.razorOrder; // Assuming backend returns Razorpay order details
@@ -103,7 +106,7 @@ export default function Accepted({
       if (!response.ok) throw new Error("Failed to add payment stage");
 
       toast.success("✅ Online payment processed successfully!");
-			window.location.reload();
+      window.location.reload();
       setShowForm(false);
     } catch (error) {
       console.error("Error adding payment stage:", error);
@@ -113,43 +116,42 @@ export default function Accepted({
 
   // Add payment method (COD)
   const addPaymentMethod = async () => {
-  try {
-    const payload = {
-      amount: parseFloat(amount),
-      tax: parseFloat(amount) * 0.09,
-      description,
-      method: "cod",
-      status: "success",
-      collected_by: serviceProvider?.full_name || "Unknown",
-    };
+    try {
+      const payload = {
+        amount: parseFloat(amount),
+        tax: parseFloat(amount) * 0.09,
+        description,
+        method: "cod",
+        status: "success",
+        collected_by: serviceProvider?.full_name || "Unknown",
+      };
 
-    const response = await fetch(
-      `${BASE_URL}/direct-order/order/payment-stage/${orderId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
-        },
-        body: JSON.stringify(payload),
+      const response = await fetch(
+        `${BASE_URL}/direct-order/order/payment-stage/${orderId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json(); // 👈 always parse the response body
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add COD payment stage");
       }
-    );
 
-    const data = await response.json(); // 👈 always parse the response body
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to add COD payment stage");
+      toast.success("✅ COD payment added successfully!");
+      window.location.reload();
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error adding COD payment:", error);
+      toast.error(error.message || "Something went wrong");
     }
-
-    toast.success("✅ COD payment added successfully!");
-    window.location.reload();
-    setShowForm(false);
-  } catch (error) {
-    console.error("Error adding COD payment:", error);
-    toast.error(error.message || "Something went wrong");
-  }
-};
-
+  };
 
   // Handle payment release
   const handlePay = async (paymentId) => {
@@ -168,7 +170,7 @@ export default function Accepted({
 
       if (response.status === 200) {
         toast.success("Payment release requested successfully!");
-				window.location.reload();
+        window.location.reload();
       } else {
         toast.error("Payment release request failed, please try again.");
       }
@@ -235,7 +237,7 @@ export default function Accepted({
     toast.info("Form cleared!");
   };
 
-	   const handleChatOpen = (receiverId, senderId) => {
+  const handleChatOpen = (receiverId, senderId) => {
     // Save receiverId in localStorage
     localStorage.setItem("receiverId", receiverId);
     localStorage.setItem("senderId", senderId);
@@ -243,6 +245,7 @@ export default function Accepted({
     navigate("/chats");
   };
   return (
+		<>
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       {/* Add ToastContainer to render toasts */}
       <ToastContainer
@@ -273,19 +276,25 @@ export default function Accepted({
               <p className="text-lg font-semibold">
                 {serviceProvider.full_name || "Unknown Worker"}
               </p>
-             
-                <div className="flex ml-auto items-center space-x-3 ml-6">
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                    <img src={Call} alt="Call" className="w-5 h-5" />
-                  </div>
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer" onClick={() => handleChatOpen(serviceProvider._id, user_id)}>
-                    <img src={Message} alt="Message" className="w-5 h-5" />
-                  </div>
+
+              <div className="flex ml-auto items-center space-x-3 ml-6">
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                  <img src={Call} alt="Call" className="w-5 h-5" />
                 </div>
-              
-              <button className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-							onClick={()=>navigate(`/profile-details/${serviceProvider._id}/direct`)}
-							>
+                <div
+                  className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                  onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+                >
+                  <img src={Message} alt="Message" className="w-5 h-5" />
+                </div>
+              </div>
+
+              <button
+                className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                onClick={() =>
+                  navigate(`/profile-details/${serviceProvider._id}/direct`)
+                }
+              >
                 View Profile
               </button>
             </div>
@@ -311,7 +320,7 @@ export default function Accepted({
                   </p>
                 </div>
               </div>
-               <Link
+              <Link
                 to={`/view-worker/${assignedWorker._id}`}
                 className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
               >
@@ -408,7 +417,8 @@ export default function Accepted({
                 <div className="mt-2 text-sm text-gray-600">
                   Tax (9%): ₹{(parseFloat(amount) * 0.09).toFixed(2)}
                   <br />
-                  Total: ₹{(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(2)}
+                  Total: ₹
+                  {(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(2)}
                 </div>
               )}
               <div className="flex justify-end space-x-4 mt-4">
@@ -430,5 +440,30 @@ export default function Accepted({
         </div>
       )}
     </div>
+		<div className="p-4 bg-white shadow-md rounded-lg">
+        <table className="w-full border border-gray-300 rounded-md overflow-hidden">
+          <thead style={{ backgroundColor: "#228B22", color: "white" }}>
+            <tr>
+              <th className="border p-2 text-left">Amount</th>
+              <th className="border p-2 text-left">Total Paid</th>
+              <th className="border p-2 text-left">Total Tax</th>
+              <th className="border p-2 text-left">Paid to Provider</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.total_expected}
+              </td>
+              <td className="border p-2">₹{fullPaymentHistory.total_tax}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.remaining_amount}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+		</>
   );
 }
