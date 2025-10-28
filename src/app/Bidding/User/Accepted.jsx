@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the toastify CSS
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -154,34 +155,102 @@ export default function Accepted({
 
 
   // Handle payment release
-  const handlePay = async (paymentId) => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      const response = await axios.post(
-        `${BASE_URL}/bidding-order/user/request-release/${orderId}/${paymentId}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  // const handlePay = async (paymentId) => {
+  //   try {
+  //     const token = localStorage.getItem("bharat_token");
+  //     const response = await axios.post(
+  //       `${BASE_URL}/bidding-order/user/request-release/${orderId}/${paymentId}`,
+  //       {},
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      if (response.status === 200) {
-        toast.success("Payment release requested successfully!");
+  //     if (response.status === 200) {
+  //       toast.success("Payment release requested successfully!");
+	// 			window.location.reload();
+  //     } else {
+  //       toast.error("Payment release request failed, please try again.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Payment release error:", error);
+  //     toast.error(
+  //       error.response?.data?.message ||
+  //         "Something went wrong while requesting payment release."
+  //     );
+  //   }
+  // };
+
+const handlePay = async (paymentId) => {
+	// Step 1️⃣: Show confirmation alert
+	const result = await Swal.fire({
+		title: "Are you sure?",
+		text: "Do you really want to release this payment?",
+		icon: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#3085d6",
+		cancelButtonColor: "#d33",
+		confirmButtonText: "Yes, Pay Now",
+		cancelButtonText: "Cancel",
+	});
+
+	// Step 2️⃣: Only continue if user clicks "Yes"
+	if (result.isConfirmed) {
+		try {
+			const token = localStorage.getItem("bharat_token");
+
+			const response = await axios.post(
+				`${BASE_URL}/bidding-order/user/request-release/${orderId}/${paymentId}`,
+				{},
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+
+			if (response.status === 200) {
+				await Swal.fire({
+					icon: "success",
+					title: "Payment Released",
+					text: "Payment release requested successfully!",
+					timer: 2000,
+					showConfirmButton: false,
+				});
 				window.location.reload();
-      } else {
-        toast.error("Payment release request failed, please try again.");
-      }
-    } catch (error) {
-      console.error("Payment release error:", error);
-      toast.error(
-        error.response?.data?.message ||
-          "Something went wrong while requesting payment release."
-      );
-    }
-  };
+			} else {
+				Swal.fire({
+					icon: "error",
+					title: "Failed",
+					text: "Payment release request failed, please try again.",
+				});
+			}
+		} catch (error) {
+			console.error("Payment release error:", error);
+			Swal.fire({
+				icon: "error",
+				title: "Error",
+				text:
+					error.response?.data?.message ||
+					"Something went wrong while requesting payment release.",
+			});
+		}
+	} else {
+		// Optional: user cancelled
+		Swal.fire({
+			icon: "info",
+			title: "Cancelled",
+			text: "Payment release was cancelled.",
+			timer: 1500,
+			showConfirmButton: false,
+		});
+	}
+};
+
 
   // Handle form submission
   const handlePaymentSubmit = async () => {
@@ -356,16 +425,16 @@ export default function Accepted({
                       onClick={() => handlePay(payment._id)}
                       className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
                     >
-                      Pay
+                      Pay to app
                     </button>
                   )}
                 {payment.release_status === "release_requested" && (
-                  <span className="text-yellow-600 font-semibold">
-                    Requested
+                  <span className="text-yellow-700 font-semibold">
+                    Requested for Pay
                   </span>
                 )}
                 {payment.release_status === "released" && (
-                  <span className="text-[#228B22] font-semibold">Paid</span>
+                  <span className="text-[#228B22] font-semibold">Paid to Provider</span>
                 )}
                 {payment.release_status === "refunded" && (
                   <span className="text-blue-600 font-semibold">Refunded</span>

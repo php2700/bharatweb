@@ -611,6 +611,7 @@ const Post = () => {
                   placeholder="Enter or select address"
                   className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                   aria-invalid={validationErrors.address ? "true" : "false"}
+                  onClick={() => setShowOptions(!showOptions)}
                 />
                 <button
                   type="button"
@@ -717,13 +718,14 @@ const Post = () => {
               <input
                 type="text"
                 name="contact"
-               
                 value={formData.contact}
                 // onChange={handleInputChange}
-                   onChange={(e) => {
-      const onlyNums = e.target.value.replace(/\D/g, "");
-      handleInputChange({ target: { name: "contact", value: onlyNums } });
-    }}
+                onChange={(e) => {
+                  const onlyNums = e.target.value.replace(/\D/g, "");
+                  handleInputChange({
+                    target: { name: "contact", value: onlyNums },
+                  });
+                }}
                 placeholder="Enter Contact Number"
                 className={`w-full border ${
                   validationErrors.contact
@@ -780,8 +782,13 @@ const Post = () => {
                   type="datetime-local"
                   name="deadline"
                   value={formData.deadline}
-                  onChange={handleInputChange}
-                  className="w-full bg-transparent outline-none cursor-pointer"
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    // ✅ this ensures picker closes after selection
+                    // e.target.blur();
+                  }}
+                  min={new Date().toISOString().slice(0, 16)} // ✅ blocks past dates
+                  className="w-full bg-white text-gray-800 outline-none cursor-pointer appearance-none"
                 />
               </div>
               {validationErrors.deadline && (

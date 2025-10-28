@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -28,7 +28,11 @@ export default function ViewProfileDetails() {
   const [bannerError, setBannerError] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+ const statuslocation = useLocation();
+const { hire_status } = statuslocation.state || {};
 
+console.log("hfhfhf", hire_status);
+console.log("lllll", statuslocation.state);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -650,7 +654,7 @@ export default function ViewProfileDetails() {
               </div>
             </div>
           )}
-          {type === "direct" && (
+          {(type === "direct" && (hire_status === "pending" || hire_status === "NoStatus")) && (
             <div className="flex justify-center mt-6">
               <button
                 className="w-1/2 py-4 bg-[#228B22] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition"

@@ -153,6 +153,14 @@ export default function ServiceProviderList() {
       }
     });
 
+  const handleRouteHire = (ProviderId) => {
+    navigate(`/profile-details/${ProviderId}/direct`, {
+      state: {
+        hire_status: "NoStatus",
+      },
+    });
+  };
+
   // Slider settings for react-slick
   const sliderSettings = {
     dots: true,
@@ -285,11 +293,13 @@ export default function ServiceProviderList() {
                       </div>
 
                       <div className="flex gap-4">
-                        <Link to={`/profile-details/${worker._id}/direct`}>
-                          <button className="text-[#228B22] py-1 px-4 border rounded-lg">
-                            View Profile
-                          </button>
-                        </Link>
+                        <button
+                          className="text-[#228B22] py-1 px-4 border rounded-lg"
+                          onClick={() => handleRouteHire(worker._id)}
+                        >
+                          View Profile
+                        </button>
+
                         <button
                           onClick={() => handleHire(worker._id)}
                           className="text-white bg-[#228B22] py-1 px-10 rounded-lg"

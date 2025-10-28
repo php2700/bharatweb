@@ -15,7 +15,7 @@ import pdf from "../../../assets/directHiring/pdficon2.png";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
-  const { task } = useParams(); // e.g., "My%20Bidding"
+  const { task } = useParams();
   const [activeTab, setActiveTab] = useState(task ? decodeURIComponent(task) : "Emergency Tasks");
   const [taskData, setTaskData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,12 +24,15 @@ export default function Worklist() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
-  const [downloadingIds, setDownloadingIds] = useState([]); // Track downloading tasks
+  const [downloadingIds, setDownloadingIds] = useState([]);
+  const [expandedAddresses, setExpandedAddresses] = useState({});
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
 
-  // Helper: Map tab to download type
+  /* --------------------------------------------------- */
+  /*  Helpers                                            */
+  /* --------------------------------------------------- */
   const downloadTypeFromTab = (tab) => {
     const map = {
       "My Bidding": "bidding",
@@ -39,7 +42,16 @@ export default function Worklist() {
     return map[tab] || "bidding";
   };
 
-  // Fetch banner images
+  const toggleAddress = (taskId) => {
+    setExpandedAddresses((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
+
+  /* --------------------------------------------------- */
+  /*  Banner fetch                                       */
+  /* --------------------------------------------------- */
   const fetchBannerImages = async () => {
     try {
       if (!token) throw new Error("No authentication token found");
@@ -65,7 +77,9 @@ export default function Worklist() {
     }
   };
 
-  // Initialize tab and fetch banners
+  /* --------------------------------------------------- */
+  /*  Init – tab + banners                               */
+  /* --------------------------------------------------- */
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
@@ -85,7 +99,9 @@ export default function Worklist() {
     }
   }, [task, navigate]);
 
-  // Fetch tasks based on activeTab
+  /* --------------------------------------------------- */
+  /*  Tasks fetch                                        */
+  /* --------------------------------------------------- */
   useEffect(() => {
     if (!activeTab || !token) return;
 
@@ -122,14 +138,16 @@ export default function Worklist() {
           id: task._id,
           project_id: task.project_id || "N/A",
           image: task.image_urls?.[0] || task.image || Work,
-          name: task.category_id?.name || task.title || "Unnamed Task",
+          name: task.title || null,
+          category_name: task.category_id?.name || "N/A",
+          subcategory_name: task.sub_category_ids?.map((sub) => sub.name).join(", ") || "N/A",
+          description: task.description || null,
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
             : "Unknown Date",
           skills:
             task.sub_category_ids?.map((sub) => sub.name).join(", ") ||
             task.skills?.join(", ") ||
-            task.description ||
             "No skills listed",
           price: task.service_payment?.amount
             ? `₹${task.service_payment.amount}`
@@ -142,6 +160,7 @@ export default function Worklist() {
           status: task.hire_status || task.status || "N/A",
           location:
             task.google_address || task.location || task.address || "Unknown Location",
+          milestone: task.service_payment?.payment_history || [],
         }));
 
         setTaskData(mappedTasks);
@@ -156,10 +175,28 @@ export default function Worklist() {
     fetchTasks();
   }, [activeTab, token]);
 
-  // Handle search input
+  /* --------------------------------------------------- */
+  /*  Search                                             */
+  /* --------------------------------------------------- */
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
-  // Handle PDF download
+  const filteredTasks = taskData.filter((task) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+
+    return (
+      (task.name?.toLowerCase().includes(q) ?? false) ||
+      (task.category_name?.toLowerCase().includes(q) ?? false) ||
+      (task.subcategory_name?.toLowerCase().includes(q) ?? false) ||
+      (task.description?.toLowerCase().includes(q) ?? false) ||
+      (task.skills?.toLowerCase().includes(q) ?? false) ||
+      (task.location?.toLowerCase().includes(q) ?? false)
+    );
+  });
+
+  /* --------------------------------------------------- */
+  /*  PDF download                                       */
+  /* --------------------------------------------------- */
   const handledownload = async (id, type) => {
     if (!id) return alert("Invalid task ID");
     if (!token) return alert("User not authenticated");
@@ -168,15 +205,10 @@ export default function Worklist() {
 
     try {
       let endpoint = "";
-      if (type === "bidding") {
-        endpoint = `${BASE_URL}/user/invoice/bidding/${id}`;
-      } else if (type === "my-hire") {
-        endpoint = `${BASE_URL}/user/invoice/direct/${id}`;
-      } else if (type === "emergency") {
-        endpoint = `${BASE_URL}/user/invoice/emergency/${id}`;
-      } else {
-        throw new Error("Invalid invoice type");
-      }
+      if (type === "bidding") endpoint = `${BASE_URL}/user/invoice/bidding/${id}`;
+      else if (type === "my-hire") endpoint = `${BASE_URL}/user/invoice/direct/${id}`;
+      else if (type === "emergency") endpoint = `${BASE_URL}/user/invoice/emergency/${id}`;
+      else throw new Error("Invalid invoice type");
 
       const response = await axios.get(endpoint, {
         responseType: "blob",
@@ -200,21 +232,14 @@ export default function Worklist() {
     }
   };
 
-  // Filter tasks
-  const filteredTasks = taskData.filter(
-    (task) =>
-      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.skills.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.location.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Handle tab click
+  /* --------------------------------------------------- */
+  /*  Tab handling                                       */
+  /* --------------------------------------------------- */
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     navigate(`/user/work-list/${encodeURIComponent(tab)}`);
   };
 
-  // Slider settings
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -226,11 +251,57 @@ export default function Worklist() {
     arrows: true,
   };
 
+  /* --------------------------------------------------- */
+  /*  Render address with See-More                       */
+  /* --------------------------------------------------- */
+  const renderAddress = (task) => {
+    const isExpanded = expandedAddresses[task.id];
+    const maxLength = 50;
+
+    if (task.location.length <= maxLength || isExpanded) {
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="flex items-center text-gray-700 text-sm">
+            <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
+            {task.location}
+          </span>
+          {isExpanded && (
+            <button
+              onClick={() => toggleAddress(task.id)}
+              className="text-xs text-gray-500 hover:text-gray-700 ml-6 self-start"
+            >
+              See Less
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    const truncated = task.location.substring(0, maxLength) + "...";
+    return (
+      <div className="flex flex-col gap-1">
+        <span className="flex items-center text-gray-700 text-sm">
+          <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
+          {truncated}
+        </span>
+        <button
+          onClick={() => toggleAddress(task.id)}
+          className="text-xs text-[#228B22] hover:text-green-800 font-medium ml-6 self-start"
+        >
+          See More
+        </button>
+      </div>
+    );
+  };
+
+  /* --------------------------------------------------- */
+  /*  JSX                                                */
+  /* --------------------------------------------------- */
   return (
     <>
       <Header />
 
-      {/* Back Button */}
+      {/* Back button */}
       <div className="container mx-auto px-4 py-4 mt-20">
         <button
           onClick={() => navigate(-1)}
@@ -241,7 +312,7 @@ export default function Worklist() {
         </button>
       </div>
 
-      {/* Top Banner Slider */}
+      {/* Top banner */}
       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -253,15 +324,13 @@ export default function Worklist() {
           </p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i}>
                 <img
                   src={banner}
-                  alt={`Banner ${index + 1}`}
+                  alt={`Banner ${i + 1}`}
                   className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = Work; // fallback to default work image
-                  }}
+                  onError={(e) => (e.target.src = Work)}
                 />
               </div>
             ))}
@@ -273,7 +342,7 @@ export default function Worklist() {
         )}
       </div>
 
-      {/* Work Section */}
+      {/* Main section */}
       <div className="container max-w-full mx-auto my-10">
         <h1 className="text-xl sm:text-2xl max-w-5xl text-center mb-5 font-bold mx-auto">
           My Hiring
@@ -306,33 +375,37 @@ export default function Worklist() {
             />
             <input
               type="search"
-              placeholder="Search for services"
+              placeholder="Search by title, category, subcategory, description, skills, or location..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm"
             />
           </div>
         </div>
 
-        {/* Task List */}
+        {/* Task list */}
         <div className="space-y-6 max-w-5xl mx-auto">
           {loading ? (
             <p className="text-center">Loading tasks...</p>
           ) : error ? (
             <p className="text-center text-red-500">{error}</p>
           ) : filteredTasks.length === 0 ? (
-            <p className="text-center">No {activeTab.toLowerCase()} available.</p>
+            <p className="text-center">
+              {searchQuery
+                ? `No results found for "${searchQuery}" in ${activeTab.toLowerCase()}.`
+                : `No ${activeTab.toLowerCase()} available.`}
+            </p>
           ) : (
             filteredTasks.map((task) => (
               <div
                 key={task.id}
                 className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
               >
-                {/* Left Image */}
+                {/* Image */}
                 <div className="relative w-full sm:w-1/3 h-48 sm:h-auto">
                   <img
                     src={task.image}
-                    alt={task.name}
+                    alt={task.name || "Task"}
                     className="w-full h-full object-cover"
                   />
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
@@ -340,29 +413,58 @@ export default function Worklist() {
                   </span>
                 </div>
 
-                {/* Right Content */}
+                {/* Content */}
                 <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
+                  {/* Title + Date */}
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
-                    <h2 className="text-lg font-semibold text-gray-800">{task.name}</h2>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {task.name || "Untitled Task"}
+                    </h2>
                     <p className="text-sm text-[#334247] font-medium">
                       Posted: {task.date}
                     </p>
                   </div>
-                  <p className="text-sm flex justify-between text-[#334247] mt-2 line-clamp-2">
-                    {task.skills}
-										<button
-                      onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
-                      disabled={downloadingIds.includes(task.id)}
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs"
-                      title="Download Invoice"
-                    >
-                      <img src={pdf} alt="PDF" className="w-5 h-5" />
-                      {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
-                    </button>
-                  </p>
 
-                  <p className="text-green-600 font-bold mt-2">{task.price}</p>
+                  {/* Category / Subcategory – ONLY SHOW IF NOT "N/A" */}
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 mt-1">
+                    {task.category_name !== "N/A" && (
+                      <span>
+                        <strong>Category:</strong> {task.category_name}
+                      </span>
+                    )}
+                    {task.subcategory_name !== "N/A" && (
+                      <span>
+                        <strong>Subcategory:</strong> {task.subcategory_name}
+                      </span>
+                    )}
+                  </div>
 
+                  {/* Description */}
+                  {task.description && (
+                    <p className="text-sm text-[#334247] mt-2 italic line-clamp-3 bg-gray-50 p-2 rounded">
+                      {task.description}
+                    </p>
+                  )}
+
+                  {/* Skills + PDF */}
+                  <div className="flex justify-between items-start mt-2">
+                    {/*<p className="text-sm text-[#334247]  line-clamp-2 flex-1 pr-2">
+                      {task.skills}
+                    </p> */}
+										<p className="text-green-600 font-bold mt-2">{task.price}</p>
+                    {task.milestone.length > 0 && (
+                      <button
+                        onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
+                        disabled={downloadingIds.includes(task.id)}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs flex-shrink-0"
+                        title="Download Invoice"
+                      >
+                        <img src={pdf} alt="PDF" className="w-5 h-5" />
+                        {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
+                      </button>
+                    )}
+                  </div>
+                  {/* Completion + Status */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
                     <p className="text-sm text-[#334247] font-medium">
                       Completion: {task.completiondate}
@@ -386,11 +488,10 @@ export default function Worklist() {
                     </p>
                   </div>
 
+                  {/* Address + View Details */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
-                    <span className="flex items-center text-gray-700 text-sm">
-                      <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
-                      {task.location}
-                    </span>
+                    <div className="flex-1 min-w-0">{renderAddress(task)}</div>
+
                     <button
                       onClick={() => {
                         const routes = {
@@ -400,7 +501,7 @@ export default function Worklist() {
                         };
                         navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
                       }}
-                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
+                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
                     >
                       View Details
                     </button>
@@ -411,7 +512,7 @@ export default function Worklist() {
           )}
         </div>
 
-        {/* See All Button */}
+        {/* See All */}
         {filteredTasks.length > 0 && (
           <div className="flex justify-center my-10">
             <button className="py-2 px-8 text-white rounded-full bg-[#228B22] hover:bg-[#1a6d1a] transition">
@@ -420,7 +521,7 @@ export default function Worklist() {
           </div>
         )}
 
-        {/* Bottom Banner */}
+        {/* Bottom banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -432,11 +533,11 @@ export default function Worklist() {
             </p>
           ) : bannerImages.length > 0 ? (
             <Slider {...sliderSettings}>
-              {bannerImages.map((banner, index) => (
-                <div key={index}>
+              {bannerImages.map((banner, i) => (
+                <div key={i}>
                   <img
                     src={banner}
-                    alt={`Banner ${index + 1}`}
+                    alt={`Banner ${i + 1}`}
                     className="w-full h-[400px] object-cover"
                     onError={(e) => (e.target.src = Work)}
                   />

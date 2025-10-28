@@ -135,7 +135,7 @@ export default function BiddingNewTask() {
         },
         body: JSON.stringify({
           latitude: addr.latitude || 28.6139,
-          longitude: addr.longitude || 77.2090,
+          longitude: addr.longitude || 77.209,
           address: addr.address || "New Delhi, India",
         }),
       });
@@ -156,7 +156,10 @@ export default function BiddingNewTask() {
   };
 
   useEffect(() => {
-    if (selectedAddressObj && isAddressConfirmed[profile?.full_address?.indexOf(selectedAddressObj)]) {
+    if (
+      selectedAddressObj &&
+      isAddressConfirmed[profile?.full_address?.indexOf(selectedAddressObj)]
+    ) {
       updateLocation(selectedAddressObj);
       setShowDropdown(false); // Close dropdown after confirmation
     }
@@ -368,8 +371,12 @@ export default function BiddingNewTask() {
                           onClick={() => handleSelect(addr, index)}
                         >
                           <p className="font-medium">{addr.title}</p>
-                          <p className="text-sm text-gray-600">{addr.landmark}</p>
-                          <p className="text-xs text-gray-500">{addr.address}</p>
+                          <p className="text-sm text-gray-600">
+                            {addr.landmark}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {addr.address}
+                          </p>
                         </label>
                       </li>
                     ))
@@ -429,6 +436,15 @@ export default function BiddingNewTask() {
                   showTimeSelect
                   dateFormat="yyyy-MM-dd HH:mm"
                   placeholderText="Select deadline"
+                  minDate={new Date()} // ✅ Prevents selecting past dates
+                  minTime={
+                    formData.deadline &&
+                    new Date(formData.deadline).toDateString() ===
+                      new Date().toDateString()
+                      ? new Date() // ✅ If today, block past times too
+                      : new Date(0, 0, 0, 0, 0) // else allow all times
+                  }
+                  maxTime={new Date(0, 0, 0, 23, 59)}
                   className="w-[754px] border-2 border-[#777777] rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -505,7 +521,9 @@ export default function BiddingNewTask() {
                         onClick={() => {
                           setFormData({
                             ...formData,
-                            images: formData.images.filter((_, i) => i !== index),
+                            images: formData.images.filter(
+                              (_, i) => i !== index
+                            ),
                           });
                         }}
                         className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
@@ -518,7 +536,8 @@ export default function BiddingNewTask() {
               )}
             </div>
             <span className="text-xs text-[#008000] font-[500]">
-              Upload (.png, .jpg, .jpeg) Files (300px * 300px) - Max 5 photos (Optional)
+              Upload (.png, .jpg, .jpeg) Files (300px * 300px) - Max 5 photos
+              (Optional)
             </span>
 
             <br />

@@ -304,6 +304,7 @@ const DirectHiring = () => {
                 placeholder="Enter or select address"
                 className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.address ? "true" : "false"}
+								onClick={() => setShowOptions(!showOptions)}
               />
               <button
                 type="button"
@@ -416,6 +417,7 @@ const DirectHiring = () => {
                 onChange={(e) => setDeadline(e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer"
                 aria-invalid={errors.deadline ? "true" : "false"}
+								min={new Date().toISOString().slice(0, 16)} 
                 onClick={(e) => {
                   e.preventDefault();
                   // Ye calendar icon jaisa open karega

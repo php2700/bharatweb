@@ -10,12 +10,12 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import pdfIcon from "../../../assets/directHiring/pdficon2.png";
+import pdfIcon from "../../../assets/directHiring/pdficon2.png"; // <-- NEW
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
-  const { task } = useParams();
+  const { task } = useParams(); // e.g., "My%20Bidding"
   const decodedTask = task ? decodeURIComponent(task) : "Emergency Tasks";
 
   const [activeTab, setActiveTab] = useState(decodedTask);
@@ -26,13 +26,14 @@ export default function Worklist() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
-  const [downloadingIds, setDownloadingIds] = useState([]);
-  const [expandedAddresses, setExpandedAddresses] = useState({}); // For "See More"
+  const [downloadingIds, setDownloadingIds] = useState([]); // <-- NEW
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
 
-  // Map tab to invoice type
+  /* -------------------------------------------------
+     Helper – map tab → invoice type
+  ------------------------------------------------- */
   const downloadTypeFromTab = (tab) => {
     const map = {
       "My Bidding": "bidding",
@@ -42,25 +43,22 @@ export default function Worklist() {
     return map[tab] || "bidding";
   };
 
-  // Toggle address expansion
-  const toggleAddress = (taskId) => {
-    setExpandedAddresses((prev) => ({
-      ...prev,
-      [taskId]: !prev[taskId],
-    }));
-  };
-
-  // Fetch banner images
+  /* -------------------------------------------------
+     Fetch banner images
+  ------------------------------------------------- */
   const fetchBannerImages = async () => {
     try {
       if (!token) throw new Error("No authentication token found");
 
-      const { data } = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (data?.success && Array.isArray(data.images) && data.images.length) {
         setBannerImages(data.images);
@@ -76,7 +74,9 @@ export default function Worklist() {
     }
   };
 
-  // Initialize tab + banners
+  /* -------------------------------------------------
+     Initialise tab + banners
+  ------------------------------------------------- */
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
@@ -90,7 +90,9 @@ export default function Worklist() {
     }
   }, [task, navigate]);
 
-  // Fetch tasks
+  /* -------------------------------------------------
+     Fetch tasks for the active tab
+  ------------------------------------------------- */
   useEffect(() => {
     if (!activeTab || !token) return;
 
@@ -127,10 +129,7 @@ export default function Worklist() {
           id: t._id,
           project_id: t.project_id || "N/A",
           image: t.image_urls?.[0] || t.image_url?.[0] || Work,
-          name: t.title || t.category_id?.name || "Unnamed Task",
-          category_name: t.category_id?.name || "N/A",
-          subcategory_name: t.sub_category_ids?.map((s) => s.name).join(", ") || "N/A",
-          description: t.description || null,
+          name: t.category_id?.name || t.title || "Unnamed Task",
           date: t.createdAt
             ? new Date(t.createdAt).toLocaleDateString()
             : "Unknown Date",
@@ -150,7 +149,7 @@ export default function Worklist() {
           status: t.hire_status || t.status || "N/A",
           location:
             t.google_address || t.location || t.address || "Unknown Location",
-          milestone: t.service_payment?.payment_history || [],
+						milestone:t.service_payment.payment_history || [],
         }));
 
         setTaskData(mapped);
@@ -165,10 +164,14 @@ export default function Worklist() {
     fetchTasks();
   }, [activeTab, token]);
 
-  // Search handler
+  /* -------------------------------------------------
+     Search handler
+  ------------------------------------------------- */
   const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
-  // PDF download
+  /* -------------------------------------------------
+     PDF download
+  ------------------------------------------------- */
   const handledownload = async (id, type) => {
     if (!id) return alert("Invalid task id");
     if (!token) return alert("Not authenticated");
@@ -207,28 +210,27 @@ export default function Worklist() {
     }
   };
 
-  // Filter tasks (enhanced search)
-  const filteredTasks = taskData.filter((t) => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return true;
+  /* -------------------------------------------------
+     Filter tasks
+  ------------------------------------------------- */
+  const filteredTasks = taskData.filter(
+    (t) =>
+      t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.skills.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-    return (
-      (t.name?.toLowerCase().includes(q) ?? false) ||
-      (t.category_name?.toLowerCase().includes(q) ?? false) ||
-      (t.subcategory_name?.toLowerCase().includes(q) ?? false) ||
-      (t.description?.toLowerCase().includes(q) ?? false) ||
-      (t.skills?.toLowerCase().includes(q) ?? false) ||
-      (t.location?.toLowerCase().includes(q) ?? false)
-    );
-  });
-
-  // Tab click
+  /* -------------------------------------------------
+     Tab click → update URL
+  ------------------------------------------------- */
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     navigate(`/worker/work-list/${encodeURIComponent(tab)}`);
   };
 
-  // Slider settings
+  /* -------------------------------------------------
+     Slider config
+  ------------------------------------------------- */
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -240,47 +242,9 @@ export default function Worklist() {
     arrows: true,
   };
 
-  // Render address with See More
-  const renderAddress = (task) => {
-    const isExpanded = expandedAddresses[task.id];
-    const maxLength = 50;
-
-    if (task.location.length <= maxLength || isExpanded) {
-      return (
-        <div className="flex flex-col gap-1">
-          <span className="flex items-center text-gray-700 text-sm">
-            <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
-            {task.location}
-          </span>
-          {isExpanded && (
-            <button
-              onClick={() => toggleAddress(task.id)}
-              className="text-xs text-gray-500 hover:text-gray-700 ml-6 self-start"
-            >
-              See Less
-            </button>
-          )}
-        </div>
-      );
-    }
-
-    const truncated = task.location.substring(0, maxLength) + "...";
-    return (
-      <div className="flex flex-col gap-1">
-        <span className="flex items-center text-gray-700 text-sm">
-          <FaMapMarkerAlt size={20} color="#228B22" className="mr-1" />
-          {truncated}
-        </span>
-        <button
-          onClick={() => toggleAddress(task.id)}
-          className="text-xs text-[#228B22] hover:text-green-800 font-medium ml-6 self-start"
-        >
-          See More
-        </button>
-      </div>
-    );
-  };
-
+  /* -------------------------------------------------
+     Render
+  ------------------------------------------------- */
   return (
     <>
       <Header />
@@ -359,10 +323,10 @@ export default function Worklist() {
             />
             <input
               type="search"
-              placeholder="Search by title, category, subcategory, description, skills, or location..."
+              placeholder="Search for services"
               value={searchQuery}
               onChange={handleSearchChange}
-              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm"
+              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
         </div>
@@ -375,9 +339,7 @@ export default function Worklist() {
             <p className="text-center text-red-500">{error}</p>
           ) : filteredTasks.length === 0 ? (
             <p className="text-center">
-              {searchQuery
-                ? `No results found for "${searchQuery}" in ${activeTab.toLowerCase()}.`
-                : `No ${activeTab.toLowerCase()} available.`}
+              No {activeTab.toLowerCase()} available.
             </p>
           ) : (
             filteredTasks.map((task) => (
@@ -400,7 +362,6 @@ export default function Worklist() {
 
                 {/* Content */}
                 <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
-                  {/* Title + Date */}
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                     <h2 className="text-lg font-semibold text-gray-800">
                       {task.name}
@@ -410,47 +371,25 @@ export default function Worklist() {
                     </p>
                   </div>
 
-                  {/* Category & Subcategory (Only if not N/A) */}
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 mt-1">
-                    {task.category_name !== "N/A" && (
-                      <span>
-                        <strong>Category:</strong> {task.category_name}
-                      </span>
-                    )}
-                    {task.subcategory_name !== "N/A" && (
-                      <span>
-                        <strong>Subcategory:</strong> {task.subcategory_name}
-                      </span>
-                    )}
-                  </div>
+                  <p className="text-sm flex justify-between text-[#334247] mt-2 line-clamp-2">
+                    {task.skills}
+                   {task.milestone.length > 0 && <button
+                      onClick={() =>
+                        handledownload(task.id, downloadTypeFromTab(activeTab))
+                      }
+                      disabled={downloadingIds.includes(task.id)}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs"
+                      title="Download Invoice"
+                    >
+                      <img src={pdfIcon} alt="PDF" className="w-5 h-5" />
+                      {downloadingIds.includes(task.id)
+                        ? "Downloading..."
+                        : "Download PDF"}
+                    </button>}
+                  </p>
 
-                  {/* Description */}
-                  {task.description && (
-                    <p className="text-sm text-[#334247] mt-2 italic line-clamp-3 bg-gray-50 p-2 rounded">
-                      {task.description}
-                    </p>
-                  )}
+                  <p className="text-green-600 font-bold mt-2">{task.price}</p>
 
-                  {/* Skills + PDF */}
-                  <div className="flex justify-between items-start mt-2">
-                    {/*<p className="text-sm text-[#334247] line-clamp-2 flex-1 pr-2">
-                      {task.skills}
-                    </p>*/}
-                    <p className="text-green-600 font-bold mt-2">{task.price}</p>
-                    {task.milestone.length > 0 && (
-                      <button
-                        onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
-                        disabled={downloadingIds.includes(task.id)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs flex-shrink-0"
-                        title="Download Invoice"
-                      >
-                        <img src={pdfIcon} alt="PDF" className="w-5 h-5" />
-                        {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Completion + Status */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
                     <p className="text-sm text-[#334247] font-medium">
                       Completion: {task.completiondate}
@@ -465,7 +404,8 @@ export default function Worklist() {
                           ? "bg-green-100 text-green-800"
                           : task.status === "cancelledDispute"
                           ? "bg-orange-100 text-orange-800"
-                          : task.status === "accepted" || task.status === "assigned"
+                          : task.status === "accepted" ||
+                            task.status === "assigned"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
@@ -474,11 +414,17 @@ export default function Worklist() {
                     </p>
                   </div>
 
-                  {/* Address + View Details */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
-                    <div className="flex-1 min-w-0">
-                      {renderAddress(task)}
-                    </div>
+                    <span className="flex items-center text-gray-700 text-sm">
+                      <FaMapMarkerAlt
+                        size={20}
+                        color="#228B22"
+                        className="mr-1"
+                      />
+                      {task.location.length > 30
+                        ? `${task.location.slice(0, 30)}...`
+                        : task.location}
+                    </span>
 
                     <button
                       onClick={() => {
@@ -487,9 +433,11 @@ export default function Worklist() {
                           "My Hire": "hire/worker",
                           "Emergency Tasks": "emergency/worker",
                         };
-                        navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
+                        navigate(
+                          `/${routes[activeTab]}/order-detail/${task.id}`
+                        );
                       }}
-                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
+                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
                     >
                       View Details
                     </button>
@@ -499,15 +447,6 @@ export default function Worklist() {
             ))
           )}
         </div>
-
-        {/* See All */}
-        {filteredTasks.length > 0 && (
-          <div className="flex justify-center my-10">
-            <button className="py-2 px-8 text-white rounded-full bg-[#228B22] hover:bg-[#1a6d1a] transition">
-              See All
-            </button>
-          </div>
-        )}
 
         {/* Bottom Banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">

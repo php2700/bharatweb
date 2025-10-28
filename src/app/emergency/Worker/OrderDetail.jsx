@@ -9,6 +9,7 @@ import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,7 +21,7 @@ export default function ViewProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-   useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
@@ -135,10 +136,19 @@ export default function ViewProfile() {
                 </span>
 
                 <div>
-                  Detailed Address :-{" "}
-                  {orderData?.detailed_address || "No Address Provided"}
-                  <div className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                  Sub Category :-{" "}
+                  {orderData?.sub_category_ids
+                    .map((sub) => sub.name)
+                    .join(", ") || "No Address Provided"}
+                  <div className="text-gray-600 flex justify-center items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
                     {" "}
+                    <span>
+                      <FaMapMarkerAlt
+                        size={25}
+                        color="#228B22"
+                        className="mr-2"
+                      />
+                    </span>
                     {orderData?.google_address || "Unknown Location"}
                   </div>
                 </div>
@@ -239,13 +249,11 @@ export default function ViewProfile() {
                     orderData?.hire_status === "pending") && (
                     <div className="flex space-x-4">
                       {/* Red button (Cancel Task) */}
-                      	<Link to={`/dispute/${id}/emergency`}>
-												<button
-													className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-												>
-													Cancel Task and Create Dispute
-												</button>
-											</Link>
+                      <Link to={`/dispute/${id}/emergency`}>
+                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                          Cancel Task and Create Dispute
+                        </button>
+                      </Link>
                     </div>
                   )}
                 </div>

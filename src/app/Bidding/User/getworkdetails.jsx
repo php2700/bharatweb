@@ -44,7 +44,7 @@ export default function BiddinggetWorkDetail() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
   const [showCompletedModal, setShowCompletedModal] = useState(false);
-	const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
+  const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -241,122 +241,127 @@ export default function BiddinggetWorkDetail() {
     }
   };
 
-const handleMarkComplete = async () => {
-  try {
-    const token = localStorage.getItem("bharat_token");
+  const handleMarkComplete = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
 
-    const response = await axios.post(
-      `${BASE_URL}/bidding-order/completeOrderUser`,
-      { order_id: id },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      const response = await axios.post(
+        `${BASE_URL}/bidding-order/completeOrderUser`,
+        { order_id: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    // ✅ Success case
-    if (response.status === 200 && response.data.status) {
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Order marked as complete successfully!",
-        confirmButtonColor: "#228B22",
-      }).then(() => {
-        setShowCompletedModal(true);
-      });
-      return;
-    }
+      // ✅ Success case
+      if (response.status === 200 && response.data.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Order marked as complete successfully!",
+          confirmButtonColor: "#228B22",
+        }).then(() => fetchOrder()).then(() => {
+          setShowCompletedModal(true);
+        });
+        return;
+      }
 
-    // ❌ If API returns non-200 but no throw (edge case)
-    throw new Error(response.data?.message || "Failed to mark order as complete");
+      // ❌ If API returns non-200 but no throw (edge case)
+      throw new Error(
+        response.data?.message || "Failed to mark order as complete"
+      );
+    } catch (err) {
+      console.error(err);
 
-  } catch (err) {
-    console.error(err);
+      // ❌ Case 1: No payment records exist
+      if (
+        err.response?.data?.message ===
+        "Cannot complete the order because no payment records exist for this order."
+      ) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Cannot complete the order because no payment records exist for this order.",
+          confirmButtonColor: "#FF0000",
+        });
+        return;
+      }
 
-    // ❌ Case 1: No payment records exist
-    if (
-      err.response?.data?.message ===
-      "Cannot complete the order because no payment records exist for this order."
-    ) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Cannot complete the order because no payment records exist for this order.",
-        confirmButtonColor: "#FF0000",
-      });
-      return;
-    }
+      // ⚠️ Case 2: Pending payments exist (400 Bad Request)
+      if (err.response && err.response.status === 400) {
+        const { pendingPaymentsCount, message } = err.response.data;
 
-    // ⚠️ Case 2: Pending payments exist (400 Bad Request)
-    if (err.response && err.response.status === 400) {
-      const { pendingPaymentsCount, message } = err.response.data;
+        Swal.fire({
+          icon: "error",
+          title: `Pending Payments: ${pendingPaymentsCount || 0}`,
+          text: message || "You still have pending payments to release.",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#FF0000",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // Ask confirmation for releasing all payments
+            const confirmRelease = await Swal.fire({
+              title: "Release All Payments?",
+              text: "Do you want to release all pending payments now?",
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonColor: "#228B22",
+              cancelButtonColor: "#FF0000",
+              confirmButtonText: "Yes, release all",
+            });
 
-      Swal.fire({
-        icon: "error",
-        title: `Pending Payments: ${pendingPaymentsCount || 0}`,
-        text: message || "You still have pending payments to release.",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#FF0000",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          // Ask confirmation for releasing all payments
-          const confirmRelease = await Swal.fire({
-            title: "Release All Payments?",
-            text: "Do you want to release all pending payments now?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#228B22",
-            cancelButtonColor: "#FF0000",
-            confirmButtonText: "Yes, release all",
-          });
+            if (confirmRelease.isConfirmed) {
+              try {
+                const token = localStorage.getItem("bharat_token");
+                const releaseResponse = await axios.put(
+                  `${BASE_URL}/bidding-order/requestAllPaymentReleases/${id}`,
+                  {},
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-          if (confirmRelease.isConfirmed) {
-            try {
-							const token = localStorage.getItem("bharat_token");
-              const releaseResponse = await axios.put(
-                `${BASE_URL}/bidding-order/requestAllPaymentReleases/${id}`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
-
-              if (releaseResponse.status === 200 && releaseResponse.data.status) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Payments Released!",
-                  text: "All pending payments have been successfully released.",
-                  confirmButtonColor: "#228B22",
-                }).then(() => fetchOrder());
-              } else {
+                if (
+                  releaseResponse.status === 200 &&
+                  releaseResponse.data.status
+                ) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Payments Released!",
+                    text: "All pending payments have been successfully released.",
+                    confirmButtonColor: "#228B22",
+                  }).then(() => fetchOrder());
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Failed!",
+                    text:
+                      releaseResponse.data.message ||
+                      "Failed to release payments.",
+                    confirmButtonColor: "#FF0000",
+                  });
+                }
+              } catch (releaseErr) {
+                console.error(releaseErr);
                 Swal.fire({
                   icon: "error",
-                  title: "Failed!",
-                  text: releaseResponse.data.message || "Failed to release payments.",
+                  title: "Error!",
+                  text: "Something went wrong while releasing payments.",
                   confirmButtonColor: "#FF0000",
                 });
               }
-            } catch (releaseErr) {
-              console.error(releaseErr);
-              Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: "Something went wrong while releasing payments.",
-                confirmButtonColor: "#FF0000",
-              });
             }
           }
-        }
+        });
+
+        return;
+      }
+
+      // 🚫 Case 3: Generic error
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: err.message || "Failed to mark order as complete.",
+        confirmButtonColor: "#FF0000",
       });
-
-      return;
     }
-
-    // 🚫 Case 3: Generic error
-    Swal.fire({
-      icon: "error",
-      title: "Oops!",
-      text: err.message || "Failed to mark order as complete.",
-      confirmButtonColor: "#FF0000",
-    });
-  }
-};
-
+  };
 
   const handleAcceptBid = async (serviceProviderId) => {
     const token = localStorage.getItem("bharat_token");
@@ -764,6 +769,12 @@ const handleMarkComplete = async () => {
                 </span>
               </div>
             </div>
+            <p className="font-semibold">
+              Category: {orderDetail?.category_id?.name}
+            </p>
+						<p className="font-semibold">
+              SubCategory: {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+            </p>
             <h3 className="text-lg font-semibold">Work Title</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
@@ -832,17 +843,17 @@ const handleMarkComplete = async () => {
                 </span>
               ) : null}
               <ReviewModal
-                  show={showCompletedModal}
-                  onClose={() => {
-                    setShowCompletedModal(false);
-                    fetchOrder();
-                  }}
-                  service_provider_id={
-                    orderDetail?.service_provider_id?._id || null
-                  }
-                  orderId={id}
-                  type="bidding"
-                />
+                show={showCompletedModal}
+                onClose={() => {
+                  setShowCompletedModal(false);
+                  fetchOrder();
+                }}
+                service_provider_id={
+                  orderDetail?.service_provider_id?._id || null
+                }
+                orderId={id}
+                type="bidding"
+              />
               <OrderReviewModal
                 show={showOrderReviewModal}
                 onClose={() => setShowOrderReviewModal(false)}
@@ -1058,7 +1069,7 @@ const handleMarkComplete = async () => {
               user_id={orderDetail?.user_id._id}
               assignedWorker={assignedWorker}
               paymentHistory={orderDetail?.service_payment?.payment_history}
-							fullPaymentHistory={orderDetail?.service_payment}
+              fullPaymentHistory={orderDetail?.service_payment}
               orderId={id}
               hireStatus={orderDetail?.hire_status}
             />

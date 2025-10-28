@@ -15,6 +15,7 @@ export default function ReviewModal({
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [images, setImages] = useState([]);
+	console.log("immmm", images)
   // console.log("ReviewModal props:", {
   //   show,
   //   onClose,
@@ -36,6 +37,7 @@ export default function ReviewModal({
       if (orderId) formData.append("orderId", orderId);
       if (type) formData.append("type", type);
       images.forEach((img) => formData.append("images", img));
+			console.log("imgggg",images)
 
       await axios.post(`${BASE_URL}/user/add-review`, formData, {
         headers: {
@@ -117,6 +119,7 @@ export default function ReviewModal({
             multiple
             onChange={(e) => {
               const files = Array.from(e.target.files).slice(0, 5);
+							console.log("files", files)
               setImages(files);
             }}
             className="w-full mb-2"
@@ -133,6 +136,7 @@ export default function ReviewModal({
           {/* Preview */}
           <div className="flex flex-wrap mt-2 gap-2">
             {images.map((img, index) => (
+							// console.log("kdkdkd",img),
               <img
                 key={index}
                 src={URL.createObjectURL(img)}

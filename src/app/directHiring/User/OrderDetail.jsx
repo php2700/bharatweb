@@ -342,6 +342,14 @@ export default function ViewProfile() {
     }
   };
 
+  const handleRouteHire = (ProviderId) => {
+    navigate(`/profile-details/${ProviderId}/direct`, {
+      state: {
+        hire_status: orderData?.hire_status,
+      },
+    });
+  };
+
   const handleCancelOffer = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -394,8 +402,10 @@ export default function ViewProfile() {
           title: "Success!",
           text: "Order marked as complete successfully!",
           confirmButtonColor: "#228B22",
-        }).then(() => {
-          setShowCompletedModal(true);
+        }).then(() => fetchData()).then(() => {
+          setTimeout(() => {
+            setShowCompletedModal(true);
+          }, 150);
         });
       }
     } catch (err) {
@@ -426,7 +436,7 @@ export default function ViewProfile() {
 
             if (confirmRelease.isConfirmed) {
               try {
-								const token = localStorage.getItem("bharat_token");
+                const token = localStorage.getItem("bharat_token");
                 const releaseResponse = await axios.put(
                   `${BASE_URL}/direct-order/requestAllPaymentReleases/${id}`,
                   {},
@@ -441,7 +451,7 @@ export default function ViewProfile() {
                     title: "Payments Released!",
                     text: "All pending payments have been successfully released.",
                     confirmButtonColor: "#228B22",
-                  }).then(() => fetchData())
+                  }).then(() => fetchData());
                 } else {
                   Swal.fire({
                     icon: "error",
@@ -737,16 +747,15 @@ export default function ViewProfile() {
             )*/}
 
             {/* Service Providers from Offer History */}
-            {orderData?.hire_status !== "cancelled" &&
-              orderData?.hire_status !== "cancelled task" &&
-              !isHired &&
+            {(orderData?.hire_status === "pending" ||
+              orderData?.hire_status === "cancelled") &&
               filteredProviders.length > 0 && (
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-black mb-4">
                     Offered Service Providers
                   </h2>
                   <div className="space-y-4">
-                    {filteredProviders.map((provider) => (
+                    {filteredProviders.reverse().map((provider) => (
                       <div
                         key={provider.provider_id._id}
                         className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
@@ -767,12 +776,14 @@ export default function ViewProfile() {
                             {provider.provider_id?.location?.address ||
                               "No Address Provided"}
                           </p>
-                          <Link
-                            to={`/profile-details/${provider.provider_id._id}/direct`}
+                          <button
+                            onClick={() =>
+                              handleRouteHire(provider.provider_id._id)
+                            }
                             className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                           >
                             View Profile
-                          </Link>
+                          </button>
                         </div>
                         <div className="flex flex-col items-center justify-center flex-1">
                           <p className="text-gray-600 font-medium">Contact</p>
@@ -916,7 +927,7 @@ export default function ViewProfile() {
                   user_id={orderData?.user_id._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
-									fullPaymentHistory={orderData?.service_payment}
+                  fullPaymentHistory={orderData?.service_payment}
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />

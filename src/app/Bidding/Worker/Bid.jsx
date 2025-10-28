@@ -394,7 +394,12 @@ export default function Bid() {
                   </span>
                 </div>
               </div>
-
+               <p className="font-semibold">
+              Category: {worker?.category_id?.name}
+            </p>
+						<p className="font-semibold">
+              SubCategory: {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+            </p>
               <h3 className="text-lg font-semibold">Task Details</h3>
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{worker.skills || "No description available"}</p>
