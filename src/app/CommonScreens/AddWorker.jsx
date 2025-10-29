@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import profile from "../../assets/addworker/bharatprofile.png"
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -33,6 +34,13 @@ export default function AddWorkerDetails() {
   });
 
   const [errors, setErrors] = useState({});
+  const today = new Date();
+  const minDate = new Date(today.getFullYear() - 99, today.getMonth(), today.getDate())
+    .toISOString()
+    .split("T")[0];
+  const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
+    .toISOString()
+    .split("T")[0];
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -116,6 +124,28 @@ export default function AddWorkerDetails() {
     }
     return null;
   };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const token = localStorage.getItem("bharat_token");
+    if (!token) {
+      toast.error("You are not logged in. Please log in to continue.");
+      setTimeout(() => navigate("/login"), 2000);
+      return;
+    }
+
+    // ✅ Load saved address from profile map selection
+    const savedAddress = localStorage.getItem("user_address");
+    if (savedAddress && savedAddress.trim() !== "") {
+      setFormData((prev) => ({ ...prev, address: savedAddress }));
+      console.log("✅ Loaded address from localStorage:", savedAddress);
+    } else {
+      console.log("⚠️ No saved address found in localStorage");
+    }
+
+    fetchBannerImages();
+  }, [navigate]);
+
 
   const handleInputChange = (field, value) => {
     let processedValue = value;
@@ -138,12 +168,23 @@ export default function AddWorkerDetails() {
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
 
-    const phoneNumber = formData.phone.replace(/\D/g, "");
-    if (!formData.phone) {
+    // const phoneNumber = formData.phone.replace(/\D/g, "");
+    // if (!formData.phone) {
+    //   newErrors.phone = "Phone number is required";
+    // } else if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
+    //   newErrors.phone = "Enter a valid 10-digit phone number starting with 6-9";
+    // }
+    // const phoneNumber = formData.phone.replace(/\D/g, ""); // remove non-digits
+    const phoneNumber = formData.phone.trim().replace(/\D/g, "");
+
+    if (!phoneNumber) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
-      newErrors.phone = "Enter a valid 10-digit phone number starting with 6-9";
+    } else if (phoneNumber.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    } else if (!/^[6-9]/.test(phoneNumber)) {
+      newErrors.phone = "Phone number must start with digits 6–9";
     }
+
 
     const aadharNumber = formData.aadharNumber.replace(/\D/g, "");
     if (!formData.aadharNumber) {
@@ -158,7 +199,7 @@ export default function AddWorkerDetails() {
 
     if (!formData.aadharImage) newErrors.aadharImage = "Aadhaar image is required";
 
-    if (!image) newErrors.image = "Profile image is required";
+    // if (!image) newErrors.image = "Profile image is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -238,6 +279,7 @@ export default function AddWorkerDetails() {
     arrows: true,
   };
 
+
   return (
     <>
       <Header />
@@ -256,9 +298,14 @@ export default function AddWorkerDetails() {
                 <div className="w-48 h-48 rounded-full overflow-hidden p-1">
                   <div className="w-full h-full rounded-full overflow-hidden">
                     <img
-                      src={image ? URL.createObjectURL(image) : image}
+                      // src={image ? URL.createObjectURL(image) : profile}
+                      src={image instanceof File ? URL.createObjectURL(image) : image || profile}
+
                       alt="Worker profile image"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = "/src/assets/addworker/default-profile.png"; // fallback if image fails
+                      }}
                     />
                   </div>
                 </div>
@@ -300,29 +347,47 @@ export default function AddWorkerDetails() {
                     <span className="text-[#000000] font-[700]">{countryCode}</span>
                     <img src={downarrow} alt="Dropdown arrow" className="w-4 h-4" />
                   </div>
-                  <input
+                  {/* <input
                     type="tel"
                     placeholder="9822515445"
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     className="flex-1 h-[55px] px-3 text-base placeholder:text-gray-400 focus:outline-none"
                     aria-label="Phone number"
+                  /> */}
+                  <input
+                    type="tel"
+                    placeholder="9822515445"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      // Allow only digits
+                      const onlyDigits = e.target.value.replace(/\D/g, "");
+                      handleInputChange("phone", onlyDigits);
+                    }}
+                    maxLength="10"
+                    className="flex-1 h-[55px] px-3 text-base placeholder:text-gray-400 focus:outline-none"
+                    aria-label="Phone number"
                   />
+
                 </div>
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
-              <div>
-                <input
-                  type="text"
-                  placeholder="Aadhar Number"
-                  value={formData.aadharNumber}
-                  onChange={(e) => handleInputChange("aadharNumber", e.target.value)}
-                  className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
-                  aria-label="Aadhaar number"
-                />
-                {errors.aadharNumber && <p className="text-red-500 text-sm mt-1">{errors.aadharNumber}</p>}
-              </div>
+              <input
+                type="text"
+                placeholder="Aadhar Number"
+                value={formData.aadharNumber}
+                onChange={(e) =>
+                  handleInputChange(
+                    "aadharNumber",
+                    e.target.value.replace(/\D/g, "").slice(0, 12) // Limit to 12 digits
+                  )
+                }
+                className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
+                aria-label="Aadhaar number"
+              />
+
+
 
               <div className="relative">
                 <input
@@ -331,11 +396,24 @@ export default function AddWorkerDetails() {
                   onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                   className="h-[55px] text-base border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3"
                   aria-label="Date of birth"
+                  min={minDate}
+                  max={maxDate}
                 />
                 <img src={dob} alt="Calendar icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
                 {errors.dateOfBirth && <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
 
+              {/* <div>
+                <input
+                  type="text"
+                  placeholder="Address"
+                  value={formData.address}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
+                  className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
+                  aria-label="Address"
+                />
+                {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+              </div> */}
               <div>
                 <input
                   type="text"
@@ -347,6 +425,7 @@ export default function AddWorkerDetails() {
                 />
                 {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
               </div>
+
 
               <div>
                 <input

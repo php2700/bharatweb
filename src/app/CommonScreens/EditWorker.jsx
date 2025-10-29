@@ -6,11 +6,15 @@ import editicon from "../../assets/addworker/edit-icon.svg";
 import flag from "../../assets/addworker/flag.png";
 import downarrow from "../../assets/addworker/downarrow.png";
 import dobIcon from "../../assets/addworker/icon.png";
+import dob from "../../assets/addworker/icon.png";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import profile from "../../assets/addworker/bharatprofile.png"
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -32,6 +36,13 @@ export default function EditWorker() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const today = new Date();
+  const minDate = new Date(today.getFullYear() - 99, today.getMonth(), today.getDate())
+    .toISOString()
+    .split("T")[0];
+  const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate())
+    .toISOString()
+    .split("T")[0];
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -160,11 +171,14 @@ export default function EditWorker() {
   const validateForm = () => {
     let newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    const phoneNumber = formData.phone.replace(/\D/g, "");
-    if (!formData.phone) {
+    const phoneNumber = formData.phone.trim().replace(/\D/g, "");
+
+    if (!phoneNumber) {
       newErrors.phone = "Phone number is required";
-    } else if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
-      newErrors.phone = "Enter a valid 10-digit phone number starting with 6-9";
+    } else if (phoneNumber.length !== 10) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    } else if (!/^[6-9]/.test(phoneNumber)) {
+      newErrors.phone = "Phone number must start with digits 6–9";
     }
     const aadharNumber = formData.aadharNumber.replace(/\D/g, "");
     if (!formData.aadharNumber) {
@@ -261,7 +275,8 @@ export default function EditWorker() {
                 <div className="w-48 h-48 rounded-full overflow-hidden p-1">
                   <div className="w-full h-full rounded-full overflow-hidden">
                     <img
-                      src={image instanceof File ? URL.createObjectURL(image) : image || image}
+                      // src={image instanceof File ? URL.createObjectURL(image) : image || image}
+                      src={image instanceof File ? URL.createObjectURL(image) : image || profile}
                       alt="Worker profile"
                       className="w-full h-full object-cover"
                     />
@@ -302,27 +317,43 @@ export default function EditWorker() {
                     <span className="text-[#000000] font-[700]">{formData.countryCode}</span>
                     <img src={downarrow} alt="Dropdown arrow" className="w-4 h-4" />
                   </div>
-                  <input
+                  {/* <input
                     type="tel"
                     placeholder="9822515445"
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     className="flex-1 h-[55px] px-3 text-base placeholder:text-gray-400 focus:outline-none"
+                  /> */}
+                  <input
+                    type="tel"
+                    placeholder="9822515445"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      // Allow only digits
+                      const onlyDigits = e.target.value.replace(/\D/g, "");
+                      handleInputChange("phone", onlyDigits);
+                    }}
+                    maxLength="10"
+                    className="flex-1 h-[55px] px-3 text-base placeholder:text-gray-400 focus:outline-none"
+                    aria-label="Phone number"
                   />
                 </div>
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
-              <div>
-                <input
-                  type="text"
-                  placeholder="Aadhar Number"
-                  value={formData.aadharNumber}
-                  onChange={(e) => handleInputChange("aadharNumber", e.target.value)}
-                  className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
-                />
-                {errors.aadharNumber && <p className="text-red-500 text-sm mt-1">{errors.aadharNumber}</p>}
-              </div>
+              <input
+                type="text"
+                placeholder="Aadhar Number"
+                value={formData.aadharNumber}
+                onChange={(e) =>
+                  handleInputChange(
+                    "aadharNumber",
+                    e.target.value.replace(/\D/g, "").slice(0, 12) // Limit to 12 digits
+                  )
+                }
+                className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
+                aria-label="Aadhaar number"
+              />
 
               <div className="relative">
                 <input
@@ -330,8 +361,11 @@ export default function EditWorker() {
                   value={formData.dateOfBirth}
                   onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                   className="h-[55px] text-base border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3"
+                  aria-label="Date of birth"
+                  min={minDate}
+                  max={maxDate}
                 />
-                <img src={dobIcon} alt="Calendar icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
+                <img src={dob} alt="Calendar icon" className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5" />
                 {errors.dateOfBirth && <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>}
               </div>
 
