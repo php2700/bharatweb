@@ -52,6 +52,8 @@ export default function ViewProfile() {
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [markerLocationAddress, setMarkerLocationAddress] = useState(null);
   const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundReason, setRefundReason] = useState("");
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -402,11 +404,13 @@ export default function ViewProfile() {
           title: "Success!",
           text: "Order marked as complete successfully!",
           confirmButtonColor: "#228B22",
-        }).then(() => fetchData()).then(() => {
-          setTimeout(() => {
-            setShowCompletedModal(true);
-          }, 150);
-        });
+        })
+          .then(() => fetchData())
+          .then(() => {
+            setTimeout(() => {
+              setShowCompletedModal(true);
+            }, 150);
+          });
       }
     } catch (err) {
       console.error(err);
@@ -549,7 +553,58 @@ export default function ViewProfile() {
       )
   );
 
-  console.log("serviceProviders", serviceProviders);
+  // console.log("serviceProviders", serviceProviders);
+
+  const showRefundButton =
+    orderData?.hire_status === "pending" ||
+    (orderData?.hire_status === "accepted" &&
+      orderData?.service_payment?.payment_history === 0);
+
+  const handleRefundRequest = async () => {
+    if (!refundReason.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please enter a reason for refund.",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/request-refund`,
+        { orderId: id, reason: refundReason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+   console.log("ssds", response)
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Refund request submitted successfully!",
+          toast: true,
+          position: "top-end",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setShowRefundModal(false);
+        setRefundReason("");
+        fetchData(); // refresh data after refund
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: error.response?.data?.message || "Refund request failed!",
+        toast: true,
+        position: "top-end",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  };
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -721,6 +776,32 @@ export default function ViewProfile() {
                       : "Unknown Status"}
                   </span>
                 </span>
+								{orderData?.refundRequest && <span className="text-gray-600 font-semibold block">
+                 Refund Status:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                      ${
+                        orderData?.refundStatus === "pending"
+                          ? "bg-yellow-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.refundStatus === "processed"
+                          ? "bg-blue-500"
+                          : ""
+                      }`}
+                  >
+                    {orderData?.refundStatus
+                      ? orderData.refundStatus
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
+                      : "Unknown Status"}
+                  </span>
+                </span>}
                 <span className="text-gray-600 font-semibold block">
                   Deadline Date:{" "}
                   {orderData?.deadline
@@ -916,6 +997,52 @@ export default function ViewProfile() {
                 orderId={id}
                 type="direct"
               />
+
+              {/* ✅ Show Refund Button */}
+              {showRefundButton && (
+                <button
+                  onClick={() => setShowRefundModal(true)}
+                  className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+                >
+                  Get Refund
+                </button>
+              )}
+							{orderData?.refundRequest && (
+                <button
+                  className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+                >
+                 {orderData?.refundStatus == "pending" ? "Refund Request Submitted" : "Refunded"}
+                </button>
+              )}
+              {/* ✅ Refund Modal */}
+              {showRefundModal && (
+                <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
+                  <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                    Request Refund
+                  </h2>
+                  <textarea
+                    value={refundReason}
+                    onChange={(e) => setRefundReason(e.target.value)}
+                    placeholder="Enter your refund reason..."
+                    className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                  />
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => setShowRefundModal(false)}
+                      className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleRefundRequest}
+                      className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {(orderData?.hire_status === "accepted" ||
