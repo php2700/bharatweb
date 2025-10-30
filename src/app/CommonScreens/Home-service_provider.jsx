@@ -14,6 +14,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
+import defaultWorkImage from "../../assets/directHiring/his-work.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
@@ -98,7 +99,7 @@ export default function ServiceProviderHome() {
             data.data.map((item) => ({
               id: item._id,
               image:
-                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+                item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -148,7 +149,7 @@ export default function ServiceProviderHome() {
             data.data.map((item) => ({
               id: item._id,
               image:
-                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+                item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -199,7 +200,7 @@ export default function ServiceProviderHome() {
             data?.data.map((item) => ({
               id: item._id,
               image:
-                item.image_urls[0] || "/src/assets/directHiring/his-work.png",
+                item.image_urls[0] || defaultWorkImage,
               work: item.title || "Emergency task",
 
               description: item.description || "No description",
