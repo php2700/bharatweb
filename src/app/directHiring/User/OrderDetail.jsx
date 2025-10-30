@@ -20,7 +20,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import defaultWorkImage from "../../../assets/directHiring/his-work.png";
+import defaultWorkImage from "../../../assets/workcategory/image.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 
