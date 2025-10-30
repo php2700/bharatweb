@@ -13,7 +13,9 @@ import "react-toastify/dist/ReactToastify.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import profile from "../../assets/addworker/bharatprofile.png"
+// import profile from "../../assets/addworker/bharatprofile.png"
+import profile from "../../assets/addworker/defaultDP.png"
+
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
