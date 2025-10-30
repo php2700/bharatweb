@@ -10,6 +10,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import workImage from "../../../assets/workcategory/image.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -121,7 +122,7 @@ export default function ViewProfile() {
             </Carousel>
           ) : (
             <img
-              src="https://via.placeholder.com/800x400"
+              src={workImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
@@ -130,6 +131,10 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
+							<p>
+                  Title :-{" "}
+                  {orderData?.title || "No Title"}
+                </p>
                 <span>
                   Category :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
@@ -189,9 +194,7 @@ export default function ViewProfile() {
 
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
-                {orderData?.sub_category_ids
-                  ?.map((sub) => sub.name)
-                  .join(", ") || "No details available."}
+                {orderData?.description || "No details available."}
               </p>
             </div>
 

@@ -680,7 +680,7 @@ export default function ServiceProviderHome() {
                             {capitalizeFirst(card.work)}
                           </h3>
                           <p className="text-black font-medium max-md:text-sm">
-                            ₹{card.amount}
+                            {card.amount}
                           </p>
                         </div>
                         <p className="text-gray-600 max-w-[87%] text-xs mt-1">

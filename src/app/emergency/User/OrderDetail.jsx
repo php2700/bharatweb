@@ -646,6 +646,10 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
+							<p>
+                  Title :-{" "}
+                  {orderData?.title || "Unknown Title"}
+                </p>
                 <span>
                   Category :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
@@ -731,13 +735,10 @@ export default function ViewProfile() {
 
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
-                {orderData?.sub_category_ids
-                  ?.map((sub) => sub.name)
-                  .join(", ") || "No details available."}
+                {orderData?.description || "No details available."}
               </p>
             </div>
 
-            {console.log(orderData, "hhhhhhhhhhhhhhhh")}
             <div className="text-center mb-6">
               {orderData?.hire_status === "cancelled" ? (
                 <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
@@ -794,7 +795,7 @@ export default function ViewProfile() {
               ) : null}
 
              {/* ✅ Show Refund Button */}
-              {showRefundButton && (
+              {showRefundButton && orderData?.platform_fee_paid && (
                 <button
                   onClick={() => setShowRefundModal(true)}
                   className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
@@ -907,7 +908,7 @@ export default function ViewProfile() {
 
       {!isHired &&
         orderData?.hire_status !== "cancelled" &&
-        !orderData?.platform_fee_paid && (
+        !orderData?.platform_fee_paid && filteredProviders.length > 0 && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
             <div className="relative mb-4">
               <input

@@ -127,7 +127,11 @@ export default function Accepted({
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Payment Summary</h3>
           </div>
-
+          {paymentHistory.length === 0 && (
+            <p className="text-center text-gray-500 mt-4">
+              No payment history available
+            </p>
+          )}
           {/* Payment List */}
           {paymentHistory.map((payment, index) => (
             <div

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
+import Swal from "sweetalert2";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -34,6 +35,8 @@ const Post = () => {
   const [error, setError] = useState(null);
   const [platformFee, setPlatformFee] = useState("");
   const [formData, setFormData] = useState({
+    title: "",
+    description: "",
     google_address: "",
     detailed_address: "",
     contact: "",
@@ -267,8 +270,25 @@ const Post = () => {
       errors.sub_category_ids = "At least one subcategory is required.";
     // if (!formData.google_address)
     //   errors.google_address = "Google address is required";
-    // if (!formData.detailed_address)
-    //   errors.detailed_address = "Detailed address is required";
+    // ✅ Title Validation
+    if (!formData.title || formData.title.trim() === "") {
+      errors.title = "Title is required";
+    } else if (formData.title.trim().length < 5) {
+      errors.title = "Title must be at least 5 characters long";
+    } else if (formData.title.trim().length > 100) {
+      errors.title = "Title cannot exceed 100 characters";
+    } else if (!/^[A-Za-z0-9\s.,'-]+$/.test(formData.title.trim())) {
+      errors.title = "Title contains invalid characters";
+    }
+
+    // ✅ Description Validation
+    if (!formData.description || formData.description.trim() === "") {
+      errors.description = "Description is required";
+    } else if (formData.description.trim().length < 20) {
+      errors.description = "Description must be at least 20 characters long";
+    } else if (formData.description.trim().length > 1000) {
+      errors.description = "Description cannot exceed 1000 characters";
+    }
     if (!formData.contact) errors.contact = "Contact number is required.";
     else if (formData.contact.trim()?.length != 10)
       errors.contact = "Contact should be 10 digits.";
@@ -279,62 +299,93 @@ const Post = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errors = validateForm();
-    setValidationErrors(errors);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const errors = validateForm();
+  setValidationErrors(errors);
 
-    if (Object.keys(errors).length > 0) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-
-    const submissionData = new FormData();
-    submissionData.append("category_id", selectedCategory);
-    submissionData.append(
-      "sub_category_ids",
-      selectedSubcategories.map((option) => option.value).join(",")
-    );
-    // submissionData.append("google_address", formData.detailed_address);
-    submissionData.append(
-      "google_address",
-      address || profile?.location?.address
-    );
-    submissionData.append("address", address || profile?.location?.address);
-    submissionData.append("detailed_address", formData.detailed_address);
-    submissionData.append("contact", formData.contact);
-    submissionData.append("deadline", formData.deadline);
-    formData.images.forEach((image) => {
-      submissionData.append("images", image);
+  if (Object.keys(errors).length > 0) {
+    setError("Please fill in all required fields.");
+    Swal.fire({
+      icon: "error",
+      title: "Validation Error",
+      text: "Please fill in all required fields.",
+      timer: 2500,
+      showConfirmButton: false,
     });
+    return;
+  }
 
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/emergency-order/create`,
-        submissionData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("response=======", response);
-      if (response.data) {
-        navigate(`/emergency/order-detail/${response.data?.order?._id}`);
-        // const { id, amount } = response.data.razorpay_order;
-        // setRazorpayOrder({ id, amount: amount / 100 }); // Convert paise to INR
-        // setShowPaymentModal(true); // Trigger payment modal
-      } else {
-        setError("Not add a post");
+  const submissionData = new FormData();
+  submissionData.append("category_id", selectedCategory);
+  submissionData.append(
+    "sub_category_ids",
+    selectedSubcategories.map((option) => option.value).join(",")
+  );
+  submissionData.append(
+    "google_address",
+    address || profile?.location?.address
+  );
+  submissionData.append("title", formData.title);
+  submissionData.append("description", formData.description);
+  submissionData.append("address", address || profile?.location?.address);
+  submissionData.append("detailed_address", formData.detailed_address);
+  submissionData.append("contact", formData.contact);
+  submissionData.append("deadline", formData.deadline);
+  formData.images.forEach((image) => {
+    submissionData.append("images", image);
+  });
+
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/emergency-order/create`,
+      submissionData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    } catch (err) {
-      setError(
-        "Failed to submit task: " + (err.response?.data?.message || err.message)
-      );
-      console.error("Submission Error:", err);
+    );
+
+    if (response.data) {
+      // ✅ SweetAlert on success
+      Swal.fire({
+        icon: "success",
+        title: "Order Created Successfully!",
+        text: "Redirecting to order details...",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      // Redirect after small delay
+      setTimeout(() => {
+        navigate(`/emergency/order-detail/${response.data?.order?._id}`);
+      }, 2000);
+    } else {
+      setError("Not add a post");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to add a post. Please try again.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
     }
-  };
+  } catch (err) {
+    console.error("Submission Error:", err);
+    setError(
+      "Failed to submit task: " + (err.response?.data?.message || err.message)
+    );
+    Swal.fire({
+      icon: "error",
+      title: "Submission Failed",
+      text: err.response?.data?.message || err.message,
+      timer: 2500,
+      showConfirmButton: false,
+    });
+  }
+};
 
   // Handle confirm from payment modal
   const handlePayConfirm = () => {
@@ -476,6 +527,47 @@ const Post = () => {
           {loading && <p className="text-center">Loading...</p>}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* TItle */}
+            <div>
+              <label className="block text-sm mb-1 font-bold">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Enter Title"
+                className={`w-full border ${
+                  validationErrors.title ? "border-red-500" : "border-green-500"
+                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
+              />
+              {validationErrors.title && (
+                <p className="text-red-500 text-sm">{validationErrors.title}</p>
+              )}
+            </div>
+            {/* Description */}
+            <div className="mt-4">
+              <label className="block text-sm mb-1 font-bold">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Enter description"
+                className={`w-full border ${
+                  validationErrors.description
+                    ? "border-red-500"
+                    : "border-green-500"
+                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
+                rows={4}
+              />
+              {validationErrors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.description}
+                </p>
+              )}
+            </div>
+
             {/* Work Category */}
             <div>
               <label className="block text-sm mb-1 font-bold">
@@ -685,30 +777,6 @@ const Post = () => {
                 </p>
               )}
             </label>
-
-            {/* Detailed Address */}
-            {/* <div>
-              <label className="block text-sm mb-1 font-bold">
-                Detailed Address (Landmark)
-              </label>
-              <input
-                type="text"
-                name="detailed_address"
-                value={formData.detailed_address}
-                onChange={handleInputChange}
-                placeholder="Abc gali 145 banglow no. indore"
-                className={`w-full border ${
-                  validationErrors.detailed_address
-                    ? "border-red-500"
-                    : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-              />
-              {validationErrors.detailed_address && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.detailed_address}
-                </p>
-              )}
-            </div>  */}
 
             {/* Contact */}
             <div>

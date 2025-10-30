@@ -7,6 +7,7 @@ import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
+ import workImage from "../../../assets/workcategory/image.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -136,7 +137,7 @@ export default function WokerAcceptReject() {
             </Carousel>
           ) : (
             <img
-              src="https://via.placeholder.com/800x400"
+              src={workImage}
               alt="No images available"
               className="w-full h-[360px] object-cover"
             />
