@@ -413,6 +413,12 @@ export default function Accepted({
             )}
           </div>
 
+					{paymentHistory.length === 0 && (
+            <p className="text-center text-gray-500 mt-4">
+              No payment history available
+            </p>
+          )}
+
           {paymentHistory.map((payment, index) => (
             <div
               key={payment._id}

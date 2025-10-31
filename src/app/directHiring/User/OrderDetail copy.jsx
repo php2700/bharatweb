@@ -20,7 +20,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import defaultWorkImage from "../../../assets/workcategory/image.png";
+import defaultWorkImage from "../../../assets/directHiring/his-work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 
@@ -932,14 +932,12 @@ export default function ViewProfile() {
                                     provider.status.slice(1)
                                   : ""}
                               </button>
-                             {orderData?.hire_status == "pending" && provider.status === "pending" && <button
-                                className={`px-6 py-2 ${
-      showChangeProvider ? "bg-green-600" : "bg-[#FB3523]"
-    } text-white font-semibold rounded-lg shadow`}
+                              <button
+                                className="px-6 py-2 bg-[#FB3523] text-white font-semibold rounded-lg shadow hover:bg-red-700"
                                 onClick={() => setShowChangeProvider(true)} // show section when clicked
                               >
-                                {showChangeProvider ? "Please change" : "Change Service Provider"}
-                              </button>}
+                                Change Service Provider
+                              </button>
                             </>
                           )}
                         </div>
@@ -1119,14 +1117,6 @@ export default function ViewProfile() {
           </div>
         </div>
       </div>
-     
-			{showChangeProvider && filteredRelatedWorkers.length == 0 &&
-			<div className="container mx-auto px-4 py-6 max-w-4xl">
-            <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
-             Providers are not found!.
-            </h2>
-				</div>
-			}
 
       {showChangeProvider &&
         orderData?.hire_status !== "cancelled" &&

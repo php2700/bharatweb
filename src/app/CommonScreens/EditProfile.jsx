@@ -5,8 +5,7 @@ import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, clearUserProfile } from "../../redux/userSlice";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import {
   GoogleMap,
@@ -22,37 +21,36 @@ export default function EditProfile() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
   const location = useLocation();
   const { activeTab } = location.state || { activeTab: "user" };
-  const role = profile?.role;
-  const verificationStatus = profile?.verificationStatus;
+
   const fileInputRef = useRef(null);
   const autoCompleteRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: "",
     subcategory: [],
     emergencysubcategory: [],
     aboutUs: "",
     skill: "",
-    documents: [],
-    businessImage: [],
     age: "",
     gender: "",
     address: "",
     full_address: [],
-    customDocName: "",
     hasShop: "",
     shopAddress: "",
     shopFullAddress: [],
+    category: "",
   });
+
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [emergencysubcategories, setEmergencysubcategories] = useState([]);
-  const [documentPreviews, setDocumentPreviews] = useState([]);
-  const [businessImagePreviews, setBusinessImagePreviews] = useState([]);
+
   const [profilePic, setProfilePic] = useState(null);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [mapFor, setMapFor] = useState("address");
@@ -68,22 +66,98 @@ export default function EditProfile() {
     latitude: null,
     longitude: null,
   });
-  const [selectedDocType, setSelectedDocType] = useState("");
-  const [showCustomDocInput, setShowCustomDocInput] = useState(false);
+
+  const [documents, setDocuments] = useState({
+    aadhaarFront: { preview: null, file: null, path: null },
+    aadhaarBack: { preview: null, file: null, path: null },
+    panFront: { preview: null, file: null, path: null },
+    panBack: { preview: null, file: null, path: null },
+    selfie: { preview: null, file: null, path: null },
+  });
+
+  const [businessImage, setBusinessImage] = useState({
+    preview: null,
+    file: null,
+    path: null,
+  });
+
+  const [errors, setErrors] = useState({});
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
     libraries,
   });
 
-  const docTypeOptions = [
-    { value: "AadharCard", label: "Aadhaar Card" },
-    { value: "PanCard", label: "PAN Card" },
-    { value: "Passport", label: "Passport" },
-    { value: "DrivingLicense", label: "Driving License" },
-    { value: "Other", label: "Any Other Government ID Proof" },
-  ];
+  const allowedTypes = ["image/jpeg", "image/png", "image/avif", "image/gif"];
 
+  // ------------------------------------------------------------------------
+  // Helper functions
+  // ------------------------------------------------------------------------
+  const getDocumentName = (type) => {
+    if (type.includes("aadhaar")) return "AadharCard";
+    if (type.includes("pan")) return "PanCard";
+    if (type === "selfie") return "selfAttached";
+    return "unknown";
+  };
+
+  const getPathFromUrl = (url) => {
+    const base = BASE_URL.replace(/\/$/, "");
+    if (url.startsWith(base)) {
+      return url.slice(base.length).replace(/^\//, "");
+    }
+    return url.replace(/^\//, "");
+  };
+
+  // STRICT MANDATORY VALIDATION: Aadhaar + PAN + Selfie
+  const getDocErrors = () => {
+    const errs = {};
+
+    if (activeTab === "worker") {
+      // Aadhaar: both required
+      const hasAadhaar = documents.aadhaarFront.preview && documents.aadhaarBack.preview;
+      const partialAadhaar =
+        (documents.aadhaarFront.preview || documents.aadhaarBack.preview) && !hasAadhaar;
+
+      if (!hasAadhaar) {
+        errs.aadhaar = partialAadhaar
+          ? "Upload both sides of Aadhaar Card."
+          : "Aadhaar Card (front & back) is required.";
+      }
+
+      // PAN: both required
+      const hasPan = documents.panFront.preview && documents.panBack.preview;
+      const partialPan =
+        (documents.panFront.preview || documents.panBack.preview) && !hasPan;
+
+      if (!hasPan) {
+        errs.pan = partialPan
+          ? "Upload both sides of PAN Card."
+          : "PAN Card (front & back) is required.";
+      }
+
+      // Selfie: required
+      if (!documents.selfie.preview) {
+        errs.selfie = "Selfie is required.";
+      }
+    }
+
+    return errs;
+  };
+
+  // Real-time validation
+  useEffect(() => {
+    const docErrors = getDocErrors();
+    setErrors((prev) => ({
+      ...prev,
+      aadhaar: docErrors.aadhaar || undefined,
+      pan: docErrors.pan || undefined,
+      selfie: docErrors.selfie || undefined,
+    }));
+  }, [documents, activeTab]);
+
+  // ------------------------------------------------------------------------
+  // Auth & URL validation
+  // ------------------------------------------------------------------------
   const handleUnauthorized = () => {
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
@@ -91,10 +165,12 @@ export default function EditProfile() {
     localStorage.removeItem("otp");
     localStorage.removeItem("selectedAddressId");
     dispatch(clearUserProfile());
-    toast.error("Session expired, please log in again", {
-      toastId: "unauthorized",
-    });
-    navigate("/login");
+    Swal.fire({
+      icon: "error",
+      title: "Session Expired",
+      text: "Please log in again.",
+      confirmButtonColor: "#d33",
+    }).then(() => navigate("/login"));
   };
 
   const isValidUrl = async (url) => {
@@ -107,73 +183,141 @@ export default function EditProfile() {
     try {
       const response = await fetch(url, { method: "HEAD" });
       return response.ok;
-    } catch (error) {
-      console.error(`Failed to validate URL ${url}:`, error);
+    } catch {
       return false;
     }
   };
 
-  const handleDeleteDocument = async (index, preview) => {
+  // ------------------------------------------------------------------------
+  // Document Upload / Delete
+  // ------------------------------------------------------------------------
+  const handleDocUpload = async (e, type) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File",
+        text: "Only JPEG, PNG, AVIF, or GIF images are allowed.",
+      });
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      Swal.fire({
+        icon: "error",
+        title: "File Too Large",
+        text: "File size must be under 20 MB.",
+      });
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    setDocuments((prev) => ({
+      ...prev,
+      [type]: { preview, file, path: null },
+    }));
+  };
+
+  const handleBusinessUpload = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File",
+        text: "Only JPEG, PNG, AVIF, or GIF images are allowed.",
+      });
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      Swal.fire({
+        icon: "error",
+        title: "File Too Large",
+        text: "File size must be under 20 MB.",
+      });
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+    setBusinessImage({ preview, file, path: null });
+  };
+
+  const handleDocDelete = async (type) => {
+    const current = documents[type];
+    if (!current.preview) return;
+
+    if (!current.path) {
+      if (current.file) URL.revokeObjectURL(current.preview);
+      setDocuments((prev) => ({
+        ...prev,
+        [type]: { preview: null, file: null, path: null },
+      }));
+      return;
+    }
+
+    let imagePath = current.path;
+    if (imagePath.startsWith("http")) {
+      const baseURL = `${window.location.origin}/`;
+      imagePath = imagePath.replace(baseURL, "");
+    }
+    if (imagePath.includes("uploads/")) {
+      imagePath = imagePath.substring(imagePath.indexOf("uploads/"));
+    }
+
     try {
       const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        handleUnauthorized();
-        return;
-      }
-
-      const doc = formData.documents[index];
-      console.log(
-        "Deleting document:",
-        doc,
-        "at index:",
-        index,
-        "with preview:",
-        preview
-      );
-
-      if (!(doc.images[0] instanceof File)) {
-        const res = await fetch(`${BASE_URL}/user/deleteDocumentImage`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            documentName: doc.documentName,
-            imagePath: doc.images[0]?.replace(
-              "http://api.thebharatworks.com/",
-              ""
-            ),
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          if (res.status === 401) {
-            handleUnauthorized();
-            return;
-          }
-          throw new Error(data.message || "Failed to delete document");
-        }
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        documents: prev.documents.filter((_, i) => i !== index),
-      }));
-      setDocumentPreviews((prev) => prev.filter((_, i) => i !== index));
-      toast.success("Document deleted successfully!", {
-        toastId: `deleteDocumentSuccess-${index}`,
+      const res = await fetch(`${BASE_URL}/user/deleteDocumentImage`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          userID: profile._id,
+        },
+        body: JSON.stringify({
+          documentName: getDocumentName(type),
+          imagePath,
+        }),
       });
-      dispatch(fetchUserProfile());
-    } catch (error) {
-      console.error("Error deleting document:", error);
-      toast.error(error.message || "Failed to delete document", {
-        toastId: `deleteDocumentError-${index}`,
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) return handleUnauthorized();
+        throw new Error(data.message || "Delete failed");
+      }
+
+      if (current.file) URL.revokeObjectURL(current.preview);
+      setDocuments((prev) => ({
+        ...prev,
+        [type]: { preview: null, file: null, path: null },
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: data.message,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: err.message || "Could not delete image",
       });
     }
   };
 
+  // ------------------------------------------------------------------------
+  // Profile Fetch & Populate
+  // ------------------------------------------------------------------------
   useEffect(() => {
     const token = localStorage.getItem("bharat_token");
     if (
@@ -182,12 +326,15 @@ export default function EditProfile() {
     ) {
       dispatch(fetchUserProfile()).then((result) => {
         if (fetchUserProfile.rejected.match(result)) {
-          toast.error(result.payload || "Failed to fetch user profile", {
-            toastId: "fetchProfileError",
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: result.payload || "Failed to fetch profile",
+          }).then(() => {
+            if (result.payload === "Session expired, please log in again") {
+              handleUnauthorized();
+            }
           });
-          if (result.payload === "Session expired, please log in again") {
-            handleUnauthorized();
-          }
         }
       });
     } else {
@@ -195,126 +342,82 @@ export default function EditProfile() {
     }
   }, [dispatch]);
 
-  console.log("EditProfile Rendered: ", profile);
-
   useEffect(() => {
+		console.log("profile", profile);
     if (profile) {
       const selectedAddressIndex =
         parseInt(localStorage.getItem("selectedAddressId")) || 0;
       const selectedAddress =
         profile.full_address?.[selectedAddressIndex] || {};
 
-      const tempSubcategories =
-        Array.isArray(profile.subcategory_ids) &&
-        Array.isArray(profile.subcategory_names)
-          ? profile.subcategory_ids.map((id, index) => ({
-              value: id,
-              label: profile.subcategory_names[index] || "Unknown",
-            }))
-          : [];
-
-      const tempEmergencysubcategories =
-        Array.isArray(profile.emergencysubcategory_ids) &&
-        Array.isArray(profile.emergencySubcategory_names)
-          ? profile.emergencysubcategory_ids.map((id, index) => ({
-              value: id,
-              label: profile.emergencySubcategory_names[index] || "Unknown",
-            }))
-          : [];
-
       const processDocuments = async () => {
-        const validDocuments = [];
-        const validPreviews = [];
-        const validBusinessImages = [];
-        const validBusinessImagePreviews = [];
+        const tempDocs = {
+          aadhaarFront: { preview: null, file: null, path: null },
+          aadhaarBack: { preview: null, file: null, path: null },
+          panFront: { preview: null, file: null, path: null },
+          panBack: { preview: null, file: null, path: null },
+          selfie: { preview: null, file: null, path: null },
+        };
+        let businessObj = { preview: null, file: null, path: null };
         const seenUrls = new Set();
-        const inaccessibleDocs = [];
+        const inaccessible = [];
 
-        // Process documents from profile.documents
-        for (const [index, doc] of (profile.documents || []).entries()) {
-          if (doc && Array.isArray(doc.images) && doc.images.length > 0) {
-            for (const image of doc.images) {
-              if (
-                typeof image === "string" &&
-                image.trim() &&
-                !["null", "undefined"].includes(image.toLowerCase()) &&
-                !seenUrls.has(image)
-              ) {
-                const isAccessible = await isValidUrl(image);
-                if (isAccessible) {
+        for (const doc of profile.documents || []) {
+          if (doc && Array.isArray(doc.images) && doc.images.length) {
+            for (const img of doc.images) {
+              if (typeof img === "string" && img.trim() && !seenUrls.has(img)) {
+                const ok = await isValidUrl(img);
+                if (ok) {
+                  seenUrls.add(img);
+                  const path = getPathFromUrl(img);
                   if (doc.documentName === "businessImage") {
-                    validBusinessImages.push({
-                      documentName: "businessImage",
-                      images: [image],
-                    });
-                    validBusinessImagePreviews.push(image);
+                    if (!businessObj.preview) businessObj = { preview: img, file: null, path };
                   } else {
-                    validDocuments.push({
-                      documentName: doc.documentName || "unknown",
-                      images: [image],
-                    });
-                    validPreviews.push(image);
+                    if (doc.documentName === "AadharCard") {
+                      if (!tempDocs.aadhaarFront.preview) tempDocs.aadhaarFront = { preview: img, file: null, path };
+                      else if (!tempDocs.aadhaarBack.preview) tempDocs.aadhaarBack = { preview: img, file: null, path };
+                    } else if (doc.documentName === "PanCard") {
+                      if (!tempDocs.panFront.preview) tempDocs.panFront = { preview: img, file: null, path };
+                      else if (!tempDocs.panBack.preview) tempDocs.panBack = { preview: img, file: null, path };
+                    } else if (doc.documentName === "selfAttached") {
+                      if (!tempDocs.selfie.preview) tempDocs.selfie = { preview: img, file: null, path };
+                    }
                   }
-                  seenUrls.add(image);
                 } else {
-                  console.warn(`Skipping inaccessible URL: ${image}`);
-                  inaccessibleDocs.push({
-                    docName: doc.documentName || "unknown",
-                    url: image,
-                  });
+                  inaccessible.push({ docName: doc.documentName || "unknown", url: img });
                 }
-              } else {
-                console.warn(
-                  `Invalid or duplicate image in document ${index}:`,
-                  image
-                );
               }
             }
-          } else {
-            console.warn(`Profile document ${index} is invalid or empty:`, doc);
           }
         }
 
-        // Process businessImage from profile.businessImage
         if (Array.isArray(profile.businessImage)) {
-          for (const image of profile.businessImage) {
-            if (
-              typeof image === "string" &&
-              image.trim() &&
-              !["null", "undefined"].includes(image.toLowerCase()) &&
-              !seenUrls.has(image)
-            ) {
-              const isAccessible = await isValidUrl(image);
-              if (isAccessible) {
-                validBusinessImages.push({
-                  documentName: "businessImage",
-                  images: [image],
-                });
-                validBusinessImagePreviews.push(image);
-                seenUrls.add(image);
-              } else {
-                console.warn(
-                  `Skipping inaccessible business image URL: ${image}`
-                );
-                inaccessibleDocs.push({
-                  docName: "businessImage",
-                  url: image,
-                });
+          for (const img of profile.businessImage) {
+            if (typeof img === "string" && img.trim() && !seenUrls.has(img)) {
+              const ok = await isValidUrl(img);
+              if (ok && !businessObj.preview) {
+                const path = getPathFromUrl(img);
+                businessObj = { preview: img, file: null, path };
+                seenUrls.add(img);
+              } else if (!ok) {
+                inaccessible.push({ docName: "businessImage", url: img });
               }
-            } else {
-              console.warn(`Invalid or duplicate business image:`, image);
             }
           }
         }
 
-        if (inaccessibleDocs.length > 0) {
-          toast.error(
-            `The following documents are inaccessible and will not be displayed: ${inaccessibleDocs
-              .map((d) => d.docName)
-              .join(", ")}. Please re-upload them.`,
-            { toastId: "inaccessibleDocumentsError" }
-          );
+        if (inaccessible.length) {
+          Swal.fire({
+            icon: "warning",
+            title: "Image Load Failed",
+            text: `Some images could not be loaded. Please re-upload: ${[
+              ...new Set(inaccessible.map((i) => i.docName)),
+            ].join(", ")}`,
+          });
         }
+
+        setDocuments(tempDocs);
+        setBusinessImage(businessObj);
 
         setFormData((prev) => ({
           ...prev,
@@ -333,8 +436,6 @@ export default function EditProfile() {
           full_address: Array.isArray(profile.full_address)
             ? profile.full_address
             : [],
-          documents: validDocuments,
-          businessImage: validBusinessImages,
           hasShop: profile.isShop ? "yes" : "no",
           shopAddress: profile.businessAddress?.address || "",
           shopFullAddress: profile.businessAddress?.address
@@ -348,10 +449,9 @@ export default function EditProfile() {
                 },
               ]
             : [],
+          category: profile.category_id || "",
         }));
 
-        setDocumentPreviews(validPreviews);
-        setBusinessImagePreviews(validBusinessImagePreviews);
         setProfilePic(profile.profilePic || null);
 
         if (profile.category_id) {
@@ -367,33 +467,36 @@ export default function EditProfile() {
         emergencysubcategory: [],
         aboutUs: "",
         skill: "",
-        documents: [],
-        businessImage: [],
         age: "",
         gender: "",
         address: "",
         full_address: [],
-        customDocName: "",
         hasShop: "",
         shopAddress: "",
         shopFullAddress: [],
+        category: "",
       });
       setSubcategories([]);
       setEmergencysubcategories([]);
-      setDocumentPreviews([]);
-      setBusinessImagePreviews([]);
+      setDocuments({
+        aadhaarFront: { preview: null, file: null, path: null },
+        aadhaarBack: { preview: null, file: null, path: null },
+        panFront: { preview: null, file: null, path: null },
+        panBack: { preview: null, file: null, path: null },
+        selfie: { preview: null, file: null, path: null },
+      });
+      setBusinessImage({ preview: null, file: null, path: null });
       setProfilePic(null);
     }
   }, [profile, activeTab]);
 
+  // ------------------------------------------------------------------------
+  // Categories & Subcategories
+  // ------------------------------------------------------------------------
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
-        if (!token) {
-          handleUnauthorized();
-          return;
-        }
         const res = await fetch(`${BASE_URL}/work-category`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -408,10 +511,11 @@ export default function EditProfile() {
         } else if (res.status === 401) {
           handleUnauthorized();
         }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast.error("Failed to fetch categories", {
-          toastId: "fetchCategoriesError",
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Failed to fetch categories",
         });
       }
     };
@@ -419,182 +523,154 @@ export default function EditProfile() {
   }, []);
 
   const handleCategoryChange = async (selected) => {
-    const selectedCatId = selected?.value || "";
+    const catId = selected?.value || "";
+    setFormData((prev) => ({
+      ...prev,
+      category: catId,
+      subcategory: catId !== prev.category ? [] : prev.subcategory,
+      emergencysubcategory:
+        catId !== prev.category ? [] : prev.emergencysubcategory,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      category: catId ? undefined : "Category is required.",
+    }));
 
-    if (selectedCatId !== formData.category) {
-      setFormData((prev) => ({
-        ...prev,
-        category: selectedCatId,
-        subcategory: [],
-        emergencysubcategory: [],
-      }));
-      setSubcategories([]);
-      setEmergencysubcategories([]);
-    } else {
-      setFormData((prev) => ({ ...prev, category: selectedCatId }));
-    }
-
-    if (!selectedCatId) {
-      return;
-    }
+    if (!catId) return;
 
     try {
       const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        handleUnauthorized();
-        return;
-      }
-
-      const subRes = await fetch(`${BASE_URL}/subcategories/${selectedCatId}`, {
+      const subRes = await fetch(`${BASE_URL}/subcategories/${catId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const subData = await subRes.json();
       if (subRes.ok) {
-        let fetchedSubcategories = (subData.data || []).map((sub) => ({
-          value: sub._id,
-          label: sub.name,
+        const fetched = (subData.data || []).map((s) => ({
+          value: s._id,
+          label: s.name,
         }));
-
-        const profileSubcategoryIds = Array.isArray(profile?.subcategory_ids)
-          ? profile.subcategory_ids
-          : [];
-        const profileSubcategoryNames = Array.isArray(
-          profile?.subcategory_names
-        )
-          ? profile.subcategory_names
-          : [];
-        const mergedSubcategories = fetchedSubcategories.map((sub) => {
-          const profileIndex = profileSubcategoryIds.indexOf(sub.value);
-          return profileIndex !== -1
-            ? {
-                value: sub.value,
-                label: profileSubcategoryNames[profileIndex] || sub.label,
-              }
-            : sub;
-        });
-
-        profileSubcategoryIds.forEach((id, index) => {
-          if (!mergedSubcategories.some((s) => s.value === id)) {
-            mergedSubcategories.push({
-              value: id,
-              label: profileSubcategoryNames[index] || "Unknown",
-            });
-          }
-        });
-
-        setSubcategories(mergedSubcategories);
-
-        if (
-          profileSubcategoryIds.length > 0 &&
-          selectedCatId === profile?.category_id
-        ) {
-          setFormData((prev) => ({
-            ...prev,
-            subcategory: profileSubcategoryIds,
-          }));
-        }
-      } else if (subRes.status === 401) {
-        handleUnauthorized();
-        return;
+        setSubcategories(fetched);
       }
 
       const emerRes = await fetch(
-        `${BASE_URL}/emergency/subcategories/${selectedCatId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `${BASE_URL}/emergency/subcategories/${catId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       const emerData = await emerRes.json();
       if (emerRes.ok) {
-        let fetchedEmergencysubcategories = (emerData.data || []).map(
-          (emer) => ({
-            value: emer._id,
-            label: emer.name,
-          })
-        );
-
-        const profileEmergencySubcategoryIds = Array.isArray(
-          profile?.emergencysubcategory_ids
-        )
-          ? profile.emergencysubcategory_ids
-          : [];
-        const profileEmergencySubcategoryNames = Array.isArray(
-          profile?.emergencySubcategory_names
-        )
-          ? profile.emergencySubcategory_names
-          : [];
-        const mergedEmergencysubcategories = fetchedEmergencysubcategories.map(
-          (emer) => {
-            const profileIndex = profileEmergencySubcategoryIds.indexOf(
-              emer.value
-            );
-            return profileIndex !== -1
-              ? {
-                  value: emer.value,
-                  label:
-                    profileEmergencySubcategoryNames[profileIndex] ||
-                    emer.label,
-                }
-              : emer;
-          }
-        );
-
-        profileEmergencySubcategoryIds.forEach((id, index) => {
-          if (!mergedEmergencysubcategories.some((e) => e.value === id)) {
-            mergedEmergencysubcategories.push({
-              value: id,
-              label: profileEmergencySubcategoryNames[index] || "Unknown",
-            });
-          }
-        });
-
-        setEmergencysubcategories(mergedEmergencysubcategories);
-
-        if (
-          profileEmergencySubcategoryIds.length > 0 &&
-          selectedCatId === profile?.category_id
-        ) {
-          setFormData((prev) => ({
-            ...prev,
-            emergencysubcategory: profileEmergencySubcategoryIds,
-          }));
-        }
-      } else if (emerRes.status === 401) {
-        handleUnauthorized();
+        const fetched = (emerData.data || []).map((e) => ({
+          value: e._id,
+          label: e.name,
+        }));
+        setEmergencysubcategories(fetched);
       }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast.error("Failed to fetch subcategories or emergency subcategories", {
-        toastId: "fetchCategoriesError",
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed to fetch sub-categories",
       });
     }
   };
 
-  const handleSubcategoryChange = (selectedOptions) => {
-    setFormData({
-      ...formData,
-      subcategory: selectedOptions ? selectedOptions.map((s) => s.value) : [],
-    });
+  // ------------------------------------------------------------------------
+  // Form Change Handlers
+  // ------------------------------------------------------------------------
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
+    if (name === "name") {
+      const clean = value.replace(/[^a-zA-Z\s]/g, "");
+      setFormData((prev) => ({ ...prev, name: clean }));
+      const err =
+        !clean.trim()
+          ? "Name is required."
+          : clean.trim().length < 3
+          ? "Name must be at least 3 characters."
+          : !/^[a-zA-Z\s]+$/.test(clean.trim())
+          ? "Only letters and spaces allowed."
+          : null;
+      setErrors((prev) => ({ ...prev, name: err }));
+      if (value !== clean) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Input",
+          text: "Name can only contain letters and spaces!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+      return;
+    }
+
+    if (name === "age") {
+      const num = value.replace(/[^0-9]/g, "").slice(0, 2);
+      setFormData((prev) => ({ ...prev, age: num }));
+      const err =
+        !num
+          ? "Age is required."
+          : parseInt(num, 10) < 18 || parseInt(num, 10) > 99
+          ? "Age must be 18–99."
+          : null;
+      setErrors((prev) => ({ ...prev, age: err }));
+      return;
+    }
+
+    if (name === "hasShop") {
+      if (value === "no") {
+        setFormData((prev) => ({
+          ...prev,
+          hasShop: value,
+          shopAddress: "",
+          shopFullAddress: [],
+        }));
+        setMarkerLocationShop(null);
+      } else {
+        setFormData((prev) => ({ ...prev, hasShop: value }));
+      }
+      const err = !value ? "Please select an option." : null;
+      setErrors((prev) => ({ ...prev, hasShop: err }));
+      return;
+    }
+
+    if (name === "aboutUs") {
+      if (value.length > 500) {
+        Swal.fire({
+          icon: "warning",
+          title: "Limit Exceeded",
+          text: "Maximum 500 characters allowed.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        return;
+      }
+      const field = activeTab === "worker" ? "skill" : "aboutUs";
+      setFormData((prev) => ({ ...prev, [field]: value }));
+      const err =
+        !value.trim()
+          ? `${activeTab === "worker" ? "Skill" : "About Us"} is required.`
+          : value.trim().length < 10
+          ? "Minimum 10 characters."
+          : null;
+      setErrors((prev) => ({ ...prev, aboutUs: err }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
   };
 
-  const handleEmergencysubcategoryChange = (selectedOptions) => {
-    setFormData({
-      ...formData,
-      emergencysubcategory: selectedOptions
-        ? selectedOptions.map((s) => s.value)
-        : [],
-    });
-  };
-
+  // ------------------------------------------------------------------------
+  // Map & Address
+  // ------------------------------------------------------------------------
   const getAddressFromLatLng = (lat, lng) => {
     if (!isLoaded) return;
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results[0]) {
         const address = results[0].formatted_address;
-        console.log(
-          `Geocoded address for lat: ${lat}, lng: ${lng} -> ${address}`
-        );
         if (mapFor === "address") {
           setFormData((prev) => ({ ...prev, address }));
           setTempAddress((prev) => ({
@@ -614,11 +690,6 @@ export default function EditProfile() {
           }));
           setMarkerLocationShop({ lat, lng });
         }
-      } else {
-        console.error("Geocoding failed:", status);
-        toast.error("Failed to fetch address from location", {
-          toastId: "geocodeError",
-        });
       }
     });
   };
@@ -628,22 +699,18 @@ export default function EditProfile() {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          console.log("Current location fetched:", loc);
           setCurrentLocation(loc);
           if (mapFor === "address") setMarkerLocationAddress(loc);
           else if (mapFor === "shopAddress") setMarkerLocationShop(loc);
           getAddressFromLatLng(loc.lat, loc.lng);
           if (map) map.panTo(loc);
         },
-        () =>
-          toast.error("Unable to fetch current location", {
-            toastId: "geolocationError",
-          })
+        () => Swal.fire({
+          icon: "error",
+          title: "Location Error",
+          text: "Unable to fetch your location.",
+        })
       );
-    } else {
-      toast.error("Geolocation not supported by browser", {
-        toastId: "geolocationSupportError",
-      });
     }
   };
 
@@ -654,15 +721,11 @@ export default function EditProfile() {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
         const loc = { lat, lng };
-        console.log("Place selected:", place.formatted_address, loc);
         setCurrentLocation(loc);
         if (mapFor === "address") setMarkerLocationAddress(loc);
         else if (mapFor === "shopAddress") setMarkerLocationShop(loc);
         getAddressFromLatLng(lat, lng);
         if (map) map.panTo(loc);
-      } else {
-        console.error("No geometry available for selected place");
-        toast.error("Invalid place selected", { toastId: "invalidPlaceError" });
       }
     }
   };
@@ -670,332 +733,21 @@ export default function EditProfile() {
   const handleMapClick = (e) => {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
-    console.log(`Map clicked at lat: ${lat}, lng: ${lng}`);
     if (mapFor === "address") setMarkerLocationAddress({ lat, lng });
     else if (mapFor === "shopAddress") setMarkerLocationShop({ lat, lng });
     getAddressFromLatLng(lat, lng);
   };
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    console.log(`handleChange: name=${name}, value=${value}, files=`, files);
-
-    if (name === "name") {
-      const validName = value.replace(/[^a-zA-Z\s]/g, "");
-      if (value !== validName) {
-        toast.error("Name can only contain letters and spaces!", {
-          toastId: "nameFormatError",
-        });
-      }
-      setFormData({ ...formData, name: validName });
-      return;
-    }
-
-    if (name === "age") {
-      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 2);
-      setFormData({ ...formData, age: numericValue });
-      return;
-    }
-
-    if (name === "documents" && files) {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/avif",
-        "image/gif",
-      ];
-      const newFiles = Array.from(files);
-      const validFiles = newFiles.filter((file) =>
-        allowedTypes.includes(file.type)
-      );
-
-      const maxFileSize = 20 * 1024 * 1024; // 20MB
-      if (validFiles.some((file) => file.size > maxFileSize)) {
-        toast.error("File size exceeds 20MB limit!", {
-          toastId: "fileSizeError",
-        });
-        return;
-      }
-
-      if (newFiles.length !== 2) {
-        toast.error("Exactly 2 images are required for documents!", {
-          toastId: "documentCountError",
-        });
-        return;
-      }
-
-      if (validFiles.length !== newFiles.length) {
-        toast.error("Only image files (JPEG, PNG, AVIF, GIF) are allowed!", {
-          toastId: "fileTypeError",
-        });
-        return;
-      }
-
-      if (!selectedDocType) {
-        toast.error("Please select a document type before uploading!", {
-          toastId: "docTypeError",
-        });
-        return;
-      }
-
-      if (selectedDocType === "other" && !formData.customDocName.trim()) {
-        toast.error("Please enter the name of the government ID!", {
-          toastId: "customDocNameError",
-        });
-        return;
-      }
-
-      if (formData.documents.length + validFiles.length > 2) {
-        toast.error("Total documents cannot exceed 2!", {
-          toastId: "maxDocumentsError",
-        });
-        return;
-      }
-
-      const docType =
-        selectedDocType === "other" ? formData.customDocName : selectedDocType;
-
-      const newDocs = validFiles.map((file) => ({
-        documentName: docType,
-        images: [file],
-      }));
-
-      setFormData((prev) => ({
-        ...prev,
-        documents: [...prev.documents, ...newDocs],
-      }));
-      setDocumentPreviews((prev) => [
-        ...prev,
-        ...validFiles.map((file) => URL.createObjectURL(file)),
-      ]);
-      setSelectedDocType("");
-      setShowCustomDocInput(false);
-      setFormData((prev) => ({ ...prev, customDocName: "" }));
-      return;
-    }
-
-    // if (name === "businessImage" && files) {
-    //   const allowedTypes = [
-    //     "image/jpeg",
-    //     "image/png",
-    //     "image/avif",
-    //     "image/gif",
-    //   ];
-    //   const newFiles = Array.from(files);
-    //   const validFiles = newFiles.filter((file) =>
-    //     allowedTypes.includes(file.type)
-    //   );
-
-    //   const maxFileSize = 20 * 1024 * 1024; // 20MB
-    //   if (validFiles.some((file) => file.size > maxFileSize)) {
-    //     toast.error("File size exceeds 20MB limit!", {
-    //       toastId: "fileSizeError",
-    //     });
-    //     return;
-    //   }
-
-    //   if (newFiles.length !=1) {
-    //     toast.error(
-    //       "Please upload image!",
-    //       {
-    //         toastId: "businessImageCountError",
-    //       }
-    //     );
-    //     return;
-    //   }
-
-    //   if (validFiles.length !== newFiles.length) {
-    //     toast.error("Only image files are allowed for business images!", {
-    //       toastId: "businessImageTypeError",
-    //     });
-    //     return;
-    //   }
-    //   const totalBusinessImagesAfterUpload =
-    //     formData.businessImage.length + validFiles.length;
-    //   if (totalBusinessImagesAfterUpload > 5) {
-    //     toast.error("Total business images cannot exceed 5!", {
-    //       toastId: "maxBusinessImagesError",
-    //     });
-    //     return;
-    //   }
-
-    //   const newBusinessImages = validFiles.map((file) => ({
-    //     documentName: "businessImage",
-    //     images: [file],
-    //   }));
-
-    //   setFormData((prev) => ({
-    //     ...prev,
-    //     businessImage: [...prev.businessImage, ...newBusinessImages],
-    //   }));
-    //   setBusinessImagePreviews((prev) => [
-    //     ...prev,
-    //     ...validFiles.map((file) => URL.createObjectURL(file)),
-    //   ]);
-    //   return;
-    // }
-
-    if (name === "businessImage" && files) {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/avif",
-        "image/gif",
-      ];
-
-      const newFiles = Array.from(files);
-      const validFiles = newFiles.filter((file) =>
-        allowedTypes.includes(file.type)
-      );
-
-      const maxFileSize = 20 * 1024 * 1024;
-
-      if (validFiles.some((file) => file.size > maxFileSize)) {
-        toast.error("File size exceeds 20MB limit!", {
-          toastId: "fileSizeError",
-        });
-        return;
-      }
-
-      if (validFiles.length !== newFiles.length) {
-        toast.error("Only image files are allowed!", {
-          toastId: "businessImageTypeError",
-        });
-        return;
-      }
-
-      if (validFiles.length === 0) {
-        toast.error("Please upload an image!", {
-          toastId: "businessImageMissingError",
-        });
-        return;
-      }
-
-      const newImage = {
-        documentName: "businessImage",
-        images: [validFiles[0]],
-      };
-
-      setFormData((prev) => ({
-        ...prev,
-        businessImage: [newImage],
-      }));
-
-      setBusinessImagePreviews([URL.createObjectURL(validFiles[0])]);
-
-      return;
-    }
-
-    if (name === "customDocName") {
-      const validCustomDocName = value.replace(/[^a-zA-Z\s]/g, "");
-      if (value !== validCustomDocName) {
-        toast.error("Document name can only contain letters and spaces!", {
-          toastId: "customDocNameFormatError",
-        });
-      }
-      setFormData({ ...formData, customDocName: validCustomDocName });
-      return;
-    }
-
-    if (name === "hasShop") {
-      console.log(`hasShop changed to: ${value}`);
-      if (value === "no") {
-        setFormData((prev) => ({
-          ...prev,
-          hasShop: value,
-          shopAddress: "",
-          shopFullAddress: [],
-        }));
-        setMarkerLocationShop(null);
-      } else {
-        setFormData((prev) => ({
-          ...prev,
-          hasShop: value,
-        }));
-      }
-      return;
-    }
-
-    if (name === "aboutUs") {
-      if (value.length > 500) {
-        toast.error("About Us/Skill cannot exceed 500 characters!", {
-          toastId: "aboutUsLengthError",
-        });
-        return;
-      }
-      setFormData({
-        ...formData,
-        [activeTab === "worker" ? "skill" : "aboutUs"]: value,
-      });
-      return;
-    }
-
-    setFormData({ ...formData, [name]: files ? files[0] : value });
-  };
-
-  const handleDocTypeChange = (selected) => {
-    const docType = selected?.value || "";
-    setSelectedDocType(docType);
-    setShowCustomDocInput(docType === "other");
-    if (docType !== "other") {
-      setFormData((prev) => ({ ...prev, customDocName: "" }));
-    }
-    setFormData((prev) => ({ ...prev, documents: [] }));
-    setDocumentPreviews([]);
-  };
-
-  const handleProfilePicClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleProfilePicChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const allowedTypes = ["image/jpeg", "image/png"];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Only JPG/PNG images are allowed for profile picture!", {
-        toastId: "profilePicTypeError",
-      });
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("bharat_token");
-      if (!token) {
-        handleUnauthorized();
-        return;
-      }
-      const formData = new FormData();
-      formData.append("profilePic", file);
-      const res = await fetch(`${BASE_URL}/user/updateProfilePic`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (res.status === 401) {
-          handleUnauthorized();
-          return;
-        }
-        toast.error(data.message || "Failed to update profile pic.", {
-          toastId: "updateProfilePicError",
-        });
-        return;
-      }
-
-      setProfilePic(URL.createObjectURL(file));
-      toast.success("Profile picture updated successfully!", {
-        toastId: "updateProfilePicSuccess",
-      });
-      dispatch(fetchUserProfile());
-    } catch (error) {
-      console.error("Error updating profile pic:", error);
-      toast.error("Something went wrong!", {
-        toastId: "updateProfilePicGeneralError",
-      });
-    }
+  const handleOpenAddressModal = (type) => {
+    setMapFor(type);
+    setTempAddress({
+      title: "",
+      landmark: "",
+      address: type === "address" ? formData.address : formData.shopAddress,
+      latitude: null,
+      longitude: null,
+    });
+    setAddressModalOpen(true);
   };
 
   const handleSaveAddress = () => {
@@ -1004,14 +756,14 @@ export default function EditProfile() {
       !tempAddress.landmark.trim() ||
       !tempAddress.address.trim()
     ) {
-      toast.error(
-        "Please fill in all address fields: Title, Landmark, and Address.",
-        { toastId: "saveAddressError" }
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Incomplete",
+        text: "Title, Landmark and Address are required.",
+      });
       return;
     }
 
-    console.log(`Saving address for ${mapFor}:`, tempAddress);
     if (mapFor === "address") {
       setFormData((prev) => ({
         ...prev,
@@ -1027,7 +779,8 @@ export default function EditProfile() {
           },
         ],
       }));
-    } else if (mapFor === "shopAddress") {
+      setErrors((prev) => ({ ...prev, address: undefined }));
+    } else {
       setFormData((prev) => ({
         ...prev,
         shopAddress: tempAddress.address,
@@ -1041,7 +794,9 @@ export default function EditProfile() {
           },
         ],
       }));
+      setErrors((prev) => ({ ...prev, shopAddress: undefined }));
     }
+
     setAddressModalOpen(false);
     setTempAddress({
       title: "",
@@ -1053,119 +808,61 @@ export default function EditProfile() {
     setIsMapOpen(false);
   };
 
-  const handleOpenAddressModal = (type) => {
-    console.log(`Opening address modal for: ${type}`);
-    setMapFor(type);
-    setTempAddress({
-      title: "",
-      landmark: "",
-      address: type === "address" ? formData.address : formData.shopAddress,
-      latitude: null,
-      longitude: null,
-    });
-    setAddressModalOpen(true);
+  // ------------------------------------------------------------------------
+  // Final Validation
+  // ------------------------------------------------------------------------
+  const validateAll = () => {
+    const errs = {};
+
+    if (!formData.name.trim()) errs.name = "Name is required.";
+    else if (formData.name.trim().length < 3) errs.name = "Name must be >= 3 chars.";
+    else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim()))
+      errs.name = "Only letters and spaces.";
+
+    if (!formData.age) errs.age = "Age is required.";
+    else if (parseInt(formData.age, 10) < 18 || parseInt(formData.age, 10) > 99)
+      errs.age = "Age 18–99.";
+
+    if (!formData.gender) errs.gender = "Gender is required.";
+
+    if (!formData.address.trim()) errs.address = "Address is required.";
+
+    const aboutVal = activeTab === "worker" ? formData.skill : formData.aboutUs;
+    if (!aboutVal.trim())
+      errs.aboutUs = `${activeTab === "worker" ? "Skill" : "About Us"} required.`;
+    else if (aboutVal.trim().length < 10) errs.aboutUs = "Minimum 10 characters.";
+
+    if (activeTab === "worker") {
+      if (!formData.category) errs.category = "Category required.";
+      if (!formData.subcategory.length) errs.subcategory = "Select at least one subcategory.";
+      if (!formData.emergencysubcategory.length)
+        errs.emergencysubcategory = "Select at least one emergency subcategory.";
+      if (!formData.hasShop) errs.hasShop = "Select shop option.";
+      if (formData.hasShop === "yes" && !formData.shopAddress.trim())
+        errs.shopAddress = "Shop address required.";
+    }
+
+    return errs;
   };
 
+  // ------------------------------------------------------------------------
+  // Submit Handler
+  // ------------------------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Hard validation
-    if (!formData.name.trim()) {
-      toast.error("Name is required!", { toastId: "nameRequiredError" });
-      return;
-    }
-    if (formData.name.trim().length < 3) {
-      toast.error("Name must be at least 3 characters long!", {
-        toastId: "nameLengthError",
+    const fieldErrors = validateAll();
+    const docErrors = getDocErrors();
+    const allErrors = { ...fieldErrors, ...docErrors };
+
+    if (Object.keys(allErrors).length) {
+      setErrors(allErrors);
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: "Please fix all required fields.",
+        confirmButtonColor: "#d33",
       });
-      return;
-    }
-    if (!/^[a-zA-Z\s]+$/.test(formData.name.trim())) {
-      toast.error("Name can only contain letters and spaces!", {
-        toastId: "nameFormatError",
-      });
-      return;
-    }
-
-    if (!formData.age) {
-      toast.error("Age is required!", { toastId: "ageRequiredError" });
-      return;
-    }
-    const ageNum = parseInt(formData.age);
-    if (isNaN(ageNum) || ageNum < 18 || ageNum > 99) {
-      toast.error("Age must be a number between 18 and 99!", {
-        toastId: "ageRangeError",
-      });
-      return;
-    }
-
-    if (!formData.gender) {
-      toast.error("Gender is required!", { toastId: "genderRequiredError" });
-      return;
-    }
-
-    if (!formData.address.trim()) {
-      toast.error("Address is required!", { toastId: "addressRequiredError" });
-      return;
-    }
-
-    if (activeTab === "worker") {
-      if (!formData.category) {
-        toast.error("Category is required!", {
-          toastId: "categoryRequiredError",
-        });
-        return;
-      }
-      if (!formData.subcategory.length) {
-        toast.error("Select at least one subcategory!", {
-          toastId: "subcategoryRequiredError",
-        });
-        return;
-      }
-      if (!formData.emergencysubcategory.length) {
-        toast.error("Select at least one emergency subcategory!", {
-          toastId: "emergencysubcategoryRequiredError",
-        });
-        return;
-      }
-      if (formData.documents.length !== 2) {
-        toast.error("Exactly 2 document images are required!", {
-          toastId: "documentsRequiredError",
-        });
-        return;
-      }
-      if (!formData.hasShop) {
-        toast.error("Please select if you have a shop!", {
-          toastId: "hasShopError",
-        });
-        return;
-      }
-      if (formData.hasShop === "yes" && !formData.shopAddress.trim()) {
-        toast.error("Shop address is required if you have a shop!", {
-          toastId: "shopAddressError",
-        });
-        return;
-      }
-    }
-
-    const aboutField =
-      activeTab === "worker" ? formData.skill : formData.aboutUs;
-    if (!aboutField.trim()) {
-      toast.error(
-        activeTab === "worker"
-          ? "Skill description is required!"
-          : "About Us is required!",
-        { toastId: "aboutRequiredError" }
-      );
-      return;
-    }
-    if (aboutField.trim().length < 10) {
-      toast.error(
-        activeTab === "worker"
-          ? "Skill description must be at least 10 characters!"
-          : "About Us must be at least 10 characters!",
-        { toastId: "aboutLengthError" }
-      );
       return;
     }
 
@@ -1179,23 +876,17 @@ export default function EditProfile() {
       if (activeTab === "worker") {
         const fd = new FormData();
 
-        formData.documents.forEach((doc) => {
-          if (doc.images[0] instanceof File) {
-            fd.append("documents", doc.images[0]);
+        Object.keys(documents).forEach((key) => {
+          const slot = documents[key];
+          if (slot.file) {
+            fd.append("documents", slot.file);
+            fd.append("documentName", getDocumentName(key));
           }
         });
-        if (formData.documents.length > 0) {
-          fd.append(
-            "documentName",
-            formData.documents[0]?.documentName || "unknown"
-          );
-        }
 
-        formData.businessImage.forEach((img) => {
-          if (img.images[0] instanceof File) {
-            fd.append("businessImage", img.images[0]);
-          }
-        });
+        if (businessImage.file) {
+          fd.append("businessImage", businessImage.file);
+        }
 
         fd.append("full_name", formData.name);
         fd.append("category_id", formData.category);
@@ -1208,29 +899,19 @@ export default function EditProfile() {
         fd.append("age", formData.age);
         fd.append("gender", formData.gender);
         fd.append("isShop", formData.hasShop === "yes" ? "true" : "false");
-        if (formData.hasShop === "yes" && formData.shopFullAddress.length > 0) {
-          const businessAddress = {
+
+        if (formData.hasShop === "yes" && formData.shopFullAddress.length) {
+          const addr = {
             address: formData.shopFullAddress[0].address,
             latitude: formData.shopFullAddress[0].latitude,
             longitude: formData.shopFullAddress[0].longitude,
           };
-          if (
-            !businessAddress.address ||
-            businessAddress.latitude == null ||
-            businessAddress.longitude == null
-          ) {
-            return toast.error("Invalid shop address data!", {
-              toastId: "invalidShopAddressError",
-            });
-          }
-          fd.append("businessAddress", JSON.stringify(businessAddress));
+          fd.append("businessAddress", JSON.stringify(addr));
         }
 
         const res = await fetch(`${BASE_URL}/user/updateUserDetails`, {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
           body: fd,
         });
 
@@ -1240,47 +921,49 @@ export default function EditProfile() {
             handleUnauthorized();
             return;
           }
-          return toast.error(
-            data.message || "Failed to update worker profile.",
-            { toastId: "updateUserDetailsError" }
-          );
+          Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: data.message || "Something went wrong.",
+            confirmButtonColor: "#d33",
+          });
+          return;
         }
 
-        if (role === "user" || verificationStatus === "rejected") {
-          const upgradeRes = await fetch(
-            `${BASE_URL}/user/request-role-upgrade`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const upgradeData = await upgradeRes.json();
-          if (!upgradeRes.ok) {
-            if (upgradeRes.status === 401) {
-              handleUnauthorized();
-              return;
-            }
-            toast.error(
-              upgradeData.message || "Failed to request role upgrade.",
-              { toastId: "roleUpgradeError" }
-            );
+        if (profile?.role === "user" || profile?.verificationStatus === "rejected") {
+          const upRes = await fetch(`${BASE_URL}/user/request-role-upgrade`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!upRes.ok) {
+            const upData = await upRes.json();
+            Swal.fire({
+              icon: "warning",
+              title: "Role Upgrade",
+              text: upData.message || "Could not send request.",
+              confirmButtonColor: "#f59e0b",
+            });
           } else {
-            toast.success("Role upgrade request sent successfully!", {
-              toastId: "roleUpgradeSuccess",
+            Swal.fire({
+              icon: "info",
+              title: "Request Sent",
+              text: "Your role upgrade request has been sent!",
+              confirmButtonColor: "#10b981",
             });
           }
         }
 
-        await dispatch(fetchUserProfile());
-
-        toast.success("Worker profile updated successfully!", {
-          toastId: "updateWorkerSuccess",
-          onClose: () => setTimeout(() => navigate("/details"), 500),
+        dispatch(fetchUserProfile());
+        await Swal.fire({
+          icon: "success",
+          title: "Profile Updated!",
+          text: "Your profile has been updated successfully.",
+          confirmButtonColor: "#22c55e",
         });
+        navigate("/details");
       }
 
       if (activeTab === "user") {
@@ -1310,25 +993,40 @@ export default function EditProfile() {
             handleUnauthorized();
             return;
           }
-          return toast.error(data.message || "Failed to update user profile.", {
-            toastId: "updateUserProfileError",
+          Swal.fire({
+            icon: "error",
+            title: "Update Failed",
+            text: data.message || "Something went wrong.",
+            confirmButtonColor: "#d33",
           });
+          return;
         }
 
-        await dispatch(fetchUserProfile());
-
-        toast.success("User profile updated successfully!", {
-          toastId: "updateUserSuccess",
-          onClose: () => setTimeout(() => navigate("/details"), 500),
+        dispatch(fetchUserProfile());
+        await Swal.fire({
+          icon: "success",
+          title: "Profile Updated!",
+          text: "Your profile has been updated successfully.",
+          confirmButtonColor: "#22c55e",
         });
+        navigate("/details");
       }
-    } catch (error) {
-      console.error("Error in handleSubmit:", error);
-      toast.error("Something went wrong!", { toastId: "submitGeneralError" });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+        text: "Please check your connection.",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
-  const defaultCenter = markerLocationAddress ||
+  // ------------------------------------------------------------------------
+  // Render
+  // ------------------------------------------------------------------------
+  const defaultCenter =
+    markerLocationAddress ||
     markerLocationShop ||
     currentLocation || { lat: 28.6139, lng: 77.209 };
 
@@ -1340,21 +1038,11 @@ export default function EditProfile() {
           onClick={() => navigate(-1)}
           className="flex items-center text-green-700 mb-4 hover:underline ml-10"
         >
-          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
+          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
           Back
         </button>
       </div>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+
       <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           {activeTab === "worker"
@@ -1363,169 +1051,163 @@ export default function EditProfile() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {activeTab == "worker" && (
-            <div>
-              {businessImagePreviews?.length > 0 && (
-                <div className="mt-4">
-                  {/* <h3 className="text-lg font-semibold text-gray-800">
-                    Business Image Previews
-                  </h3> */}
-                  <div className="w-full mt-2 gap-4">
-                    {businessImagePreviews.map((preview, index) => (
-                      <div
-                        key={`${preview}-${index}`}
-                        className="relative w-32 h-32 mx-auto "
-                      >
-                        <img
-                          src={preview}
-                          alt={`Business Image Preview ${index + 1}`}
-                          className="w-full h-full object-cover rounded-lg shadow-md"
-                          onError={(e) => {
-                            console.error(
-                              `Error loading preview for business image ${
-                                index + 1
-                              }, URL:`,
-                              preview
-                            );
-                            toast.error(
-                              `Failed to load business image ${
-                                index + 1
-                              }. Please re-upload.`,
-                              {
-                                toastId: `businessImagePreviewError-${index}`,
-                              }
-                            );
-                          }}
-                        />
-                        <div className="absolute top-0 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded-br-lg">
-                          Business Image
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <label className="block mb-2 font-semibold text-gray-700">
-                Upload Business Image
+          {/* Business Image */}
+          {activeTab === "worker" && (
+            <div className="bg-gray-50 p-6 rounded-xl">
+              <label className="block mb-4 font-semibold text-gray-700">
+                Business Image (optional)
               </label>
-              <div className="space-y-3">
-                <label className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#228b22] to-[#32cd32] text-white font-semibold rounded-lg cursor-pointer hover:from-green-600 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                  <span>
-                    {formData.businessImage.length > 0
-                      ? `image selected`
-                      : "Choose image"}
-                  </span>
+              <div className="max-w-sm mx-auto space-y-4">
+                <label className="block cursor-pointer">
+                  <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed border-green-500 rounded-xl hover:bg-green-50 transition">
+                    <svg
+                      className="w-12 h-12 text-green-500 mb-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <p className="text-center text-gray-600">
+                      {businessImage.preview ? "Change Image" : "Upload Image"}
+                    </p>
+                  </div>
                   <input
                     type="file"
-                    name="businessImage"
-                    onChange={handleChange}
                     className="hidden"
-                    multiple
                     accept="image/jpeg,image/png,image/avif,image/gif"
+                    onChange={handleBusinessUpload}
                   />
                 </label>
+
+                {businessImage.preview && (
+                  <div className="relative">
+                    <img
+                      src={businessImage.preview}
+                      alt="Business"
+                      className="w-full rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}
 
+          {/* Name */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              Name
-            </label>
+            <label className="block mb-2 font-semibold text-gray-700">Name</label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your name"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-              required
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
+          {/* Age */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              Age
-            </label>
+            <label className="block mb-2 font-semibold text-gray-700">Age</label>
             <input
               type="text"
               name="age"
               value={formData.age}
               onChange={handleChange}
-              placeholder="Enter your age (18-99)"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-              required
+              placeholder="18–99"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.age ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
             />
+            {errors.age && (
+              <p className="text-red-500 text-sm mt-1">{errors.age}</p>
+            )}
           </div>
 
+          {/* Gender */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              Gender
-            </label>
+            <label className="block mb-2 font-semibold text-gray-700">Gender</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.gender ? "border-red-500" : "border-gray-300"
+              } bg-white focus:outline-none focus:ring-2 focus:ring-blue-400`}
             >
-              <option value="" disabled>
-                Select Gender
-              </option>
+              <option value="" disabled>Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
             </select>
+            {errors.gender && (
+              <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
+            )}
           </div>
 
-          {/* <div>
-            <label className="block mb-2 font-semibold text-gray-700">
-              Address
-            </label>
+          {/* Address */}
+          <div>
+            <label className="block mb-2 font-semibold text-gray-700">Address</label>
             <input
               type="text"
-              name="address"
               value={formData.address}
               readOnly
               onClick={() => handleOpenAddressModal("address")}
-              placeholder="Click to enter address"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              required
+              placeholder="Click to select address"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.address ? "border-red-500" : "border-gray-300"
+              } cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
             />
-          </div>*/}
+            {errors.address && (
+              <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+            )}
+          </div>
 
+          {/* Worker Fields */}
           {activeTab === "worker" && (
             <>
+              {/* Category */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
                   Category
                 </label>
                 <Select
                   options={categories}
-                  value={
-                    categories.find((c) => c.value === formData.category) ||
-                    null
-                  }
-                  onChange={handleCategoryChange}
-                  placeholder="Search or select category..."
+                  value={categories.find((c) => c.value === formData.category) || null}
+                  onChange={(sel) => {
+                    const id = sel?.value || "";
+                    setFormData((prev) => ({
+                      ...prev,
+                      category: id,
+                      subcategory: id !== prev.category ? [] : prev.subcategory,
+                      emergencysubcategory:
+                        id !== prev.category ? [] : prev.emergencysubcategory,
+                    }));
+                    setErrors((prev) => ({
+                      ...prev,
+                      category: id ? undefined : "Category required.",
+                    }));
+                    if (id) handleCategoryChange(sel);
+                  }}
+                  placeholder="Search or select..."
                   isClearable
                 />
+                {errors.category && (
+                  <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+                )}
               </div>
 
+              {/* Subcategory */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
                   Subcategory
@@ -1535,13 +1217,24 @@ export default function EditProfile() {
                   value={subcategories.filter((s) =>
                     formData.subcategory.includes(s.value)
                   )}
-                  onChange={handleSubcategoryChange}
+                  onChange={(opts) => {
+                    const ids = opts ? opts.map((o) => o.value) : [];
+                    setFormData((prev) => ({ ...prev, subcategory: ids }));
+                    setErrors((prev) => ({
+                      ...prev,
+                      subcategory: ids.length ? undefined : "Select at least one.",
+                    }));
+                  }}
                   isMulti
-                  placeholder="Search or select subcategories..."
                   isDisabled={!formData.category}
+                  placeholder="Search or select..."
                 />
+                {errors.subcategory && (
+                  <p className="text-red-500 text-sm mt-1">{errors.subcategory}</p>
+                )}
               </div>
 
+              {/* Emergency Subcategory */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
                   Emergency Subcategory
@@ -1551,131 +1244,246 @@ export default function EditProfile() {
                   value={emergencysubcategories.filter((e) =>
                     formData.emergencysubcategory.includes(e.value)
                   )}
-                  onChange={handleEmergencysubcategoryChange}
+                  onChange={(opts) => {
+                    const ids = opts ? opts.map((o) => o.value) : [];
+                    setFormData((prev) => ({
+                      ...prev,
+                      emergencysubcategory: ids,
+                    }));
+                    setErrors((prev) => ({
+                      ...prev,
+                      emergencysubcategory: ids.length
+                        ? undefined
+                        : "Select at least one.",
+                    }));
+                  }}
                   isMulti
-                  placeholder="Search or select emergency subcategories..."
                   isDisabled={!formData.category}
+                  placeholder="Search or select..."
                 />
-              </div>
-
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700">
-                  Upload Documents (Exactly 2 images)
-                </label>
-                <div className="space-y-3">
-                  <Select
-                    options={docTypeOptions}
-                    value={docTypeOptions.find(
-                      (d) => d.value === selectedDocType
-                    )}
-                    onChange={handleDocTypeChange}
-                    placeholder="Select document type..."
-                    isClearable
-                    className="mb-2"
-                  />
-                  {showCustomDocInput && (
-                    <input
-                      type="text"
-                      name="customDocName"
-                      value={formData.customDocName}
-                      onChange={handleChange}
-                      placeholder="Enter government ID name"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-                    />
-                  )}
-                  {selectedDocType && (
-                    <label className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#228b22] to-[#32cd32] text-white font-semibold rounded-lg cursor-pointer hover:from-green-600 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
-                      <svg
-                        className="w-5 h-5 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        />
-                      </svg>
-                      <span>
-                        {formData.documents.length > 0
-                          ? `${formData.documents.length} image(s) selected`
-                          : "Upload exactly 2 images"}
-                      </span>
-                      <input
-                        type="file"
-                        name="documents"
-                        onChange={handleChange}
-                        className="hidden"
-                        multiple
-                        accept="image/jpeg,image/png,image/avif,image/gif"
-                      />
-                    </label>
-                  )}
-                </div>
-
-                {documentPreviews.length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Document Previews
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 mt-2 gap-4">
-                      {documentPreviews.map((preview, index) => (
-                        <div
-                          key={`${preview}-${index}`}
-                          className="relative w-32 h-32 group"
-                        >
-                          <img
-                            src={preview}
-                            alt={`Document Preview ${index + 1}`}
-                            className="w-full h-full object-cover rounded-lg shadow-md"
-                            onError={(e) => {
-                              console.error(
-                                `Error loading preview for document ${
-                                  index + 1
-                                }, URL:`,
-                                preview
-                              );
-                            }}
-                          />
-                          <div className="absolute top-0 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded-br-lg">
-                            {formData?.documents[index]?.documentName ||
-                              "Unknown"}
-                          </div>
-                          <button
-                            onClick={() => handleDeleteDocument(index, preview)}
-                            className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1.5  transition-opacity bg-red-700"
-                            title="Delete document"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                {errors.emergencysubcategory && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.emergencysubcategory}
+                  </p>
                 )}
               </div>
 
+              {/* === DOCUMENTS === */}
+              <div className="space-y-8">
+                {/* Aadhaar */}
+                <div className={`bg-gray-50 p-6 rounded-xl ${errors.aadhaar ? 'ring-2 ring-red-500' : ''}`}>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                    Aadhaar Card <span className="text-red-600">*</span>
+                  </h3>
+                  {errors.aadhaar && (
+                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.aadhaar}</p>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Front */}
+                    <div className="space-y-4">
+                      <label className="font-medium text-gray-700">Front Side</label>
+                      <label className="block cursor-pointer">
+                        <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
+                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-center text-gray-600">
+                            {documents.aadhaarFront.preview ? "Change Front" : "Upload Front"}
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/avif,image/gif"
+                          onChange={(e) => handleDocUpload(e, "aadhaarFront")}
+                        />
+                      </label>
+                      {documents.aadhaarFront.preview && (
+                        <div className="relative max-w-xs mx-auto">
+                          <img src={documents.aadhaarFront.preview} alt="Aadhaar Front" className="w-full rounded-lg shadow-md" />
+                          <button
+                            type="button"
+                            onClick={() => handleDocDelete("aadhaarFront")}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Back */}
+                    <div className="space-y-4">
+                      <label className="font-medium text-gray-700">Back Side</label>
+                      <label className="block cursor-pointer">
+                        <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
+                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-center text-gray-600">
+                            {documents.aadhaarBack.preview ? "Change Back" : "Upload Back"}
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/avif,image/gif"
+                          onChange={(e) => handleDocUpload(e, "aadhaarBack")}
+                        />
+                      </label>
+                      {documents.aadhaarBack.preview && (
+                        <div className="relative max-w-xs mx-auto">
+                          <img src={documents.aadhaarBack.preview} alt="Aadhaar Back" className="w-full rounded-lg shadow-md" />
+                          <button
+                            type="button"
+                            onClick={() => handleDocDelete("aadhaarBack")}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* PAN */}
+                <div className={`bg-gray-50 p-6 rounded-xl ${errors.pan ? 'ring-2 ring-red-500' : ''}`}>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                    PAN Card <span className="text-red-600">*</span>
+                  </h3>
+                  {errors.pan && (
+                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.pan}</p>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <label className="font-medium text-gray-700">Front Side</label>
+                      <label className="block cursor-pointer">
+                        <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
+                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-center text-gray-600">
+                            {documents.panFront.preview ? "Change Front" : "Upload Front"}
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/avif,image/gif"
+                          onChange={(e) => handleDocUpload(e, "panFront")}
+                        />
+                      </label>
+                      {documents.panFront.preview && (
+                        <div className="relative max-w-xs mx-auto">
+                          <img src={documents.panFront.preview} alt="PAN Front" className="w-full rounded-lg shadow-md" />
+                          <button
+                            type="button"
+                            onClick={() => handleDocDelete("panFront")}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <label className="font-medium text-gray-700">Back Side</label>
+                      <label className="block cursor-pointer">
+                        <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
+                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-center text-gray-600">
+                            {documents.panBack.preview ? "Change Back" : "Upload Back"}
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/avif,image/gif"
+                          onChange={(e) => handleDocUpload(e, "panBack")}
+                        />
+                      </label>
+                      {documents.panBack.preview && (
+                        <div className="relative max-w-xs mx-auto">
+                          <img src={documents.panBack.preview} alt="PAN Back" className="w-full rounded-lg shadow-md" />
+                          <button
+                            type="button"
+                            onClick={() => handleDocDelete("panBack")}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selfie */}
+                <div className={`bg-gray-50 p-6 rounded-xl ${errors.selfie ? 'ring-2 ring-red-500' : ''}`}>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                    Selfie <span className="text-red-600">*</span>
+                  </h3>
+                  {errors.selfie && (
+                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.selfie}</p>
+                  )}
+                  <div className="max-w-sm mx-auto space-y-4">
+                    <label className="block cursor-pointer">
+                      <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed border-green-500 rounded-xl hover:bg-green-50 transition">
+                        <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p className="text-center text-gray-600">
+                          {documents.selfie.preview ? "Change Selfie" : "Upload Selfie"}
+                        </p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/jpeg,image/png,image/avif,image/gif"
+                        onChange={(e) => handleDocUpload(e, "selfie")}
+                      />
+                    </label>
+
+                    {documents.selfie.preview && (
+                      <div className="relative">
+                        <img
+                          src={documents.selfie.preview}
+                          alt="Selfie"
+                          className="w-full max-w-xs mx-auto rounded-lg shadow-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleDocDelete("selfie")}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Has Shop */}
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">
                   Do you have a shop?
                 </label>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <label className="flex items-center">
                     <input
                       type="radio"
@@ -1699,8 +1507,12 @@ export default function EditProfile() {
                     No
                   </label>
                 </div>
+                {errors.hasShop && (
+                  <p className="text-red-500 text-sm mt-2">{errors.hasShop}</p>
+                )}
               </div>
 
+              {/* Shop Address */}
               {formData.hasShop === "yes" && (
                 <div>
                   <label className="block mb-2 font-semibold text-gray-700">
@@ -1708,19 +1520,25 @@ export default function EditProfile() {
                   </label>
                   <input
                     type="text"
-                    name="shopAddress"
                     value={formData.shopAddress}
                     readOnly
                     onClick={() => handleOpenAddressModal("shopAddress")}
-                    placeholder="Click to enter shop address"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    required
+                    placeholder="Click to select shop address"
+                    className={`w-full px-4 py-2 rounded-lg border ${
+                      errors.shopAddress ? "border-red-500" : "border-gray-300"
+                    } cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 transition`}
                   />
+                  {errors.shopAddress && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.shopAddress}
+                    </p>
+                  )}
                 </div>
               )}
             </>
           )}
 
+          {/* About / Skill */}
           <div>
             <label className="block mb-2 font-semibold text-gray-700">
               {activeTab === "worker" ? "About My Skill" : "About Us"}
@@ -1731,39 +1549,39 @@ export default function EditProfile() {
               onChange={handleChange}
               placeholder={
                 activeTab === "worker"
-                  ? "Describe your skill (min 10 characters)..."
-                  : "Tell us about yourself (min 10 characters)..."
+                  ? "Describe your skill (min 10 chars)..."
+                  : "Tell us about yourself (min 10 chars)..."
               }
               maxLength={500}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
-              rows="4"
-              required
-            ></textarea>
+              rows={4}
+              className={`w-full px-4 py-2 rounded-lg border ${
+                errors.aboutUs ? "border-red-500" : "border-gray-300"
+              } focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none`}
+            />
             <p className="text-sm text-gray-500 mt-1">
-              {
-                (activeTab === "worker" ? formData.skill : formData.aboutUs)
-                  .length
-              }
-              /500 characters
+              {(activeTab === "worker" ? formData.skill : formData.aboutUs).length}
+              /500
             </p>
+            {errors.aboutUs && (
+              <p className="text-red-500 text-sm mt-1">{errors.aboutUs}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-64 lg:w-72 mx-auto bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition shadow-md hover:shadow-lg block"
+            className="w-64 lg:w-72 mx-auto block bg-[#228b22] text-white font-semibold py-3 rounded-lg hover:bg-green-600 transition shadow-md hover:shadow-lg"
           >
             Submit
           </button>
         </form>
       </div>
 
+      {/* Address Modal */}
       {addressModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center w-[90%] max-w-md">
+          <div className="bg-white p-6 rounded-2xl shadow-lg w-[90%] max-w-md">
             <h2 className="text-lg font-bold mb-4">
-              {mapFor === "address"
-                ? "Enter Address Details"
-                : "Enter Shop Address Details"}
+              {mapFor === "address" ? "Enter Address Details" : "Enter Shop Address Details"}
             </h2>
             <input
               type="text"
@@ -1818,14 +1636,13 @@ export default function EditProfile() {
         </div>
       )}
 
+      {/* Map Modal */}
       {isMapOpen && isLoaded && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
             <div className="flex justify-between mb-2">
               <h1 className="text-black text-[20px] font-semibold">
-                {mapFor === "address"
-                  ? "Select Address"
-                  : "Select Shop Address"}
+                {mapFor === "address" ? "Select Address" : "Select Shop Address"}
               </h1>
               <button
                 onClick={() => setIsMapOpen(false)}
@@ -1856,7 +1673,7 @@ export default function EditProfile() {
               mapContainerStyle={{ height: "350px", width: "100%" }}
               center={defaultCenter}
               zoom={15}
-              onLoad={(map) => setMap(map)}
+              onLoad={(m) => setMap(m)}
               onClick={handleMapClick}
             >
               {mapFor === "address" && markerLocationAddress && (

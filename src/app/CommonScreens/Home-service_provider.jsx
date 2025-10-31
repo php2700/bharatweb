@@ -14,6 +14,7 @@ import "slick-carousel/slick/slick-theme.css";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
+import defaultWorkImage from "../../assets/directHiring/his-work.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
@@ -98,7 +99,7 @@ export default function ServiceProviderHome() {
             data.data.map((item) => ({
               id: item._id,
               image:
-                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+                item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -148,7 +149,7 @@ export default function ServiceProviderHome() {
             data.data.map((item) => ({
               id: item._id,
               image:
-                item.image_url[0] || "/src/assets/directHiring/his-work.png",
+                item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -199,9 +200,10 @@ export default function ServiceProviderHome() {
             data?.data.map((item) => ({
               id: item._id,
               image:
-                item.image_urls[0] || "/src/assets/directHiring/his-work.png",
-              work: item.category_id?.name || "Emergency task",
-              // description: item.description || "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+                item.image_urls[0] || defaultWorkImage,
+              work: item.title || "Emergency task",
+
+              description: item.description || "No description",
               amount: item.platform_fee || "₹200",
               location: item.google_address || "Indore M.P.",
             }))
@@ -335,7 +337,6 @@ export default function ServiceProviderHome() {
   const visibleDirectHiring = directHiring.slice(0, 4);
   const visibleBidding = bidding.slice(0, 4);
   const visibleEmergency = emergency.slice(0, 4);
-  console.log(isEmergencyOn, "gggggggg");
   return (
     <>
       <Header />
@@ -647,7 +648,7 @@ export default function ServiceProviderHome() {
                     </button>
                   )}
                 </div>
-
+  {console.log("ememememe", visibleEmergency)}
                 {emergencyLoading ? (
                   <p className="text-gray-500 text-center">
                     Loading emergency tasks...
@@ -657,6 +658,7 @@ export default function ServiceProviderHome() {
                 //     Please Turn on Emergency Button to get Emergency Task
                 //   </p>
                 // )
+								
                 emergency.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {visibleEmergency.map((card, index) => (
@@ -680,7 +682,7 @@ export default function ServiceProviderHome() {
                             {capitalizeFirst(card.work)}
                           </h3>
                           <p className="text-black font-medium max-md:text-sm">
-                            ₹{card.amount}
+                            {card.amount}
                           </p>
                         </div>
                         <p className="text-gray-600 max-w-[87%] text-xs mt-1">
