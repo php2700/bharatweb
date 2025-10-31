@@ -583,7 +583,8 @@ export default function WorkerList() {
                         <img
                           src={worker.image || image}
                           alt={`${worker.name}'s profile image`}
-                          className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-lg object-cover"
+                          // className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-lg object-cover"
+                            className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full object-cover "
                         />
                       </div>
                       <div className="flex-1 min-w-0 text-center sm:text-left">

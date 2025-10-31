@@ -675,7 +675,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 // --- 1. useSelector को import करें --- // <<-- बदला हुआ
-import { useSelector } from "react-redux"; 
+import { useSelector } from "react-redux";
 
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -685,12 +685,14 @@ import downarrow from "../../assets/addworker/downarrow.png";
 import dob from "../../assets/addworker/icon.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Arrow from "../../assets/profile/arrow_back.svg";
+
 // --- 2. image का नाम बदलें ताकि profile से conflict न हो --- // <<-- बदला हुआ
-import defaultProfileImage from "../../assets/addworker/defaultDP.png"; 
+import defaultProfileImage from "../../assets/addworker/defaultDP.png";
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -832,7 +834,11 @@ export default function AddWorkerDetails() {
 
   const validateForm = () => {
     let newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.name.trim())) {
+      newErrors.name = "Name must contain only letters";
+    }
     const phoneNumber = formData.phone.trim().replace(/\D/g, "");
     if (!phoneNumber) {
       newErrors.phone = "Phone number is required";
@@ -841,12 +847,14 @@ export default function AddWorkerDetails() {
     } else if (!/^[6-9]/.test(phoneNumber)) {
       newErrors.phone = "Phone number must start with digits 6–9";
     }
-    const aadharNumber = formData.aadharNumber.replace(/\D/g, "");
-    if (!formData.aadharNumber) {
-      newErrors.aadharNumber = "Aadhar number is required";
-    } else if (!/^\d{12}$/.test(aadharNumber)) {
-      newErrors.aadharNumber = "Aadhar must be exactly 12 digits";
-    }
+   const aadharNumber = formData.aadharNumber.trim();
+
+if (!aadharNumber) {
+  newErrors.aadharNumber = "Aadhar number is required";
+} else if (!/^\d{12}$/.test(aadharNumber)) {
+  newErrors.aadharNumber = "Aadhar number must be exactly 12 digits";
+}
+
     if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
     if (!address) newErrors.address = "Address is required";
     if (!formData.aadharImage) newErrors.aadharImage = "Aadhaar image is required";
@@ -925,22 +933,43 @@ export default function AddWorkerDetails() {
       <div className="min-h-screen px-5 py-6 sm:px-6 lg:px-8">
         <ToastContainer position="top-right" autoClose={3000} />
         <div className="w-full max-w-[83rem] xl:max-w-[60rem] shadow-[0px_4px_4px_0px_#00000040] rounded-xl p-3 sm:p-20 space-y-4 lg:ml-[290px]">
+          <div className="flex items-center mb-6">
+            <Link
+              to="/workerlist"
+              className="flex items-center text-[#008000] hover:text-green-800 font-semibold text-xl"
+              aria-label="Go back to previous page"
+            >
+              <img src={Arrow} className="w-7 h-7 mr-2" alt="Back arrow icon" />
+              Back
+            </Link>
+          </div>
           <div className="max-w-sm mx-auto sm:max-w-md lg:max-w-[36rem]">
-            <div className="flex items-center mb-10">
-              <h1 className="text-[27px] font-[700] text-[#191A1D] flex-1 text-center mr-8">
-                Add Worker Details
-              </h1>
+            <div className="flex items-center mb-6">
+              {/* <Link
+                to="/"
+                className="flex items-center text-[#008000] hover:text-green-800 font-semibold text-xl"
+                aria-label="Go back to previous page"
+              >
+                <img src={Arrow} className="w-7 h-7 mr-2" alt="Back arrow icon" />
+                Back
+              </Link> */}
             </div>
+
+            {/* ✅ Title center aligned below Back button */}
+            <h1 className="text-[27px] font-[700] text-[#191A1D] text-center mb-10">
+              Add Worker Details
+            </h1>
+
 
             <div className="flex justify-center mb-8">
               <div className="relative">
                 <div className="w-48 h-48 rounded-full overflow-hidden p-1">
                   <div className="w-full h-full rounded-full overflow-hidden">
                     <img
-                       // --- 5. यहाँ image का नया नाम इस्तेमाल करें --- // <<-- बदला हुआ
+
                       src={image ? URL.createObjectURL(image) : defaultProfileImage}
                       alt="Worker profile image"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full  object-cover"
                     />
                   </div>
                 </div>
@@ -950,6 +979,7 @@ export default function AddWorkerDetails() {
                   id="profileUpload"
                   className="hidden"
                   onChange={handleImageChange}
+                  
                 />
                 <label
                   htmlFor="profileUpload"
@@ -983,7 +1013,7 @@ export default function AddWorkerDetails() {
                   </div>
                   <input
                     type="tel"
-                    placeholder="9822515445"
+                    placeholder="Enter Your Mobile Number"
                     value={formData.phone}
                     onChange={(e) => {
                       const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -996,28 +1026,40 @@ export default function AddWorkerDetails() {
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
-              <input
-                type="text"
-                placeholder="Aadhar Number"
-                value={formData.aadharNumber}
-                onChange={(e) =>
-                  handleInputChange(
-                    "aadharNumber",
-                    e.target.value.replace(/\D/g, "").slice(0, 12)
-                  )
-                }
-                className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
-              />
+          <div>
+  <input
+    type="text"
+    placeholder="Aadhar Number"
+    value={formData.aadharNumber}
+    onChange={(e) =>
+      handleInputChange(
+        "aadharNumber",
+        e.target.value.replace(/\D/g, "").slice(0, 12)
+      )
+    }
+    className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
+    aria-label="Aadhaar number"
+  />
+  {errors.aadharNumber && (
+    <p className="text-red-500 text-sm mt-1">{errors.aadharNumber}</p>
+  )}
+</div>
 
-              <div className="relative">
+
+              <div className="relative" >
                 <input
+                  onClick={() => document.getElementById("dob-input").showPicker?.()}
+
                   id="dob-input"
-                  type="date"
+                    type={formData.dateOfBirth ? "date" : "text"}
+  placeholder="Enter your date of birth"
                   value={formData.dateOfBirth}
                   onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
                   className="h-[55px] text-base border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3 cursor-pointer"
                   min={minDate}
                   max={maxDate}
+                  aria-label="Date of birth"
+                  l
                 />
                 <img
                   src={dob}
