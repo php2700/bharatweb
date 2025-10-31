@@ -343,6 +343,7 @@ export default function EditProfile() {
   }, [dispatch]);
 
   useEffect(() => {
+		console.log("profile", profile);
     if (profile) {
       const selectedAddressIndex =
         parseInt(localStorage.getItem("selectedAddressId")) || 0;
