@@ -114,9 +114,11 @@ export default function EditProfile() {
 
     if (activeTab === "worker") {
       // Aadhaar: both required
-      const hasAadhaar = documents.aadhaarFront.preview && documents.aadhaarBack.preview;
+      const hasAadhaar =
+        documents.aadhaarFront.preview && documents.aadhaarBack.preview;
       const partialAadhaar =
-        (documents.aadhaarFront.preview || documents.aadhaarBack.preview) && !hasAadhaar;
+        (documents.aadhaarFront.preview || documents.aadhaarBack.preview) &&
+        !hasAadhaar;
 
       if (!hasAadhaar) {
         errs.aadhaar = partialAadhaar
@@ -343,12 +345,23 @@ export default function EditProfile() {
   }, [dispatch]);
 
   useEffect(() => {
-		console.log("profile", profile);
+    console.log("profile", profile);
     if (profile) {
       const selectedAddressIndex =
         parseInt(localStorage.getItem("selectedAddressId")) || 0;
       const selectedAddress =
         profile.full_address?.[selectedAddressIndex] || {};
+
+      const isValidUrl = (url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url.startsWith("http://")
+            ? url.replace("http://", "https://")
+            : url;
+        });
+      };
 
       const processDocuments = async () => {
         const tempDocs = {
@@ -371,20 +384,37 @@ export default function EditProfile() {
                   seenUrls.add(img);
                   const path = getPathFromUrl(img);
                   if (doc.documentName === "businessImage") {
-                    if (!businessObj.preview) businessObj = { preview: img, file: null, path };
+                    if (!businessObj.preview)
+                      businessObj = { preview: img, file: null, path };
                   } else {
                     if (doc.documentName === "AadharCard") {
-                      if (!tempDocs.aadhaarFront.preview) tempDocs.aadhaarFront = { preview: img, file: null, path };
-                      else if (!tempDocs.aadhaarBack.preview) tempDocs.aadhaarBack = { preview: img, file: null, path };
+                      if (!tempDocs.aadhaarFront.preview)
+                        tempDocs.aadhaarFront = {
+                          preview: img,
+                          file: null,
+                          path,
+                        };
+                      else if (!tempDocs.aadhaarBack.preview)
+                        tempDocs.aadhaarBack = {
+                          preview: img,
+                          file: null,
+                          path,
+                        };
                     } else if (doc.documentName === "PanCard") {
-                      if (!tempDocs.panFront.preview) tempDocs.panFront = { preview: img, file: null, path };
-                      else if (!tempDocs.panBack.preview) tempDocs.panBack = { preview: img, file: null, path };
+                      if (!tempDocs.panFront.preview)
+                        tempDocs.panFront = { preview: img, file: null, path };
+                      else if (!tempDocs.panBack.preview)
+                        tempDocs.panBack = { preview: img, file: null, path };
                     } else if (doc.documentName === "selfAttached") {
-                      if (!tempDocs.selfie.preview) tempDocs.selfie = { preview: img, file: null, path };
+                      if (!tempDocs.selfie.preview)
+                        tempDocs.selfie = { preview: img, file: null, path };
                     }
                   }
                 } else {
-                  inaccessible.push({ docName: doc.documentName || "unknown", url: img });
+                  inaccessible.push({
+                    docName: doc.documentName || "unknown",
+                    url: img,
+                  });
                 }
               }
             }
@@ -582,14 +612,13 @@ export default function EditProfile() {
     if (name === "name") {
       const clean = value.replace(/[^a-zA-Z\s]/g, "");
       setFormData((prev) => ({ ...prev, name: clean }));
-      const err =
-        !clean.trim()
-          ? "Name is required."
-          : clean.trim().length < 3
-          ? "Name must be at least 3 characters."
-          : !/^[a-zA-Z\s]+$/.test(clean.trim())
-          ? "Only letters and spaces allowed."
-          : null;
+      const err = !clean.trim()
+        ? "Name is required."
+        : clean.trim().length < 3
+        ? "Name must be at least 3 characters."
+        : !/^[a-zA-Z\s]+$/.test(clean.trim())
+        ? "Only letters and spaces allowed."
+        : null;
       setErrors((prev) => ({ ...prev, name: err }));
       if (value !== clean) {
         Swal.fire({
@@ -606,12 +635,11 @@ export default function EditProfile() {
     if (name === "age") {
       const num = value.replace(/[^0-9]/g, "").slice(0, 2);
       setFormData((prev) => ({ ...prev, age: num }));
-      const err =
-        !num
-          ? "Age is required."
-          : parseInt(num, 10) < 18 || parseInt(num, 10) > 99
-          ? "Age must be 18–99."
-          : null;
+      const err = !num
+        ? "Age is required."
+        : parseInt(num, 10) < 18 || parseInt(num, 10) > 99
+        ? "Age must be 18–99."
+        : null;
       setErrors((prev) => ({ ...prev, age: err }));
       return;
     }
@@ -646,12 +674,11 @@ export default function EditProfile() {
       }
       const field = activeTab === "worker" ? "skill" : "aboutUs";
       setFormData((prev) => ({ ...prev, [field]: value }));
-      const err =
-        !value.trim()
-          ? `${activeTab === "worker" ? "Skill" : "About Us"} is required.`
-          : value.trim().length < 10
-          ? "Minimum 10 characters."
-          : null;
+      const err = !value.trim()
+        ? `${activeTab === "worker" ? "Skill" : "About Us"} is required.`
+        : value.trim().length < 10
+        ? "Minimum 10 characters."
+        : null;
       setErrors((prev) => ({ ...prev, aboutUs: err }));
       return;
     }
@@ -705,11 +732,12 @@ export default function EditProfile() {
           getAddressFromLatLng(loc.lat, loc.lng);
           if (map) map.panTo(loc);
         },
-        () => Swal.fire({
-          icon: "error",
-          title: "Location Error",
-          text: "Unable to fetch your location.",
-        })
+        () =>
+          Swal.fire({
+            icon: "error",
+            title: "Location Error",
+            text: "Unable to fetch your location.",
+          })
       );
     }
   };
@@ -815,7 +843,8 @@ export default function EditProfile() {
     const errs = {};
 
     if (!formData.name.trim()) errs.name = "Name is required.";
-    else if (formData.name.trim().length < 3) errs.name = "Name must be >= 3 chars.";
+    else if (formData.name.trim().length < 3)
+      errs.name = "Name must be >= 3 chars.";
     else if (!/^[a-zA-Z\s]+$/.test(formData.name.trim()))
       errs.name = "Only letters and spaces.";
 
@@ -829,14 +858,19 @@ export default function EditProfile() {
 
     const aboutVal = activeTab === "worker" ? formData.skill : formData.aboutUs;
     if (!aboutVal.trim())
-      errs.aboutUs = `${activeTab === "worker" ? "Skill" : "About Us"} required.`;
-    else if (aboutVal.trim().length < 10) errs.aboutUs = "Minimum 10 characters.";
+      errs.aboutUs = `${
+        activeTab === "worker" ? "Skill" : "About Us"
+      } required.`;
+    else if (aboutVal.trim().length < 10)
+      errs.aboutUs = "Minimum 10 characters.";
 
     if (activeTab === "worker") {
       if (!formData.category) errs.category = "Category required.";
-      if (!formData.subcategory.length) errs.subcategory = "Select at least one subcategory.";
+      if (!formData.subcategory.length)
+        errs.subcategory = "Select at least one subcategory.";
       if (!formData.emergencysubcategory.length)
-        errs.emergencysubcategory = "Select at least one emergency subcategory.";
+        errs.emergencysubcategory =
+          "Select at least one emergency subcategory.";
       if (!formData.hasShop) errs.hasShop = "Select shop option.";
       if (formData.hasShop === "yes" && !formData.shopAddress.trim())
         errs.shopAddress = "Shop address required.";
@@ -930,7 +964,10 @@ export default function EditProfile() {
           return;
         }
 
-        if (profile?.role === "user" || profile?.verificationStatus === "rejected") {
+        if (
+          profile?.role === "user" ||
+          profile?.verificationStatus === "rejected"
+        ) {
           const upRes = await fetch(`${BASE_URL}/user/request-role-upgrade`, {
             method: "POST",
             headers: {
@@ -1025,8 +1062,7 @@ export default function EditProfile() {
   // ------------------------------------------------------------------------
   // Render
   // ------------------------------------------------------------------------
-  const defaultCenter =
-    markerLocationAddress ||
+  const defaultCenter = markerLocationAddress ||
     markerLocationShop ||
     currentLocation || { lat: 28.6139, lng: 77.209 };
 
@@ -1100,7 +1136,9 @@ export default function EditProfile() {
 
           {/* Name */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">Name</label>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               name="name"
@@ -1118,7 +1156,9 @@ export default function EditProfile() {
 
           {/* Age */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">Age</label>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Age
+            </label>
             <input
               type="text"
               name="age"
@@ -1136,7 +1176,9 @@ export default function EditProfile() {
 
           {/* Gender */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">Gender</label>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Gender
+            </label>
             <select
               name="gender"
               value={formData.gender}
@@ -1145,7 +1187,9 @@ export default function EditProfile() {
                 errors.gender ? "border-red-500" : "border-gray-300"
               } bg-white focus:outline-none focus:ring-2 focus:ring-blue-400`}
             >
-              <option value="" disabled>Select Gender</option>
+              <option value="" disabled>
+                Select Gender
+              </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -1157,7 +1201,9 @@ export default function EditProfile() {
 
           {/* Address */}
           <div>
-            <label className="block mb-2 font-semibold text-gray-700">Address</label>
+            <label className="block mb-2 font-semibold text-gray-700">
+              Address
+            </label>
             <input
               type="text"
               value={formData.address}
@@ -1183,7 +1229,10 @@ export default function EditProfile() {
                 </label>
                 <Select
                   options={categories}
-                  value={categories.find((c) => c.value === formData.category) || null}
+                  value={
+                    categories.find((c) => c.value === formData.category) ||
+                    null
+                  }
                   onChange={(sel) => {
                     const id = sel?.value || "";
                     setFormData((prev) => ({
@@ -1222,7 +1271,9 @@ export default function EditProfile() {
                     setFormData((prev) => ({ ...prev, subcategory: ids }));
                     setErrors((prev) => ({
                       ...prev,
-                      subcategory: ids.length ? undefined : "Select at least one.",
+                      subcategory: ids.length
+                        ? undefined
+                        : "Select at least one.",
                     }));
                   }}
                   isMulti
@@ -1230,7 +1281,9 @@ export default function EditProfile() {
                   placeholder="Search or select..."
                 />
                 {errors.subcategory && (
-                  <p className="text-red-500 text-sm mt-1">{errors.subcategory}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.subcategory}
+                  </p>
                 )}
               </div>
 
@@ -1271,24 +1324,44 @@ export default function EditProfile() {
               {/* === DOCUMENTS === */}
               <div className="space-y-8">
                 {/* Aadhaar */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.aadhaar ? 'ring-2 ring-red-500' : ''}`}>
+                <div
+                  className={`bg-gray-50 p-6 rounded-xl ${
+                    errors.aadhaar ? "ring-2 ring-red-500" : ""
+                  }`}
+                >
                   <h3 className="text-xl font-semibold mb-4 text-gray-800">
                     Aadhaar Card <span className="text-red-600">*</span>
                   </h3>
                   {errors.aadhaar && (
-                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.aadhaar}</p>
+                    <p className="text-red-500 text-sm -mt-2 mb-2">
+                      {errors.aadhaar}
+                    </p>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Front */}
                     <div className="space-y-4">
-                      <label className="font-medium text-gray-700">Front Side</label>
+                      <label className="font-medium text-gray-700">
+                        Front Side
+                      </label>
                       <label className="block cursor-pointer">
                         <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
-                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          <svg
+                            className="w-12 h-12 text-green-500 mb-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
                           </svg>
                           <p className="text-center text-gray-600">
-                            {documents.aadhaarFront.preview ? "Change Front" : "Upload Front"}
+                            {documents.aadhaarFront.preview
+                              ? "Change Front"
+                              : "Upload Front"}
                           </p>
                         </div>
                         <input
@@ -1300,14 +1373,28 @@ export default function EditProfile() {
                       </label>
                       {documents.aadhaarFront.preview && (
                         <div className="relative max-w-xs mx-auto">
-                          <img src={documents.aadhaarFront.preview} alt="Aadhaar Front" className="w-full rounded-lg shadow-md" />
+                          <img
+                            src={documents.aadhaarFront.preview}
+                            alt="Aadhaar Front"
+                            className="w-full rounded-lg shadow-md"
+                          />
                           <button
                             type="button"
                             onClick={() => handleDocDelete("aadhaarFront")}
                             className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -1316,14 +1403,28 @@ export default function EditProfile() {
 
                     {/* Back */}
                     <div className="space-y-4">
-                      <label className="font-medium text-gray-700">Back Side</label>
+                      <label className="font-medium text-gray-700">
+                        Back Side
+                      </label>
                       <label className="block cursor-pointer">
                         <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
-                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          <svg
+                            className="w-12 h-12 text-green-500 mb-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
                           </svg>
                           <p className="text-center text-gray-600">
-                            {documents.aadhaarBack.preview ? "Change Back" : "Upload Back"}
+                            {documents.aadhaarBack.preview
+                              ? "Change Back"
+                              : "Upload Back"}
                           </p>
                         </div>
                         <input
@@ -1335,14 +1436,28 @@ export default function EditProfile() {
                       </label>
                       {documents.aadhaarBack.preview && (
                         <div className="relative max-w-xs mx-auto">
-                          <img src={documents.aadhaarBack.preview} alt="Aadhaar Back" className="w-full rounded-lg shadow-md" />
+                          <img
+                            src={documents.aadhaarBack.preview}
+                            alt="Aadhaar Back"
+                            className="w-full rounded-lg shadow-md"
+                          />
                           <button
                             type="button"
                             onClick={() => handleDocDelete("aadhaarBack")}
                             className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -1352,23 +1467,43 @@ export default function EditProfile() {
                 </div>
 
                 {/* PAN */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.pan ? 'ring-2 ring-red-500' : ''}`}>
+                <div
+                  className={`bg-gray-50 p-6 rounded-xl ${
+                    errors.pan ? "ring-2 ring-red-500" : ""
+                  }`}
+                >
                   <h3 className="text-xl font-semibold mb-4 text-gray-800">
                     PAN Card <span className="text-red-600">*</span>
                   </h3>
                   {errors.pan && (
-                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.pan}</p>
+                    <p className="text-red-500 text-sm -mt-2 mb-2">
+                      {errors.pan}
+                    </p>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                      <label className="font-medium text-gray-700">Front Side</label>
+                      <label className="font-medium text-gray-700">
+                        Front Side
+                      </label>
                       <label className="block cursor-pointer">
                         <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
-                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          <svg
+                            className="w-12 h-12 text-green-500 mb-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
                           </svg>
                           <p className="text-center text-gray-600">
-                            {documents.panFront.preview ? "Change Front" : "Upload Front"}
+                            {documents.panFront.preview
+                              ? "Change Front"
+                              : "Upload Front"}
                           </p>
                         </div>
                         <input
@@ -1380,14 +1515,28 @@ export default function EditProfile() {
                       </label>
                       {documents.panFront.preview && (
                         <div className="relative max-w-xs mx-auto">
-                          <img src={documents.panFront.preview} alt="PAN Front" className="w-full rounded-lg shadow-md" />
+                          <img
+                            src={documents.panFront.preview}
+                            alt="PAN Front"
+                            className="w-full rounded-lg shadow-md"
+                          />
                           <button
                             type="button"
                             onClick={() => handleDocDelete("panFront")}
                             className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -1395,14 +1544,28 @@ export default function EditProfile() {
                     </div>
 
                     <div className="space-y-4">
-                      <label className="font-medium text-gray-700">Back Side</label>
+                      <label className="font-medium text-gray-700">
+                        Back Side
+                      </label>
                       <label className="block cursor-pointer">
                         <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
-                          <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          <svg
+                            className="w-12 h-12 text-green-500 mb-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
                           </svg>
                           <p className="text-center text-gray-600">
-                            {documents.panBack.preview ? "Change Back" : "Upload Back"}
+                            {documents.panBack.preview
+                              ? "Change Back"
+                              : "Upload Back"}
                           </p>
                         </div>
                         <input
@@ -1414,14 +1577,28 @@ export default function EditProfile() {
                       </label>
                       {documents.panBack.preview && (
                         <div className="relative max-w-xs mx-auto">
-                          <img src={documents.panBack.preview} alt="PAN Back" className="w-full rounded-lg shadow-md" />
+                          <img
+                            src={documents.panBack.preview}
+                            alt="PAN Back"
+                            className="w-full rounded-lg shadow-md"
+                          />
                           <button
                             type="button"
                             onClick={() => handleDocDelete("panBack")}
                             className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -1431,21 +1608,39 @@ export default function EditProfile() {
                 </div>
 
                 {/* Selfie */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.selfie ? 'ring-2 ring-red-500' : ''}`}>
+                <div
+                  className={`bg-gray-50 p-6 rounded-xl ${
+                    errors.selfie ? "ring-2 ring-red-500" : ""
+                  }`}
+                >
                   <h3 className="text-xl font-semibold mb-4 text-gray-800">
                     Selfie <span className="text-red-600">*</span>
                   </h3>
                   {errors.selfie && (
-                    <p className="text-red-500 text-sm -mt-2 mb-2">{errors.selfie}</p>
+                    <p className="text-red-500 text-sm -mt-2 mb-2">
+                      {errors.selfie}
+                    </p>
                   )}
                   <div className="max-w-sm mx-auto space-y-4">
                     <label className="block cursor-pointer">
                       <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed border-green-500 rounded-xl hover:bg-green-50 transition">
-                        <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        <svg
+                          className="w-12 h-12 text-green-500 mb-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
                         </svg>
                         <p className="text-center text-gray-600">
-                          {documents.selfie.preview ? "Change Selfie" : "Upload Selfie"}
+                          {documents.selfie.preview
+                            ? "Change Selfie"
+                            : "Upload Selfie"}
                         </p>
                       </div>
                       <input
@@ -1468,8 +1663,18 @@ export default function EditProfile() {
                           onClick={() => handleDocDelete("selfie")}
                           className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
                       </div>
@@ -1559,7 +1764,10 @@ export default function EditProfile() {
               } focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none`}
             />
             <p className="text-sm text-gray-500 mt-1">
-              {(activeTab === "worker" ? formData.skill : formData.aboutUs).length}
+              {
+                (activeTab === "worker" ? formData.skill : formData.aboutUs)
+                  .length
+              }
               /500
             </p>
             {errors.aboutUs && (
@@ -1581,7 +1789,9 @@ export default function EditProfile() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-[90%] max-w-md">
             <h2 className="text-lg font-bold mb-4">
-              {mapFor === "address" ? "Enter Address Details" : "Enter Shop Address Details"}
+              {mapFor === "address"
+                ? "Enter Address Details"
+                : "Enter Shop Address Details"}
             </h2>
             <input
               type="text"
@@ -1642,7 +1852,9 @@ export default function EditProfile() {
           <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
             <div className="flex justify-between mb-2">
               <h1 className="text-black text-[20px] font-semibold">
-                {mapFor === "address" ? "Select Address" : "Select Shop Address"}
+                {mapFor === "address"
+                  ? "Select Address"
+                  : "Select Shop Address"}
               </h1>
               <button
                 onClick={() => setIsMapOpen(false)}

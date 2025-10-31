@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import defaultWorkImage from "../../../assets/directHiring/Work.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -90,18 +91,20 @@ export default function RecentPost() {
           throw new Error("Failed to fetch available orders");
         }
         const data = await res.json();
+				// console.log("data", data);
         const fetchedWorkers = (data.data || []).map((item) => ({
           project_id: item.project_id,
           _id: item._id,
           workName: item.title,
           location: item.google_address,
           status: item.status,
-          image: item.image_url[0] || "/src/assets/directHiring/Work.png",
+          image: item.image_url[0] || defaultWorkImage,
           amount: item.cost,
           date: item.createdAt,
           completionDate: item.deadline,
           description: item.description,
         }));
+				// console.log("dhdhd", fetchedWorkers);
         setWorkers(fetchedWorkers);
       } catch (err) {
         setError("Failed to fetch available bidding orders");
@@ -248,10 +251,10 @@ export default function RecentPost() {
                       </span>
 
                       <Link
-                        to={`/bidding/bid/${worker._id}`}
+                        to={`/bidding/worker/order-detail/${worker._id}`}
                         className="text-[#228B22] py-1 px-4 border rounded-lg hover:bg-[#228B22] hover:text-white transition"
                       >
-                        View Profile
+                        View Details
                       </Link>
                     </div>
                   </div>
