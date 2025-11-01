@@ -562,11 +562,14 @@ export default function WorkerList() {
               <h1 className="text-lg sm:text-xl lg:text-[25px] font-[700] text-gray-800 text-center">
                 Worker List
               </h1>
-              <button className="bg-[#228B22] text-white px-3 sm:px-4 py-2 rounded-2xl shadow hover:bg-[#121212] w-[160px] sm:w-[180px] lg:w-[220px] lg:h-[48px] text-[15px] font-[500] mt-4 sm:mt-0">
-                <Link to="/add-worker" aria-label="Add new worker">
-                  Add Worker
-                </Link>
-              </button>
+              <Link
+                to="/add-worker"
+                aria-label="Add new worker"
+                className="bg-[#228B22] text-white px-3 sm:px-4 py-2 rounded-2xl shadow hover:bg-[#121212] w-[160px] sm:w-[180px] lg:w-[220px] lg:h-[48px] text-[15px] font-[500] mt-4 sm:mt-0 flex justify-center items-center"
+              >
+                Add Worker
+              </Link>
+
             </div>
 
             <div className="w-full">
@@ -584,7 +587,7 @@ export default function WorkerList() {
                           src={worker.image || image}
                           alt={`${worker.name}'s profile image`}
                           // className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-lg object-cover"
-                            className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full object-cover "
+                          className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full object-cover "
                         />
                       </div>
                       <div className="flex-1 min-w-0 text-center sm:text-left">

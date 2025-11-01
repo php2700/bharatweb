@@ -403,7 +403,7 @@ export default function Accepted({
         <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Payment Summary</h3>
-            {hireStatus !== "assigned" && (
+            {hireStatus !== "completed" && (
               <button
                 onClick={() => setShowForm(true)}
                 className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"

@@ -847,13 +847,13 @@ export default function AddWorkerDetails() {
     } else if (!/^[6-9]/.test(phoneNumber)) {
       newErrors.phone = "Phone number must start with digits 6–9";
     }
-   const aadharNumber = formData.aadharNumber.trim();
+    const aadharNumber = formData.aadharNumber.trim();
 
-if (!aadharNumber) {
-  newErrors.aadharNumber = "Aadhar number is required";
-} else if (!/^\d{12}$/.test(aadharNumber)) {
-  newErrors.aadharNumber = "Aadhar number must be exactly 12 digits";
-}
+    if (!aadharNumber) {
+      newErrors.aadharNumber = "Aadhar number is required";
+    } else if (!/^\d{12}$/.test(aadharNumber)) {
+      newErrors.aadharNumber = "Aadhar number must be exactly 12 digits";
+    }
 
     if (!formData.dateOfBirth) newErrors.dateOfBirth = "Date of Birth is required";
     if (!address) newErrors.address = "Address is required";
@@ -979,7 +979,7 @@ if (!aadharNumber) {
                   id="profileUpload"
                   className="hidden"
                   onChange={handleImageChange}
-                  
+
                 />
                 <label
                   htmlFor="profileUpload"
@@ -1026,50 +1026,72 @@ if (!aadharNumber) {
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
 
-          <div>
-  <input
-    type="text"
-    placeholder="Aadhar Number"
-    value={formData.aadharNumber}
-    onChange={(e) =>
-      handleInputChange(
-        "aadharNumber",
-        e.target.value.replace(/\D/g, "").slice(0, 12)
-      )
-    }
-    className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
-    aria-label="Aadhaar number"
-  />
-  {errors.aadharNumber && (
-    <p className="text-red-500 text-sm mt-1">{errors.aadharNumber}</p>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Aadhar Number"
+                  value={formData.aadharNumber}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "aadharNumber",
+                      e.target.value.replace(/\D/g, "").slice(0, 12)
+                    )
+                  }
+                  className="h-[55px] text-base placeholder:text-gray-500 border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] px-3 w-full"
+                  aria-label="Aadhaar number"
+                />
+                {errors.aadharNumber && (
+                  <p className="text-red-500 text-sm mt-1">{errors.aadharNumber}</p>
+                )}
+              </div>
+
+
+<div className="relative">
+  {/* Label */}
+  <label
+    htmlFor="dob-input"
+    className="block text-gray-700 text-sm font-medium mb-2"
+  >
+    Enter your date of birth
+  </label>
+
+  {/* Wrapper div — click anywhere triggers calendar */}
+  <div
+    className="relative"
+    onClick={() => {
+      const input = document.getElementById("dob-input");
+      if (input) {
+        input.showPicker?.();
+        input.focus();
+      }
+    }}
+  >
+    <input
+      id="dob-input"
+      type="date"
+      value={formData.dateOfBirth}
+      onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
+      className="h-[55px] text-base border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3 cursor-pointer"
+      min={minDate}
+      max={maxDate}
+      aria-label="Date of birth"
+      style={{ colorScheme: "light" }} // ensures visible picker style
+    />
+
+    {/* Calendar icon */}
+    <img
+      src={dob}
+      alt="Calendar icon"
+      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none"
+    />
+  </div>
+
+  {/* Error message */}
+  {errors.dateOfBirth && (
+    <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>
   )}
 </div>
 
-
-              <div className="relative" >
-                <input
-                  onClick={() => document.getElementById("dob-input").showPicker?.()}
-
-                  id="dob-input"
-                    type={formData.dateOfBirth ? "date" : "text"}
-  placeholder="Enter your date of birth"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-                  className="h-[55px] text-base border border-gray-300 focus:border-gray-400 bg-white rounded-[19px] pr-12 w-full px-3 cursor-pointer"
-                  min={minDate}
-                  max={maxDate}
-                  aria-label="Date of birth"
-                  l
-                />
-                <img
-                  src={dob}
-                  alt="Calendar icon"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none"
-                />
-                {errors.dateOfBirth && (
-                  <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>
-                )}
-              </div>
 
               <label className="block">
                 <span className="text-sm font-medium text-gray-600">Address</span>

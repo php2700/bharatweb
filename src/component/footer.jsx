@@ -29,7 +29,7 @@ export default function Footer() {
       >
         {/* Logo Section */}
         <div className="md:flex justify-center md:justify-start">
-          <div className="bg-white w-[120px] h-[60px] sm:w-[140px] sm:h-[70px] md:w-[160px] md:h-[75px] lg:w-[185px] lg:h-[90px] flex items-center justify-center mx-auto md:mx-0">
+          <div className="cursor-pointer bg-white w-[120px] h-[60px] sm:w-[140px] sm:h-[70px] md:w-[160px] md:h-[75px] lg:w-[185px] lg:h-[90px] flex items-center justify-center mx-auto md:mx-0">
             <img onClick={()=>{
 navigate('/homeuser')
             }}
@@ -133,7 +133,7 @@ navigate('/homeuser')
           </div>
 
           {/* ✅ Replaced Newsletter with social icons */}
-          <div className="flex justify-center md:justify-start gap-4 mt-20">
+          <div className="flex justify-center md:justify-start gap-4 mt-20 cursor-pointer">
             {[
               { src: Facebook, alt: "Facebook" },
               { src: Twitter, alt: "Twitter" },
