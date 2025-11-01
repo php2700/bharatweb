@@ -8,7 +8,8 @@ import Search from "../../../assets/search-normal.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import defaultBanner from "../../../assets/profile/banner.png";
+import defaultWorkImage from "../../../assets/directHiring/Work.png";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EmergencyTasks() {
@@ -90,12 +91,12 @@ export default function EmergencyTasks() {
           throw new Error(data.message || `API request failed with status ${response.status}`);
         }
 
-        console.log("Fetched tasks:", data);
+        // console.log("Fetched tasks:", data);
         const transformedData = data.data.map((item) => ({
           id: item._id,
           project_id: item.project_id,
           name: item.category_id.name,
-          image: item.image_urls[0],
+          image: item.image_urls[0] || defaultWorkImage,
           date: new Date(item.createdAt).toLocaleDateString("en-GB"),
           completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
           price: item.platform_fee
@@ -159,11 +160,11 @@ export default function EmergencyTasks() {
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner || defaultBanner} // Fallback image
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = defaultBanner; // Fallback on image load error
                   }}
                 />
               </div>
