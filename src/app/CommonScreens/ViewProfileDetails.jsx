@@ -204,6 +204,7 @@ console.log("lllll", statuslocation.state);
 
   const {
     full_name = "N/A",
+		unique_id="N/A",
     phone = "N/A",
     location = { address: "Not Available" },
     full_address = [{ address: "Not Available" }],
@@ -342,10 +343,10 @@ console.log("lllll", statuslocation.state);
                   </span>
                 )}
               </div>
-              {/* <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                <img src={Location} alt="Phone icon" className="w-5 h-5" />
-                <span>{phone}</span>
-              </div> */}
+              <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                
+               <span className="font-semibold text-[#228B22]">Id-</span>{" "} <span>{unique_id}</span>
+              </div> 
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
                 <img src={Location} alt="Location icon" className="w-5 h-5" />
                 <span>

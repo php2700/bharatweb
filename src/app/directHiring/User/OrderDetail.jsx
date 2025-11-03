@@ -1099,7 +1099,8 @@ export default function ViewProfile() {
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
-                {orderData?.hire_status === "accepted" && (
+                {(orderData?.hire_status === "accepted" ||
+                  orderData?.hire_status === "completed") && (
                   <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                     <div className="relative max-w-2xl mx-auto">
                       <div className="relative z-10">
@@ -1120,22 +1121,30 @@ export default function ViewProfile() {
                     </div>
 
                     <div className="flex space-x-4">
-                      <button
-                        className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                        onClick={handleMarkComplete}
-                      >
-                        Mark as Complete
-                      </button>
-                      <ReviewModal
-                        show={showCompletedModal}
-                        onClose={() => {
-                          setShowCompletedModal(false);
-                          fetchData();
-                        }}
-                        service_provider_id={orderData?.service_provider_id._id}
-                        orderId={id}
-                        type="direct"
-                      />
+                      {orderData?.hire_status === "completed" ? (
+                        ""
+                      ) : (
+                        <>
+                          <button
+                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                            onClick={handleMarkComplete}
+                          >
+                            Mark as Complete
+                          </button>
+                          <ReviewModal
+                            show={showCompletedModal}
+                            onClose={() => {
+                              setShowCompletedModal(false);
+                              fetchData();
+                            }}
+                            service_provider_id={
+                              orderData?.service_provider_id._id
+                            }
+                            orderId={id}
+                            type="direct"
+                          />{" "}
+                        </>
+                      )}
                       <Link to={`/dispute/${id}/direct`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
                           Cancel Task and Create Dispute

@@ -619,7 +619,7 @@ export default function ViewProfile() {
                   hireStatus={orderData?.hire_status}
                 />
 
-                {orderData?.hire_status === "accepted" && (
+                {(orderData?.hire_status === "accepted" || orderData?.hire_status === "completed") && (
                   <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                     <div className="relative max-w-2xl mx-auto">
                       <div className="relative z-10">
