@@ -914,12 +914,14 @@ export default function ViewProfile() {
                             <>
                               <button
                                 className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
-    ${provider.status === "pending" ? "bg-yellow-500" : ""}
-    ${provider.status === "accepted" ? "bg-green-600" : ""}
-    ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+      ${provider.status === "pending" ? "bg-yellow-500" : ""}
+      ${provider.status === "accepted" ? "bg-green-600" : ""}
+      ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
                                 disabled
                               >
-                                {Array.isArray(provider.status)
+                                {provider.isRejectedByUser
+                                  ? "Rejected by Me"
+                                  : Array.isArray(provider.status)
                                   ? provider.status
                                       .map(
                                         (word) =>
@@ -932,14 +934,42 @@ export default function ViewProfile() {
                                     provider.status.slice(1)
                                   : ""}
                               </button>
-                             {orderData?.hire_status == "pending" && provider.status === "pending" && <button
-                                className={`px-6 py-2 ${
-      showChangeProvider ? "bg-green-600" : "bg-[#FB3523]"
-    } text-white font-semibold rounded-lg shadow`}
-                                onClick={() => setShowChangeProvider(true)} // show section when clicked
-                              >
-                                {showChangeProvider ? "Please change" : "Change Service Provider"}
-                              </button>}
+                              {orderData?.hire_status === "pending" &&
+                                provider.status === "pending" && (
+                                  <button
+                                    className={`px-6 py-2 ${
+                                      showChangeProvider
+                                        ? "bg-green-600"
+                                        : "bg-[#FB3523]"
+                                    } text-white font-semibold rounded-lg shadow`}
+                                    onClick={() => {
+                                      Swal.fire({
+                                        title: "Are you sure?",
+                                        text: "Do you really want to change the service provider?",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#3085d6",
+                                        cancelButtonColor: "#d33",
+                                        confirmButtonText: "Yes, change it!",
+                                      }).then((result) => {
+                                        if (result.isConfirmed) {
+                                          setShowChangeProvider(true); // ✅ show section when confirmed
+                                          Swal.fire({
+                                            title: "Confirmed!",
+                                            text: "You can now change the service provider.",
+                                            icon: "success",
+                                            timer: 1500,
+                                            showConfirmButton: false,
+                                          });
+                                        }
+                                      });
+                                    }}
+                                  >
+                                    {showChangeProvider
+                                      ? "Please change"
+                                      : "Change Service Provider"}
+                                  </button>
+                                )}
                             </>
                           )}
                         </div>
@@ -1119,14 +1149,14 @@ export default function ViewProfile() {
           </div>
         </div>
       </div>
-     
-			{showChangeProvider && filteredRelatedWorkers.length == 0 &&
-			<div className="container mx-auto px-4 py-6 max-w-4xl">
-            <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
-             Providers are not found!.
-            </h2>
-				</div>
-			}
+
+      {showChangeProvider && filteredRelatedWorkers.length == 0 && (
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
+          <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
+            Providers are not found!.
+          </h2>
+        </div>
+      )}
 
       {showChangeProvider &&
         orderData?.hire_status !== "cancelled" &&
