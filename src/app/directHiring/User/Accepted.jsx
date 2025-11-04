@@ -305,10 +305,11 @@ export default function Accepted({
     toast.info("Form cleared!");
   };
 
-  const handleRouteHire = (ProviderId) => {
+  const handleRouteHire = (ProviderId, isHired) => {
     navigate(`/profile-details/${ProviderId}/direct`, {
       state: {
         hire_status: hireStatus,
+				isHired
       },
     });
   };
@@ -367,7 +368,7 @@ export default function Accepted({
 
                 <button
                   className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-                  onClick={() => handleRouteHire(serviceProvider._id)}
+                  onClick={() => handleRouteHire(serviceProvider._id, true)}
                 >
                   View Profile
                 </button>

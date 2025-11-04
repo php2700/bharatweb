@@ -30,7 +30,7 @@ export default function ViewProfileDetails() {
   const [selectedImage, setSelectedImage] = useState(null);
   const statuslocation = useLocation();
   const { hire_status, isHired } = statuslocation.state || {};
-
+ console.log("ddddd", isHired);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
