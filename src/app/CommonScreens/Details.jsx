@@ -1254,7 +1254,7 @@ console.log("Profile Object:", profile); // Debugging line
             <div className="container mx-auto max-w-[550px] px-4 sm:px-6 py-6">
               <Link to="/workerlist">
                 <button className="w-full bg-[#228B22] text-white py-3 rounded-lg text-base sm:text-lg font-semibold shadow-md hover:bg-green-700 transition-colors duration-300">
-                  Add workers
+                  view and add workers
                 </button>
               </Link>
             </div>

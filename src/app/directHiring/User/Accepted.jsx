@@ -516,7 +516,7 @@ const handlePay = async (paymentId) => {
         </div>
       )}
     </div>
-		<div className="p-4 bg-white shadow-md rounded-lg">
+		{/* <div className="p-4 bg-white shadow-md rounded-lg">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>
             <tr>
@@ -539,7 +539,48 @@ const handlePay = async (paymentId) => {
             </tr>
           </tbody>
         </table>
-      </div>
+      </div> */}
+             <div className="p-4 bg-white shadow-md rounded-lg mt-10">
+  <table className="w-full border border-gray-300 rounded-md overflow-hidden">
+    <thead style={{ backgroundColor: "#228B22", color: "white" }}>
+      <tr>
+        <th className="border p-2 text-left">Description</th>
+        <th className="border p-2 text-left">Amount (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td className="border p-2">Total Amount</td>
+        <td className="border p-2">₹{fullPaymentHistory.total_expected}</td>
+      </tr>
+      <tr>
+        <td className="border p-2">Pay to App</td>
+        <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+      </tr>
+      <tr>
+        <td className="border p-2">Play to user</td>
+               <td className="border p-2">
+          ₹{paymentHistory
+            .filter(payment => payment.release_status === "release_requested")
+            .reduce((sum, payment) => sum + payment.amount, 0)}
+        </td>
+        {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
+      </tr>
+      {/* <tr>
+        <td className="border p-2">Remaining Amount to Pay</td>
+        <td className="border p-2">₹{fullPaymentHistory.remaining}</td>
+      </tr> */}
+      {/* <tr className="font-semibold">
+        <td className="border p-2">Total Amount Released</td>
+        <td className="border p-2">₹{fullPaymentHistory.}</td>
+      </tr> */}
+      {/* <tr className="font-semibold">
+        <td className="border p-2">Released by Admin</td>
+        <td className="border p-2">₹{fullPaymentHistory.releasedByAdmin}</td>
+      </tr> */}
+    </tbody>
+  </table>
+</div>
 		</>
   );
 }

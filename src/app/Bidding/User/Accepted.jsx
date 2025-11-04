@@ -536,6 +536,7 @@ export default function Accepted({
             </tbody>
           </table>
         </div>
+
       </div>
     </>
   );

@@ -1160,6 +1160,16 @@ export default function AddWorkerDetails() {
                 </label>
                 {errors.aadharImage && <p className="text-red-500 text-sm mt-1">{errors.aadharImage}</p>}
               </div>
+               {formData.aadharImage && (
+    <div className="mt-4">
+      <p className="text-sm font-medium text-gray-600 mb-2">Preview:</p>
+      <img
+        src={URL.createObjectURL(formData.aadharImage)}
+        alt="Aadhaar preview"
+        className="w-[200px] h-[100px] max-w-md h-auto object-cover rounded-lg border border-gray-300 shadow-sm"
+      />
+    </div>
+  )}
 
               <div className="pt-6">
                 <button
