@@ -55,6 +55,7 @@ export default function ViewProfile() {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
   const [showChangeProvider, setShowChangeProvider] = useState(false);
+    const [expandedAddresses, setExpandedAddresses] = useState({});
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -798,6 +799,24 @@ export default function ViewProfile() {
       }
     });
   };
+    const toggleAddress = (providerId) => {
+    setExpandedAddresses(prev => ({
+      ...prev,
+      [providerId]: !prev[providerId]
+    }));
+  };
+
+  const truncateAddress = (address, providerId) => {
+    if (!address) return "No Address Provided";
+    const maxLength = 50;
+    const isExpanded = expandedAddresses[providerId];
+
+    if (address.length <= maxLength || isExpanded) {
+      return address;
+    }
+    return address.substring(0, maxLength) + "...";
+  };
+  
 
   return (
     <>
@@ -1003,10 +1022,30 @@ export default function ViewProfile() {
                             {provider.provider_id.full_name ||
                               "Unknown Provider"}
                           </p>
-                          <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                          {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                             {provider.provider_id?.location?.address ||
                               "No Address Provided"}
-                          </p>
+                          </p> */}
+                                 <FaMapMarkerAlt className="text-[#F27773] mt-1 flex-shrink-0" color="#228B22" size={20} />
+                            <div className="flex-1">
+                              <p className="text-gray-700 text-sm">
+                                {truncateAddress(
+                                  provider.provider_id?.location?.address,
+                                  provider.provider_id._id
+                                )}
+                                {provider.provider_id?.location?.address?.length > 50 && (
+                                  <button
+                                    onClick={() => toggleAddress(provider.provider_id._id)}
+                                    className="text-[#228B22] font-semibold ml-2 hover:underline"
+                                  >
+                                    {expandedAddresses[provider.provider_id._id]
+                                      ? "See Less"
+                                      : "See More"}
+                                  </button>
+                                )}
+                              </p>
+                            </div>
+
                           <button
                             onClick={() =>
                               handleRouteHire(provider.provider_id._id, true)
@@ -1113,7 +1152,7 @@ export default function ViewProfile() {
                                     }}
                                   >
                                     {showChangeProvider
-                                      ? "Please change"
+                                      ? "Rejected by Me"
                                       : "Change Service Provider"}
                                   </button>
                                 )}
@@ -1369,9 +1408,31 @@ export default function ViewProfile() {
                         <p className="text-lg font-semibold">
                           {worker.full_name || "Unknown Worker"}
                         </p>
-                        <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                        {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}
-                        </p>
+                        </p> */}
+                        
+                        <div className="flex items-start gap-2 mt-2">
+                          <FaMapMarkerAlt className="text-red-500 mt-1 flex-shrink-0" color="#228B22" size={20} />
+                          <div className="flex-1">
+                            <p className="text-gray-700 text-sm">
+                              {truncateAddress(
+                                worker.location?.address,
+                                worker._id
+                              )}
+                              {worker.location?.address && worker.location.address.length > 50 && (
+                                <button
+                                  onClick={() => toggleAddress(worker._id)}
+                                  className="text-green-600 font-semibold ml-2 hover:underline text-sm"
+                                >
+                                  {expandedAddresses[worker._id]
+                                    ? "See Less"
+                                    : "See More"}
+                                </button>
+                              )}
+                            </p>
+                          </div>
+                        </div>
                         <button
                           onClick={() => handleRouteHire(worker._id, false)}
                           className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
