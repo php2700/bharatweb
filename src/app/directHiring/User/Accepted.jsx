@@ -558,7 +558,7 @@ const handlePay = async (paymentId) => {
         <td className="border p-2">₹{fullPaymentHistory.amount}</td>
       </tr>
       <tr>
-        <td className="border p-2">Play to user</td>
+        <td className="border p-2">Pay to user</td>
                <td className="border p-2">
           ₹{paymentHistory
             .filter(payment => payment.release_status === "release_requested")

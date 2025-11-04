@@ -24,8 +24,20 @@ export default function WorkerList() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success) setWorkers(data.workers);
-      else setWorkers([]);
+      console.log("data", data)
+      if (data.success) {
+  // ✅ Sirf approved workers ko rakho
+
+  const approvedWorkers = data.workers.filter(
+    (worker) => worker.verifyStatus?.toLowerCase() === "approved"
+  );
+  console.log("apppr", approvedWorkers);
+  setWorkers(approvedWorkers);
+} else {
+  setWorkers([]);
+}
+      // if (data.success) setWorkers(data.workers);
+      // else setWorkers([]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,79 +49,79 @@ export default function WorkerList() {
     fetchWorkers();
   }, []);
 
- const handleAssign = async (workerId) => {
-  if (!workerId || !orderId || !type) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Information",
-      text: "Worker, Order, or Type is missing.",
-      timer: 2000,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
-    });
-    return;
-  }
-
-  try {
-    console.log("Sending request with:", { worker_id: workerId, order_id: orderId, type });
-    const response = await axios.post(
-      `${BASE_URL}/worker/assign-order`,
-      {
-        worker_id: workerId,
-        order_id: orderId,
-        type: type,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    // console.log("API Response:", response.data); // Log the full response
-
-    if (response.data.success) { // Changed from response.data.status to response.data.success
+  const handleAssign = async (workerId) => {
+    if (!workerId || !orderId || !type) {
       Swal.fire({
-        icon: "success",
-        title: "Order Assigned!",
-        text: response.data.message || "The worker has been assigned successfully.", // Use API message
+        icon: "warning",
+        title: "Missing Information",
+        text: "Worker, Order, or Type is missing.",
         timer: 2000,
         showConfirmButton: false,
         toast: true,
         position: "top-end",
       });
-      setTimeout(() => {
-        console.log("Navigating to:", `/emergency/worker/order-detail/${orderId}`);
-        // navigate(`/emergency/worker/order-detail/${orderId}`);
-				navigate(-1);
-      }, 2000); // Navigate after toast duration
-    } else {
-      console.log("Error Message:", response.data.message);
+      return;
+    }
+
+    try {
+      console.log("Sending request with:", { worker_id: workerId, order_id: orderId, type });
+      const response = await axios.post(
+        `${BASE_URL}/worker/assign-order`,
+        {
+          worker_id: workerId,
+          order_id: orderId,
+          type: type,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // console.log("API Response:", response.data); // Log the full response
+
+      if (response.data.success) { // Changed from response.data.status to response.data.success
+        Swal.fire({
+          icon: "success",
+          title: "Order Assigned!",
+          text: response.data.message || "The worker has been assigned successfully.", // Use API message
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+        setTimeout(() => {
+          console.log("Navigating to:", `/emergency/worker/order-detail/${orderId}`);
+          // navigate(`/emergency/worker/order-detail/${orderId}`);
+          navigate(-1);
+        }, 2000); // Navigate after toast duration
+      } else {
+        console.log("Error Message:", response.data.message);
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: response.data.message || "Could not assign order.",
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+      }
+    } catch (error) {
+      console.error("Request Failed:", error.response?.data || error.message);
       Swal.fire({
         icon: "error",
-        title: "Failed",
-        text: response.data.message || "Could not assign order.",
+        title: "Error",
+        text: error.response?.data?.message || "Something went wrong.",
         timer: 2000,
         showConfirmButton: false,
         toast: true,
         position: "top-end",
       });
     }
-  } catch (error) {
-    console.error("Request Failed:", error.response?.data || error.message);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.response?.data?.message || "Something went wrong.",
-      timer: 2000,
-      showConfirmButton: false,
-      toast: true,
-      position: "top-end",
-    });
-  }
-};
+  };
 
   if (loading) {
     return (
@@ -178,10 +190,26 @@ export default function WorkerList() {
                   <button
                     type="button"
                     className="bg-[#228B22] text-white px-5 py-2 rounded shadow hover:bg-[#121212]"
-                    onClick={() => handleAssign(worker._id)}
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "Do you want to assign this order to the worker?",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#228B22",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, Assign",
+                        cancelButtonText: "No, Cancel",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                          handleAssign(worker._id);
+                        }
+                      });
+                    }}
                   >
                     Assign
                   </button>
+
                 </div>
               </div>
             ))
