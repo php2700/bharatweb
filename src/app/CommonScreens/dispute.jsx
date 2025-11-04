@@ -39,7 +39,7 @@ export default function Dispute() {
         },
       });
 
-      console.log("Banner API response:", response.data); // Debug response
+      // console.log("Banner API response:", response.data); // Debug response
 
       if (response.data && Array.isArray(response.data.images) && response.data.images.length > 0) {
         setBannerImages(response.data.images);
@@ -93,9 +93,9 @@ export default function Dispute() {
       newErrors.requirement = "Requirement is required";
     }
 
-    // if (images.length === 0) {
-    //   newErrors.images = "Please upload at least one image";
-    // }
+    if (images.length === 0) {
+      newErrors.images = "Please upload at least one image";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -254,9 +254,9 @@ export default function Dispute() {
                 ? `${images.length} image(s) selected`
                 : "Upload Images (Max 5)"}
             </label>
-            {/* {errors.images && (
+             {errors.images && (
               <p className="text-red-600 text-sm mt-1">{errors.images}</p>
-            )} */}
+            )} 
 
             {/* Show preview of selected images with remove button */}
             <div className="flex flex-wrap mt-3 gap-3">

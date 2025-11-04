@@ -184,73 +184,72 @@ export default function Accepted({
   //   }
   // };
 
-const handlePay = async (paymentId) => {
-  // Step 1️⃣: Show confirmation alert
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "Do you really want to release this payment?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, Pay Now",
-    cancelButtonText: "Cancel",
-  });
+  const handlePay = async (paymentId) => {
+    // Step 1️⃣: Show confirmation alert
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to release this payment?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Pay Now",
+      cancelButtonText: "Cancel",
+    });
 
-  // Step 2️⃣: Only continue if user clicks "Yes"
-  if (result.isConfirmed) {
-    try {
-      const token = localStorage.getItem("bharat_token");
+    // Step 2️⃣: Only continue if user clicks "Yes"
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("bharat_token");
 
-      const response = await axios.post(
-        `${BASE_URL}/direct-order/user/request-release/${orderId}/${paymentId}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.post(
+          `${BASE_URL}/direct-order/user/request-release/${orderId}/${paymentId}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Released",
+            text: "Payment release requested successfully!",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          window.location.reload();
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: "Payment release request failed, please try again.",
+          });
         }
-      );
-
-      if (response.status === 200) {
-        await Swal.fire({
-          icon: "success",
-          title: "Payment Released",
-          text: "Payment release requested successfully!",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        window.location.reload();
-      } else {
+      } catch (error) {
+        console.error("Payment release error:", error);
         Swal.fire({
           icon: "error",
-          title: "Failed",
-          text: "Payment release request failed, please try again.",
+          title: "Error",
+          text:
+            error.response?.data?.message ||
+            "Something went wrong while requesting payment release.",
         });
       }
-    } catch (error) {
-      console.error("Payment release error:", error);
+    } else {
+      // Optional: user cancelled
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text:
-          error.response?.data?.message ||
-          "Something went wrong while requesting payment release.",
+        icon: "info",
+        title: "Cancelled",
+        text: "Payment release was cancelled.",
+        timer: 1500,
+        showConfirmButton: false,
       });
     }
-  } else {
-    // Optional: user cancelled
-    Swal.fire({
-      icon: "info",
-      title: "Cancelled",
-      text: "Payment release was cancelled.",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  }
-};
-
+  };
 
   // Handle form submission
   const handlePaymentSubmit = async () => {
@@ -306,13 +305,13 @@ const handlePay = async (paymentId) => {
     toast.info("Form cleared!");
   };
 
-		const handleRouteHire = (ProviderId) => {
-		navigate(`/profile-details/${ProviderId}/direct`, {
-      state:{
-        hire_status:hireStatus
-			}		
-	})
-	}
+  const handleRouteHire = (ProviderId) => {
+    navigate(`/profile-details/${ProviderId}/direct`, {
+      state: {
+        hire_status: hireStatus,
+      },
+    });
+  };
 
   const handleChatOpen = (receiverId, senderId) => {
     // Save receiverId in localStorage
@@ -322,265 +321,244 @@ const handlePay = async (paymentId) => {
     navigate("/chats");
   };
   return (
-		<>
-    <div className="container mx-auto px-4 py-6 max-w-4xl">
-      {/* Add ToastContainer to render toasts */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+    <>
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        {/* Add ToastContainer to render toasts */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
 
-      <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
+        <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
 
-      {/* Service Provider Details */}
-      {serviceProvider && (
-        <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-          <div className="flex items-center space-x-4">
-            <img
-              src={serviceProvider.profile_pic || Profile}
-              alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
-              className="w-16 h-16 rounded-full object-cover"
-            />
-            <div className="flex items-center w-full">
-              <p className="text-lg font-semibold">
-                {serviceProvider.full_name || "Unknown Worker"}
-              </p>
+        {/* Service Provider Details */}
+        {serviceProvider && (
+          <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
+            <div className="flex items-center space-x-4">
+              <img
+                src={serviceProvider.profile_pic || Profile}
+                alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="flex items-center w-full">
+                <p className="text-lg font-semibold">
+                  {serviceProvider.full_name || "Unknown Worker"}
+                </p>
 
-              <div className="flex ml-auto items-center space-x-3 ml-6">
-                <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                  <img src={Call} alt="Call" className="w-5 h-5" />
+                <div className="flex ml-auto items-center space-x-3 ml-6">
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                    <img src={Call} alt="Call" className="w-5 h-5" />
+                  </div>
+                  <div
+                    className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                    onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+                  >
+                    <img src={Message} alt="Message" className="w-5 h-5" />
+                  </div>
                 </div>
-                <div
-                  className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                  onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+
+                <button
+                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  onClick={() => handleRouteHire(serviceProvider._id)}
                 >
-                  <img src={Message} alt="Message" className="w-5 h-5" />
-                </div>
+                  View Profile
+                </button>
               </div>
-
-              <button
-                className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-                onClick={() =>handleRouteHire(serviceProvider._id)
-                }
-              >
-                View Profile
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Assigned Worker Details */}
-      {assignedWorker && (
-        <div className="mb-4">
-          <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
-          <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <img
-                  src={assignedWorker.image || Profile}
-                  alt={`Profile of ${assignedWorker.name || "Worker"}`}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-lg font-semibold">
-                    {assignedWorker.name || "Unknown Worker"}
-                  </p>
+        {/* Assigned Worker Details */}
+        {assignedWorker && (
+          <div className="mb-4">
+            <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
+            <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={assignedWorker.image || Profile}
+                    alt={`Profile of ${assignedWorker.name || "Worker"}`}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-lg font-semibold">
+                      {assignedWorker.name || "Unknown Worker"}
+                    </p>
+                  </div>
                 </div>
+                <Link
+                  to={`/view-worker/${assignedWorker._id}`}
+                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                >
+                  View Profile
+                </Link>
               </div>
-              <Link
-                to={`/view-worker/${assignedWorker._id}`}
-                className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-              >
-                View Profile
-              </Link>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Payment History */}
-      {paymentHistory && Array.isArray(paymentHistory) && (
-        <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Payment Summary</h3>
-            {hireStatus == "accepted" && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
+        {/* Payment History */}
+        {paymentHistory && Array.isArray(paymentHistory) && (
+          <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Payment Summary</h3>
+              {hireStatus == "accepted" && (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                  Create Payment
+                </button>
+              )}
+            </div>
+
+            {paymentHistory.map((payment, index) => (
+              <div
+                key={payment._id}
+                className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
               >
-                Create Payment
-              </button>
+                <div className="flex items-center space-x-5">
+                  <span className="font-semibold">{index + 1}.</span>
+                  <span>{payment.description || "Starting Payment"}</span>
+                </div>
+                <div className="mx-2">
+                  {payment.status === "success" &&
+                    payment.release_status === "pending" && (
+											<>
+											<span className="text-[#228B22] me-2">
+											  Pay to app
+											</span>
+                      <button
+                        onClick={() => handlePay(payment._id)}
+                        className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                      >
+                        Pay
+                      </button>
+											</>
+                    )}
+                  {payment.release_status === "release_requested" && (
+                    <span className="text-yellow-600 font-semibold">
+                      Requested for Pay
+                    </span>
+                  )}
+                  {payment.release_status === "released" && (
+                    <span className="text-[#228B22] font-semibold">
+                      Paid to Provider
+                    </span>
+                  )}
+                  {payment.release_status === "refunded" && (
+                    <span className="text-blue-600 font-semibold">
+                      Refunded
+                    </span>
+                  )}
+                </div>
+                <div className="font-semibold">₹{payment.amount}</div>
+              </div>
+            ))}
+
+            {showForm && (
+              <>
+                <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
+                  <span className="font-semibold">
+                    {paymentHistory.length + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter payment description"
+                    className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  >
+                    <option value="" disabled>
+                      Select payment method
+                    </option>
+                    <option value="online">Online</option>
+                    <option value="cod">Cash on Delivery</option>
+                  </select>
+                </div>
+                {amount && parseFloat(amount) > 0 && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Tax (9%): ₹{(parseFloat(amount) * 0.09).toFixed(2)}
+                    <br />
+                    Total: ₹
+                    {(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(
+                      2
+                    )}
+                  </div>
+                )}
+                <div className="flex justify-end space-x-4 mt-4">
+                  <button
+                    onClick={handlePaymentSubmit}
+                    className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
             )}
           </div>
-
-          {paymentHistory.map((payment, index) => (
-            <div
-              key={payment._id}
-              className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
-            >
-              <div className="flex items-center space-x-5">
-                <span className="font-semibold">{index + 1}.</span>
-                <span>{payment.description || "Starting Payment"}</span>
-              </div>
-              <div className="mx-2">
-                {payment.status === "success" &&
-                  payment.release_status === "pending" && (
-                    <button
-                      onClick={() => handlePay(payment._id)}
-                      className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                    >
-                      Pay to app
-                    </button>
-                  )}
-                {payment.release_status === "release_requested" && (
-                  <span className="text-yellow-600 font-semibold">
-                    Requested for Pay
-                  </span>
-                )}
-                {payment.release_status === "released" && (
-                  <span className="text-[#228B22] font-semibold">Paid to Provider</span>
-                )}
-                {payment.release_status === "refunded" && (
-                  <span className="text-blue-600 font-semibold">Refunded</span>
-                )}
-              </div>
-              <div className="font-semibold">₹{payment.amount}</div>
-            </div>
-          ))}
-
-          {showForm && (
-            <>
-              <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
-                <span className="font-semibold">
-                  {paymentHistory.length + 1}
-                </span>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter payment description"
-                  className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                >
-                  <option value="" disabled>
-                    Select payment method
-                  </option>
-                  <option value="online">Online</option>
-                  <option value="cod">Cash on Delivery</option>
-                </select>
-              </div>
-              {amount && parseFloat(amount) > 0 && (
-                <div className="mt-2 text-sm text-gray-600">
-                  Tax (9%): ₹{(parseFloat(amount) * 0.09).toFixed(2)}
-                  <br />
-                  Total: ₹
-                  {(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(2)}
-                </div>
-              )}
-              <div className="flex justify-end space-x-4 mt-4">
-                <button
-                  onClick={handlePaymentSubmit}
-                  className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-		{/* <div className="p-4 bg-white shadow-md rounded-lg">
+        )}
+      </div>
+      <div className="p-4 bg-white shadow-md rounded-lg mt-10">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>
             <tr>
-              <th className="border p-2 text-left">Amount</th>
-              <th className="border p-2 text-left">Total Paid</th>
-              <th className="border p-2 text-left">Total Tax</th>
-              <th className="border p-2 text-left">Paid to Provider</th>
+              <th className="border p-2 text-left">Description</th>
+              <th className="border p-2 text-left">Amount (₹)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">Total Amount</td>
               <td className="border p-2">
                 ₹{fullPaymentHistory.total_expected}
               </td>
-              <td className="border p-2">₹{fullPaymentHistory.total_tax}</td>
+            </tr>
+            <tr>
+              <td className="border p-2">Pay to App</td>
+              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+            </tr>
+            <tr>
+              <td className="border p-2">Paid to Provider</td>
               <td className="border p-2">
-                ₹{fullPaymentHistory.remaining_amount}
+                ₹
+                {paymentHistory
+                  .filter(
+                    (payment) => payment.release_status === "released"
+                  )
+                  .reduce((sum, payment) => sum + payment.amount, 0)}
               </td>
+              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
             </tr>
           </tbody>
         </table>
-      </div> */}
-             <div className="p-4 bg-white shadow-md rounded-lg mt-10">
-  <table className="w-full border border-gray-300 rounded-md overflow-hidden">
-    <thead style={{ backgroundColor: "#228B22", color: "white" }}>
-      <tr>
-        <th className="border p-2 text-left">Description</th>
-        <th className="border p-2 text-left">Amount (₹)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td className="border p-2">Total Amount</td>
-        <td className="border p-2">₹{fullPaymentHistory.total_expected}</td>
-      </tr>
-      <tr>
-        <td className="border p-2">Pay to App</td>
-        <td className="border p-2">₹{fullPaymentHistory.amount}</td>
-      </tr>
-      <tr>
-        <td className="border p-2">Play to user</td>
-               <td className="border p-2">
-          ₹{paymentHistory
-            .filter(payment => payment.release_status === "release_requested")
-            .reduce((sum, payment) => sum + payment.amount, 0)}
-        </td>
-        {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
-      </tr>
-      {/* <tr>
-        <td className="border p-2">Remaining Amount to Pay</td>
-        <td className="border p-2">₹{fullPaymentHistory.remaining}</td>
-      </tr> */}
-      {/* <tr className="font-semibold">
-        <td className="border p-2">Total Amount Released</td>
-        <td className="border p-2">₹{fullPaymentHistory.}</td>
-      </tr> */}
-      {/* <tr className="font-semibold">
-        <td className="border p-2">Released by Admin</td>
-        <td className="border p-2">₹{fullPaymentHistory.releasedByAdmin}</td>
-      </tr> */}
-    </tbody>
-  </table>
-</div>
-		</>
+      </div>
+    </>
   );
 }

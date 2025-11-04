@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import defaultImage from "../../assets/default-image.jpg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Review({ orderId, type }) {
@@ -76,7 +76,7 @@ export default function Review({ orderId, type }) {
       {/* Reviewer Info */}
       <div className="flex flex-col items-center mb-4">
         <img
-          src={reviewData.reviewer?.image}
+          src={reviewData.reviewer?.image || defaultImage}
           alt={reviewData.reviewer?.name}
           className="w-20 h-20 rounded-full object-cover border mb-2"
         />

@@ -275,6 +275,19 @@ export default function ViewProfile() {
   };
 
   const handleRejectOffer = async () => {
+    const confirmResult = await Swal.fire({
+      title: "Are you sure?",
+      text: "Are you sure you want to reject this offer?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, reject it!",
+      cancelButtonText: "Cancel",
+    });
+
+    // If user cancels, stop execution
+    if (!confirmResult.isConfirmed) return;
     setIsRejecting(true);
     try {
       const token = localStorage.getItem("bharat_token");
@@ -424,10 +437,15 @@ export default function ViewProfile() {
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
                 <div>
                   <div className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
-                  <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" /> {orderData?.user_id?.location?.address ||
+                    <FaMapMarkerAlt
+                      size={25}
+                      color="#228B22"
+                      className="mr-2"
+                    />{" "}
+                    {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
                   </div>
-                </div> 
+                </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">
                 <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
@@ -553,7 +571,9 @@ export default function ViewProfile() {
                     </div>
 
                     {orderData?.hire_status === "cancelled" ? (
-                      <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">Project is Cancelled by User</div>
+                      <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">
+                        Project is Cancelled by User
+                      </div>
                     ) : offerStatus === "accepted" ? (
                       <>
                         <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
@@ -619,7 +639,8 @@ export default function ViewProfile() {
                   hireStatus={orderData?.hire_status}
                 />
 
-                {(orderData?.hire_status === "accepted" || orderData?.hire_status === "completed") && (
+                {(orderData?.hire_status === "accepted" ||
+                  orderData?.hire_status === "completed") && (
                   <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                     <div className="relative max-w-2xl mx-auto">
                       <div className="relative z-10">
