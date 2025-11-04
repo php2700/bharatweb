@@ -338,9 +338,9 @@ export default function WorkCategories() {
                         <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">
                           {capitalizeFirst(card.work)}
                         </h3>
-                        <p className="text-black font-medium max-md:text-sm">
+                       {/* <p className="text-black font-medium max-md:text-sm">
                           ₹{card.amount}
-                        </p>
+                        </p> */}
                       </div>
                       <p className="text-gray-600 max-w-[87%] text-xs mt-1">
                         {(() => {

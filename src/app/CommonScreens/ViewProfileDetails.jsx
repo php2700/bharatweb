@@ -28,11 +28,9 @@ export default function ViewProfileDetails() {
   const [bannerError, setBannerError] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
- const statuslocation = useLocation();
-const { hire_status } = statuslocation.state || {};
+  const statuslocation = useLocation();
+  const { hire_status, isHired } = statuslocation.state || {};
 
-console.log("hfhfhf", hire_status);
-console.log("lllll", statuslocation.state);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -204,7 +202,7 @@ console.log("lllll", statuslocation.state);
 
   const {
     full_name = "N/A",
-		unique_id="N/A",
+    unique_id = "N/A",
     phone = "N/A",
     location = { address: "Not Available" },
     full_address = [{ address: "Not Available" }],
@@ -344,9 +342,9 @@ console.log("lllll", statuslocation.state);
                 )}
               </div>
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                
-               <span className="font-semibold text-[#228B22]">Id-</span>{" "} <span>{unique_id}</span>
-              </div> 
+                <span className="font-semibold text-[#228B22]">Id-</span>{" "}
+                <span>{unique_id}</span>
+              </div>
               <div className="flex items-center gap-2 text-gray-600 font-semibold">
                 <img src={Location} alt="Location icon" className="w-5 h-5" />
                 <span>
@@ -593,40 +591,100 @@ console.log("lllll", statuslocation.state);
               <div className="mt-4">
                 {documents.length > 0 ? (
                   documents.map((doc, index) => (
-                    <div key={index} className="mb-6">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 flex items-center justify-center rounded-lg">
+                    <div
+                      key={index}
+                      className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
+                    >
+                      {/* Document header – always sharp */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
                           <img
                             src={Aadhar}
                             alt="Document Icon"
-                            className="w-9 h-9"
+                            className="w-8 h-8"
                           />
                         </div>
-                        <p className="font-medium">{doc.documentName}</p>
+                        <p className="text-lg font-semibold text-gray-800">
+                          {doc.documentName}
+                        </p>
                       </div>
-                      <div className="flex flex-wrap gap-4">
-                        {doc.images.map((img, imgIndex) => (
+
+                      {/* Images grid */}
+                      {doc.images?.length > 0 ? (
+                        <div className="relative">
+                          {/* Images – blurred + no interaction when not hired */}
                           <div
-                            key={imgIndex}
-                            className="relative w-24 h-24 overflow-hidden cursor-pointer"
-                            onClick={() => handleDocumentClick(img)}
+                            className={`flex flex-wrap gap-6 ${
+                              !isHired ? "blur-md pointer-events-none" : ""
+                            }`}
                           >
-                            <img
-                              src={img}
-                              alt={`${doc.documentName} image ${imgIndex + 1}`}
-                              className="w-full h-full object-cover rounded-md shadow-md"
-                              onError={(e) => {
-                                e.target.src = defaultPic;
-                              }}
-                            />
+                            {doc.images.map((img, imgIndex) => (
+                              <div
+                                key={imgIndex}
+                                className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${
+                                  isHired
+                                    ? "cursor-pointer hover:shadow-xl"
+                                    : "cursor-default"
+                                }`}
+                                onClick={
+                                  isHired
+                                    ? () => handleDocumentClick(img)
+                                    : undefined
+                                }
+                              >
+                                <img
+                                  src={img}
+                                  alt={`${doc.documentName} image ${
+                                    imgIndex + 1
+                                  }`}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  onError={(e) => {
+                                    e.target.src = defaultPic;
+                                  }}
+                                />
+
+                                {/* Hover overlay – only when hired */}
+                                {isHired && (
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
+                                    <span className="text-white font-medium text-sm">
+                                      Click to view
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+
+                          {/* Blur overlay + CTA – only when not hired */}
+                          {!isHired && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+                              <div className="text-center bg-white p-5 rounded-2xl shadow-2xl border border-gray-200">
+                                <p className="text-xl font-bold text-[#228B22]">
+                                  Hire to Unlock
+                                </p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  View clear document images after hiring
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic pl-1">
+                          No images uploaded for this document.
+                        </p>
+                      )}
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center justify-center bg-gray-200 rounded-md p-4 text-gray-700 font-semibold">
-                    No Documents Uploaded
+                  /* No documents at all – always fully visible */
+                  <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                    <p className="text-xl font-medium text-gray-600">
+                      No Documents Uploaded Yet
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Documents will appear here once the worker uploads them.
+                    </p>
                   </div>
                 )}
               </div>
@@ -655,16 +713,18 @@ console.log("lllll", statuslocation.state);
               </div>
             </div>
           )}
-          {(type === "direct" && (hire_status === "pending" || hire_status === "NoStatus")) && (
-            <div className="flex justify-center mt-6">
-              <button
-                className="w-1/2 py-4 bg-[#228B22] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
-                onClick={() => handleDirectHire(worker._id)}
-              >
-                Hire
-              </button>
-            </div>
-          )}
+          {type === "direct" &&
+            (hire_status === "pending" || hire_status === "NoStatus") &&
+            !isHired && (
+              <div className="flex justify-center mt-6">
+                <button
+                  className="w-1/2 py-4 bg-[#228B22] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+                  onClick={() => handleDirectHire(worker._id)}
+                >
+                  Hire
+                </button>
+              </div>
+            )}
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Rate & Reviews</h2>

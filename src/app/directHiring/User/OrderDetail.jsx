@@ -247,143 +247,277 @@ export default function ViewProfile() {
   }, [category_id, subcategory_ids, assignedProviderIds, serviceProviders]);
 
   // Modified handleHire function
+  // const handleHire = async (providerId) => {
+  //   try {
+  //     const token = localStorage.getItem("bharat_token");
+  //     const response = await axios.post(
+  //       `${BASE_URL}/direct-order/send-next-offer`,
+  //       {
+  //         next_provider_id: providerId,
+  //         order_id: id,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     // console.log("Hire Response:", response.data);
+
+  //     // Find the hired provider from relatedWorkers
+  //     const hiredProvider = relatedWorkers.find(
+  //       (worker) => worker._id === providerId
+  //     );
+
+  //     if (hiredProvider) {
+  //       // Create a new provider object
+  //       const newProvider = {
+  //         provider_id: {
+  //           _id: hiredProvider._id,
+  //           full_name: hiredProvider.full_name,
+  //           profile_pic: hiredProvider.profile_pic,
+  //           location: hiredProvider.location,
+  //           category_id: hiredProvider.category_id,
+  //           subcategory_ids: hiredProvider.subcategory_ids,
+  //         },
+  //         status: ["sent"],
+  //       };
+
+  //       // Update serviceProviders and assignedProviderIds
+  //       setServiceProviders((prev) => [...prev, newProvider]);
+  //       setAssignedProviderIds((prev) => [...prev, providerId]);
+  //     }
+
+  //     // Update order data and clear related workers
+  //     setOrderData((prev) => ({
+  //       ...prev,
+  //       hire_status: "accepted",
+  //     }));
+  //     setIsHired(true);
+  //     setServiceProviders([]); // Clear service providers after hire
+  //     setRelatedWorkers([]); // Clear related workers after hire
+
+  //     // Update offer statuses
+  //     setOfferStatuses((prev) => ({
+  //       ...prev,
+  //       [providerId]: "sent",
+  //     }));
+
+  //     // Show success message
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Success!",
+  //       text: response.data.message || "Provider hired successfully!",
+  //       confirmButtonColor: "#228B22",
+  //     });
+  //     window.location.reload();
+  //     // Scroll to accepted section
+  //     acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  //     // Refresh order data
+  //     const orderResponse = await axios.get(
+  //       `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     setOrderData(orderResponse.data.data.order);
+  //     setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+  //   } catch (err) {
+  //     console.error(
+  //       "Error hiring provider:",
+  //       err.response?.data || err.message
+  //     );
+  //     const errorMessage =
+  //       err.response?.data?.message ||
+  //       err.message ||
+  //       "Failed to hire provider. Please try again.";
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Oops!",
+  //       text: errorMessage,
+  //       confirmButtonColor: "#FF0000",
+  //     });
+  //   }
+  // };
+
+
   const handleHire = async (providerId) => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      const response = await axios.post(
-        `${BASE_URL}/direct-order/send-next-offer`,
-        {
-          next_provider_id: providerId,
-          order_id: id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+    // Step 1: Ask for confirmation
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to hire another service provider?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, hire provider",
+      cancelButtonText: "No, cancel",
+    });
+
+    // Step 2: If user confirms, proceed with API call
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("bharat_token");
+        const response = await axios.post(
+          `${BASE_URL}/direct-order/send-next-offer`,
+          {
+            next_provider_id: providerId,
+            order_id: id,
           },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Find the hired provider from relatedWorkers
+        const hiredProvider = relatedWorkers.find(
+          (worker) => worker._id === providerId
+        );
+
+        if (hiredProvider) {
+          const newProvider = {
+            provider_id: {
+              _id: hiredProvider._id,
+              full_name: hiredProvider.full_name,
+              profile_pic: hiredProvider.profile_pic,
+              location: hiredProvider.location,
+              category_id: hiredProvider.category_id,
+              subcategory_ids: hiredProvider.subcategory_ids,
+            },
+            status: ["sent"],
+          };
+
+          setServiceProviders((prev) => [...prev, newProvider]);
+          setAssignedProviderIds((prev) => [...prev, providerId]);
         }
-      );
-      // console.log("Hire Response:", response.data);
 
-      // Find the hired provider from relatedWorkers
-      const hiredProvider = relatedWorkers.find(
-        (worker) => worker._id === providerId
-      );
+        // Update state
+        setOrderData((prev) => ({ ...prev, hire_status: "accepted" }));
+        setIsHired(true);
+        setServiceProviders([]);
+        setRelatedWorkers([]);
+        setOfferStatuses((prev) => ({ ...prev, [providerId]: "sent" }));
 
-      if (hiredProvider) {
-        // Create a new provider object
-        const newProvider = {
-          provider_id: {
-            _id: hiredProvider._id,
-            full_name: hiredProvider.full_name,
-            profile_pic: hiredProvider.profile_pic,
-            location: hiredProvider.location,
-            category_id: hiredProvider.category_id,
-            subcategory_ids: hiredProvider.subcategory_ids,
-          },
-          status: ["sent"],
-        };
+        // Step 3: Success alert
+        await Swal.fire({
+          icon: "success",
+          title: "Hired Successfully!",
+          text: response.data.message || "Service provider has been hired.",
+          confirmButtonColor: "#228B22",
+        });
 
-        // Update serviceProviders and assignedProviderIds
-        setServiceProviders((prev) => [...prev, newProvider]);
-        setAssignedProviderIds((prev) => [...prev, providerId]);
+        // Refresh page and scroll
+        window.location.reload();
+        acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+
+        // Refresh order data
+        const orderResponse = await axios.get(
+          `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setOrderData(orderResponse.data.data.order);
+        setAssignedWorker(orderResponse.data.data.assignedWorker || null);
+      } catch (err) {
+        console.error(
+          "Error hiring provider:",
+          err.response?.data || err.message
+        );
+        const errorMessage =
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to hire provider. Please try again.";
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: errorMessage,
+          confirmButtonColor: "#FF0000",
+        });
       }
-
-      // Update order data and clear related workers
-      setOrderData((prev) => ({
-        ...prev,
-        hire_status: "accepted",
-      }));
-      setIsHired(true);
-      setServiceProviders([]); // Clear service providers after hire
-      setRelatedWorkers([]); // Clear related workers after hire
-
-      // Update offer statuses
-      setOfferStatuses((prev) => ({
-        ...prev,
-        [providerId]: "sent",
-      }));
-
-      // Show success message
+    } else {
+      // Step 4: User cancelled
       Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: response.data.message || "Provider hired successfully!",
-        confirmButtonColor: "#228B22",
-      });
-      window.location.reload();
-      // Scroll to accepted section
-      acceptedSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-
-      // Refresh order data
-      const orderResponse = await axios.get(
-        `${BASE_URL}/direct-order/getDirectOrderWithWorker/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setOrderData(orderResponse.data.data.order);
-      setAssignedWorker(orderResponse.data.data.assignedWorker || null);
-    } catch (err) {
-      console.error(
-        "Error hiring provider:",
-        err.response?.data || err.message
-      );
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to hire provider. Please try again.";
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: errorMessage,
-        confirmButtonColor: "#FF0000",
+        icon: "info",
+        title: "Cancelled",
+        text: "Hiring action was cancelled.",
+        confirmButtonColor: "#3085d6",
       });
     }
   };
 
-  const handleRouteHire = (ProviderId) => {
+  const handleRouteHire = (ProviderId, isHired) => {
     navigate(`/profile-details/${ProviderId}/direct`, {
       state: {
         hire_status: orderData?.hire_status,
+        isHired,
       },
     });
   };
 
   const handleCancelOffer = async () => {
-    try {
-      const token = localStorage.getItem("bharat_token");
-      const response = await axios.post(
-        `${BASE_URL}/direct-order/cancelOrderByUser`,
-        {
-          order_id: id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // console.log("Cancel Offer Response:", response.data);
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to cancel this project?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it",
+    });
 
+    // If user confirms
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("bharat_token");
+        const response = await axios.post(
+          `${BASE_URL}/direct-order/cancelOrderByUser`,
+          { order_id: id },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: "Cancelled!",
+          text: "Order has been cancelled successfully!",
+          confirmButtonColor: "#228B22",
+        }).then(() => {
+          window.location.reload();
+        });
+      } catch (err) {
+        console.error("Error cancelling offer:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Failed to cancel offer. Please try again.",
+          confirmButtonColor: "#FF0000",
+        });
+      }
+    } else {
+      // Optional: Feedback when user cancels the confirmation
       Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Order has been cancelled successfully!",
-        confirmButtonColor: "#228B22",
-      });
-      window.location.reload();
-    } catch (err) {
-      console.error("Error cancelling offer:", err);
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to cancel offer. Please try again.",
-        confirmButtonColor: "#FF0000",
+        icon: "info",
+        title: "Cancelled",
+        text: "Your order was not cancelled.",
+        confirmButtonColor: "#3085d6",
       });
     }
   };
@@ -558,6 +692,7 @@ export default function ViewProfile() {
 
   const showRefundButton =
     orderData?.hire_status === "pending" ||
+    (orderData?.hire_status === "cancelled" && !orderData?.refundRequest) ||
     (orderData?.hire_status === "accepted" &&
       orderData?.service_payment?.payment_history === 0);
 
@@ -819,6 +954,18 @@ export default function ViewProfile() {
                 {orderData?.description}
               </p>
             </div>
+            <p className="m-3">
+              <span className="text-gray-600 font-semibold block">
+                Do you want to visit a shop:{" "}
+                <span
+                  className={
+                    orderData?.isShopVisited ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {orderData?.isShopVisited ? "Yes" : "No"}
+                </span>
+              </span>
+            </p>
             {/*orderData?.hire_status == "pending" && (
               <div className="flex justify-center mt-4">
                 <button
@@ -862,7 +1009,7 @@ export default function ViewProfile() {
                           </p>
                           <button
                             onClick={() =>
-                              handleRouteHire(provider.provider_id._id)
+                              handleRouteHire(provider.provider_id._id, true)
                             }
                             className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                           >
@@ -1061,6 +1208,12 @@ export default function ViewProfile() {
                   <h2 className="text-xl font-semibold mb-4 text-gray-800">
                     Request Refund
                   </h2>
+                  <p className="flex items-center text-black-600 font-bold mt-2 mb-2">
+                    &#9888;{" "}
+                    <span className="ml-2">
+                      Note: 60% amount will be refundable.
+                    </span>
+                  </p>
                   <textarea
                     value={refundReason}
                     onChange={(e) => setRefundReason(e.target.value)}
@@ -1219,12 +1372,12 @@ export default function ViewProfile() {
                         <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}
                         </p>
-                        <Link
-                          to={`/profile-details/${worker._id}/direct`}
+                        <button
+                          onClick={() => handleRouteHire(worker._id, false)}
                           className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                         >
                           View Profile
-                        </Link>
+                        </button>
                       </div>
                       <div className="flex flex-col gap-2">
                         <button
@@ -1295,12 +1448,12 @@ export default function ViewProfile() {
                         <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}
                         </p>
-                        <Link
-                          to={`/profile-details/${worker._id}/direct`}
+                        <button
+                          onClick={() => handleRouteHire(worker._id, false)}
                           className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                         >
                           View Profile
-                        </Link>
+                        </button>
                       </div>
                       <div className="flex flex-col gap-2">
                         <button
