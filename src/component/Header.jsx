@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { FaBriefcase, FaGavel, FaTrophy, FaUserTie } from "react-icons/fa";
 import Profile from "../assets/profile.svg";
 import Logout from "../assets/logout.svg";
 import Account from "../assets/account.svg";
+import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -52,7 +53,8 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
-
+  const notifDropdownRef = useRef(null); // NEW: Ref for notification dropdown
+  const [refreshNotifications, setRefreshNotifications] = useState(false);
   const isLoggedIn = !!localStorage.getItem("bharat_token");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -66,50 +68,30 @@ export default function Header() {
     homeLink = role === "service_provider" ? "/homeservice" : "/homeuser";
   }
 
-  // Handle unauthorized access (401)
-  // const handleUnauthorized = () => {
-  //     // localStorage.clear();
-  //   localStorage.removeItem("bharat_token");
-  //   localStorage.removeItem("isProfileComplete");
-  //   localStorage.removeItem("role");
-  //   localStorage.removeItem("otp");
-  //   localStorage.removeItem("selectedAddressId");
-  //   localStorage.removeItem("selectedAddressTitle");
-  //   dispatch(clearUserProfile());
-  //   toast.error("Session expired, please log in again");
-  //   navigate("/login");
-  // };
-
-
-const handleUnauthorized = async () => {
-  try {
-    const token = localStorage.getItem("bharat_token");
-
-    // Call logout API
-    await fetch(`${BASE_URL}/user/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (error) {
-    console.error("Logout API failed:", error);
-  } finally {
-    // Clear localStorage and navigate
-    localStorage.removeItem("bharat_token");
-    localStorage.removeItem("isProfileComplete");
-    localStorage.removeItem("role");
-    localStorage.removeItem("otp");
-    localStorage.removeItem("selectedAddressId");
-    localStorage.removeItem("selectedAddressTitle");
-
-    dispatch(clearUserProfile());
-    toast.error("Session expired, please log in again");
-    navigate("/login");
-  }
-};
-
+  const handleUnauthorized = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      await fetch(`${BASE_URL}/user/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      localStorage.removeItem("bharat_token");
+      localStorage.removeItem("isProfileComplete");
+      localStorage.removeItem("role");
+      localStorage.removeItem("otp");
+      localStorage.removeItem("selectedAddressId");
+      localStorage.removeItem("selectedAddressTitle");
+      dispatch(clearUserProfile());
+      toast.error("Session expired, please log in again");
+      navigate("/login");
+    }
+  };
 
   // Prevent body scrolling when modal is open
   useEffect(() => {
@@ -123,20 +105,20 @@ const handleUnauthorized = async () => {
     };
   }, [isModalOpen, isMenuOpen]);
 
-  // Outside click handler for dropdowns
+  // Outside click handler for dropdowns (FIXED)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target) &&
-        addressDropdownRef.current &&
-        !addressDropdownRef.current.contains(event.target)
-      ) {
+      const outsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
+      const outsideAddress = addressDropdownRef.current && !addressDropdownRef.current.contains(event.target);
+      const outsideNotif = notifDropdownRef.current && !notifDropdownRef.current.contains(event.target);
+
+      if (outsideDropdown && outsideAddress && outsideNotif) {
         setIsOpen(false);
         setIsNotifOpen(false);
         setIsAddressDropdownOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -183,7 +165,6 @@ const handleUnauthorized = async () => {
 
     markerRef.current = marker;
 
-    // Handle marker drag
     window.google.maps.event.addListener(marker, "dragend", () => {
       const position = marker.getPosition();
       setCurrentAddress((prev) => ({
@@ -194,7 +175,6 @@ const handleUnauthorized = async () => {
       reverseGeocode(position.lat(), position.lng());
     });
 
-    // Handle map click
     map.addListener("click", (e) => {
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
@@ -207,7 +187,6 @@ const handleUnauthorized = async () => {
       reverseGeocode(lat, lng);
     });
 
-    // Initialize Autocomplete
     const input = document.getElementById("address");
     if (input) {
       autocompleteRef.current = new window.google.maps.places.Autocomplete(input, {
@@ -234,8 +213,8 @@ const handleUnauthorized = async () => {
             street:
               place.address_components.find((c) => c.types.includes("route"))?.long_name || prev.street,
             area:
-              place.address_components.find((c) =>
-                c.types.includes("sublocality") || c.types.includes("locality")
+              place.address_components.find(
+                (c) => c.types.includes("sublocality") || c.types.includes("locality")
               )?.long_name || prev.area,
           }));
         } else {
@@ -245,7 +224,6 @@ const handleUnauthorized = async () => {
     }
   };
 
-  // Reverse geocode to get address from lat/lng
   const reverseGeocode = (lat, lng) => {
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
@@ -261,8 +239,8 @@ const handleUnauthorized = async () => {
           street:
             addressComponents.find((c) => c.types.includes("route"))?.long_name || prev.street,
           area:
-            addressComponents.find((c) =>
-              c.types.includes("sublocality") || c.types.includes("locality")
+            addressComponents.find(
+              (c) => c.types.includes("sublocality") || c.types.includes("locality")
             )?.long_name || prev.area,
         }));
       } else {
@@ -272,7 +250,6 @@ const handleUnauthorized = async () => {
     });
   };
 
-  // Fetch user profile and sync selected address
   useEffect(() => {
     if (isLoggedIn && !profile && !loading && !error) {
       dispatch(fetchUserProfile()).then((result) => {
@@ -312,7 +289,6 @@ const handleUnauthorized = async () => {
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
 
-  // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -323,22 +299,27 @@ const handleUnauthorized = async () => {
           toast.error("Please log in to view notifications");
           return;
         }
+
         if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
           handleUnauthorized();
           return;
         }
+
         const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
+
         if (res.ok && data.success) {
           const combinedNotifications = [
             ...reduxNotifications,
-            ...(data.data || []),
+            ...(data.notifications || []),
           ];
           setNotifications(combinedNotifications);
-          setNotificationCount(combinedNotifications.length);
+
+          const count = combinedNotifications.filter((notif) => !notif.isRead);
+          setNotificationCount(count.length);
         } else {
           if (res.status === 401) {
             handleUnauthorized();
@@ -349,20 +330,42 @@ const handleUnauthorized = async () => {
         }
       } catch (err) {
         setNotifError("Something went wrong while fetching notifications");
-        toast.error("Something went wrong while fetching notifications");
       } finally {
         setIsNotifLoading(false);
       }
     };
+
     if (isLoggedIn) {
       fetchNotifications();
     } else {
       setNotifications(reduxNotifications);
       setNotificationCount(reduxNotifications.length);
     }
-  }, [isLoggedIn, reduxNotifications]);
+  }, [isLoggedIn, reduxNotifications, refreshNotifications]);
 
-  // Fetch user's current location when modal opens
+  const handleNotificationClick = async () => {
+    const nextState = !isNotifOpen;
+    setIsNotifOpen(nextState);
+
+    if (nextState) {
+      try {
+        const token = localStorage.getItem("bharat_token");
+        await axios.put(
+          `${BASE_URL}/user/markNotificationAsRead`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRefreshNotifications((prev) => !prev);
+      } catch (error) {
+        console.error("Error marking notifications as read:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     if (isModalOpen && navigator.geolocation && editingAddress === null) {
       navigator.geolocation.getCurrentPosition(
@@ -380,13 +383,11 @@ const handleUnauthorized = async () => {
     }
   }, [isModalOpen, editingAddress]);
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCurrentAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle save location
   const handleSaveLocation = async () => {
     if (
       !currentAddress.title.trim() ||
@@ -414,9 +415,7 @@ const handleUnauthorized = async () => {
         street: currentAddress.street || null,
         area: currentAddress.area || null,
         pincode: currentAddress.pincode || null,
-        ...(editingAddress !== null && currentAddress._id
-          ? { _id: currentAddress._id }
-          : {}),
+        ...(editingAddress !== null && currentAddress._id ? { _id: currentAddress._id } : {}),
       };
       let updatedAddresses;
       if (editingAddress !== null) {
@@ -445,8 +444,7 @@ const handleUnauthorized = async () => {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
-        const newIndex =
-          editingAddress !== null ? editingAddress : updatedAddresses.length - 1;
+        const newIndex = editingAddress !== null ? editingAddress : updatedAddresses.length - 1;
         setSelectedAddressId(newAddress._id || newIndex);
         setSelectedAddress(newAddress.title || newAddress.address);
         localStorage.setItem("selectedAddressId", newAddress._id || newIndex);
@@ -478,7 +476,6 @@ const handleUnauthorized = async () => {
     });
   };
 
-  // Handle delete address
   const handleDeleteAddress = async (index, addressId) => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -488,22 +485,17 @@ const handleUnauthorized = async () => {
       }
       const response = await fetch(`${BASE_URL}/user/deleteAddress/${addressId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       if (response.ok && data.success) {
         toast.success("Address deleted successfully!");
-        window.location.reload();
         const updatedAddresses = savedAddresses.filter((_, idx) => idx !== index);
         setSavedAddresses(updatedAddresses);
         let newLocation = profile.location;
         if (selectedAddressId === addressId) {
           newLocation = updatedAddresses[0] || null;
-          const newSelectedAddress = newLocation
-            ? newLocation.title || newLocation.address
-            : "Location";
+          const newSelectedAddress = newLocation ? newLocation.title || newLocation.address : "Location";
           setSelectedAddressId(newLocation?._id || null);
           setSelectedAddress(newSelectedAddress);
           localStorage.setItem("selectedAddressId", newLocation?._id || "");
@@ -548,7 +540,6 @@ const handleUnauthorized = async () => {
     setIsAddressDropdownOpen(false);
   };
 
-  // Handle edit address
   const handleEditAddress = (index, addressId) => {
     setEditingAddress(index);
     setCurrentAddress({
@@ -559,7 +550,6 @@ const handleUnauthorized = async () => {
     setIsAddressDropdownOpen(false);
   };
 
-  // Handle select address
   const handleSelectAddress = async (index, addressId) => {
     const selectedAddr = savedAddresses[index];
     setSelectedAddressId(addressId);
@@ -610,7 +600,6 @@ const handleUnauthorized = async () => {
     handleUnauthorized();
   };
 
-  // Group notifications
   const groupedNotifications = notifications.reduce((acc, notif) => {
     const date = new Date(notif.createdAt).toLocaleDateString("en-US", {
       day: "numeric",
@@ -622,14 +611,11 @@ const handleUnauthorized = async () => {
       month: "long",
       year: "numeric",
     });
-    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString(
-      "en-US",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }
-    );
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
     let section = date;
     if (date === today) section = "Today";
     else if (date === yesterday) section = "Yesterday";
@@ -638,15 +624,40 @@ const handleUnauthorized = async () => {
     return acc;
   }, {});
 
-  const notificationSections = Object.keys(groupedNotifications).map(
-    (section) => ({
-      section,
-      items: groupedNotifications[section].map((notif) => ({
-        title: notif.title || "Notification",
-        message: notif.message || "No message available",
-      })),
-    })
-  );
+  const notificationSections = Object.keys(groupedNotifications).map((section) => ({
+    section,
+    items: groupedNotifications[section].map((notif) => ({
+      ...notif,
+      title: notif.title || "Notification",
+      message: notif.message || "No message available",
+    })),
+  }));
+
+  // FIXED: Notification click handler
+  const handleRedirectNotification = (notif) => {
+    console.log("Notification clicked:", notif);
+	let	orderId = notif.orderId;
+	// let userId = notif.userId
+   if(notif.userType === "user"){
+    if(notif.orderType === "direct"){
+			navigate(`/my-hire/order-detail/${orderId}`)
+		} else if(notif.orderType === "bidding"){
+      navigate(`/bidding/order-detail/${orderId}`)
+		} else{
+			navigate(`/emergency/order-detail/${orderId}`)
+		}
+	 }else if(notif.userType === "service_provider"){
+    if(notif.orderType === "direct"){
+			navigate(`/hire/worker/order-detail/${orderId}`)
+		} else if(notif.orderType === "bidding"){
+      navigate(`/bidding/worker/order-detail/${orderId}`)
+		} else{
+			navigate(`/emergency/worker/order-detail/${orderId}`)
+		}
+	 }else{
+    navigate(`/`)
+	 }
+  };
 
   return (
     <header className="w-full bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] fixed top-0 z-50">
@@ -766,20 +777,10 @@ const handleUnauthorized = async () => {
             </div>
           )}
           <nav className="hidden lg:flex items-center gap-6 text-[#969696] text-base font-medium">
-            <Link to={homeLink} className="hover:text-black">
-              Home
-            </Link>
-            <Link to="/aboutus" className="hover:text-black">
-              About
-            </Link>
-            <Link to="/ourservices" className="hover:text-black">
-              Services
-            </Link>
-            {isLoggedIn && (
-              <Link to="/chats" className="hover:text-black">
-                Chats
-              </Link>
-            )}
+            <Link to={homeLink} className="hover:text-black">Home</Link>
+            <Link to="/aboutus" className="hover:text-black">About</Link>
+            <Link to="/ourservices" className="hover:text-black">Services</Link>
+            {isLoggedIn && <Link to="/chats" className="hover:text-black">Chats</Link>}
           </nav>
         </div>
 
@@ -804,16 +805,13 @@ const handleUnauthorized = async () => {
           )}
           {isLoggedIn && (
             <>
+              {/* Desktop Notification */}
               <div className="relative lg:flex hidden">
                 <button
                   className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
-                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                  onClick={handleNotificationClick}
                 >
-                  <img
-                    src={Notification}
-                    alt="Notification"
-                    className="w-6 h-6 text-gray-700"
-                  />
+                  <img src={Notification} alt="Notification" className="w-6 h-6 text-gray-700" />
                   {notificationCount > 0 && (
                     <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
                       {notificationCount}
@@ -821,7 +819,10 @@ const handleUnauthorized = async () => {
                   )}
                 </button>
                 {isNotifOpen && (
-                  <div className="absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                  <div
+                    ref={notifDropdownRef}
+                    className="absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto"
+                  >
                     {isNotifLoading ? (
                       <div className="p-4 text-center">
                         <div className="flex items-center justify-center space-x-2">
@@ -830,43 +831,28 @@ const handleUnauthorized = async () => {
                         </div>
                       </div>
                     ) : notifError ? (
-                      <div className="p-4 text-center text-red-500 text-sm">
-                        {notifError}
-                      </div>
+                      <div className="p-4 text-center text-red-500 text-sm">{notifError}</div>
                     ) : notificationSections.length === 0 ? (
-                      <div className="p-4 text-center text-gray-600 text-sm">
-                        No recent update
-                      </div>
+                      <div className="p-4 text-center text-gray-600 text-sm">No recent update</div>
                     ) : (
                       <>
                         {notificationSections.map((section, i) => (
                           <div key={i}>
-                            <div className="p-3 text-sm font-medium text-gray-700 border-b">
-                              {section.section}
-                            </div>
+                            <div className="p-3 text-sm font-medium text-gray-700 border-b">{section.section}</div>
                             {section.items.map((notif, idx) => (
                               <div
                                 key={idx}
-                                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                onClick={() => handleRedirectNotification(notif)}
                               >
                                 <div className="flex items-center gap-3">
-                                  <img
-                                    src={Logo}
-                                    alt="coin"
-                                    className="w-10 h-10"
-                                  />
+                                  <img src={Logo} alt="coin" className="w-10 h-10" />
                                   <div>
-                                    <p className="text-sm font-medium text-gray-800">
-                                      {notif.title}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {notif.message}
-                                    </p>
+                                    <p className="text-sm font-medium text-gray-800">{notif.title}</p>
+                                    <p className="text-xs text-gray-500">{notif.message}</p>
                                   </div>
                                 </div>
-                                <span className="text-gray-400 text-xs font-medium">
-                                  {section.section}
-                                </span>
+                                <span className="text-gray-400 text-xs font-medium">{section.section}</span>
                               </div>
                             ))}
                           </div>
@@ -887,92 +873,59 @@ const handleUnauthorized = async () => {
                   </div>
                 )}
               </div>
-             <div className="relative lg:flex hidden" ref={dropdownRef}>
-														 {fullName ? (
-															 <button
-																 onClick={() => setIsOpen(!isOpen)}
-																 className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
-															 >
-																 <span className="truncate max-w-[120px] sm:max-w-[150px]">
-																	 {fullName}
-																 </span>
-																 <img
-																	 src={Dropdown}
-																	 alt="Dropdown"
-																	 className={`w-5 h-5 transition-transform duration-300 ${
-																		 isOpen ? "rotate-180" : "rotate-0"
-																	 }`}
-																 />
-															 </button>
-														 ) : (
-															 <Link
-																 to="/login"
-																 className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
-															 >
-																 Login / Signup
-																 <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
-															 </Link>
-														 )}
-														 {isOpen && fullName && (
-															 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-																 <Link
-																	 to="/account"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <img src={Account} alt="Account" className="w-5 h-5" />
-																	 Account
-																 </Link>
-																 <Link
-																	 to="/details"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <img src={Profile} alt="Profile" className="w-5 h-5" />
-																	 Profile
-																 </Link>
-																 <Link
-																	 to="/user/work-list/My Hire"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaUserTie className="w-5 h-5" />
-																	 My Hire
-																 </Link>
-																 <Link
-																	 to="/worker/work-list/My Hire"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaBriefcase className="w-5 h-5" />
-																	 My Work
-																 </Link>
-																 <Link
-																	 to="/disputes"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaGavel className="w-5 h-5" />
-																	 Disputes
-																 </Link>
-																 <Link
-																	 to="/promotion"
-																	 className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																	 onClick={() => setIsOpen(false)}
-																 >
-																	 <FaTrophy className="w-5 h-5" />
-																	 Promotion
-																 </Link>
-																 <button
-																	 onClick={logoutdestroy}
-																	 className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
-																 >
-																	 <img src={Logout} alt="Logout" className="w-5 h-5" />
-																	 Logout
-																 </button>
-															 </div>
-														 )}
-													 </div>
+
+              {/* Profile Dropdown */}
+              <div className="relative lg:flex hidden" ref={dropdownRef}>
+                {fullName ? (
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                  >
+                    <span className="truncate max-w-[120px] sm:max-w-[150px]">{fullName}</span>
+                    <img
+                      src={Dropdown}
+                      alt="Dropdown"
+                      className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                  >
+                    Login / Signup
+                    <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+                  </Link>
+                )}
+                {isOpen && fullName && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                    <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <img src={Account} alt="Account" className="w-5 h-5" /> Account
+                    </Link>
+                    <Link to="/details" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <img src={Profile} alt="Profile" className="w-5 h-5" /> Profile
+                    </Link>
+                    <Link to="/user/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <FaUserTie className="w-5 h-5" /> My Hire
+                    </Link>
+                    <Link to="/worker/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <FaBriefcase className="w-5 h-5" /> My Work
+                    </Link>
+                    <Link to="/disputes" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <FaGavel className="w-5 h-5" /> Disputes
+                    </Link>
+                    <Link to="/promotion" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <FaTrophy className="w-5 h-5" /> Promotion
+                    </Link>
+                    <button
+                      onClick={logoutdestroy}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                    >
+                      <img src={Logout} alt="Logout" className="w-5 h-5" /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           )}
           <button
@@ -987,11 +940,7 @@ const handleUnauthorized = async () => {
               stroke="currentColor"
               className="w-6 h-6 text-white"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
         </div>
@@ -1001,36 +950,10 @@ const handleUnauthorized = async () => {
       {isMenuOpen && (
         <div className="lg:hidden bg-white shadow-lg fixed top-[60px] left-0 w-full z-40">
           <div className="px-4 py-4 space-y-3 text-[#969696] font-medium flex flex-col items-center text-center">
-            <Link
-              to={homeLink}
-              className="hover:text-black"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/aboutus"
-              className="hover:text-black"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              to="/ourservices"
-              className="hover:text-black"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Services
-            </Link>
-            {isLoggedIn && (
-              <Link
-                to="/chats"
-                className="hover:text-black"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Chats
-              </Link>
-            )}
+            <Link to={homeLink} className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Home</Link>
+            <Link to="/aboutus" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>About</Link>
+            <Link to="/ourservices" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Services</Link>
+            {isLoggedIn && <Link to="/chats" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Chats</Link>}
             {isLoggedIn && (
               <Link to="/bidding/newtask" onClick={() => setIsMenuOpen(false)}>
                 <button className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-6 py-2 rounded-xl shadow">
@@ -1040,16 +963,13 @@ const handleUnauthorized = async () => {
             )}
             {isLoggedIn && (
               <>
+                {/* Mobile Notification */}
                 <div className="relative lg:hidden">
                   <button
                     className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
-                    onClick={() => setIsNotifOpen(!isNotifOpen)}
+                    onClick={handleNotificationClick}
                   >
-                    <img
-                      src={Notification}
-                      alt="Notification"
-                      className="w-6 h-6 text-gray-700"
-                    />
+                    <img src={Notification} alt="Notification" className="w-6 h-6 text-gray-700" />
                     {notificationCount > 0 && (
                       <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
                         {notificationCount}
@@ -1057,7 +977,10 @@ const handleUnauthorized = async () => {
                     )}
                   </button>
                   {isNotifOpen && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                    <div
+                      ref={notifDropdownRef}
+                      className="absolute left-1/2 transform -translate-x-1/2 mt-3 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto"
+                    >
                       {isNotifLoading ? (
                         <div className="p-4 text-center">
                           <div className="flex items-center justify-center space-x-2">
@@ -1066,43 +989,28 @@ const handleUnauthorized = async () => {
                           </div>
                         </div>
                       ) : notifError ? (
-                        <div className="p-4 text-center text-red-500 text-sm">
-                          {notifError}
-                        </div>
+                        <div className="p-4 text-center text-red-500 text-sm">{notifError}</div>
                       ) : notificationSections.length === 0 ? (
-                        <div className="p-4 text-center text-gray-600 text-sm">
-                          No recent update
-                        </div>
+                        <div className="p-4 text-center text-gray-600 text-sm">No recent update</div>
                       ) : (
                         <>
                           {notificationSections.map((section, i) => (
                             <div key={i}>
-                              <div className="p-3 text-sm font-medium text-gray-700 border-b">
-                                {section.section}
-                              </div>
+                              <div className="p-3 text-sm font-medium text-gray-700 border-b">{section.section}</div>
                               {section.items.map((notif, idx) => (
                                 <div
                                   key={idx}
-                                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                  onClick={() => handleRedirectNotification(notif)}
                                 >
                                   <div className="flex items-center gap-3">
-                                    <img
-                                      src={Logo}
-                                      alt="coin"
-                                      className="w-10 h-10"
-                                    />
+                                    <img src={Logo} alt="coin" className="w-10 h-10" />
                                     <div>
-                                      <p className="text-sm font-medium text-gray-800">
-                                        {notif.title}
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        {notif.message}
-                                      </p>
+                                      <p className="text-sm font-medium text-gray-800">{notif.title}</p>
+                                      <p className="text-xs text-gray-500">{notif.message}</p>
                                     </div>
                                   </div>
-                                  <span className="text-gray-400 text-xs font-medium">
-                                    {section.section}
-                                  </span>
+                                  <span className="text-gray-400 text-xs font-medium">{section.section}</span>
                                 </div>
                               ))}
                             </div>
@@ -1120,24 +1028,31 @@ const handleUnauthorized = async () => {
                           </div>
                         </>
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log("Test button clicked (mobile)!");
+                        }}
+                        className="w-full mt-2 p-2 bg-blue-600 text-white text-sm font-medium"
+                      >
+                        Test
+                      </button>
                     </div>
                   )}
                 </div>
+
+                {/* Mobile Profile Dropdown */}
                 <div className="relative lg:hidden" ref={dropdownRef}>
                   {fullName ? (
                     <button
                       onClick={() => setIsOpen(!isOpen)}
                       className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
                     >
-                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                        {fullName}
-                      </span>
+                      <span className="truncate max-w-[120px] sm:max-w-[150px]">{fullName}</span>
                       <img
                         src={Dropdown}
                         alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : "rotate-0"
-                        }`}
+                        className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}
                       />
                     </button>
                   ) : (
@@ -1152,60 +1067,29 @@ const handleUnauthorized = async () => {
                   )}
                   {isOpen && fullName && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                      <Link
-                        to="/account"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <img src={Account} alt="Account" className="w-5 h-5" />
-                        Account
+                      <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <img src={Account} alt="Account" className="w-5 h-5" /> Account
                       </Link>
-                      <Link
-                        to="/details"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <img src={Profile} alt="Profile" className="w-5 h-5" />
-                        Profile
+                      <Link to="/details" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <img src={Profile} alt="Profile" className="w-5 h-5" /> Profile
                       </Link>
-                      <Link
-                        to="/user/work-list/My Hire"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaUserTie className="w-5 h-5" />
-                        My Hire
+                      <Link to="/user/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <FaUserTie className="w-5 h-5" /> My Hire
                       </Link>
-                      <Link
-                        to="/worker/work-list/My Hire"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaBriefcase className="w-5 h-5" />
-                        My Work
+                      <Link to="/worker/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <FaBriefcase className="w-5 h-5" /> My Work
                       </Link>
-                      <Link
-                        to="/disputes"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaGavel className="w-5 h-5" />
-                        Disputes
+                      <Link to="/disputes" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <FaGavel className="w-5 h-5" /> Disputes
                       </Link>
-                      <Link
-                        to="/promotion"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaTrophy className="w-5 h-5" />
-                        Promotion
+                      <Link to="/promotion" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                        <FaTrophy className="w-5 h-5" /> Promotion
                       </Link>
                       <button
                         onClick={logoutdestroy}
                         className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
                       >
-                        <img src={Logout} alt="Logout" className="w-5 h-5" />
-                        Logout
+                        <img src={Logout} alt="Logout" className="w-5 h-5" /> Logout
                       </button>
                     </div>
                   )}
@@ -1215,6 +1099,7 @@ const handleUnauthorized = async () => {
           </div>
         </div>
       )}
+
       {/* Address Modal */}
       {isModalOpen && (
         <div
@@ -1237,28 +1122,17 @@ const handleUnauthorized = async () => {
                 stroke="currentColor"
                 className="w-6 h-6"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               {editingAddress !== null ? "Edit Address" : "Add New Address"}
             </h2>
             {mapError && (
-              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">
-                {mapError}
-              </div>
+              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">{mapError}</div>
             )}
             <div className="mb-4">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Title *
-              </label>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
               <input
                 type="text"
                 id="title"
@@ -1270,12 +1144,7 @@ const handleUnauthorized = async () => {
               />
             </div>
             <div className="mb-4">
-              <label
-                htmlFor="landmark"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Landmark *
-              </label>
+              <label htmlFor="landmark" className="block text-sm font-medium text-gray-700 mb-1">Landmark *</label>
               <input
                 type="text"
                 id="landmark"
@@ -1287,12 +1156,7 @@ const handleUnauthorized = async () => {
               />
             </div>
             <div className="mb-4">
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Address *
-              </label>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
               <input
                 type="text"
                 id="address"
@@ -1301,74 +1165,6 @@ const handleUnauthorized = async () => {
                 onChange={handleInputChange}
                 className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
                 placeholder="Enter or select address"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="houseno"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                House No
-              </label>
-              <input
-                type="text"
-                id="houseno"
-                name="houseno"
-                value={currentAddress.houseno}
-                onChange={handleInputChange}
-                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
-                placeholder="Enter house number"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="street"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Street
-              </label>
-              <input
-                type="text"
-                id="street"
-                name="street"
-                value={currentAddress.street}
-                onChange={handleInputChange}
-                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
-                placeholder="Enter street name"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="area"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Area
-              </label>
-              <input
-                type="text"
-                id="area"
-                name="area"
-                value={currentAddress.area}
-                onChange={handleInputChange}
-                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
-                placeholder="Enter area"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="pincode"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Pincode
-              </label>
-              <input
-                type="text"
-                id="pincode"
-                name="pincode"
-                value={currentAddress.pincode}
-                onChange={handleInputChange}
-                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
-                placeholder="Enter pincode"
               />
             </div>
             <div className="h-64 mb-4 rounded-lg overflow-hidden shadow-md border border-gray-200">

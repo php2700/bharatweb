@@ -55,7 +55,7 @@ export default function ViewProfile() {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
   const [showChangeProvider, setShowChangeProvider] = useState(false);
-    const [expandedAddresses, setExpandedAddresses] = useState({});
+  const [expandedAddresses, setExpandedAddresses] = useState({});
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -67,6 +67,17 @@ export default function ViewProfile() {
   const user = useSelector((state) => state.user.profile);
   const userId = user?._id;
 
+ useEffect(() => {
+  if (Array.isArray(serviceProviders) && serviceProviders.length > 0) {
+    // check if all providers have status === "rejected"
+    const allRejected = serviceProviders.every(
+      (provider) => provider.status === "rejected"
+    );
+    if (allRejected) {
+      setShowChangeProvider(true);
+    }
+  }
+}, [serviceProviders]);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -345,7 +356,6 @@ export default function ViewProfile() {
   //     });
   //   }
   // };
-
 
   const handleHire = async (providerId) => {
     // Step 1: Ask for confirmation
@@ -755,6 +765,7 @@ export default function ViewProfile() {
     arrows: true,
   };
 
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -799,10 +810,10 @@ export default function ViewProfile() {
       }
     });
   };
-    const toggleAddress = (providerId) => {
-    setExpandedAddresses(prev => ({
+  const toggleAddress = (providerId) => {
+    setExpandedAddresses((prev) => ({
       ...prev,
-      [providerId]: !prev[providerId]
+      [providerId]: !prev[providerId],
     }));
   };
 
@@ -816,7 +827,7 @@ export default function ViewProfile() {
     }
     return address.substring(0, maxLength) + "...";
   };
-  
+
 
   return (
     <>
@@ -1026,25 +1037,32 @@ export default function ViewProfile() {
                             {provider.provider_id?.location?.address ||
                               "No Address Provided"}
                           </p> */}
-                                 <FaMapMarkerAlt className="text-[#F27773] mt-1 flex-shrink-0" color="#228B22" size={20} />
-                            <div className="flex-1">
-                              <p className="text-gray-700 text-sm">
-                                {truncateAddress(
-                                  provider.provider_id?.location?.address,
-                                  provider.provider_id._id
-                                )}
-                                {provider.provider_id?.location?.address?.length > 50 && (
-                                  <button
-                                    onClick={() => toggleAddress(provider.provider_id._id)}
-                                    className="text-[#228B22] font-semibold ml-2 hover:underline"
-                                  >
-                                    {expandedAddresses[provider.provider_id._id]
-                                      ? "See Less"
-                                      : "See More"}
-                                  </button>
-                                )}
-                              </p>
-                            </div>
+                          <FaMapMarkerAlt
+                            className="text-[#F27773] mt-1 flex-shrink-0"
+                            color="#228B22"
+                            size={20}
+                          />
+                          <div className="flex-1">
+                            <p className="text-gray-700 text-sm">
+                              {truncateAddress(
+                                provider.provider_id?.location?.address,
+                                provider.provider_id._id
+                              )}
+                              {provider.provider_id?.location?.address?.length >
+                                50 && (
+                                <button
+                                  onClick={() =>
+                                    toggleAddress(provider.provider_id._id)
+                                  }
+                                  className="text-[#228B22] font-semibold ml-2 hover:underline"
+                                >
+                                  {expandedAddresses[provider.provider_id._id]
+                                    ? "See Less"
+                                    : "See More"}
+                                </button>
+                              )}
+                            </p>
+                          </div>
 
                           <button
                             onClick={() =>
@@ -1098,38 +1116,61 @@ export default function ViewProfile() {
                             </span>
                           ) : (
                             <>
-                              <button
-                                className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
-      ${provider.status === "pending" ? "bg-yellow-500" : ""}
-      ${provider.status === "accepted" ? "bg-green-600" : ""}
-      ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                disabled
-                              >
-                                {provider.isRejectedByUser
-                                  ? "Rejected by Me"
-                                  : Array.isArray(provider.status)
-                                  ? provider.status
-                                      .map(
-                                        (word) =>
-                                          word.charAt(0).toUpperCase() +
-                                          word.slice(1)
-                                      )
-                                      .join(" ")
-                                  : provider.status
-                                  ? provider.status.charAt(0).toUpperCase() +
-                                    provider.status.slice(1)
-                                  : ""}
-                              </button>
+                              {/* Status Button */}
+                              {!provider.isRejectedByUser && (
+															<>
+                                <button
+                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
+            ${provider.status === "pending" ? "bg-yellow-500" : ""}
+            ${provider.status === "accepted" ? "bg-green-600" : ""}
+            ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+                                  disabled
+                                >
+																
+                                  {Array.isArray(provider.status)
+                                    ? provider.status
+                                        .map(
+                                          (word) =>
+                                            word.charAt(0).toUpperCase() +
+                                            word.slice(1)
+                                        )
+                                        .join(" ")
+                                    : provider.status
+                                    ? provider.status.charAt(0).toUpperCase() +
+                                      provider.status.slice(1)
+                                    : ""}
+                                </button>
+																</>
+                              )}
+
+                              {/* If user rejected — show 'Rejected by Me' instead */}
+                              {provider.isRejectedByUser && (
+                                <button
+                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed"
+                                  disabled
+                                >
+                                  Rejected by Me
+                                </button>
+                              )}
+
+                              {/* Change Service Provider Button */}
                               {orderData?.hire_status === "pending" &&
                                 provider.status === "pending" && (
                                   <button
                                     className={`px-6 py-2 ${
-                                      showChangeProvider
+                                      showChangeProvider ||
+                                      provider.isRejectedByUser
                                         ? "bg-green-600"
                                         : "bg-[#FB3523]"
                                     } text-white font-semibold rounded-lg shadow`}
-                                    onClick={() => {
-                                      Swal.fire({
+                                    onClick={async () => {
+                                      // If already rejected, just open section
+                                      if (provider.isRejectedByUser) {
+                                        setShowChangeProvider(true);
+                                        return;
+                                      }
+
+                                      const result = await Swal.fire({
                                         title: "Are you sure?",
                                         text: "Do you really want to change the service provider?",
                                         icon: "warning",
@@ -1137,21 +1178,56 @@ export default function ViewProfile() {
                                         confirmButtonColor: "#3085d6",
                                         cancelButtonColor: "#d33",
                                         confirmButtonText: "Yes, change it!",
-                                      }).then((result) => {
-                                        if (result.isConfirmed) {
-                                          setShowChangeProvider(true); // ✅ show section when confirmed
+                                      });
+
+                                      if (result.isConfirmed) {
+                                        try {
+                                          const token =
+                                            localStorage.getItem(
+                                              "bharat_token"
+                                            );
+
+                                          await axios.post(
+                                            `${BASE_URL}/direct-order/userRejectOffer`,
+                                            {
+                                              order_id: orderData._id,
+                                              provider_id:
+                                                provider.provider_id._id,
+                                            },
+                                            {
+                                              headers: {
+                                                "Content-Type":
+                                                  "application/json",
+                                                Authorization: `Bearer ${token}`,
+                                              },
+                                            }
+                                          );
+
                                           Swal.fire({
-                                            title: "Confirmed!",
-                                            text: "You can now change the service provider.",
+                                            title: "Offer Rejected!",
+                                            text: "You have rejected this offer successfully.",
                                             icon: "success",
                                             timer: 1500,
                                             showConfirmButton: false,
                                           });
+
+                                          // ✅ Automatically open section for new provider hire
+                                          setShowChangeProvider(true);
+                                          fetchData();
+                                        } catch (error) {
+                                          Swal.fire({
+                                            title: "Error",
+                                            text:
+                                              error.response?.data?.message ||
+                                              "Failed to reject the offer.",
+                                            icon: "error",
+                                          });
                                         }
-                                      });
+                                      }
                                     }}
                                   >
-                                    {showChangeProvider
+                                    {showChangeProvider ||
+                                    provider.isRejectedByUser
                                       ? "Rejected by Me"
                                       : "Change Service Provider"}
                                   </button>
@@ -1411,25 +1487,30 @@ export default function ViewProfile() {
                         {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}
                         </p> */}
-                        
+
                         <div className="flex items-start gap-2 mt-2">
-                          <FaMapMarkerAlt className="text-red-500 mt-1 flex-shrink-0" color="#228B22" size={20} />
+                          <FaMapMarkerAlt
+                            className="text-red-500 mt-1 flex-shrink-0"
+                            color="#228B22"
+                            size={20}
+                          />
                           <div className="flex-1">
                             <p className="text-gray-700 text-sm">
                               {truncateAddress(
                                 worker.location?.address,
                                 worker._id
                               )}
-                              {worker.location?.address && worker.location.address.length > 50 && (
-                                <button
-                                  onClick={() => toggleAddress(worker._id)}
-                                  className="text-green-600 font-semibold ml-2 hover:underline text-sm"
-                                >
-                                  {expandedAddresses[worker._id]
-                                    ? "See Less"
-                                    : "See More"}
-                                </button>
-                              )}
+                              {worker.location?.address &&
+                                worker.location.address.length > 50 && (
+                                  <button
+                                    onClick={() => toggleAddress(worker._id)}
+                                    className="text-green-600 font-semibold ml-2 hover:underline text-sm"
+                                  >
+                                    {expandedAddresses[worker._id]
+                                      ? "See Less"
+                                      : "See More"}
+                                  </button>
+                                )}
                             </p>
                           </div>
                         </div>
@@ -1457,7 +1538,7 @@ export default function ViewProfile() {
         )}
 
       {/* Related Workers Section */}
-      {orderData?.hire_status !== "cancelled" &&
+      {/*orderData?.hire_status !== "cancelled" &&
         orderData?.hire_status !== "cancelled task" &&
         !hasPendingProvider &&
         !isHired &&
@@ -1530,7 +1611,7 @@ export default function ViewProfile() {
               )}
             </div>
           </div>
-        )}
+        ) */}
 
       {/* Banner Slider */}
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
