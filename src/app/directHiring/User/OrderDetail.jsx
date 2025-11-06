@@ -927,7 +927,7 @@ export default function ViewProfile() {
                       }
                       ${
                         orderData?.hire_status === "accepted"
-                          ? "bg-blue-500"
+                          ? "bg-[#228B22]"
                           : ""
                       }`}
                   >
@@ -1073,7 +1073,7 @@ export default function ViewProfile() {
                             View Profile
                           </button>
                         </div>
-                        <div className="flex flex-col items-center justify-center flex-1">
+                        {orderData.hire_status === "cancelled" ? " " : <div className="flex flex-col items-center justify-center flex-1">
                           <p className="text-gray-600 font-medium">Contact</p>
                           <div className="flex space-x-2 mt-2">
                             <button
@@ -1106,7 +1106,7 @@ export default function ViewProfile() {
                               />
                             </button>
                           </div>
-                        </div>
+                        </div>}
 
                         <div className="flex flex-col gap-2">
                           {offerStatuses[provider.provider_id._id] ===
@@ -1383,7 +1383,7 @@ export default function ViewProfile() {
                           Warning Message
                         </h2>
                         <p className="text-gray-700 text-sm md:text-base">
-                          Lorem Ipsum is simply dummy text...
+                       Pay securely — no extra charges from the platform. Choose simple and safe transactions.
                         </p>
                       </div>
                     </div>

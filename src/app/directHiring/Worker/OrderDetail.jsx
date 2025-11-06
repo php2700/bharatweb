@@ -488,7 +488,7 @@ export default function ViewProfile() {
                       }
                       ${
                         orderData?.hire_status === "accepted"
-                          ? "bg-blue-500"
+                          ? "bg-[#228B22]"
                           : ""
                       }`}
                   >
@@ -528,7 +528,7 @@ export default function ViewProfile() {
                       />
                       <div>
                         <p className="text-lg font-semibold">
-                          {orderData?.user_id?.full_name || "Unknown User"}
+                          {orderData?.user_id?.full_name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown User"}
                         </p>
                         {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
@@ -543,7 +543,7 @@ export default function ViewProfile() {
                       </div>
                     </div>
 
-                    <div className="text-center">
+                    {(orderData?.hire_status === "cancelled" || orderData?.hire_status === "cancelledDispute") ? " " : <div className="text-center">
                       <p className="text-gray-600 font-medium mb-2">Contact</p>
                       <div className="flex space-x-2 justify-center mt-1">
                         <button
@@ -568,7 +568,7 @@ export default function ViewProfile() {
                           <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                         </button>
                       </div>
-                    </div>
+                    </div>}
 
                     {orderData?.hire_status === "cancelled" ? (
                       <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">
@@ -635,6 +635,7 @@ export default function ViewProfile() {
                   user_id={orderData?.service_provider_id?._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
+									fullPaymentHistory={orderData?.service_payment}
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
@@ -642,7 +643,7 @@ export default function ViewProfile() {
                 {(orderData?.hire_status === "accepted" ||
                   orderData?.hire_status === "completed") && (
                   <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    <div className="relative max-w-2xl mx-auto">
+                    {/*<div className="relative max-w-2xl mx-auto">
                       <div className="relative z-10">
                         <img
                           src={Warning}
@@ -658,7 +659,7 @@ export default function ViewProfile() {
                           Lorem Ipsum is simply dummy text...
                         </p>
                       </div>
-                    </div>
+                    </div>*/}
 
                     <div className="flex space-x-4">
                       <Link to={`/dispute/${id}/direct`}>

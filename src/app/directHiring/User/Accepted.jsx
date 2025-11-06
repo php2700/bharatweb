@@ -54,7 +54,7 @@ export default function Accepted({
   const createOrder = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
-      const totalAmount = parseFloat(amount) + parseFloat(amount) * 0.09; // Calculate total (amount + tax)
+      const totalAmount = parseFloat(amount) + parseFloat(amount) * 0.02; // Calculate total (amount + tax)
       const response = await axios.post(
         `${BASE_URL}/emergency-order/create-razorpay-order`,
         { amount: totalAmount }, // Send total amount to Razorpay
@@ -85,7 +85,7 @@ export default function Accepted({
     try {
       const payload = {
         amount: parseFloat(amount),
-        tax: parseFloat(amount) * 0.09,
+        tax: parseFloat(amount) * 0.02,
         payment_id: paymentId,
         description,
         method: "online",
@@ -339,8 +339,13 @@ export default function Accepted({
         />
 
         <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
-
         {/* Service Provider Details */}
+				<p className="font-bold mb-3 text-gray-900">
+          Note:&nbsp;
+          <span className="text-sm text-red-600 font-semibold">
+            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+          </span>
+        </p>
         {serviceProvider && (
           <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
             <div className="flex items-center space-x-4">
@@ -351,10 +356,13 @@ export default function Accepted({
               />
               <div className="flex items-center w-full">
                 <p className="text-lg font-semibold">
-                  {serviceProvider.full_name || "Unknown Worker"}
+                  {serviceProvider.full_name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown Worker"}
+									<span>
+									{" "}({serviceProvider.unique_id})
+									</span>
                 </p>
-
-                <div className="flex ml-auto items-center space-x-3 ml-6">
+                
+                {(hireStatus === "cancelled" || hireStatus === "cancelledDispute") ? "" : <div className="flex ml-auto items-center space-x-3 ml-6">
                   <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                     <img src={Call} alt="Call" className="w-5 h-5" />
                   </div>
@@ -364,7 +372,7 @@ export default function Accepted({
                   >
                     <img src={Message} alt="Message" className="w-5 h-5" />
                   </div>
-                </div>
+                </div> }
 
                 <button
                   className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
@@ -391,7 +399,7 @@ export default function Accepted({
                   />
                   <div>
                     <p className="text-lg font-semibold">
-                      {assignedWorker.name || "Unknown Worker"}
+                      {assignedWorker.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown Worker"}
                     </p>
                   </div>
                 </div>
@@ -435,7 +443,7 @@ export default function Accepted({
                     payment.release_status === "pending" && (
 											<>
 											<span className="text-[#228B22] me-2">
-											  Pay to app
+											  Waiting for Approval
 											</span>
                       <button
                         onClick={() => handlePay(payment._id)}
@@ -446,13 +454,13 @@ export default function Accepted({
 											</>
                     )}
                   {payment.release_status === "release_requested" && (
-                    <span className="text-yellow-600 font-semibold">
-                      Requested for Pay
+                    <span className="text-[#228B22] font-semibold">
+                      Paid
                     </span>
                   )}
                   {payment.release_status === "released" && (
                     <span className="text-[#228B22] font-semibold">
-                      Paid to Provider
+                      Paid
                     </span>
                   )}
                   {payment.release_status === "refunded" && (
@@ -499,10 +507,10 @@ export default function Accepted({
                 </div>
                 {amount && parseFloat(amount) > 0 && (
                   <div className="mt-2 text-sm text-gray-600">
-                    Tax (9%): ₹{(parseFloat(amount) * 0.09).toFixed(2)}
+                    RazorPay Charges (2%): ₹{(parseFloat(amount) * 0.02).toFixed(2)}
                     <br />
                     Total: ₹
-                    {(parseFloat(amount) + parseFloat(amount) * 0.09).toFixed(
+                    {(parseFloat(amount) + parseFloat(amount) * 0.02).toFixed(
                       2
                     )}
                   </div>
@@ -536,17 +544,17 @@ export default function Accepted({
           </thead>
           <tbody>
             <tr>
-              <td className="border p-2">Total Amount</td>
+              <td className="border p-2">Total Amount Paid</td>
               <td className="border p-2">
-                ₹{fullPaymentHistory.total_expected}
+                ₹{fullPaymentHistory.amount}
               </td>
             </tr>
             <tr>
-              <td className="border p-2">Pay to App</td>
-              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">Pending with App</td>
+              <td className="border p-2">₹{fullPaymentHistory.remaining_amount}</td>
             </tr>
             <tr>
-              <td className="border p-2">Paid to Provider</td>
+              <td className="border p-2">Paid to Worker</td>
               <td className="border p-2">
                 ₹
                 {paymentHistory

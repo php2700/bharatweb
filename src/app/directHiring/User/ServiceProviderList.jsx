@@ -14,7 +14,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* --------------------------------------------------------------
-   Re-usable banner slider (top + bottom)
+   Re‑usable banner slider (top + bottom)
    -------------------------------------------------------------- */
 const BannerSlider = ({ images, loading, error }) => {
   const settings = {
@@ -133,6 +133,8 @@ export default function ServiceProviderList() {
           const withToggle = (data.data || []).map((w) => ({
             ...w,
             isAddressExpanded: false,
+            isSkillExpanded: false,
+            isSubcatExpanded: false,
           }));
           setWorkers(withToggle);
         }
@@ -148,19 +150,18 @@ export default function ServiceProviderList() {
 
   /* collapse all when search / sort changes */
   useEffect(() => {
-    setWorkers((prev) => prev.map((w) => ({ ...w, isAddressExpanded: false })));
+    setWorkers((prev) =>
+      prev.map((w) => ({
+        ...w,
+        isAddressExpanded: false,
+        isSkillExpanded: false,
+        isSubcatExpanded: false,
+      }))
+    );
   }, [searchQuery, sortOrder]);
 
   /* ---------- helpers ---------- */
   const handleHire = (id) => navigate(`/direct-hiring/${id}`);
-
-  const truncateText = (text, limit = 25) => {
-    if (!text) return "";
-    const words = text.trim().split(/\s+/);
-    return words.length > limit
-      ? words.slice(0, limit).join(" ") + "..."
-      : text;
-  };
 
   const capitalizeWords = (text) =>
     text
@@ -170,12 +171,21 @@ export default function ServiceProviderList() {
           .join(" ")
       : "";
 
+  const getTruncated = (text, limit = 25) => {
+    if (!text) return "";
+    const words = text.trim().split(/\s+/);
+    return words.length > limit
+      ? words.slice(0, limit).join(" ") + "..."
+      : text;
+  };
+
   const filteredWorkers = workers
     .filter((w) => {
       const q = searchQuery.toLowerCase();
       return (
         w.full_name?.toLowerCase().includes(q) ||
-        w.skill?.toLowerCase().includes(q)
+        w.skill?.toLowerCase().includes(q) ||
+				w.unique_id?.toLowerCase().includes(q)
       );
     })
     .sort((a, b) =>
@@ -189,11 +199,10 @@ export default function ServiceProviderList() {
       state: { hire_status: "NoStatus", isHired: false },
     });
 
-  const toggleAddress = (id) => {
+  /** Toggle any expandable field */
+  const toggleField = (id, field) => {
     setWorkers((prev) =>
-      prev.map((w) =>
-        w._id === id ? { ...w, isAddressExpanded: !w.isAddressExpanded } : w
-      )
+      prev.map((w) => (w._id === id ? { ...w, [field]: !w[field] } : w))
     );
   };
 
@@ -231,7 +240,7 @@ export default function ServiceProviderList() {
               <input
                 className="border rounded-lg p-2 w-full sm:w-64"
                 type="search"
-                placeholder="Search by name"
+                placeholder="Search by Name and Id"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -253,17 +262,29 @@ export default function ServiceProviderList() {
           ) : (
             <div className="space-y-6">
               {filteredWorkers.map((worker) => {
+                /* ---------- ADDRESS ---------- */
                 const fullAddress =
                   capitalizeWords(worker?.location?.address) || "Unknown";
-                const isLong = fullAddress.length > 70;
+                const addressLong = fullAddress.length > 70;
                 const displayedAddress = worker.isAddressExpanded
                   ? fullAddress
-                  : truncateText(fullAddress, 12);
+                  : getTruncated(fullAddress, 12);
 
-                const addressPaddingClass =
-                  isLong && worker.isAddressExpanded
-                    ? "address-wrapper expanded"
-                    : "adress-wrapper";
+                /* ---------- SKILL ---------- */
+                const fullSkill = capitalizeWords(worker?.skill) || "";
+                const skillLong = fullSkill.length > 70;
+                const displayedSkill = worker.isSkillExpanded
+                  ? fullSkill
+                  : getTruncated(fullSkill, 12);
+
+                /* ---------- SUBCATEGORIES ---------- */
+                const subcatString = (worker?.subcategory_names || []).join(
+                  ", "
+                );
+                const subcatLong = subcatString.length > 70;
+                const displayedSubcat = worker.isSubcatExpanded
+                  ? subcatString
+                  : getTruncated(subcatString, 12);
 
                 return (
                   <div
@@ -284,7 +305,10 @@ export default function ServiceProviderList() {
                       {/* Name + rating */}
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800">
-                          {capitalizeWords(worker.full_name)}
+                          {capitalizeWords(worker.full_name)}{" "}
+                          <span className="text-gray-700">
+                            (Id: {worker?.unique_id})
+                          </span>
                         </h2>
                         <div className="flex items-center gap-1">
                           <img
@@ -296,46 +320,107 @@ export default function ServiceProviderList() {
                         </div>
                       </div>
 
-                      <p className="text-gray-700">Id: {worker?.unique_id}</p>
-
-                      <p className="font-medium text-gray-800">
-                        About My Skill
-                      </p>
-                      <p className="line-clamp-3 break-words">
-                        {capitalizeWords(worker?.skill)}
+                      <p className="text-gray-700">
+                        Category: {worker?.category_name}
                       </p>
 
-                      {/* Address + Buttons */}
-                      <div className="mt-4 flex flex-col sm:flex-row justify-between gap-4">
-                        {/* Address Column */}
-                        <div className="flex-1">
-                          <div className={addressPaddingClass}>
-                            <div className="flex items-start text-gray-600 text-sm">
-                              <FaMapMarkerAlt
-                                size={18}
-                                color="#228B22"
-                                className="mr-2 flex-shrink-0 mt-0.5"
-                              />
-                              <p className="break-words leading-snug">
-                                {displayedAddress}
-                              </p>
-                            </div>
-                          </div>
-
-                          {isLong && (
+                      {/* Sub-categories – single line */}
+                      <div className="flex items-center gap-1 text-gray-700 mt-1">
+                        <span className="font-medium">SubCategories:</span>
+                        <div className="flex items-center flex-1 overflow-hidden">
+                          <span
+                            className={`inline-block ${
+                              worker.isSubcatExpanded
+                                ? ""
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                            }`}
+                          >
+                            {displayedSubcat}
+                          </span>
+                          {subcatLong && (
                             <button
-                              onClick={() => toggleAddress(worker._id)}
-                              className="mt-1 block mx-auto text-xs font-medium text-[#228B22] hover:underline"
+                              onClick={() =>
+                                toggleField(worker._id, "isSubcatExpanded")
+                              }
+                              className="ml-1 text-xs font-medium text-[#228B22] hover:underline flex-shrink-0"
                             >
-                              {worker.isAddressExpanded
+                              {worker.isSubcatExpanded
                                 ? "See Less"
                                 : "See More"}
                             </button>
                           )}
                         </div>
+                      </div>
 
-                        {/* Fixed-size Action Buttons */}
-                        <div className="flex gap-2 flex-shrink-0">
+                      {/* About My Skill – single line */}
+                      <div className="mt-2">
+                        <p className="font-medium text-gray-800">
+                          About My Skill
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <div className="flex items-center flex-1 overflow-hidden">
+                            <span
+                              className={`inline-block ${
+                                worker.isSkillExpanded
+                                  ? ""
+                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              }`}
+                            >
+                              {displayedSkill}
+                            </span>
+                            {skillLong && (
+                              <button
+                                onClick={() =>
+                                  toggleField(worker._id, "isSkillExpanded")
+                                }
+                                className="ml-1 text-xs font-medium text-[#228B22] hover:underline flex-shrink-0"
+                              >
+                                {worker.isSkillExpanded
+                                  ? "See Less"
+                                  : "See More"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ---------- ADDRESS + ACTION BUTTONS ---------- */}
+                      <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        {/* Address – ONE line */}
+                        <div className="flex items-center gap-1 text-gray-600 text-sm flex-1 min-w-0">
+                          <FaMapMarkerAlt
+                            size={18}
+                            color="#228B22"
+                            className="flex-shrink-0"
+                          />
+                          <div className="flex items-center overflow-hidden">
+                            <span
+                              className={`inline-block ${
+                                worker.isAddressExpanded
+                                  ? ""
+                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              }`}
+                              title={fullAddress}
+                            >
+                              {displayedAddress}
+                            </span>
+                            {addressLong && (
+                              <button
+                                onClick={() =>
+                                  toggleField(worker._id, "isAddressExpanded")
+                                }
+                                className="ml-1 text-xs font-medium text-[#228B22] hover:underline flex-shrink-0"
+                              >
+                                {worker.isAddressExpanded
+                                  ? "See Less"
+                                  : "See More"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Action buttons – always inside the card */}
+                        <div className="flex gap-2 flex-shrink-0 sm:self-end">
                           <button
                             className="fixed-btn text-[#228B22] text-sm py-1.5 px-3 border border-[#228B22] rounded-lg hover:bg-green-50 transition"
                             onClick={() => handleRouteHire(worker._id)}
@@ -372,7 +457,7 @@ export default function ServiceProviderList() {
         <Footer />
       </div>
 
-      {/* line-clamp for skill text */}
+      {/* Global styles */}
       <style jsx>{`
         .fixed-btn {
           min-width: 110px;
@@ -380,23 +465,6 @@ export default function ServiceProviderList() {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .address-wrapper {
-          padding: 0.5rem 0;
-          transition: padding 0.2s ease;
-        }
-
-        .address-wrapper.expanded {
-          padding: 1.5rem 0; /* Increases vertical space when expanded */
-        }
-
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
       `}</style>
     </>
