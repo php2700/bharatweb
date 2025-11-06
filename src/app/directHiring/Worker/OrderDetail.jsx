@@ -492,15 +492,15 @@ export default function ViewProfile() {
                           : ""
                       }`}
                   >
-                    {orderData?.hire_status
-                      ? orderData.hire_status
+                    {orderData?.hire_status === "cancelledDispute"
+                      ?`Cancelled ${" "} Dispute` : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
                           .join(" ")
-                      : "Unknown Status"}
+                      || "Unknown Status"}
                   </span>
                 </span>
               </div>

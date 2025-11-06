@@ -309,7 +309,7 @@ export default function Accepted({
     navigate(`/profile-details/${ProviderId}/direct`, {
       state: {
         hire_status: hireStatus,
-				isHired
+        isHired,
       },
     });
   };
@@ -340,10 +340,11 @@ export default function Accepted({
 
         <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
         {/* Service Provider Details */}
-				<p className="font-bold mb-3 text-gray-900">
+        <p className="font-bold mb-3 text-gray-900">
           Note:&nbsp;
           <span className="text-sm text-red-600 font-semibold">
-            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+            Pay securely — no extra charges from the platform. Choose simple and
+            safe transactions.
           </span>
         </p>
         {serviceProvider && (
@@ -356,23 +357,31 @@ export default function Accepted({
               />
               <div className="flex items-center w-full">
                 <p className="text-lg font-semibold">
-                  {serviceProvider.full_name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown Worker"}
-									<span>
-									{" "}({serviceProvider.unique_id})
-									</span>
+                  {serviceProvider.full_name
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ") || "Unknown Worker"}
+                  <span> ({serviceProvider.unique_id})</span>
                 </p>
-                
-                {(hireStatus === "cancelled" || hireStatus === "cancelledDispute") ? "" : <div className="flex ml-auto items-center space-x-3 ml-6">
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                    <img src={Call} alt="Call" className="w-5 h-5" />
+
+                {hireStatus === "cancelled" ||
+                hireStatus === "cancelledDispute" ? (
+                  ""
+                ) : (
+                  <div className="flex ml-auto items-center space-x-3 ml-6">
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                      <img src={Call} alt="Call" className="w-5 h-5" />
+                    </div>
+                    <div
+                      className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                      onClick={() =>
+                        handleChatOpen(serviceProvider._id, user_id)
+                      }
+                    >
+                      <img src={Message} alt="Message" className="w-5 h-5" />
+                    </div>
                   </div>
-                  <div
-                    className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                    onClick={() => handleChatOpen(serviceProvider._id, user_id)}
-                  >
-                    <img src={Message} alt="Message" className="w-5 h-5" />
-                  </div>
-                </div> }
+                )}
 
                 <button
                   className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
@@ -399,7 +408,12 @@ export default function Accepted({
                   />
                   <div>
                     <p className="text-lg font-semibold">
-                      {assignedWorker.name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown Worker"}
+                      {assignedWorker.name
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ") || "Unknown Worker"}
                     </p>
                   </div>
                 </div>
@@ -441,27 +455,25 @@ export default function Accepted({
                 <div className="mx-2">
                   {payment.status === "success" &&
                     payment.release_status === "pending" && (
-											<>
-											<span className="text-[#228B22] me-2">
-											  Waiting for Approval
-											</span>
-                      <button
-                        onClick={() => handlePay(payment._id)}
-                        className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                      >
-                        Pay
-                      </button>
-											</>
+                      <>
+                        <span className="text-[#228B22] me-2">
+                          Waiting for Approval
+                        </span>
+                        {hireStatus === "accepted" && (
+                          <button
+                            onClick={() => handlePay(payment._id)}
+                            className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                          >
+                            Pay
+                          </button>
+                        )}
+                      </>
                     )}
                   {payment.release_status === "release_requested" && (
-                    <span className="text-[#228B22] font-semibold">
-                      Paid
-                    </span>
+                    <span className="text-[#228B22] font-semibold">Paid</span>
                   )}
                   {payment.release_status === "released" && (
-                    <span className="text-[#228B22] font-semibold">
-                      Paid
-                    </span>
+                    <span className="text-[#228B22] font-semibold">Paid</span>
                   )}
                   {payment.release_status === "refunded" && (
                     <span className="text-blue-600 font-semibold">
@@ -507,7 +519,8 @@ export default function Accepted({
                 </div>
                 {amount && parseFloat(amount) > 0 && (
                   <div className="mt-2 text-sm text-gray-600">
-                    RazorPay Charges (2%): ₹{(parseFloat(amount) * 0.02).toFixed(2)}
+                    RazorPay Charges (2%): ₹
+                    {(parseFloat(amount) * 0.02).toFixed(2)}
                     <br />
                     Total: ₹
                     {(parseFloat(amount) + parseFloat(amount) * 0.02).toFixed(
@@ -545,22 +558,20 @@ export default function Accepted({
           <tbody>
             <tr>
               <td className="border p-2">Total Amount Paid</td>
-              <td className="border p-2">
-                ₹{fullPaymentHistory.amount}
-              </td>
+              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
             </tr>
             <tr>
               <td className="border p-2">Pending with App</td>
-              <td className="border p-2">₹{fullPaymentHistory.remaining_amount}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.remaining_amount}
+              </td>
             </tr>
             <tr>
               <td className="border p-2">Paid to Worker</td>
               <td className="border p-2">
                 ₹
                 {paymentHistory
-                  .filter(
-                    (payment) => payment.release_status === "released"
-                  )
+                  .filter((payment) => payment.release_status === "released")
                   .reduce((sum, payment) => sum + payment.amount, 0)}
               </td>
               {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}

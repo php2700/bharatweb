@@ -56,6 +56,7 @@ export default function ViewProfile() {
   const [refundReason, setRefundReason] = useState("");
   const [showChangeProvider, setShowChangeProvider] = useState(false);
   const [expandedAddresses, setExpandedAddresses] = useState({});
+	const [disputeInfo, setDisputeInfo] = useState(null)
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -67,17 +68,17 @@ export default function ViewProfile() {
   const user = useSelector((state) => state.user.profile);
   const userId = user?._id;
 
- useEffect(() => {
-  if (Array.isArray(serviceProviders) && serviceProviders.length > 0) {
-    // check if all providers have status === "rejected"
-    const allRejected = serviceProviders.every(
-      (provider) => provider.status === "rejected"
-    );
-    if (allRejected) {
-      setShowChangeProvider(true);
+  useEffect(() => {
+    if (Array.isArray(serviceProviders) && serviceProviders.length > 0) {
+      // check if all providers have status === "rejected"
+      const allRejected = serviceProviders.every(
+        (provider) => provider.status === "rejected"
+      );
+      if (allRejected) {
+        setShowChangeProvider(true);
+      }
     }
-  }
-}, [serviceProviders]);
+  }, [serviceProviders]);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -119,7 +120,7 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
-  console.log("orderdata", orderData);
+  // console.log("orderdata", orderData);
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
@@ -209,7 +210,7 @@ export default function ViewProfile() {
       setAssignedWorker(orderResponse.data.data.assignedWorker || null);
       setServiceProviders(orderResponse.data.data.order.offer_history || []);
       setIsHired(orderResponse.data.data.order.hire_status !== "pending");
-
+      setDisputeInfo(orderResponse.data.data.DisputeInfo || null)
       // Initialize offer statuses and assigned provider IDs
       const initialStatuses = {};
       const providerIds = [];
@@ -652,7 +653,7 @@ export default function ViewProfile() {
           },
         }
       );
-      console.log("Cancel Response:", response.data);
+      // console.log("Cancel Response:", response.data);
       setOrderData((prev) => ({
         ...prev,
         hire_status: "cancelled task",
@@ -727,7 +728,7 @@ export default function ViewProfile() {
         { orderId: id, reason: refundReason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("ssds", response);
+      // console.log("ssds", response);
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
@@ -764,7 +765,6 @@ export default function ViewProfile() {
     autoplaySpeed: 3000,
     arrows: true,
   };
-
 
   if (loading) {
     return (
@@ -827,7 +827,6 @@ export default function ViewProfile() {
     }
     return address.substring(0, maxLength) + "...";
   };
-
 
   return (
     <>
@@ -931,15 +930,15 @@ export default function ViewProfile() {
                           : ""
                       }`}
                   >
-                    {orderData?.hire_status
-                      ? orderData.hire_status
+                    {orderData?.hire_status === "cancelledDispute"
+                      ? `Cancelled ${" "} Dispute`
+                      : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
-                          .join(" ")
-                      : "Unknown Status"}
+                          .join(" ") || "Unknown status"}
                   </span>
                 </span>
                 {orderData?.refundRequest && (
@@ -1030,19 +1029,25 @@ export default function ViewProfile() {
                         />
                         <div className="flex-1">
                           <p className="text-lg font-semibold">
-                            {provider.provider_id.full_name ||
-                              "Unknown Provider"}
+                            {provider.provider_id.full_name
+                              .split(" ")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(0)
+                              ) || "Unknown Provider"} <span className="text-gray-500 text-sm">
+													 ({provider.provider_id.unique_id})
+													</span>
                           </p>
                           {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                             {provider.provider_id?.location?.address ||
                               "No Address Provided"}
                           </p> */}
-                          <FaMapMarkerAlt
-                            className="text-[#F27773] mt-1 flex-shrink-0"
-                            color="#228B22"
-                            size={20}
-                          />
-                          <div className="flex-1">
+                          <div className="flex items-start gap-2 flex-1">
+                            <FaMapMarkerAlt
+                              className="text-[#F27773] mt-1 flex-shrink-0"
+                              color="#228B22"
+                              size={20}
+                            />
                             <p className="text-gray-700 text-sm">
                               {truncateAddress(
                                 provider.provider_id?.location?.address,
@@ -1073,40 +1078,44 @@ export default function ViewProfile() {
                             View Profile
                           </button>
                         </div>
-                        {orderData.hire_status === "cancelled" ? " " : <div className="flex flex-col items-center justify-center flex-1">
-                          <p className="text-gray-600 font-medium">Contact</p>
-                          <div className="flex space-x-2 mt-2">
-                            <button
-                              className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                              title="Call"
-                              onClick={() => {
-                                window.open(`tel:${provider.phone}`, "_self");
-                              }}
-                            >
-                              <img
-                                src={CallIcon}
-                                alt="Call"
-                                className="w-6 h-6"
-                              />
-                            </button>
-                            <button
-                              className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                              title="Chat"
-                              onClick={() =>
-                                handleChatOpen(
-                                  provider?.provider_id?._id,
-                                  userId
-                                )
-                              }
-                            >
-                              <img
-                                src={ChatIcon}
-                                alt="Chat"
-                                className="w-6 h-6"
-                              />
-                            </button>
+                        {orderData.hire_status === "cancelled" ? (
+                          " "
+                        ) : (
+                          <div className="flex flex-col items-center justify-center flex-1">
+                            <p className="text-gray-600 font-medium">Contact</p>
+                            <div className="flex space-x-2 mt-2">
+                              <button
+                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                title="Call"
+                                onClick={() => {
+                                  window.open(`tel:${provider.phone}`, "_self");
+                                }}
+                              >
+                                <img
+                                  src={CallIcon}
+                                  alt="Call"
+                                  className="w-6 h-6"
+                                />
+                              </button>
+                              <button
+                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                title="Chat"
+                                onClick={() =>
+                                  handleChatOpen(
+                                    provider?.provider_id?._id,
+                                    userId
+                                  )
+                                }
+                              >
+                                <img
+                                  src={ChatIcon}
+                                  alt="Chat"
+                                  className="w-6 h-6"
+                                />
+                              </button>
+                            </div>
                           </div>
-                        </div>}
+                        )}
 
                         <div className="flex flex-col gap-2">
                           {offerStatuses[provider.provider_id._id] ===
@@ -1118,29 +1127,30 @@ export default function ViewProfile() {
                             <>
                               {/* Status Button */}
                               {!provider.isRejectedByUser && (
-															<>
-                                <button
-                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
+                                <>
+                                  <button
+                                    className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
             ${provider.status === "pending" ? "bg-yellow-500" : ""}
             ${provider.status === "accepted" ? "bg-green-600" : ""}
             ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                  disabled
-                                >
-																
-                                  {Array.isArray(provider.status)
-                                    ? provider.status
-                                        .map(
-                                          (word) =>
-                                            word.charAt(0).toUpperCase() +
-                                            word.slice(1)
-                                        )
-                                        .join(" ")
-                                    : provider.status
-                                    ? provider.status.charAt(0).toUpperCase() +
-                                      provider.status.slice(1)
-                                    : ""}
-                                </button>
-																</>
+                                    disabled
+                                  >
+                                    {Array.isArray(provider.status)
+                                      ? provider.status
+                                          .map(
+                                            (word) =>
+                                              word.charAt(0).toUpperCase() +
+                                              word.slice(1)
+                                          )
+                                          .join(" ")
+                                      : provider.status
+                                      ? provider.status
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                        provider.status.slice(1)
+                                      : ""}
+                                  </button>
+                                </>
                               )}
 
                               {/* If user rejected — show 'Rejected by Me' instead */}
@@ -1281,7 +1291,7 @@ export default function ViewProfile() {
                 </button>
               ) : orderData?.hire_status === "cancelledDispute" ? (
                 <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-                  Cancelled (Dispute)
+                  Cancelled ({disputeInfo.unique_id || "No Id"})
                 </span>
               ) : null}
               <ReviewModal
@@ -1354,6 +1364,17 @@ export default function ViewProfile() {
               )}
             </div>
 
+            {orderData.hire_status === "cancelled" && !orderData?.refundRequest && (
+              <div className="flex justify-center mt-3">
+                <p className="text-gray-800 text-sm font-medium text-center">
+                  Note:&nbsp;
+                  <span className="text-red-600 font-semibold">
+                    You can ask for a refund by tapping on the refund button.
+                  </span>
+                </p>
+              </div>
+            )}
+
             {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed" ||
               orderData?.hire_status === "cancelledDispute") && (
@@ -1383,7 +1404,8 @@ export default function ViewProfile() {
                           Warning Message
                         </h2>
                         <p className="text-gray-700 text-sm md:text-base">
-                       Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                          Pay securely — no extra charges from the platform.
+                          Choose simple and safe transactions.
                         </p>
                       </div>
                     </div>
@@ -1482,7 +1504,9 @@ export default function ViewProfile() {
                       />
                       <div className="flex-1">
                         <p className="text-lg font-semibold">
-                          {worker.full_name || "Unknown Worker"}
+                          {worker.full_name || "Unknown Worker"} <span>
+													({worker.unique_id})
+													</span>
                         </p>
                         {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}

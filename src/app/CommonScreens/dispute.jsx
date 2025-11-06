@@ -198,7 +198,7 @@ export default function Dispute() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
-              placeholder="Enter amount"
+              placeholder="Enter Amount for which rise dispute"
             />
             {errors.amount && (
               <p className="text-red-600 text-sm mt-1">{errors.amount}</p>
