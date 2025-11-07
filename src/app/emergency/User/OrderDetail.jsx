@@ -16,7 +16,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
-import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -40,10 +40,11 @@ export default function ViewProfile() {
   const [errors, setErrors] = useState({});
   const [assignData, setAssignData] = useState();
   const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
-	const [showRefundModal, setShowRefundModal] = useState(false);
-	const [refundReason, setRefundReason] = useState("");
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundReason, setRefundReason] = useState("");
+	const [disputeInfo, setDisputeInfo] = useState(null)
   const token = localStorage.getItem("bharat_token");
-
+  //  console.log("disputeInfo", disputeInfo);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -125,6 +126,7 @@ export default function ViewProfile() {
       setOrderData(orderResponse.data.data);
       setServiceProviders(providersResponse.data.providers || []);
       setIsHired(!!orderResponse.data.data?.service_provider_id);
+			setDisputeInfo(orderResponse.data.DisputeInfo || null)
     } catch (err) {
       setError("Failed to fetch data. Please try again later.");
       console.error("Error:", err);
@@ -377,6 +379,19 @@ export default function ViewProfile() {
     }
   };
 
+  const handleRouteHire = (ProviderId, isHired) => {
+    navigate(`/profile-details/${ProviderId}/emergency`, {
+      state: {
+        hire_status: orderData?.hire_status,
+        isHired,
+				isPlatformFeePaid: orderData?.platform_fee_paid,
+				razorPayOrderId: orderData?.razorOrderIdPlatform,
+				platform_fee: orderData?.platform_fee,
+				orderId: orderData?._id,
+      },
+    });
+  };
+
   const handleMarkComplete = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
@@ -394,9 +409,11 @@ export default function ViewProfile() {
           title: "Success!",
           text: "Order marked as complete successfully!",
           confirmButtonColor: "#228B22",
-        }).then(() => fetchData()).then(() => {
-          setShowCompletedModal(true);
-        });
+        })
+          .then(() => fetchData())
+          .then(() => {
+            setShowCompletedModal(true);
+          });
       }
     } catch (err) {
       console.error(err);
@@ -522,12 +539,12 @@ export default function ViewProfile() {
     provider.full_name?.toLowerCase().includes(searchQuery)
   );
 
-	const showRefundButton =
+  const showRefundButton =
     orderData?.hire_status === "pending" ||
     (orderData?.hire_status === "accepted" &&
       orderData?.service_payment?.payment_history === 0);
 
-		  const handleRefundRequest = async () => {
+  const handleRefundRequest = async () => {
     if (!refundReason.trim()) {
       Swal.fire({
         icon: "warning",
@@ -547,7 +564,7 @@ export default function ViewProfile() {
         { orderId: id, reason: refundReason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-   console.log("ssds", response)
+      console.log("ssds", response);
       if (response.status === 200) {
         Swal.fire({
           icon: "success",
@@ -571,7 +588,7 @@ export default function ViewProfile() {
         showConfirmButton: false,
       });
     }
-  };	
+  };
 
   // Slider settings for react-slick
   const sliderSettings = {
@@ -646,10 +663,7 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-							<p>
-                  Title :-{" "}
-                  {orderData?.title || "Unknown Title"}
-                </p>
+                <p>Title :- {orderData?.title || "Unknown Title"}</p>
                 <span>
                   Category :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
@@ -691,23 +705,24 @@ export default function ViewProfile() {
       ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
       ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
       ${orderData?.hire_status === "cancelledDispute" ? "bg-[#FF0000]" : ""}
-      ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+      ${orderData?.hire_status === "assigned" ? "bg-[#228B22]" : ""}`}
                   >
-                    {orderData?.hire_status
-                      ? orderData.hire_status
+                    {orderData?.hire_status === "cancelledDispute"
+                      ? `Cancelled ${" "} Dispute` : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
                           .join(" ")
-                      : "Unknown Status"}
+                      || "Unknown Status"}
                   </span>
                 </span>
-								{orderData?.refundRequest && <span className="text-gray-600 font-semibold block">
-                 Refund Status:{" "}
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                {orderData?.refundRequest && (
+                  <span className="text-gray-600 font-semibold block">
+                    Refund Status:{" "}
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium
                       ${
                         orderData?.refundStatus === "pending"
                           ? "bg-yellow-500"
@@ -718,18 +733,19 @@ export default function ViewProfile() {
                           ? "bg-blue-500"
                           : ""
                       }`}
-                  >
-                    {orderData?.refundStatus
-                      ? orderData.refundStatus
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
-                      : "Unknown Status"}
+                    >
+                      {orderData?.refundStatus
+                        ? orderData.refundStatus
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        : "Unknown Status"}
+                    </span>
                   </span>
-                </span>}
+                )}
               </div>
             </div>
 
@@ -783,7 +799,7 @@ export default function ViewProfile() {
                 </div>
               ) : orderData?.hire_status == "cancelledDispute" ? (
                 <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled Dispute
+                  Cancelled ({disputeInfo.unique_id || "No Id"})
                 </button>
               ) : orderData?.hire_status !== "assigned" ? (
                 <button
@@ -794,7 +810,7 @@ export default function ViewProfile() {
                 </button>
               ) : null}
 
-             {/* ✅ Show Refund Button */}
+              {/* ✅ Show Refund Button */}
               {showRefundButton && orderData?.platform_fee_paid && (
                 <button
                   onClick={() => setShowRefundModal(true)}
@@ -803,11 +819,11 @@ export default function ViewProfile() {
                   Get Refund
                 </button>
               )}
-							{orderData?.refundRequest && (
-                <button
-                  className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
-                >
-                  {orderData?.refundStatus == "pending" ? "Refund Request Submitted" : "Refunded"}
+              {orderData?.refundRequest && (
+                <button className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700">
+                  {orderData?.refundStatus == "pending"
+                    ? "Refund Request Submitted"
+                    : "Refunded"}
                 </button>
               )}
               {/* ✅ Refund Modal */}
@@ -908,7 +924,8 @@ export default function ViewProfile() {
 
       {!isHired &&
         orderData?.hire_status !== "cancelled" &&
-        !orderData?.platform_fee_paid && filteredProviders.length > 0 && (
+        !orderData?.platform_fee_paid &&
+        filteredProviders.length > 0 && (
           <div className="container mx-auto px-4 py-6 max-w-4xl">
             <div className="relative mb-4">
               <input
@@ -941,17 +958,37 @@ export default function ViewProfile() {
                     />
                     <div className="flex-1">
                       <p className="text-lg font-semibold">
-                        {provider.full_name || "Unknown Provider"}
+                        {provider.full_name
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ") || "Unknown Provider"}
+                        <span className="text-sm text-gray-500 ml-2">
+                          ({provider.unique_id || "#N/A"})
+                        </span>
                       </p>
-                      <p className="bg-[#FF0000] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                      <div className="text-gray-600 flex justify-center items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                        {" "}
+                        <span>
+                          <FaMapMarkerAlt
+                            size={25}
+                            color="#228B22"
+                            className="mr-2"
+                          />
+                        </span>
                         {provider?.location?.address || "No Address Provided"}
-                      </p>
-                      <Link
-                        to={`/profile-details/${provider._id}/emergency`}
-                        className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                      </div>
+
+                      <button
+                        className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                        onClick={() =>
+                          handleRouteHire(provider._id, false)
+                        }
                       >
                         View Profile
-                      </Link>
+                      </button>
                     </div>
                     <button
                       className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"

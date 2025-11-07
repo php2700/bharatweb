@@ -55,12 +55,15 @@ export default function Worklist() {
     try {
       if (!token) throw new Error("No authentication token found");
 
-      const { data } = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (data?.success && Array.isArray(data.images) && data.images.length) {
         setBannerImages(data.images);
@@ -129,7 +132,8 @@ export default function Worklist() {
           image: t.image_urls?.[0] || t.image_url?.[0] || Work,
           name: t.title || t.category_id?.name || "Unnamed Task",
           category_name: t.category_id?.name || "N/A",
-          subcategory_name: t.sub_category_ids?.map((s) => s.name).join(", ") || "N/A",
+          subcategory_name:
+            t.sub_category_ids?.map((s) => s.name).join(", ") || "N/A",
           description: t.description || null,
           date: t.createdAt
             ? new Date(t.createdAt).toLocaleDateString()
@@ -139,11 +143,8 @@ export default function Worklist() {
             t.skills?.join(", ") ||
             t.description ||
             "No skills listed",
-          price: t.platform_fee
-            ? `₹${t.service_payment.amount}`
-            : t.price
-            ? `₹${t.price}`
-            : "Price TBD",
+          price: t.service_payment.amount || "Price TBD",
+          cost: t.cost || "Price TBD", //--- IGNORE ---
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()
             : "No deadline",
@@ -436,16 +437,25 @@ export default function Worklist() {
                     {/*<p className="text-sm text-[#334247] line-clamp-2 flex-1 pr-2">
                       {task.skills}
                     </p>*/}
-                    <p className="text-green-600 font-bold mt-2">{task.price}</p>
+                    <p className="text-green-600 font-bold mt-2">
+                      ₹{activeTab === "My Bidding" ? task.cost : task.price}
+                    </p>
                     {task.milestone.length > 0 && (
                       <button
-                        onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
+                        onClick={() =>
+                          handledownload(
+                            task.id,
+                            downloadTypeFromTab(activeTab)
+                          )
+                        }
                         disabled={downloadingIds.includes(task.id)}
                         className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs flex-shrink-0"
                         title="Download Invoice"
                       >
                         <img src={pdfIcon} alt="PDF" className="w-5 h-5" />
-                        {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
+                        {downloadingIds.includes(task.id)
+                          ? "Downloading..."
+                          : "Download PDF"}
                       </button>
                     )}
                   </div>
@@ -465,7 +475,8 @@ export default function Worklist() {
                           ? "bg-green-100 text-green-800"
                           : task.status === "cancelledDispute"
                           ? "bg-orange-100 text-orange-800"
-                          : task.status === "accepted" || task.status === "assigned"
+                          : task.status === "accepted" ||
+                            task.status === "assigned"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
@@ -476,9 +487,7 @@ export default function Worklist() {
 
                   {/* Address + View Details */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
-                    <div className="flex-1 min-w-0">
-                      {renderAddress(task)}
-                    </div>
+                    <div className="flex-1 min-w-0">{renderAddress(task)}</div>
 
                     <button
                       onClick={() => {
@@ -487,7 +496,9 @@ export default function Worklist() {
                           "My Hire": "hire/worker",
                           "Emergency Tasks": "emergency/worker",
                         };
-                        navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
+                        navigate(
+                          `/${routes[activeTab]}/order-detail/${task.id}`
+                        );
                       }}
                       className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
                     >

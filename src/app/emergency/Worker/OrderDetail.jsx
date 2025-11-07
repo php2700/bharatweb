@@ -10,7 +10,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/directHiring/Work.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -176,17 +176,17 @@ export default function ViewProfile() {
       ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
       ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
       ${orderData?.hire_status === "cancelledDispute" ? "bg-red-600" : ""}
-      ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+      ${orderData?.hire_status === "assigned" ? "bg-[#228B22]" : ""}`}
                   >
-                    {orderData?.hire_status
-                      ? orderData.hire_status
+                    {orderData?.hire_status === "cancelledDispute"
+                      ? `Cancelled ${" "} Dispute` : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
                           .join(" ")
-                      : "Unknown Status"}
+                      || "Unknown Status"}
                   </span>
                 </span>
               </div>
@@ -213,10 +213,12 @@ export default function ViewProfile() {
               <>
                 <Accepted
                   serviceProvider={orderData?.user_id}
-                  user={orderData?.service_provider_id?._id}
+                  user_id={orderData?.service_provider_id?._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
-                  orderId={orderData?._id}
+									fullPaymentHistory={orderData?.service_payment}
+                  orderId={id}
+                  hireStatus={orderData?.hire_status}
                 />
                 <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                   {/* Yellow warning box */}

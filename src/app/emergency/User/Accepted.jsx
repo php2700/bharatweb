@@ -14,7 +14,7 @@ export default function Accepted({
   serviceProvider,
   assignedWorker,
   paymentHistory,
-	fullPaymentHistory,
+  fullPaymentHistory,
   orderId,
   hireStatus,
   user_id,
@@ -22,7 +22,8 @@ export default function Accepted({
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
-	if (!fullPaymentHistory) return null;
+  if (!fullPaymentHistory) return null;
+
   const navigate = useNavigate();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -53,9 +54,10 @@ export default function Accepted({
   const createOrder = async () => {
     try {
       const token = localStorage.getItem("bharat_token");
+      const totalAmount = parseFloat(amount) + parseFloat(amount) * 0.02; // Calculate total (amount + tax)
       const response = await axios.post(
         `${BASE_URL}/emergency-order/create-razorpay-order`,
-        { amount: parseFloat(amount) },
+        { amount: totalAmount }, // Send total amount to Razorpay
         {
           headers: {
             "Content-Type": "application/json",
@@ -63,8 +65,8 @@ export default function Accepted({
           },
         }
       );
-      console.log("razor", response);
-      console.log("razor", response.status);
+      // console.log("razor", response);
+      // console.log("razor", response.status);
       if (response.status === 200) {
         console.log("razor", response.data.razorOrder);
         return response.data.razorOrder; // Assuming backend returns Razorpay order details
@@ -83,7 +85,7 @@ export default function Accepted({
     try {
       const payload = {
         amount: parseFloat(amount),
-        tax: parseFloat(amount) * 0.09,
+        tax: parseFloat(amount) * 0.02,
         payment_id: paymentId,
         description,
         method: "online",
@@ -157,7 +159,7 @@ export default function Accepted({
   //   try {
   //     const token = localStorage.getItem("bharat_token");
   //     const response = await axios.post(
-  //       `${BASE_URL}/emergency-order/user/request-release/${orderId}/${paymentId}`,
+  //       `${BASE_URL}/direct-order/user/request-release/${orderId}/${paymentId}`,
   //       {},
   //       {
   //         headers: {
@@ -182,72 +184,72 @@ export default function Accepted({
   //   }
   // };
 
-	const handlePay = async (paymentId) => {
-		// Step 1️⃣: Show confirmation alert
-		const result = await Swal.fire({
-			title: "Are you sure?",
-			text: "Do you really want to release this payment?",
-			icon: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, Pay Now",
-			cancelButtonText: "Cancel",
-		});
-	
-		// Step 2️⃣: Only continue if user clicks "Yes"
-		if (result.isConfirmed) {
-			try {
-				const token = localStorage.getItem("bharat_token");
-	
-				const response = await axios.post(
-					`${BASE_URL}/emergency-order/user/request-release/${orderId}/${paymentId}`,
-					{},
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${token}`,
-						},
-					}
-				);
-	
-				if (response.status === 200) {
-					await Swal.fire({
-						icon: "success",
-						title: "Payment Released",
-						text: "Payment release requested successfully!",
-						timer: 2000,
-						showConfirmButton: false,
-					});
-					window.location.reload();
-				} else {
-					Swal.fire({
-						icon: "error",
-						title: "Failed",
-						text: "Payment release request failed, please try again.",
-					});
-				}
-			} catch (error) {
-				console.error("Payment release error:", error);
-				Swal.fire({
-					icon: "error",
-					title: "Error",
-					text:
-						error.response?.data?.message ||
-						"Something went wrong while requesting payment release.",
-				});
-			}
-		} else {
-			// Optional: user cancelled
-			Swal.fire({
-				icon: "info",
-				title: "Cancelled",
-				text: "Payment release was cancelled.",
-				timer: 1500,
-				showConfirmButton: false,
-			});
-		}
-	};
+  const handlePay = async (paymentId) => {
+    // Step 1️⃣: Show confirmation alert
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to release this payment?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Pay Now",
+      cancelButtonText: "Cancel",
+    });
+
+    // Step 2️⃣: Only continue if user clicks "Yes"
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("bharat_token");
+
+        const response = await axios.post(
+          `${BASE_URL}/emergency-order/user/request-release/${orderId}/${paymentId}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Released",
+            text: "Payment release requested successfully!",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          window.location.reload();
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: "Payment release request failed, please try again.",
+          });
+        }
+      } catch (error) {
+        console.error("Payment release error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text:
+            error.response?.data?.message ||
+            "Something went wrong while requesting payment release.",
+        });
+      }
+    } else {
+      // Optional: user cancelled
+      Swal.fire({
+        icon: "info",
+        title: "Cancelled",
+        text: "Payment release was cancelled.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
+  };
 
   // Handle form submission
   const handlePaymentSubmit = async () => {
@@ -303,7 +305,14 @@ export default function Accepted({
     toast.info("Form cleared!");
   };
 
-
+  const handleRouteHire = (ProviderId, isHired) => {
+    navigate(`/profile-details/${ProviderId}/emergency`, {
+      state: {
+        hire_status: hireStatus,
+        isHired,
+      },
+    });
+  };
 
   const handleChatOpen = (receiverId, senderId) => {
     // Save receiverId in localStorage
@@ -313,222 +322,263 @@ export default function Accepted({
     navigate("/chats");
   };
   return (
-		<>
-    <div className="container mx-auto px-4 py-6 max-w-4xl">
-      {/* Add ToastContainer to render toasts */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+    <>
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        {/* Add ToastContainer to render toasts */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
 
-      <h2 className="text-lg font-semibold mb-4">Order Details</h2>
+        <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
+        {/* Service Provider Details */}
+        <p className="font-bold mb-3 text-gray-900">
+          Note:&nbsp;
+          <span className="text-sm text-red-600 font-semibold">
+            Pay securely — no extra charges from the platform. Choose simple and
+            safe transactions.
+          </span>
+        </p>
+        {serviceProvider && (
+          <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
+            <div className="flex items-center space-x-4">
+              <img
+                src={serviceProvider.profile_pic || Profile}
+                alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="flex items-center w-full">
+                <p className="text-lg font-semibold">
+                  {serviceProvider.full_name
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ") || "Unknown Worker"}
+                  <span> ({serviceProvider.unique_id})</span>
+                </p>
 
-      {/* Service Provider Details */}
-      {serviceProvider && (
-        <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-          <div className="flex items-center space-x-4">
-            <img
-              src={serviceProvider.profile_pic || Profile}
-              alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
-              className="w-16 h-16 rounded-full object-cover"
-            />
-            <div className="flex items-center w-full">
-              <p className="text-lg font-semibold">
-                {serviceProvider.full_name || "Unknown Worker"}
-              </p>
-              {hireStatus !== "completed" && (
-                <div className="flex items-center space-x-3 ml-6">
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                    <img src={Call} alt="Call" className="w-5 h-5" />
+                {hireStatus === "cancelled" ||
+                hireStatus === "cancelledDispute" ? (
+                  ""
+                ) : (
+                  <div className="flex ml-auto items-center space-x-3 ml-6">
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                      <img src={Call} alt="Call" className="w-5 h-5" />
+                    </div>
+                    <div
+                      className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                      onClick={() =>
+                        handleChatOpen(serviceProvider._id, user_id)
+                      }
+                    >
+                      <img src={Message} alt="Message" className="w-5 h-5" />
+                    </div>
                   </div>
-                  <div
-                    className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                    onClick={() => handleChatOpen(serviceProvider._id, user_id)}
-                  >
-                    <img src={Message} alt="Message" className="w-5 h-5" />
-                  </div>
-                </div>
-              )}
-              <Link
-                to={`/profile-details/${serviceProvider?._id}/emergency`}
-                className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-              >
+                )}
+
                 <button
-                // className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  onClick={() => handleRouteHire(serviceProvider._id, true)}
                 >
                   View Profile
                 </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Assigned Worker Details */}
-      {assignedWorker && (
-        <div className="mb-4">
-          <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
-          <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <img
-                  src={assignedWorker.image || Profile}
-                  alt={`Profile of ${assignedWorker.name || "Worker"}`}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-lg font-semibold">
-                    {assignedWorker.name || "Unknown Worker"}
-                  </p>
-                </div>
               </div>
-              <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50">
-                View Profile
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Payment History */}
-      {paymentHistory && Array.isArray(paymentHistory) && (
-        <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Payment Summary</h3>
-            {hireStatus == "assigned" && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
+        {/* Assigned Worker Details */}
+        {assignedWorker && (
+          <div className="mb-4">
+            <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
+            <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={assignedWorker.image || Profile}
+                    alt={`Profile of ${assignedWorker.name || "Worker"}`}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-lg font-semibold">
+                      {assignedWorker.name
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ") || "Unknown Worker"}
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to={`/view-worker/${assignedWorker._id}`}
+                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                >
+                  View Profile
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Payment History */}
+        {paymentHistory && Array.isArray(paymentHistory) && (
+          <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Payment Summary</h3>
+              {hireStatus == "assigned" && (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                  Create Payment
+                </button>
+              )}
+            </div>
+
+            {paymentHistory.map((payment, index) => (
+              <div
+                key={payment._id}
+                className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
               >
-                Create Payment
-              </button>
+                <div className="flex items-center space-x-5">
+                  <span className="font-semibold">{index + 1}.</span>
+                  <span>{payment.description || "Starting Payment"}</span>
+                </div>
+                <div className="mx-2">
+                  {payment.status === "success" &&
+                    payment.release_status === "pending" && (
+                      <>
+                        <span className="text-[#228B22] me-2">
+                          Waiting for Approval
+                        </span>
+                        {hireStatus == "assigned" && (
+                          <button
+                            onClick={() => handlePay(payment._id)}
+                            className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                          >
+                            Pay
+                          </button>
+                        )}
+                      </>
+                    )}
+                  {payment.release_status === "release_requested" && (
+                    <span className="text-[#228B22] font-semibold">Paid</span>
+                  )}
+                  {payment.release_status === "released" && (
+                    <span className="text-[#228B22] font-semibold">Paid</span>
+                  )}
+                  {payment.release_status === "refunded" && (
+                    <span className="text-blue-600 font-semibold">
+                      Refunded
+                    </span>
+                  )}
+                </div>
+                <div className="font-semibold">₹{payment.amount}</div>
+              </div>
+            ))}
+
+            {showForm && (
+              <>
+                <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
+                  <span className="font-semibold">
+                    {paymentHistory.length + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter payment description"
+                    className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  >
+                    <option value="" disabled>
+                      Select payment method
+                    </option>
+                    <option value="online">Online</option>
+                    <option value="cod">Cash on Delivery</option>
+                  </select>
+                </div>
+                {amount && parseFloat(amount) > 0 && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    RazorPay Charges (2%): ₹
+                    {(parseFloat(amount) * 0.02).toFixed(2)}
+                    <br />
+                    Total: ₹
+                    {(parseFloat(amount) + parseFloat(amount) * 0.02).toFixed(
+                      2
+                    )}
+                  </div>
+                )}
+                <div className="flex justify-end space-x-4 mt-4">
+                  <button
+                    onClick={handlePaymentSubmit}
+                    className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
             )}
           </div>
-
-					{paymentHistory.length === 0 && (
-            <p className="text-center text-gray-500 mt-4">
-              No payment history available
-            </p>
-          )}
-
-          {paymentHistory.map((payment, index) => (
-            <div
-              key={payment._id}
-              className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
-            >
-              <div className="flex items-center space-x-5">
-                <span className="font-semibold">{index + 1}.</span>
-                <span>{payment.description || "Starting Payment"}</span>
-              </div>
-              <div className="mx-2">
-                {payment.status === "success" &&
-                  payment.release_status === "pending" && (
-                    <button
-                      onClick={() => handlePay(payment._id)}
-                      className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                    >
-                      Pay to app
-                    </button>
-                  )}
-                {payment.release_status === "release_requested" && (
-                  <span className="text-yellow-600 font-semibold">
-                    Requested for Pay
-                  </span>
-                )}
-                {payment.release_status === "released" && (
-                  <span className="text-[#228B22] font-semibold">Paid to Provider</span>
-                )}
-                {payment.release_status === "refunded" && (
-                  <span className="text-blue-600 font-semibold">Refunded</span>
-                )}
-              </div>
-              <div className="font-semibold">₹{payment.amount}</div>
-            </div>
-          ))}
-
-          {showForm && (
-            <>
-              <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
-                <span className="font-semibold">
-                  {paymentHistory.length + 1}
-                </span>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter payment description"
-                  className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                >
-                  <option value="" disabled>
-                    Select payment method
-                  </option>
-                  <option value="online">Online</option>
-                  <option value="cod">Cash on Delivery</option>
-                </select>
-              </div>
-              <div className="flex justify-end space-x-4 mt-4">
-                <button
-                  onClick={handlePaymentSubmit}
-                  className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
-    <div className="p-4 bg-white shadow-md rounded-lg">
+        )}
+      </div>
+      <div className="p-4 bg-white shadow-md rounded-lg mt-10">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>
             <tr>
-              <th className="border p-2 text-left">Amount</th>
-              <th className="border p-2 text-left">Total Paid</th>
-              <th className="border p-2 text-left">Total Tax</th>
-              <th className="border p-2 text-left">Paid to Provider</th>
+              <th className="border p-2 text-left">Description</th>
+              <th className="border p-2 text-left">Amount (₹)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
+              <td className="border p-2">Total Amount Paid</td>
               <td className="border p-2">₹{fullPaymentHistory.amount}</td>
-              <td className="border p-2">
-                ₹{fullPaymentHistory.total_expected}
-              </td>
-              <td className="border p-2">₹{fullPaymentHistory.total_tax}</td>
+            </tr>
+            <tr>
+              <td className="border p-2">Pending with App</td>
               <td className="border p-2">
                 ₹{fullPaymentHistory.remaining_amount}
               </td>
             </tr>
+            <tr>
+              <td className="border p-2">Paid to Worker</td>
+              <td className="border p-2">
+                ₹
+                {paymentHistory
+                  .filter((payment) => payment.release_status === "released")
+                  .reduce((sum, payment) => sum + payment.amount, 0)}
+              </td>
+              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
+            </tr>
           </tbody>
         </table>
       </div>
-		</>
+    </>
   );
 }

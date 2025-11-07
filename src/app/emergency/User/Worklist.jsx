@@ -137,7 +137,7 @@ export default function Worklist() {
         const mappedTasks = (response.data.data || []).map((task) => ({
           id: task._id,
           project_id: task.project_id || "N/A",
-          image: task.image_urls?.[0] || task.image || Work,
+          image: task.image_urls?.[0] || task.image_url?.[0] || Work,
           name: task.title || null,
           category_name: task.category_id?.name || "N/A",
           subcategory_name: task.sub_category_ids?.map((sub) => sub.name).join(", ") || "N/A",
@@ -149,11 +149,8 @@ export default function Worklist() {
             task.sub_category_ids?.map((sub) => sub.name).join(", ") ||
             task.skills?.join(", ") ||
             "No skills listed",
-          price: task.service_payment?.amount
-            ? `₹${task.service_payment.amount}`
-            : task.price
-            ? `₹${task.price}`
-            : "Price TBD",
+          price: task.service_payment?.amount || "Price TBD",
+          cost: task.cost || "Price TBD",
           completiondate: task.deadline
             ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
@@ -408,6 +405,7 @@ export default function Worklist() {
                     alt={task.name || "Task"}
                     className="w-full h-full object-cover"
                   />
+									{console.log("Task Image URL:", task.image)}
                   <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
                     {task.project_id}
                   </span>
@@ -451,7 +449,7 @@ export default function Worklist() {
                     {/*<p className="text-sm text-[#334247]  line-clamp-2 flex-1 pr-2">
                       {task.skills}
                     </p> */}
-										<p className="text-green-600 font-bold mt-2">{task.price}</p>
+										<p className="text-green-600 font-bold mt-2">₹{activeTab === "My Bidding" ? task.cost : task.price}</p>
                     {task.milestone.length > 0 && (
                       <button
                         onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}

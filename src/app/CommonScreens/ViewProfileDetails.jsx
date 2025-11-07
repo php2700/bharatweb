@@ -29,8 +29,15 @@ export default function ViewProfileDetails() {
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const statuslocation = useLocation();
-  const { hire_status, isHired } = statuslocation.state || {};
- console.log("ddddd", isHired);
+  const {
+    hire_status,
+    isHired,
+    isPlatformFeePaid,
+    razorPayOrderId,
+    platform_fee,
+    orderId,
+  } = statuslocation.state || {};
+  console.log("ddddd", statuslocation.state);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -177,6 +184,138 @@ export default function ViewProfileDetails() {
 
   const handleDirectHire = (serviceProviderId) => {
     navigate(`/direct-hiring/${serviceProviderId}`);
+  };
+
+  const handleHire = async (providerId) => {
+    try {
+      const assignRes = await axios.post(
+        `${BASE_URL}/emergency-order/assignEmergencyOrder/${orderId}`,
+        {
+          service_provider_id: providerId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("bharat_token")}`,
+          },
+        }
+      );
+
+      console.log("Assign Response:", assignRes.data);
+      const { razorpay_order } = assignRes.data?.data;
+      if (!razorpay_order) {
+        throw new Error("Razorpay order not received from backend");
+      }
+      // 2️⃣ Configure Razorpay checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpay_order.amount,
+        currency: "INR",
+        name: "Bharat App",
+        description: "Emergency Hiring Payment",
+        order_id: razorpay_order.id,
+        theme: { color: "#228B22" },
+
+        handler: async function (paymentResponse) {
+          try {
+            console.log(paymentResponse, "paymentres");
+            const verifyRes = await axios.post(
+              `${BASE_URL}/emergency-order/verify-platform-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "bharat_token"
+                  )}`,
+                },
+              }
+            );
+
+            console.log("Verify Response:", verifyRes.data);
+          } catch (err) {
+            console.error("Error verifying payment:", err);
+          }
+        },
+        prefill: {
+          name: "Rahul",
+          email: "rahul@example.com",
+          contact: "9999999999",
+        },
+      };
+
+      // 5️⃣ Open Razorpay payment window
+      if (window.Razorpay) {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        console.error("Razorpay SDK not loaded. Please refresh the page.");
+      }
+    } catch (err) {
+      console.error("Error during hire:", err);
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      const razorpay_order = {
+        amount: platform_fee,
+        id: razorPayOrderId,
+      };
+      if (!razorpay_order) {
+        throw new Error("Razorpay order not received from backend");
+      }
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpay_order.amount,
+        currency: "INR",
+        name: "Bharat App",
+        description: "Emergency Hiring Payment",
+        order_id: razorpay_order.id,
+        theme: { color: "#228B22" },
+
+        handler: async function (paymentResponse) {
+          try {
+            console.log(paymentResponse, "paymentres");
+            const verifyRes = await axios.post(
+              `${BASE_URL}/emergency-order/verify-platform-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem(
+                    "bharat_token"
+                  )}`,
+                },
+              }
+            );
+          } catch (err) {
+            console.error("Error verifying payment:", err);
+          }
+        },
+        prefill: {
+          name: "Rahul",
+          email: "rahul@example.com",
+          contact: "9999999999",
+        },
+      };
+
+      // 5️⃣ Open Razorpay payment window
+      if (window.Razorpay) {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        console.error("Razorpay SDK not loaded. Please refresh the page.");
+      }
+    } catch (err) {
+      console.error("Error during hire:", err);
+    }
   };
 
   // Close modal
@@ -725,6 +864,32 @@ export default function ViewProfileDetails() {
                 </button>
               </div>
             )}
+          {type === "emergency" && !isPlatformFeePaid && !isHired && (
+            <>
+              {hire_status === "pending" && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    className="w-1/2 py-4 bg-[#228B22] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+                    onClick={() => handleHire(worker._id)}
+                  >
+                    Hire
+                  </button>
+                </div>
+              )}
+
+              {hire_status === "assigned" && (
+                <div className="flex justify-center mt-6">
+                  <button
+                    className="w-1/2 py-4 bg-[#1C4ED8] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 transition"
+                    onClick={handlePayment}
+                  >
+                    Pay
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Rate & Reviews</h2>
