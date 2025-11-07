@@ -42,7 +42,7 @@ export default function ViewProfile() {
   const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
-	const [disputeInfo, setDisputeInfo] = useState(null)
+  const [disputeInfo, setDisputeInfo] = useState(null);
   const token = localStorage.getItem("bharat_token");
   //  console.log("disputeInfo", disputeInfo);
   // Fetch banner images
@@ -126,7 +126,7 @@ export default function ViewProfile() {
       setOrderData(orderResponse.data.data);
       setServiceProviders(providersResponse.data.providers || []);
       setIsHired(!!orderResponse.data.data?.service_provider_id);
-			setDisputeInfo(orderResponse.data.DisputeInfo || null)
+      setDisputeInfo(orderResponse.data.DisputeInfo || null);
     } catch (err) {
       setError("Failed to fetch data. Please try again later.");
       console.error("Error:", err);
@@ -384,10 +384,10 @@ export default function ViewProfile() {
       state: {
         hire_status: orderData?.hire_status,
         isHired,
-				isPlatformFeePaid: orderData?.platform_fee_paid,
-				razorPayOrderId: orderData?.razorOrderIdPlatform,
-				platform_fee: orderData?.platform_fee,
-				orderId: orderData?._id,
+        isPlatformFeePaid: orderData?.platform_fee_paid,
+        razorPayOrderId: orderData?.razorOrderIdPlatform,
+        platform_fee: orderData?.platform_fee,
+        orderId: orderData?._id,
       },
     });
   };
@@ -542,7 +542,7 @@ export default function ViewProfile() {
   const showRefundButton =
     orderData?.hire_status === "pending" ||
     (orderData?.hire_status === "assigned" &&
-      orderData?.service_payment?.payment_history === 0);
+      orderData?.service_payment?.payment_history.length === 0);
 
   const handleRefundRequest = async () => {
     if (!refundReason.trim()) {
@@ -708,14 +708,14 @@ export default function ViewProfile() {
       ${orderData?.hire_status === "assigned" ? "bg-[#228B22]" : ""}`}
                   >
                     {orderData?.hire_status === "cancelledDispute"
-                      ? `Cancelled ${" "} Dispute` : orderData.hire_status
+                      ? `Cancelled ${" "} Dispute`
+                      : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
-                          .join(" ")
-                      || "Unknown Status"}
+                          .join(" ") || "Unknown Status"}
                   </span>
                 </span>
                 {orderData?.refundRequest && (
@@ -802,12 +802,14 @@ export default function ViewProfile() {
                   Cancelled ({disputeInfo.unique_id || "No Id"})
                 </button>
               ) : orderData?.hire_status !== "assigned" ? (
-                <button
-                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
-                  onClick={() => setShowModal(true)}
-                >
-                  Cancel Task
-                </button>
+                <>
+                  <button
+                    className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Cancel Task
+                  </button>
+                </>
               ) : null}
 
               {/* ✅ Show Refund Button */}
@@ -983,9 +985,7 @@ export default function ViewProfile() {
 
                       <button
                         className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
-                        onClick={() =>
-                          handleRouteHire(provider._id, false)
-                        }
+                        onClick={() => handleRouteHire(provider._id, false)}
                       >
                         View Profile
                       </button>
