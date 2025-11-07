@@ -541,7 +541,7 @@ export default function ViewProfile() {
 
   const showRefundButton =
     orderData?.hire_status === "pending" ||
-    (orderData?.hire_status === "accepted" &&
+    (orderData?.hire_status === "assigned" &&
       orderData?.service_payment?.payment_history === 0);
 
   const handleRefundRequest = async () => {
