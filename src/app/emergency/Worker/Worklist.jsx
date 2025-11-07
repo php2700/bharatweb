@@ -140,7 +140,7 @@ export default function Worklist() {
             t.description ||
             "No skills listed",
           price: t.platform_fee
-            ? `₹${task.service_payment.amount}`
+            ? `₹${t.service_payment.amount}`
             : t.price
             ? `₹${t.price}`
             : "Price TBD",
