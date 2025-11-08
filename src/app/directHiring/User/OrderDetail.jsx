@@ -56,7 +56,7 @@ export default function ViewProfile() {
   const [refundReason, setRefundReason] = useState("");
   const [showChangeProvider, setShowChangeProvider] = useState(false);
   const [expandedAddresses, setExpandedAddresses] = useState({});
-	const [disputeInfo, setDisputeInfo] = useState(null)
+  const [disputeInfo, setDisputeInfo] = useState(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -210,7 +210,7 @@ export default function ViewProfile() {
       setAssignedWorker(orderResponse.data.data.assignedWorker || null);
       setServiceProviders(orderResponse.data.data.order.offer_history || []);
       setIsHired(orderResponse.data.data.order.hire_status !== "pending");
-      setDisputeInfo(orderResponse.data.data.DisputeInfo || null)
+      setDisputeInfo(orderResponse.data.data.DisputeInfo || null);
       // Initialize offer statuses and assigned provider IDs
       const initialStatuses = {};
       const providerIds = [];
@@ -1034,9 +1034,10 @@ export default function ViewProfile() {
                               .map(
                                 (word) =>
                                   word.charAt(0).toUpperCase() + word.slice(0)
-                              ) || "Unknown Provider"} <span className="text-gray-500 text-sm">
-													 ({provider.provider_id.unique_id})
-													</span>
+                              ) || "Unknown Provider"}{" "}
+                            <span className="text-gray-500 text-sm">
+                              ({provider.provider_id.unique_id})
+                            </span>
                           </p>
                           {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                             {provider.provider_id?.location?.address ||
@@ -1290,9 +1291,18 @@ export default function ViewProfile() {
                   Cancel Task
                 </button>
               ) : orderData?.hire_status === "cancelledDispute" ? (
-                <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-                  Cancelled ({disputeInfo.unique_id || "No Id"})
-                </span>
+                <>
+                  <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                    Cancelled ({disputeInfo.unique_id || "No Id"})
+                  </span>
+
+                  <p className="text-sm text-gray-700 mt-3">
+                    Note:{" "}
+                    <span className="text-red-600 font-semibold">
+                      Freezed by Platform
+                    </span>
+                  </p>
+                </>
               ) : null}
               <ReviewModal
                 show={showCompletedModal}
@@ -1364,16 +1374,17 @@ export default function ViewProfile() {
               )}
             </div>
 
-            {orderData.hire_status === "cancelled" && !orderData?.refundRequest && (
-              <div className="flex justify-center mt-3">
-                <p className="text-gray-800 text-sm font-medium text-center">
-                  Note:&nbsp;
-                  <span className="text-red-600 font-semibold">
-                    You can ask for a refund by tapping on the refund button.
-                  </span>
-                </p>
-              </div>
-            )}
+            {orderData.hire_status === "cancelled" &&
+              !orderData?.refundRequest && (
+                <div className="flex justify-center mt-3">
+                  <p className="text-gray-800 text-sm font-medium text-center">
+                    Note:&nbsp;
+                    <span className="text-red-600 font-semibold">
+                      You can ask for a refund by tapping on the refund button.
+                    </span>
+                  </p>
+                </div>
+              )}
 
             {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed" ||
@@ -1504,9 +1515,8 @@ export default function ViewProfile() {
                       />
                       <div className="flex-1">
                         <p className="text-lg font-semibold">
-                          {worker.full_name || "Unknown Worker"} <span>
-													({worker.unique_id})
-													</span>
+                          {worker.full_name || "Unknown Worker"}{" "}
+                          <span>({worker.unique_id})</span>
                         </p>
                         {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
                           {worker.location?.address || "No Address Provided"}

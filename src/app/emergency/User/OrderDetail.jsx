@@ -798,9 +798,17 @@ export default function ViewProfile() {
                   />
                 </div>
               ) : orderData?.hire_status == "cancelledDispute" ? (
-                <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled ({disputeInfo.unique_id || "No Id"})
-                </button>
+                <>
+                  <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                    Cancelled ({disputeInfo.unique_id || "No Id"})
+                  </button>
+									<p className="text-sm text-gray-700 mt-3">
+                    Note:{" "}
+                    <span className="text-red-600 font-semibold">
+                      Freezed by Platform
+                    </span>
+                  </p>
+                </>
               ) : orderData?.hire_status !== "assigned" ? (
                 <>
                   <button
@@ -818,7 +826,7 @@ export default function ViewProfile() {
                   onClick={() => setShowRefundModal(true)}
                   className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
                 >
-                  Get Refund
+                  Cancel & Get Refund
                 </button>
               )}
               {orderData?.refundRequest && (
@@ -828,6 +836,19 @@ export default function ViewProfile() {
                     : "Refunded"}
                 </button>
               )}
+              {orderData.hire_status === "assigned" &&
+                orderData?.platform_fee_paid &&
+                !orderData?.refundRequest && (
+                  <div className="flex justify-center mt-3">
+                    <p className="text-gray-800 text-sm font-medium text-center">
+                      Note:&nbsp;
+                      <span className="text-red-600 font-semibold">
+                        You can ask for a refund and cancel the project by
+                        tapping on the cancel & get refund button.
+                      </span>
+                    </p>
+                  </div>
+                )}
               {/* ✅ Refund Modal */}
               {showRefundModal && (
                 <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
@@ -874,7 +895,8 @@ export default function ViewProfile() {
                     user_id={orderData?.user_id?._id}
                   />
 
-                  {orderData?.hire_status === "assigned" && (
+                  {(orderData?.hire_status === "assigned" ||
+                  orderData?.hire_status === "completed") && (
                     <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                       <div className="relative max-w-2xl mx-auto">
                         <div className="relative z-10">
@@ -889,12 +911,13 @@ export default function ViewProfile() {
                             Warning Message
                           </h2>
                           <p className="text-gray-700 text-sm md:text-base">
-                            Lorem Ipsum is simply dummy text...
+                            Pay securely — no extra charges from the platform.
+                            Choose simple and safe transactions.
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex space-x-4">
+                      {/*<div className="flex space-x-4">
                         <button
                           className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
                           onClick={handleMarkComplete}
@@ -910,6 +933,37 @@ export default function ViewProfile() {
                           orderId={id}
                           type="emergency"
                         />
+                        <Link to={`/dispute/${id}/emergency`}>
+                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                            Cancel Task and Create Dispute
+                          </button>
+                        </Link>
+                      </div>*/}
+                      <div className="flex space-x-4">
+                        {orderData?.hire_status === "completed" ? (
+                          ""
+                        ) : (
+                          <>
+                            <button
+                              className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                              onClick={handleMarkComplete}
+                            >
+                              Mark as Complete
+                            </button>
+                            <ReviewModal
+                              show={showCompletedModal}
+                              onClose={() => {
+                                setShowCompletedModal(false);
+                                fetchData();
+                              }}
+                              service_provider_id={
+                                orderData?.service_provider_id._id
+                              }
+                              orderId={id}
+                              type="direct"
+                            />{" "}
+                          </>
+                        )}
                         <Link to={`/dispute/${id}/emergency`}>
                           <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
                             Cancel Task and Create Dispute

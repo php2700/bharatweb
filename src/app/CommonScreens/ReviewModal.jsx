@@ -15,7 +15,6 @@ export default function ReviewModal({
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [images, setImages] = useState([]);
-	console.log("immmm", images)
   // console.log("ReviewModal props:", {
   //   show,
   //   onClose,

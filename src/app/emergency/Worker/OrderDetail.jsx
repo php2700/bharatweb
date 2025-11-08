@@ -11,6 +11,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import workImage from "../../../assets/directHiring/Work.png";
+import Slider from "react-slick";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,9 +22,54 @@ export default function ViewProfile() {
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+
+  const fetchBannerImages = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data?.success) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
+          setBannerImages(response.data.images);
+        } else {
+          setBannerImages([]);
+          setBannerError("No banners available");
+        }
+      } else {
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
+        console.error("Failed to fetch banner images:", errorMessage);
+        setBannerError(errorMessage);
+      }
+    } catch (err) {
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBannerImages();
   }, []);
 
   useEffect(() => {
@@ -70,6 +116,16 @@ export default function ViewProfile() {
 
     fetchData();
   }, [id, orderData?.hire_status]);
+
+	const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+  };
 
   if (loading) {
     return (
@@ -131,10 +187,7 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-							<p>
-                  Title :-{" "}
-                  {orderData?.title || "No Title"}
-                </p>
+                <p>Title :- {orderData?.title || "No Title"}</p>
                 <span>
                   Category :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
@@ -179,14 +232,14 @@ export default function ViewProfile() {
       ${orderData?.hire_status === "assigned" ? "bg-[#228B22]" : ""}`}
                   >
                     {orderData?.hire_status === "cancelledDispute"
-                      ? `Cancelled ${" "} Dispute` : orderData.hire_status
+                      ? `Cancelled ${" "} Dispute`
+                      : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
-                          .join(" ")
-                      || "Unknown Status"}
+                          .join(" ") || "Unknown Status"}
                   </span>
                 </span>
               </div>
@@ -216,14 +269,14 @@ export default function ViewProfile() {
                   user_id={orderData?.service_provider_id?._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
-									fullPaymentHistory={orderData?.service_payment}
+                  fullPaymentHistory={orderData?.service_payment}
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
                 <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                   {/* Yellow warning box */}
-                  <div className="relative max-w-2xl mx-auto">
-                    {/* Image */}
+                  {/*<div className="relative max-w-2xl mx-auto">
+                    
                     <div className="relative z-10">
                       <img
                         src={Warning}
@@ -232,7 +285,7 @@ export default function ViewProfile() {
                       />
                     </div>
 
-                    {/* Yellow background + paragraph */}
+                   
                     <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center mb-">
                       <h2 className="text-[#FE2B2B] font-bold -mt-2">
                         Warning Message
@@ -247,11 +300,12 @@ export default function ViewProfile() {
                         electronic typesetting.
                       </p>
                     </div>
-                  </div>
+                  </div>*/}
 
                   {/* Cancel button */}
                   {(orderData?.hire_status === "assigned" ||
-                    orderData?.hire_status === "pending") && (
+                    orderData?.hire_status === "pending" ||
+                    orderData?.hire_status === "completed") && (
                     <div className="flex space-x-4">
                       {/* Red button (Cancel Task) */}
                       <Link to={`/dispute/${id}/emergency`}>
@@ -269,11 +323,34 @@ export default function ViewProfile() {
       </div>
 
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
-        <img
-          src={Gardening}
-          alt="Decorative gardening illustration"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner || "/src/assets/profile/default.png"}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/profile/default.png";
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       <Footer />

@@ -225,8 +225,10 @@ export default function Accepted({
                 <td className="border p-2">
                   ₹
                   {paymentHistory
-                    .filter((payment) => payment.release_status === "released")
-                    .reduce((sum, payment) => sum + payment.amount, 0)}
+                  .filter((p) =>
+                    ["release_requested", "released"].includes(p.release_status)
+                  )
+                  .reduce((sum, p) => sum + p.amount, 0)}
                 </td>
                 {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
               </tr>
