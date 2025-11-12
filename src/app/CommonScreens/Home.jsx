@@ -21,11 +21,12 @@ import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
 import footer from "../../assets/Homepage/footer.svg";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Home() {
   const navigate = useNavigate();
-
-
+ const { profile } = useSelector((state) => state.user);
+console.log("profile role:",profile?.role);
   // 🔹 1. If user is already logged in, redirect to home (or dashboard)
   useEffect(() => {
     const token = localStorage.getItem("bharat_token"); // change key as per your login storage

@@ -7,7 +7,8 @@ import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
- import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/workcategory/image.png";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,8 +23,8 @@ export default function WokerAcceptReject() {
   const token = localStorage.getItem("bharat_token");
 
   useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,12 +36,15 @@ export default function WokerAcceptReject() {
 
       try {
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/emergency-order/getEmergencyOrder/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${BASE_URL}/emergency-order/getEmergencyOrder/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setOrderData(response.data.data);
         setAssignedWorker(response.data.assignedWorker || null);
       } catch (err) {
@@ -56,11 +60,15 @@ export default function WokerAcceptReject() {
 
   const handleAcceptOrder = async (orderId) => {
     try {
-      const response = await axios.post(`${BASE_URL}/emergency-order/accept-order/${orderId}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/accept-order/${orderId}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       console.log("Accept response:", response.data);
-       navigate("/worker/work-list/Emergency task")
+      navigate("/worker/work-list/Emergency task");
     } catch (err) {
       console.error("Accept error:", err);
       setError(err.message);
@@ -73,11 +81,15 @@ export default function WokerAcceptReject() {
 
   const handleConfirmReject = async (orderId) => {
     try {
-      const response = await axios.post(`${BASE_URL}/emergency-order/reject-order/${orderId}`, null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/reject-order/${orderId}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       console.log("Reject response:", response.data);
-      navigate("/emergency/worker/work-list")
+      navigate("/emergency/worker/work-list");
       setShowModal(false); // Close modal after rejection
     } catch (err) {
       console.error("Reject error:", err);
@@ -146,11 +158,25 @@ export default function WokerAcceptReject() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <div>Category: {orderData?.category_id?.name || "Unknown Category"}</div>
+							<div>
+                  Title: {orderData?.title || "Unknown title"}
+                </div>
                 <div>
-                  Address: {orderData?.detailed_address || "No Address Provided"}
-                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm mt-2">
-                    Location: {orderData?.google_address || "Unknown Location"}
+                  Description: {orderData?.description || "No Description Provided"}
+                </div>
+                <div>
+                  Category: {orderData?.category_id?.name || "Unknown Category"}
+                </div>
+                <div>
+                  <div className="flex items-start gap-2 text-gray-700 mt-2">
+                    <FaMapMarkerAlt
+                      size={16}
+                      color="#228B22"
+                      className="mt-1"
+                    />
+                    <span className="bg-gray-100 px-3 py-1 rounded-lg text-sm break-words">
+                      {orderData?.google_address || "Unknown Location"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -159,22 +185,48 @@ export default function WokerAcceptReject() {
                   {orderData?.project_id || "#N/A"}
                 </span>
                 <span className="text-gray-600 font-semibold block">
-                  Posted: {orderData?.createdAt ? new Date(orderData.createdAt).toLocaleDateString() : "N/A"}
+                  Posted:{" "}
+                  {orderData?.createdAt
+                    ? new Date(orderData.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </span>
                 <span className="text-gray-600 font-semibold block">
                   Status:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
-                      ${orderData?.hire_status === "cancelled" ? "bg-red-500" : ""}
-                      ${orderData?.hire_status === "completed" ? "bg-green-500" : ""}
-                      ${orderData?.hire_status === "cancelldispute" ? "bg-orange-500" : ""}
-                      ${orderData?.hire_status === "assigned" ? "bg-blue-500" : ""}`}
+                      ${
+                        orderData?.hire_status === "pending"
+                          ? "bg-yellow-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "cancelled"
+                          ? "bg-red-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "completed"
+                          ? "bg-green-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "cancelldispute"
+                          ? "bg-orange-500"
+                          : ""
+                      }
+                      ${
+                        orderData?.hire_status === "assigned"
+                          ? "bg-green-500"
+                          : ""
+                      }`}
                   >
                     {orderData?.hire_status
                       ? orderData.hire_status
                           .split(" ")
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
                           .join(" ")
                       : "Unknown Status"}
                   </span>
@@ -184,7 +236,9 @@ export default function WokerAcceptReject() {
 
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700">
-                {orderData?.sub_category_ids?.map((sub) => sub.name).join(", ") || "No details available."}
+                {orderData?.sub_category_ids
+                  ?.map((sub) => sub.name)
+                  .join(", ") || "No details available."}
               </p>
             </div>
 

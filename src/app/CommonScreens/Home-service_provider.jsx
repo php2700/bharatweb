@@ -104,7 +104,7 @@ export default function ServiceProviderHome() {
               description:
                 item.description ||
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-              amount: item.platform_fee || "₹200",
+              amount: item.service_payment.amount || "0",
               location: item.address || "Indore M.P.",
             }))
           );
@@ -154,7 +154,7 @@ export default function ServiceProviderHome() {
               description:
                 item.description ||
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-              amount: item.platform_fee || "₹200",
+              amount: item.cost || "0",
               location: item.address || "Indore M.P.",
             }))
           );
@@ -204,7 +204,7 @@ export default function ServiceProviderHome() {
               work: item.title || "Emergency task",
 
               description: item.description || "No description",
-              amount: item.platform_fee || "₹200",
+              amount: item.service_payment.amount || "0",
               location: item.google_address || "Indore M.P.",
             }))
           );
@@ -518,9 +518,9 @@ export default function ServiceProviderHome() {
                         <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">
                           {capitalizeFirst(card.work)}
                         </h3>
-                       {/* <p className="text-black font-medium max-md:text-sm">
+                        <p className="text-black font-medium max-md:text-sm">
                           ₹{card.amount}
-                        </p> */}
+                        </p> 
                       </div>
                       <p className="text-gray-600 max-w-[87%] text-xs mt-1">
                         {capitalizeFirst(card.description)}
@@ -602,7 +602,7 @@ export default function ServiceProviderHome() {
                           {capitalizeFirst(card.work)}
                         </h3>
                         <p className="text-black font-medium max-md:text-sm">
-                          {card.amount}
+                          ₹{card.amount}
                         </p>
                       </div>
                       <p className="text-gray-600 max-w-[87%] text-xs mt-1">
@@ -648,7 +648,6 @@ export default function ServiceProviderHome() {
                     </button>
                   )}
                 </div>
-  {console.log("ememememe", visibleEmergency)}
                 {emergencyLoading ? (
                   <p className="text-gray-500 text-center">
                     Loading emergency tasks...
@@ -681,9 +680,9 @@ export default function ServiceProviderHome() {
                           <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">
                             {capitalizeFirst(card.work)}
                           </h3>
-                          <p className="text-black font-medium max-md:text-sm">
-                            {card.amount}
-                          </p>
+                          {/*<p className="text-black font-medium max-md:text-sm">
+                            ₹{card.amount}
+                          </p>*/}
                         </div>
                         <p className="text-gray-600 max-w-[87%] text-xs mt-1">
                           {capitalizeFirst(card.description)}

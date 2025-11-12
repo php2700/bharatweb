@@ -17,7 +17,6 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
-  const role = localStorage.getItem("role");
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -62,11 +61,24 @@ export default function Header() {
   const { notifications: reduxNotifications } = useSelector(
     (state) => state.emergency
   );
+// const role = localStorage.getItem("role");
+	const role = profile?.role || "service_provider";
 
-  let homeLink = "/";
-  if (isLoggedIn) {
-    homeLink = role === "service_provider" ? "/homeservice" : "/homeuser";
+  // let homeLink = "/";
+  // if (isLoggedIn) {
+  //   homeLink = role === "service_provider" ? "/homeservice" : "/homeuser";
+  // }
+
+let homeLink = "/";
+
+if (isLoggedIn) {
+  if (role === "both" || role === "service_provider") {
+    homeLink = "/homeservice";
+  } else if (role === "user") {
+    homeLink = "/homeuser";
   }
+}
+
 
   const handleUnauthorized = async () => {
     try {

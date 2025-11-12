@@ -11,6 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import defaultBanner from "../../../assets/profile/banner.png";
 import defaultWorkImage from "../../../assets/directHiring/Work.png";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function EmergencyTasks() {
   const [activeTab, setActiveTab] = useState("Emergency Tasks");
@@ -30,24 +31,31 @@ export default function EmergencyTasks() {
         throw new Error("No authentication token found");
       }
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log("Banner API response:", response.data); // Debug response
 
       if (response.data?.success) {
-        if (Array.isArray(response.data.images) && response.data.images.length > 0) {
+        if (
+          Array.isArray(response.data.images) &&
+          response.data.images.length > 0
+        ) {
           setBannerImages(response.data.images);
         } else {
           setBannerImages([]);
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = response.data?.message || "Failed to fetch banner images";
+        const errorMessage =
+          response.data?.message || "Failed to fetch banner images";
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -88,7 +96,9 @@ export default function EmergencyTasks() {
 
         if (!response.ok) {
           // Handle non-200 responses
-          throw new Error(data.message || `API request failed with status ${response.status}`);
+          throw new Error(
+            data.message || `API request failed with status ${response.status}`
+          );
         }
 
         // console.log("Fetched tasks:", data);
@@ -110,7 +120,9 @@ export default function EmergencyTasks() {
         setError(null);
       } catch (error) {
         console.error("Error fetching tasks:", error.message);
-        setError(error.message || "Failed to load tasks. Please try again later.");
+        setError(
+          error.message || "Failed to load tasks. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -244,11 +256,15 @@ export default function EmergencyTasks() {
                       </p>
                     </div>
                     <div className="flex justify-between items-center mt-4">
-                      <span className="bg-[#F27773] text-white py-1 px-6 rounded-full">
-                        {task.location}
-                      </span>
+                      {/* Left side: icon + location */}
+                      <div className="flex items-center space-x-2">
+                        <FaMapMarkerAlt size={22} color="#228B22" />
+                        <span className="text-gray-700">{task.location}</span>
+                      </div>
+
+                      {/* Right side: button */}
                       <button
-                        className="text-[#228B22] py-1 px-7 border border-[#228B22] rounded-lg"
+                        className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
                         onClick={() => navigate(`/emergency/worker/${task.id}`)}
                       >
                         View Details

@@ -49,9 +49,21 @@ export default function OtpVerification() {
 
         localStorage.removeItem("mobileNumber");
         
-        setTimeout(() => {
-          navigate("/select-role");
-        }, 2000);
+        // setTimeout(() => {
+        //   navigate("/select-role");
+        // }, 2000);
+
+				setTimeout(() => {
+    if (data.role === "both") {
+      navigate("/homeservice");
+    } else if (data.role === "service_provider") {
+      navigate("/homeservice");
+    } else if (data.role === "user") {
+      navigate("/homeuser");
+    } else {
+      navigate("/select-role"); // fallback
+    }
+  }, 2000);
       } else {
         toast.error(data.message || "OTP verification failed");
       }

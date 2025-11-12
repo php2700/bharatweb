@@ -46,8 +46,6 @@ export default function Details() {
     return profile?.userId || localStorage.getItem("userId") || "default";
   };
 
-
-
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -105,6 +103,7 @@ export default function Details() {
     }
   }, [loading, profile, savedRole, selectedRole, dispatch, navigate]);
 
+
   useEffect(() => {
     if (
       activeTab !== "Worker" ||
@@ -124,7 +123,7 @@ export default function Details() {
   let address = "N/A";
   let images = "";
   let skill = "Not Available";
-	let aboutus = "Not Available";
+  let aboutus = "Not Available";
   let category_name = "Not Available";
   let subcategory_names = "Not Available";
   let documents = [];
@@ -142,11 +141,11 @@ export default function Details() {
   let emergencySubcategory_names = [];
   let isProfileComplete = false;
   let isShop = false;
-	let phone = "N/A";
+  let phone = "N/A";
   let rating = "N/A";
   let referral_code = "N/A";
   let isEmergencyOn = false;
-console.log("Profile Object:", profile); // Debugging line
+  console.log("Profile Object:", profile); // Debugging line
   if (profile) {
     full_name = profile.full_name || "Not Available";
     images = profile.profilePic || "Not Available";
@@ -161,7 +160,7 @@ console.log("Profile Object:", profile); // Debugging line
     businessAddress = profile.businessAddress || null;
     businessImage = profile.businessImage || [];
     customerReview = profile.customerReview || [];
-		phone = profile.phone || "N/A";
+    phone = profile.phone || "N/A";
     emergencySubcategory_names = profile.emergencySubcategory_names || [];
     isProfileComplete = profile.isProfileComplete || false;
     isShop = profile.isShop || false;
@@ -183,7 +182,7 @@ console.log("Profile Object:", profile); // Debugging line
     gender = profile.gender || "N/A";
   }
   const testimage = images && images !== "Not Available";
-    const handleSwitchToWorker = () => {
+  const handleSwitchToWorker = () => {
     if (!profile) return;
 
     const userId = getUserId();

@@ -1,20 +1,23 @@
 /* eslint-disable react/no-unescaped-entities */
 import Logo from "../assets/logo.svg";
 import { Link, useNavigate } from "react-router-dom";
-
 // import social icons (make sure these are SVGs or PNGs)
 import Whatsapp from "../assets/whatsapp.svg";
 import Facebook from "../assets/facebook.svg";
 import Instagram from "../assets/instagram.svg";
 import Twitter from "../assets/twitter.svg";
+import { useSelector } from "react-redux";
 
 export default function Footer() {
+	const { profile } = useSelector((state) => state.user);
   const navigate=useNavigate();
-  const role = localStorage.getItem("role");
+  // const role = localStorage.getItem("role");
+
+	const role = profile?.role;
 
   // Decide route based on role
   let homeLink;
-  if (role === "service_provider") {
+  if (role === "both" || role === "service_provider") {
     homeLink = "/homeservice";
   } else if (role === "user") {
     homeLink = "/homeuser";

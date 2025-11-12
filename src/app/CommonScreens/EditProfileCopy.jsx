@@ -195,7 +195,7 @@ export default function EditProfile() {
 		}
 	}, [dispatch]);
 
-	console.log("EditProfile Rendered: ", profile);
+	// console.log("EditProfile Rendered: ", profile);
 
 	useEffect(() => {
 		if (profile) {

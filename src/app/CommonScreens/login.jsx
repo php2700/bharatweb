@@ -29,9 +29,11 @@ export default function LoginPage() {
       const role = localStorage.getItem("role");
       if (role == "user") {
         navigate("/homeuser");
-      } else {
+      } else if (role == "both") {
         navigate("/homeservice");
-      }
+      } else {
+				navigate("/homeservice");
+			}
     }
   }, [navigate]);
 

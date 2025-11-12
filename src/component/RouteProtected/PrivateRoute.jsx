@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRoute = ({ element: Component }) => {
@@ -6,7 +7,8 @@ const PrivateRoute = ({ element: Component }) => {
   const role = localStorage.getItem("role"); // "service_provider" | "user" | null
   const isProfileComplete = localStorage.getItem("isProfileComplete"); // "true" / "false"
   const location = useLocation();
-
+const { profile } = useSelector((state) => state.user);
+const userRole = profile?.role;
   // 1. Token nahi hai toh login
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -30,14 +32,14 @@ const PrivateRoute = ({ element: Component }) => {
   }
 
   // 4. Role ke hisaab se redirect
-  if (token && role === "service_provider" &&isProfileComplete === "true") {
+  if (token && (userRole === "both" || userRole === "service_provider") && isProfileComplete === "true") {
     if (location.pathname === "/homeservice") {
       return <>{Component}</>;
     }
     return <Navigate to="/homeservice" replace />;
   }
 
-  if (token && role === "user" && isProfileComplete === "true") {
+  if (token && userRole === "user" && isProfileComplete === "true") {
     if (location.pathname === "/homeuser") {
       return <>{Component}</>;
     }
