@@ -180,14 +180,15 @@ export default function Worklist() {
   const filteredTasks = taskData.filter((task) => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
-
+    //  console.log("Searching for:", task);
     return (
       (task.name?.toLowerCase().includes(q) ?? false) ||
       (task.category_name?.toLowerCase().includes(q) ?? false) ||
       (task.subcategory_name?.toLowerCase().includes(q) ?? false) ||
       (task.description?.toLowerCase().includes(q) ?? false) ||
       (task.skills?.toLowerCase().includes(q) ?? false) ||
-      (task.location?.toLowerCase().includes(q) ?? false)
+      (task.location?.toLowerCase().includes(q) ?? false) ||
+			(task.project_id?.toLowerCase().includes(q) ?? false)
     );
   });
 
@@ -372,7 +373,7 @@ export default function Worklist() {
             />
             <input
               type="search"
-              placeholder="Search by title, category, subcategory, description, skills, or location..."
+              placeholder="Search by Project Id, title, category, subcategory, description, skills, or location..."
               value={searchQuery}
               onChange={handleSearchChange}
               className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm"
