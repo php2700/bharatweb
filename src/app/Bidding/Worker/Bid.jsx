@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import Footer from "../../../component/footer"; // Fixed typo in import (footer to Footer)
-import Header from "../../../component/Header"; // Fixed typo in import (Header to Header)
+import Footer from "../../../component/footer";
+import Header from "../../../component/Header";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BidModal from "./BidModel"; // Fixed typo in import (BidModel to BidModal)
-import EditBidModal from "./EditBidModel"; // Fixed typo in import (EditBidModel to EditBidModal)
+import BidModal from "./BidModel";
+import EditBidModal from "./EditBidModel";
 import cancel from "../../../assets/bidding/cancel.png";
 import warningIcon from "../../../assets/ViewProfile/warning.svg";
 import Slider from "react-slick";
@@ -22,20 +22,19 @@ export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
-	const bidding_offer_id = localStorage.getItem("bidding_offer_id");
+  const bidding_offer_id = localStorage.getItem("bidding_offer_id");
 
   // Modal States
-  const [isBidModal, setIsBidModal] = useState(false); // Fixed typo (isBidModel to isBidModal)
-  const [isEditBidModal, setIsEditBidModal] = useState(false); // Fixed typo (isEditBidModel to isEditBidModal)
+  const [isBidModal, setIsBidModal] = useState(false);
+  const [isEditBidModal, setIsEditBidModal] = useState(false);
 
   // Data States
   const [data, setData] = useState(null);
   const [worker, setWorker] = useState(null);
 
-  // Bid States
-  const [bidPlaced, setBidPlaced] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
-  const [bidDescription, setBidDescription] = useState("");
+  // Existing Bid (fetched from API)
+  const [existingBid, setExistingBid] = useState(null); // { _id, amount, description }
+  const [bidLoading, setBidLoading] = useState(false);
 
   // Offer / Negotiation
   const [offer, setOffer] = useState("");
@@ -49,7 +48,7 @@ export default function Bid() {
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
 
-  // Slider settings for banner carousel
+  // Slider settings
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -92,7 +91,7 @@ export default function Bid() {
 
     fetchBannerImages();
     window.scrollTo(0, 0);
-  }, [BASE_URL]); // Added BASE_URL to dependency array
+  }, [BASE_URL]);
 
   // Fetch Work Details
   useEffect(() => {
@@ -122,18 +121,18 @@ export default function Bid() {
           workName: result.title,
           location: result.address,
           status: result.status,
-          image: result.image_url || ["d"], // Use image_url array
+          image: result.image_url || ["d"],
           amount: result.cost,
           platform_fee_paid: result.platform_fee_paid,
           date: result.createdAt,
           completionDate: result.deadline,
           skills: result.description,
-          service_provider_id: result.service_provider_id, // Use correct field name
-          user_id: result.user_id, // Use correct field name
+          service_provider_id: result.service_provider_id,
+          user_id: result.user_id,
           category_id: result.category_id || null,
           sub_category_ids: result.sub_category_ids || [],
           hire_status: result.hire_status,
-          service_payment: result.service_payment, // Add service_payment
+          service_payment: result.service_payment,
         });
       } catch (err) {
         console.error("Fetch Work Details Error:", err);
@@ -146,6 +145,41 @@ export default function Bid() {
     fetchWorkDetails();
   }, [id, BASE_URL]);
 
+  // Fetch Existing Bid (Only if provider has placed one)
+  useEffect(() => {
+    const fetchExistingBid = async () => {
+      if (!worker?.order_id || !service_provider) return;
+
+      try {
+        setBidLoading(true);
+        const token = localStorage.getItem("bharat_token");
+        const res = await axios.get(
+          `${BASE_URL}/bidding-order/getBiddingOfferByOrder/${worker.order_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+       console.log("Existing Bid Response:", res.data);
+        if (res.data?.status && res.data.data) {
+          setExistingBid(res.data.data);
+        } else {
+          setExistingBid(null);
+        }
+      } catch (err) {
+        console.error("Fetch existing bid error:", err);
+        setExistingBid(null);
+      } finally {
+        setBidLoading(false);
+      }
+    };
+
+    fetchExistingBid();
+  }, [worker?.order_id, service_provider, BASE_URL]);
+
+  // Fetch Negotiation
   useEffect(() => {
     const fetchNegotiation = async () => {
       try {
@@ -164,20 +198,15 @@ export default function Bid() {
         );
 
         const result = await res.json();
-        console.log("Fetch Negotiation Result:", result);
-
         if (result) {
-          // ✅ Negotiation found
           setData(result);
         } else {
-          // ⚠️ No negotiation found — still open the component
-          console.warn("No negotiation found");
           setData(null);
         }
       } catch (err) {
         console.error("Fetch Negotiation Error:", err);
         setError(err.message || "Failed to fetch negotiation data");
-        setData(null); // Ensure UI still renders even if an error occurs
+        setData(null);
       }
     };
 
@@ -187,22 +216,12 @@ export default function Bid() {
   // Handle Negotiation
   const handleNegotiation = async (offerAmount) => {
     if (!offerAmount || isNaN(offerAmount) || offerAmount <= 0) {
-      toast.error("Please enter a valid offer amount ❗");
+      toast.error("Please enter a valid offer amount");
       return;
     }
 
     try {
       const token = localStorage.getItem("bharat_token");
-			console.log("worker", worker)
-			console.log("payload", {
-          order_id: worker?.order_id,
-          bidding_offer_id,
-          service_provider,
-          user: worker?.user_id?._id,
-          initiator: "service_provider",
-          offer_amount: Number(offerAmount),
-          message: `Can you do it for ${offerAmount}?`,
-        }, )
       const response = await axios.post(
         `${BASE_URL}/negotiations/start`,
         {
@@ -222,39 +241,34 @@ export default function Bid() {
         }
       );
 
-
-
-      if (response.status == 201) {
+      if (response.status === 201) {
         setOffer("");
         toast.success(`You sent ₹${offerAmount} for negotiation`);
       } else {
-        toast.error(response.data.message || "Something went wrong ❌");
+        toast.error(response.data.message || "Something went wrong");
       }
     } catch (error) {
-      console.error("Negotiation API Error:", error);
-      toast.error("Failed to start negotiation ❌");
+        console.error("Negotiation API Error:", error);
+        toast.error("Failed to start negotiation");
     }
   };
 
-  // Handle Bid Success
-  const handleBidSuccess = (amount, description) => {
-    setBidPlaced(true);
-    setBidAmount(amount);
-    setBidDescription(description);
+  // Handle Bid Success (New Bid)
+  const handleBidSuccess = (amount, description, duration, bidId) => {
+    setExistingBid({ bid_amount:amount, message: description, duration: duration, _id: bidId });
     setIsBidModal(false);
   };
 
   // Handle Edit Bid Success
-  const handleEditBidSuccess = (amount, description) => {
-    setBidAmount(amount);
-    setBidDescription(description);
+  const handleEditBidSuccess = (newAmount, newDesc, newDuration) => {
+    setExistingBid((prev) => ({ ...prev, bid_amount: newAmount, message: newDesc, duration: newDuration }));
     setIsEditBidModal(false);
   };
 
   // Handle Accept Negotiation
   const handleAcceptNegotiation = async (id, role) => {
     if (!id) {
-      toast.error("Negotiation ID is missing ❗");
+      toast.error("Negotiation ID is missing");
       return;
     }
 
@@ -272,13 +286,13 @@ export default function Bid() {
       );
 
       if (response.data.success) {
-        toast.success("You accepted the negotiation ✅");
+        toast.success("You accepted the negotiation");
       } else {
-        toast.error(response.data.message || "Something went wrong ❌");
+        toast.error(response.data.message || "Something went wrong");
       }
     } catch (error) {
       console.error("Accept Negotiation API Error:", error);
-      toast.error("Failed to accept negotiation ❌");
+      toast.error("Failed to accept negotiation");
     }
   };
 
@@ -394,17 +408,20 @@ export default function Bid() {
                   </span>
                 </div>
               </div>
-               <p className="font-semibold">
-              Category: {worker?.category_id?.name}
-            </p>
-						<p className="font-semibold">
-              SubCategory: {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
-            </p>
+
+              <p className="font-semibold">
+                Category: {worker?.category_id?.name}
+              </p>
+              <p className="font-semibold">
+                SubCategory: {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+              </p>
+
               <h3 className="text-lg font-semibold">Task Details</h3>
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{worker.skills || "No description available"}</p>
               </div>
 
+              {/* BID / EDIT BID BUTTONS */}
               <div className="flex justify-center gap-6">
                 {worker.hire_status === "cancelled" && (
                   <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
@@ -412,36 +429,55 @@ export default function Bid() {
                     Cancelled Task By User
                   </div>
                 )}
-								{worker.hire_status === "completed" && (
+                {worker.hire_status === "completed" && (
                   <div className="flex items-center justify-center gap-2 bg-[#228B22] text-white px-6 py-3 rounded-lg font-medium">
                     <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
-                    Task Completed
-                  </span>
+                      Task Completed
+                    </span>
                   </div>
                 )}
-								{worker.hire_status === "cancelledDispute" && (
+                {worker.hire_status === "cancelledDispute" && (
                   <div className="flex items-center justify-center gap-2 bg-[#FF8C00] text-white px-6 py-3 rounded-lg font-medium">
-                   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-                  Cancelled (Dispute)
-                </span>
+                    <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                      Cancelled (Dispute)
+                    </span>
                   </div>
                 )}
 
+                {/* PENDING: Show Bid or Edit Bid */}
                 {worker.hire_status === "pending" && (
-                  <button
-                    onClick={() =>
-                      setIsBidModal(!bidPlaced ? true : false) ||
-                      setIsEditBidModal(bidPlaced ? true : false)
-                    }
-                    className="text-lg font-semibold text-white text-center py-2 px-4 rounded-lg w-1/4 mx-auto bg-[#008000] hover:bg-green-700"
-                  >
-                    {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
-                  </button>
+                  <>
+                    {/* No bid yet */}
+                    {!bidLoading && !existingBid && (
+                      <button
+                        onClick={() => setIsBidModal(true)}
+                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                      >
+                        Bid
+                      </button>
+                    )}
+
+                    {/* Bid exists */}
+                    {!bidLoading && existingBid && (
+                      <button
+                        onClick={() => setIsEditBidModal(true)}
+                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                      >
+                        Edit Bid: (₹{existingBid.bid_amount})
+                      </button>
+                    )}
+
+                    {/* Loading */}
+                    {bidLoading && (
+                      <div className="text-gray-600">Checking your bid…</div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           )}
 
+          {/* Offer / Negotiate Section */}
           {worker?.hire_status === "pending" && (
             <div className="flex flex-col items-center p-6">
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
@@ -497,6 +533,8 @@ export default function Bid() {
             </div>
           )}
         </div>
+
+        {/* Accepted Section */}
         {(worker?.hire_status === "accepted" ||
           worker?.hire_status === "completed" ||
           worker?.hire_status === "cancelledDispute") &&
@@ -506,12 +544,14 @@ export default function Bid() {
               user_id={worker?.service_provider_id?._id}
               assignedWorker={assignedWorker}
               paymentHistory={worker?.service_payment?.payment_history}
+							fullPaymentHistory={worker?.service_payment}
               orderId={id}
               hireStatus={worker?.hire_status}
             />
           )}
       </div>
 
+      {/* Warning Section */}
       {worker?.hire_status === "accepted" && worker?.platform_fee_paid && (
         <div className="flex flex-col items-center justify-center space-y-6 mt-6">
           <div className="relative max-w-2xl mx-auto">
@@ -541,6 +581,7 @@ export default function Bid() {
         </div>
       )}
 
+      {/* Banner Slider */}
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -559,7 +600,7 @@ export default function Bid() {
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = hisWorkImg; // Use existing placeholder image
+                    e.target.src = hisWorkImg;
                   }}
                 />
               </div>
@@ -574,7 +615,7 @@ export default function Bid() {
 
       <Footer />
 
-      {/* Bid Modal */}
+      {/* Modals */}
       {isBidModal && (
         <BidModal
           isOpen={isBidModal}
@@ -584,14 +625,15 @@ export default function Bid() {
         />
       )}
 
-      {/* Edit Bid Modal */}
-      {isEditBidModal && (
+      {isEditBidModal && existingBid && (
         <EditBidModal
           isOpen={isEditBidModal}
           onClose={() => setIsEditBidModal(false)}
           orderId={worker?._id}
-          initialAmount={bidAmount}
-          initialDuration={bidDescription}
+          initialAmount={existingBid.bid_amount}
+          initialDuration={existingBid.duration}
+					initialDescription={existingBid.message}
+          bidId={existingBid._id}
           onEditSuccess={handleEditBidSuccess}
         />
       )}

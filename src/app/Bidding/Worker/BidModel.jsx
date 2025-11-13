@@ -8,6 +8,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+	const [duration, setDuration] = useState("");
 
   if (!isOpen) return null;
 
@@ -19,7 +20,7 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
     const payload = {
       order_id: orderId,
       bid_amount: amount,
-      duration: " ",
+      duration: duration,
       message: description,
     };
 
@@ -40,7 +41,7 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
       if (response.ok) {
         toast.success("Bid placed successfully ✅");
 				localStorage.setItem("bidding_offer_id", data?.data?._id);
-        onBidSuccess(amount, description);
+        onBidSuccess(amount, description, duration);
         onClose();
       } else {
         toast.error(data.message || "Failed to place bid ❌");
@@ -87,7 +88,17 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
               required
             />
           </div>
-
+					<div className="text-left">
+            <label className="block font-medium mb-1">Duration</label>
+            <input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
+              required
+            />
+          </div>
+         
           <div className="flex w-1/2 mx-auto justify-center gap-4 mt-6">
             <button
               type="submit"

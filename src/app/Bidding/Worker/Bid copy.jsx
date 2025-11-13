@@ -1,21 +1,32 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import Footer from "../../../component/footer";
-import Header from "../../../component/Header";
+import { Link, useParams } from "react-router-dom";
+import Footer from "../../../component/footer"; // Fixed typo in import (footer to Footer)
+import Header from "../../../component/Header"; // Fixed typo in import (Header to Header)
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BidModal from "./BidModel";
-import EditBidModal from "./EditBidModel";
+import BidModal from "./BidModel"; // Fixed typo in import (BidModel to BidModal)
+import EditBidModal from "./EditBidModel"; // Fixed typo in import (EditBidModel to EditBidModal)
 import cancel from "../../../assets/bidding/cancel.png";
+import warningIcon from "../../../assets/ViewProfile/warning.svg";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import axios from "axios";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import Accepted from "./Accepted";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 export default function Bid() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
+	const bidding_offer_id = localStorage.getItem("bidding_offer_id");
+
   // Modal States
-  const [isBidModel, setIsBidModel] = useState(false);
-  const [isEditBidModel, setIsEditBidModel] = useState(false);
+  const [isBidModal, setIsBidModal] = useState(false); // Fixed typo (isBidModel to isBidModal)
+  const [isEditBidModal, setIsEditBidModal] = useState(false); // Fixed typo (isEditBidModel to isEditBidModal)
 
   // Data States
   const [data, setData] = useState(null);
@@ -33,20 +44,33 @@ export default function Bid() {
   // Loading / Error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(true);
+  const [bannerError, setBannerError] = useState(null);
+  const [assignedWorker, setAssignedWorker] = useState(null);
+
+  // Slider settings for banner carousel
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
+  // Fetch banner images
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  // Fetch Work Details
-  useEffect(() => {
-    const fetchWorkDetails = async () => {
+    const fetchBannerImages = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
-        if (!token) throw new Error("Token not found");
+        if (!token) throw new Error("No authentication token found");
 
-        const response = await fetch(
-          `${BASE_URL}/bidding-order/getBiddingOrderById/${id}`,
+        const response = await axios.get(
+          `${BASE_URL}/banner/getAllBannerImages`,
           {
-            method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -54,35 +78,67 @@ export default function Bid() {
           }
         );
 
-        if (!response.ok) throw new Error("Failed to fetch work details");
-
-        const result = await response.json();
-        const data = result.data;
-        //  console.log("Fetched Work Details:", data); // Debug log
-        setWorker({
-          _id: data._id,
-          order_id: data._id,
-          project_id: data.project_id,
-          workName: data.title,
-          location: data.address,
-          status: data.status,
-          image: "d",
-          amount: data.cost,
-          date: data.createdAt,
-          completionDate: data.deadline,
-          skills: data.description,
-          service_provider: data.service_provider,
-          user: data.user_id._id,
-          category_id: data.category_id || null, // ✅ ensure available
-          sub_category_ids: data.sub_category_ids || [], // ✅ correct naming
-          hire_status: data.hire_status, // ✅ ensure available
-        });
-        // console.log(data.sub_category_ids);
-
-        setLoading(false);
+        if (response.data?.success && Array.isArray(response.data.images)) {
+          setBannerImages(response.data.images);
+        } else {
+          setBannerError("No banners available");
+        }
       } catch (err) {
-        console.error(err);
-        setError(err.message);
+        setBannerError(err.message || "Failed to fetch banner images");
+      } finally {
+        setBannerLoading(false);
+      }
+    };
+
+    fetchBannerImages();
+    window.scrollTo(0, 0);
+  }, [BASE_URL]); // Added BASE_URL to dependency array
+
+  // Fetch Work Details
+  useEffect(() => {
+    const fetchWorkDetails = async () => {
+      try {
+        const token = localStorage.getItem("bharat_token");
+        if (!token) throw new Error("Token not found");
+
+        const response = await axios.get(
+          `${BASE_URL}/bidding-order/getBiddingOrderById/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setAssignedWorker(response.data.assignedWorker || null);
+        if (!response.data?.status)
+          throw new Error("Failed to fetch work details");
+
+        const result = response.data.data;
+        setWorker({
+          _id: result._id,
+          order_id: result._id,
+          project_id: result.project_id,
+          workName: result.title,
+          location: result.address,
+          status: result.status,
+          image: result.image_url || ["d"], // Use image_url array
+          amount: result.cost,
+          platform_fee_paid: result.platform_fee_paid,
+          date: result.createdAt,
+          completionDate: result.deadline,
+          skills: result.description,
+          service_provider_id: result.service_provider_id, // Use correct field name
+          user_id: result.user_id, // Use correct field name
+          category_id: result.category_id || null,
+          sub_category_ids: result.sub_category_ids || [],
+          hire_status: result.hire_status,
+          service_payment: result.service_payment, // Add service_payment
+        });
+      } catch (err) {
+        console.error("Fetch Work Details Error:", err);
+        setError(err.message || "Failed to fetch work details");
+      } finally {
         setLoading(false);
       }
     };
@@ -90,13 +146,12 @@ export default function Bid() {
     fetchWorkDetails();
   }, [id, BASE_URL]);
 
-  // Fetch Latest Negotiation
   useEffect(() => {
-    const token = localStorage.getItem("bharat_token");
-    if (!worker?.order_id || !token) return;
-
     const fetchNegotiation = async () => {
       try {
+        const token = localStorage.getItem("bharat_token");
+        if (!worker?.order_id || !token) return;
+
         const res = await fetch(
           `${BASE_URL}/negotiations/getLatestNegotiation/${worker.order_id}/service_provider`,
           {
@@ -109,11 +164,20 @@ export default function Bid() {
         );
 
         const result = await res.json();
-        // console.log("Fetched Negotiation Data:", result); // Debug log
-        setData(result);
+        console.log("Fetch Negotiation Result:", result);
+
+        if (result) {
+          // ✅ Negotiation found
+          setData(result);
+        } else {
+          // ⚠️ No negotiation found — still open the component
+          console.warn("No negotiation found");
+          setData(null);
+        }
       } catch (err) {
-        console.error(err);
-        setError(err.message);
+        console.error("Fetch Negotiation Error:", err);
+        setError(err.message || "Failed to fetch negotiation data");
+        setData(null); // Ensure UI still renders even if an error occurs
       }
     };
 
@@ -121,42 +185,53 @@ export default function Bid() {
   }, [worker, BASE_URL]);
 
   // Handle Negotiation
-  const handleNegotiation = async (offer) => {
-    const token = localStorage.getItem("bharat_token");
-    if (!offer) {
-      toast.error("Please enter offer amount ❗");
+  const handleNegotiation = async (offerAmount) => {
+    if (!offerAmount || isNaN(offerAmount) || offerAmount <= 0) {
+      toast.error("Please enter a valid offer amount ❗");
       return;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/negotiations/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      const token = localStorage.getItem("bharat_token");
+			console.log("worker", worker)
+			console.log("payload", {
           order_id: worker?.order_id,
-          bidding_offer_id: data?._id,
-          service_provider: service_provider,
-          user: worker?.user,
+          bidding_offer_id,
+          service_provider,
+          user: worker?.user_id?._id,
           initiator: "service_provider",
-          offer_amount: Number(offer),
-          message: `Can you do it for ${offer}?`,
-        }),
-      });
+          offer_amount: Number(offerAmount),
+          message: `Can you do it for ${offerAmount}?`,
+        }, )
+      const response = await axios.post(
+        `${BASE_URL}/negotiations/start`,
+        {
+          order_id: worker?.order_id,
+          bidding_offer_id,
+          service_provider,
+          user: worker?.user_id?._id,
+          initiator: "service_provider",
+          offer_amount: Number(offerAmount),
+          message: `Can you do it for ${offerAmount}?`,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const result = await response.json();
-      // console.log("Negotiation API Response:", result);
 
-      if (response.ok) {
-        setOffer(" ");
-        toast.success(`You sent ₹${offer} Amount For Negotiation`);
+
+      if (response.status == 201) {
+        setOffer("");
+        toast.success(`You sent ₹${offerAmount} for negotiation`);
       } else {
-        toast.error(result.message || "Something went wrong ❌");
+        toast.error(response.data.message || "Something went wrong ❌");
       }
     } catch (error) {
-      console.error("API Error:", error);
+      console.error("Negotiation API Error:", error);
       toast.error("Failed to start negotiation ❌");
     }
   };
@@ -166,51 +241,46 @@ export default function Bid() {
     setBidPlaced(true);
     setBidAmount(amount);
     setBidDescription(description);
-    setIsBidModel(false);
+    setIsBidModal(false);
   };
 
   // Handle Edit Bid Success
   const handleEditBidSuccess = (amount, description) => {
     setBidAmount(amount);
     setBidDescription(description);
-    setIsEditBidModel(false);
+    setIsEditBidModal(false);
   };
 
-	const handleAcceptNegotiation = async (id, role) => {
-		const token = localStorage.getItem("bharat_token");
-		if (!id) {
-			toast.error("Negotiation ID is missing ❗");
-			return;
-		}
+  // Handle Accept Negotiation
+  const handleAcceptNegotiation = async (id, role) => {
+    if (!id) {
+      toast.error("Negotiation ID is missing ❗");
+      return;
+    }
 
-		try {
-			const response = await fetch(`${BASE_URL}/negotiations/accept/${id}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({
-					role: role,
-				}),
-			});
+    try {
+      const token = localStorage.getItem("bharat_token");
+      const response = await axios.put(
+        `${BASE_URL}/negotiations/accept/${id}`,
+        { role },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-			const result = await response.json();
-			console.log("Accept Negotiation API Response:", result);
-
-			if (response.ok) {
-				toast.success("You accepted the negotiation ✅");
-				// Optionally, refresh negotiation data here
-			} else {
-				toast.error(result.message || "Something went wrong ❌");
-			}
-		} catch (error) {
-			console.error("API Error:", error);
-			toast.error("Failed to accept negotiation ❌");	
-		}
-	}
-
-	// console.log("Current Negotiation Data:", data); // Debug log
+      if (response.data.success) {
+        toast.success("You accepted the negotiation ✅");
+      } else {
+        toast.error(response.data.message || "Something went wrong ❌");
+      }
+    } catch (error) {
+      console.error("Accept Negotiation API Error:", error);
+      toast.error("Failed to accept negotiation ❌");
+    }
+  };
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
   if (error)
@@ -223,19 +293,43 @@ export default function Bid() {
 
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
-          <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
+          <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
 
-          <div>
-            <img src={hisWorkImg} className="h-80 w-full" alt="Work" />
-          </div>
+          {/* Work Image */}
+          {worker?.image?.length > 0 ? (
+            <Carousel
+              showArrows={true}
+              showThumbs={false}
+              infiniteLoop={true}
+              autoPlay={true}
+              className="w-full h-[360px]"
+            >
+              {worker.image.map((url, index) => (
+                <div key={index}>
+                  <img
+                    src={url}
+                    alt={`Project image ${index + 1}`}
+                    className="w-full h-[360px] object-cover"
+                  />
+                </div>
+              ))}
+            </Carousel>
+          ) : (
+            <img
+              src={hisWorkImg}
+              alt="No project images available"
+              className="w-full h-[360px] object-cover mt-5"
+            />
+          )}
 
           {worker && (
             <div className="py-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-lg font-semibold">{worker.workName}</h2>
-                  <span className="inline-block bg-[#F27773] text-white text-sm font-semibold px-3 rounded-full mt-2">
-                    {worker.location}
+                  <span className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2">
+                    <FaMapMarkerAlt size={18} color="#228B22" />
+                    <span className="truncate">{worker.location || "N/A"}</span>
                   </span>
                   <p className="font-semibold text-lg my-2 text-[#008000]">
                     ₹{worker.amount}/-
@@ -263,13 +357,31 @@ export default function Bid() {
                     Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-      ${worker?.hire_status === "pending" ? "bg-yellow-500" : ""}
-      ${worker?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
-      ${worker?.hire_status === "completed" ? "bg-[#228B22]" : ""}
-      ${worker?.hire_status === "cancelldispute" ? "bg-[#FF0000]" : ""}
-      ${worker?.hire_status === "accepted" ? "bg-blue-500" : ""}`}
+                        ${
+                          worker.hire_status === "pending"
+                            ? "bg-yellow-500"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "cancelled"
+                            ? "bg-[#FF0000]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "completed"
+                            ? "bg-[#228B22]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "cancelledDispute"
+                            ? "bg-[#FF8C00]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "accepted" ? "bg-blue-500" : ""
+                        }`}
                     >
-                      {worker?.hire_status
+                      {worker.hire_status
                         ? worker.hire_status
                             .split(" ")
                             .map(
@@ -282,41 +394,55 @@ export default function Bid() {
                   </span>
                 </div>
               </div>
-
+               <p className="font-semibold">
+              Category: {worker?.category_id?.name}
+            </p>
+						<p className="font-semibold">
+              SubCategory: {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+            </p>
               <h3 className="text-lg font-semibold">Task Details</h3>
-
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
-                <p>{worker.skills}</p>
+                <p>{worker.skills || "No description available"}</p>
               </div>
-              
-            <div className="flex justify-center gap-6">
-  {(worker.hire_status === "cancelled" && (
-                // 🔴 Only show cancelled message
-                <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
-                  <img src={cancel} alt="Cancelled" className="w-5 h-5" />
-                  Cancelled Task By User
-                </div>
-              ))}
-            </div>
 
-              {worker?.hire_status === "pending" && (
-                <button
-                  onClick={() => {
-                    if (bidPlaced) {
-                      setIsEditBidModel(true);
-                    } else {
-                      setIsBidModel(true);
+              <div className="flex justify-center gap-6">
+                {worker.hire_status === "cancelled" && (
+                  <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
+                    <img src={cancel} alt="Cancelled" className="w-5 h-5" />
+                    Cancelled Task By User
+                  </div>
+                )}
+								{worker.hire_status === "completed" && (
+                  <div className="flex items-center justify-center gap-2 bg-[#228B22] text-white px-6 py-3 rounded-lg font-medium">
+                    <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                    Task Completed
+                  </span>
+                  </div>
+                )}
+								{worker.hire_status === "cancelledDispute" && (
+                  <div className="flex items-center justify-center gap-2 bg-[#FF8C00] text-white px-6 py-3 rounded-lg font-medium">
+                   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                  Cancelled (Dispute)
+                </span>
+                  </div>
+                )}
+
+                {worker.hire_status === "pending" && (
+                  <button
+                    onClick={() =>
+                      setIsBidModal(!bidPlaced ? true : false) ||
+                      setIsEditBidModal(bidPlaced ? true : false)
                     }
-                  }}
-                  className="text-lg font-semibold text-white text-center py-2 px-4 rounded-lg w-1/4 mx-auto bg-[#008000] hover:bg-green-700"
-                >
-                  {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
-                </button>
-              )}
+                    className="text-lg font-semibold text-white text-center py-2 px-4 rounded-lg w-1/4 mx-auto bg-[#008000] hover:bg-green-700"
+                  >
+                    {bidPlaced ? `Edit Bid: (₹${bidAmount})` : "Bid"}
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
-          {worker.hire_status === "pending" && (
+          {worker?.hire_status === "pending" && (
             <div className="flex flex-col items-center p-6">
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
                 <button
@@ -348,18 +474,19 @@ export default function Bid() {
                   value={offer}
                   onChange={(e) => setOffer(e.target.value)}
                   className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                  min="0"
                 />
               )}
             </div>
           )}
 
-          {worker.hire_status === "pending" && (
+          {worker?.hire_status === "pending" && (
             <div className="text-center">
               <button
                 className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
                 onClick={() => {
                   if (isOfferActive) {
-                    handleAcceptNegotiation(data._id, "service_provider");
+                    handleAcceptNegotiation(data?._id, "service_provider");
                   } else {
                     handleNegotiation(offer);
                   }
@@ -370,25 +497,98 @@ export default function Bid() {
             </div>
           )}
         </div>
+        {(worker?.hire_status === "accepted" ||
+          worker?.hire_status === "completed" ||
+          worker?.hire_status === "cancelledDispute") &&
+          worker?.platform_fee_paid && (
+            <Accepted
+              serviceProvider={worker?.user_id}
+              user_id={worker?.service_provider_id?._id}
+              assignedWorker={assignedWorker}
+              paymentHistory={worker?.service_payment?.payment_history}
+              orderId={id}
+              hireStatus={worker?.hire_status}
+            />
+          )}
+      </div>
+
+      {worker?.hire_status === "accepted" && worker?.platform_fee_paid && (
+        <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+          <div className="relative max-w-2xl mx-auto">
+            <div className="relative z-10">
+              <img
+                src={warningIcon}
+                alt="Warning"
+                className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+              />
+            </div>
+            <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+              <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                Warning Message
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base">
+                Lorem Ipsum is simply dummy text...
+              </p>
+            </div>
+          </div>
+          <div className="flex space-x-4">
+            <Link to={`/dispute/${id}/bidding`}>
+              <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                Cancel Task and Create Dispute
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            Error: {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, index) => (
+              <div key={index}>
+                <img
+                  src={banner}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-[400px] object-cover"
+                  onError={(e) => {
+                    e.target.src = hisWorkImg; // Use existing placeholder image
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
       </div>
 
       <Footer />
 
-      {/* Add Bid Modal */}
-      {isBidModel && (
+      {/* Bid Modal */}
+      {isBidModal && (
         <BidModal
-          isOpen={isBidModel}
-          onClose={() => setIsBidModel(false)}
+          isOpen={isBidModal}
+          onClose={() => setIsBidModal(false)}
           orderId={worker?._id}
           onBidSuccess={handleBidSuccess}
         />
       )}
 
       {/* Edit Bid Modal */}
-      {isEditBidModel && (
+      {isEditBidModal && (
         <EditBidModal
-          isOpen={isEditBidModel}
-          onClose={() => setIsEditBidModel(false)}
+          isOpen={isEditBidModal}
+          onClose={() => setIsEditBidModal(false)}
           orderId={worker?._id}
           initialAmount={bidAmount}
           initialDuration={bidDescription}

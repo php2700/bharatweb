@@ -9,6 +9,7 @@ export default function Accepted({
   serviceProvider,
   assignedWorker,
   paymentHistory,
+	fullPaymentHistory,
   orderId,
   user_id,
 }) {
@@ -172,6 +173,40 @@ export default function Accepted({
           )}
         </div>
       )}
+				<div className="p-4 bg-white shadow-md rounded-lg mt-10">
+          <table className="w-full border border-gray-300 rounded-md overflow-hidden">
+            <thead style={{ backgroundColor: "#228B22", color: "white" }}>
+              <tr>
+                <th className="border p-2 text-left">Description</th>
+                <th className="border p-2 text-left">Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border p-2">Total Project Value</td>
+                <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              </tr>
+              <tr>
+                <td className="border p-2">Pending for User Approval</td>
+                <td className="border p-2">
+                  ₹{fullPaymentHistory.remaining_amount}
+                </td>
+              </tr>
+              <tr>
+                <td className="border p-2">Paid to You</td>
+                <td className="border p-2">
+                  ₹
+                  {paymentHistory
+                  .filter((p) =>
+                    ["release_requested", "released"].includes(p.release_status)
+                  )
+                  .reduce((sum, p) => sum + p.amount, 0)}
+                </td>
+                {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
+              </tr>
+            </tbody>
+          </table>
+        </div>
     </div>
   );
 }

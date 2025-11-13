@@ -9,10 +9,12 @@ export default function EditBidModal({
   onClose,
   orderId,
   initialAmount,
+	initialDuration,
   initialDescription,
   onEditSuccess,
 }) {
   const [amount, setAmount] = useState(initialAmount || "");
+  const [duration, setDuration] = useState(initialDuration || "");
   const [description, setDescription] = useState(initialDescription || "");
   useEffect(() => {
       window.scrollTo(0, 0);
@@ -33,10 +35,10 @@ export default function EditBidModal({
   order_id: orderId,
   message: description,
   bid_amount: amount,
-	duration: " ",
+	duration: duration,
 };
 
-    console.log("Payload being sent:", payload);
+    // console.log("Payload being sent:", payload);
 
     try {
       const response = await fetch(
@@ -55,7 +57,7 @@ export default function EditBidModal({
 
       if (response.ok) {
         toast.success("Bid updated successfully ✅");
-        onEditSuccess(amount, description);
+        onEditSuccess(amount, description, duration);
         onClose();
       } else {
         toast.error(data.message || "Failed to update bid ❌");
@@ -97,6 +99,17 @@ export default function EditBidModal({
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
+              required
+            />
+          </div>
+
+					<div className="text-left">
+            <label className="block font-medium mb-1">Duration</label>
+            <input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
               required
             />
