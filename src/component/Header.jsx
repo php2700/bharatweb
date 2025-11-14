@@ -652,22 +652,22 @@ if (isLoggedIn) {
 	// let userId = notif.userId
    if(notif.userType === "user"){
     if(notif.orderType === "direct"){
-			navigate(`/my-hire/order-detail/${orderId}`)
+			window.location.href = `/my-hire/order-detail/${orderId}`
 		} else if(notif.orderType === "bidding"){
-      navigate(`/bidding/order-detail/${orderId}`)
+      window.location.href = `/bidding/order-detail/${orderId}`
 		} else{
-			navigate(`/emergency/order-detail/${orderId}`)
+			window.location.href = `/emergency/order-detail/${orderId}`
 		}
 	 }else if(notif.userType === "service_provider"){
     if(notif.orderType === "direct"){
-			navigate(`/hire/worker/order-detail/${orderId}`)
+			window.location.href = `/hire/worker/order-detail/${orderId}`
 		} else if(notif.orderType === "bidding"){
-      navigate(`/bidding/worker/order-detail/${orderId}`)
+      window.location.href = `/bidding/worker/order-detail/${orderId}`
 		} else{
-			navigate(`/emergency/worker/order-detail/${orderId}`)
+			window.location.href = `/emergency/worker/order-detail/${orderId}`
 		}
 	 }else{
-    navigate(`/`)
+    window.location.href = `/disputes`
 	 }
   };
 
@@ -869,7 +869,7 @@ if (isLoggedIn) {
                             ))}
                           </div>
                         ))}
-                        <div className="border-t p-3 flex justify-center">
+                        {/*<div className="border-t p-3 flex justify-center">
                           <button
                             onClick={() => {
                               setIsNotifOpen(false);
@@ -879,7 +879,7 @@ if (isLoggedIn) {
                           >
                             See all messages
                           </button>
-                        </div>
+                        </div>*/}
                       </>
                     )}
                   </div>
@@ -1134,17 +1134,28 @@ if (isLoggedIn) {
                 stroke="currentColor"
                 className="w-6 h-6"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               {editingAddress !== null ? "Edit Address" : "Add New Address"}
             </h2>
             {mapError && (
-              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">{mapError}</div>
+              <div className="mb-4 p-3 bg-red-100 text-red-600 text-sm rounded-lg">
+                {mapError}
+              </div>
             )}
             <div className="mb-4">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Title *
+              </label>
               <input
                 type="text"
                 id="title"
@@ -1156,7 +1167,12 @@ if (isLoggedIn) {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="landmark" className="block text-sm font-medium text-gray-700 mb-1">Landmark *</label>
+              <label
+                htmlFor="landmark"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Landmark *
+              </label>
               <input
                 type="text"
                 id="landmark"
@@ -1168,7 +1184,12 @@ if (isLoggedIn) {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Address *
+              </label>
               <input
                 type="text"
                 id="address"
@@ -1177,6 +1198,74 @@ if (isLoggedIn) {
                 onChange={handleInputChange}
                 className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
                 placeholder="Enter or select address"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="houseno"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                House No
+              </label>
+              <input
+                type="text"
+                id="houseno"
+                name="houseno"
+                value={currentAddress.houseno}
+                onChange={handleInputChange}
+                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
+                placeholder="Enter house number"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="street"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Street
+              </label>
+              <input
+                type="text"
+                id="street"
+                name="street"
+                value={currentAddress.street}
+                onChange={handleInputChange}
+                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
+                placeholder="Enter street name"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="area"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Area
+              </label>
+              <input
+                type="text"
+                id="area"
+                name="area"
+                value={currentAddress.area}
+                onChange={handleInputChange}
+                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
+                placeholder="Enter area"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="pincode"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Pincode
+              </label>
+              <input
+                type="text"
+                id="pincode"
+                name="pincode"
+                value={currentAddress.pincode}
+                onChange={handleInputChange}
+                className="px-3 py-2 rounded-lg bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm text-gray-700 w-full border border-gray-300"
+                placeholder="Enter pincode"
               />
             </div>
             <div className="h-64 mb-4 rounded-lg overflow-hidden shadow-md border border-gray-200">

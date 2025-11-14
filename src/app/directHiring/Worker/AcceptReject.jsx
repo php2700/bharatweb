@@ -62,7 +62,7 @@ export default function WokerAcceptReject() {
        navigate("/worker/work-list/Emergency task")
     } catch (err) {
       console.error("Accept error:", err);
-      setError(err.message);
+      setError(err.response.data.message || "Failed to accept order.");
     }
   };
 

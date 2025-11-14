@@ -115,8 +115,8 @@ const DirectHiring = () => {
     else if (title.length > 30)
       newErrors.title = "Title cannot exceed 30 characters.";
     if (!description) newErrors.description = "Description is required.";
-    else if (description?.length < 5)
-      newErrors.description = "Min 5 character description is required.";
+    else if (description?.length < 20)
+      newErrors.description = "Min 20 character description is required.";
     else if (description.length > 250)
       newErrors.description = "Description cannot exceed 250 characters.";
     if (!deadline) newErrors.deadline = "Deadline is required.";
@@ -185,14 +185,7 @@ const DirectHiring = () => {
               }
             );
             if (verifyRes.status === 200) {
-              Swal.fire({
-                title: "Important!",
-                text: "Before starting the work, please verify the worker's ID proof.",
-                icon: "warning",
-                confirmButtonText: "OK",
-              }).then(() => {
-                navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
-              });
+              navigate(`/my-hire/order-detail/${verifyRes.data?.order?._id}`);
             } else {
               setErrors({ general: "Payment verification failed." });
             }

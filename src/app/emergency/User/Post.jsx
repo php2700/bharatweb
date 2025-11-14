@@ -286,8 +286,8 @@ const Post = () => {
       errors.description = "Description is required";
     } else if (formData.description.trim().length < 20) {
       errors.description = "Description must be at least 20 characters long";
-    } else if (formData.description.trim().length > 1000) {
-      errors.description = "Description cannot exceed 1000 characters";
+    } else if (formData.description.trim().length > 250) {
+      errors.description = "Description cannot exceed 250 characters";
     }
     if (!formData.contact) errors.contact = "Contact number is required.";
     else if (formData.contact.trim()?.length != 10)

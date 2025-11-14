@@ -574,7 +574,11 @@ export default function Accepted({
             <tr>
               <td className="border p-2">Pending with App</td>
               <td className="border p-2">
-                ₹{fullPaymentHistory.remaining_amount}
+                ₹{paymentHistory
+                  .filter((p) =>
+                    ["pending"].includes(p.release_status)
+                  )
+                  .reduce((sum, p) => sum + p.amount, 0)}
               </td>
             </tr>
             <tr>

@@ -261,14 +261,16 @@ export default function ViewProfile() {
       }
     } catch (err) {
       console.error("Error accepting offer:", err);
+			const errorMessage =
+    err?.response?.data?.message || "Something went wrong.";
       await Swal.fire({
         icon: "error",
         title: "Oops!",
-        text: "Failed to accept offer. Please try again.",
+        text: errorMessage,
         confirmButtonColor: "#FF0000",
         showConfirmButton: false,
         timer: 2000, // Auto-close after 2 seconds
-      });
+      }).then(() => {fetchData(false);});
     } finally {
       setIsAccepting(false);
     }
@@ -446,6 +448,7 @@ export default function ViewProfile() {
                       "Unknown Location"}
                   </div>
                 </div>
+								<span>One Time Project fee :- ₹{orderData?.platform_fee || "0"}</span>
               </div>
               <div className="text-right space-y-2 tracking-tight">
                 <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">

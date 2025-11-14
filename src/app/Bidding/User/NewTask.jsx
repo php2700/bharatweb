@@ -193,6 +193,12 @@ export default function BiddingNewTask() {
     if (!formData.description.trim()) {
       return toast.error("Description is required");
     }
+    if (formData.description.trim().length < 20) {
+      return toast.error("Description must be at least 20 characters long");
+    }
+		if (formData.description.trim().length > 250) {
+      return toast.error("Description cannot exceed 250 characters");
+    }
 
     if (!formData.cost || isNaN(formData.cost)) {
       return toast.error("Valid cost is required");

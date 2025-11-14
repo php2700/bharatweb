@@ -143,8 +143,8 @@ export default function Worklist() {
             t.skills?.join(", ") ||
             t.description ||
             "No skills listed",
-          price: t.service_payment.amount || "Price TBD",
-          cost: t.cost || "Price TBD", //--- IGNORE ---
+          price: t.service_payment.amount || "0",
+          cost: t.cost || "0", //--- IGNORE ---
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()
             : "No deadline",
@@ -513,13 +513,13 @@ export default function Worklist() {
         </div>
 
         {/* See All */}
-        {filteredTasks.length > 0 && (
+        {/*filteredTasks.length > 0 && (
           <div className="flex justify-center my-10">
             <button className="py-2 px-8 text-white rounded-full bg-[#228B22] hover:bg-[#1a6d1a] transition">
               See All
             </button>
           </div>
-        )}
+        )*/}
 
         {/* Bottom Banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">

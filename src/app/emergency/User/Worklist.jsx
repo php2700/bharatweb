@@ -149,8 +149,8 @@ export default function Worklist() {
             task.sub_category_ids?.map((sub) => sub.name).join(", ") ||
             task.skills?.join(", ") ||
             "No skills listed",
-          price: task.service_payment?.amount || "Price TBD",
-          cost: task.cost || "Price TBD",
+          price: task.service_payment?.amount || "0",
+          cost: task.cost || "0",
           completiondate: task.deadline
             ? new Date(task.deadline).toLocaleDateString()
             : "No deadline",
@@ -512,13 +512,13 @@ export default function Worklist() {
         </div>
 
         {/* See All */}
-        {filteredTasks.length > 0 && (
+        {/*filteredTasks.length > 0 && (
           <div className="flex justify-center my-10">
             <button className="py-2 px-8 text-white rounded-full bg-[#228B22] hover:bg-[#1a6d1a] transition">
               See All
             </button>
           </div>
-        )}
+        ) */}
 
         {/* Bottom banner */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">
