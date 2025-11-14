@@ -310,7 +310,9 @@ export default function ViewProfile() {
                       {/* Red button (Cancel Task) */}
                       <Link to={`/dispute/${id}/emergency`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          Cancel Task and Create Dispute
+                          {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
                         </button>
                       </Link>
                     </div>

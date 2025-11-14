@@ -81,7 +81,7 @@ export default function Accepted({
 							>
                 View Profile
               </button> */}
-                    {assignedWorker ? (
+                    {hireStatus === "completed" ? null : assignedWorker ? (
                       <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
                         Assigned
                       </button>
@@ -153,39 +153,42 @@ export default function Accepted({
               paymentHistory.map((payment, index) => (
                 <div
                   key={payment._id}
-                  className="flex items-center justify-between bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
+                  className="grid grid-cols-12 items-center bg-white border-b border-gray-200 py-4 px-3 last:border-b-0"
                 >
-                  {/* Index & Description */}
-                  <div className="flex items-center space-x-5 p-2">
-                    {" "}
-                    {/* reduced gap */}
+                  {/* Index + Description */}
+                  <div className="col-span-5 flex items-center gap-3">
                     <span className="font-semibold">{index + 1}.</span>
                     <span>{payment.description || "Starting Payment"}</span>
                   </div>
 
                   {/* Status */}
-                  <div className="mx-2 ">
+                  <div className="col-span-4 text-center">
                     {payment.status === "success" &&
                       payment.release_status === "pending" && (
                         <span className="text-yellow-600 font-semibold">
                           Waiting for User Approval
                         </span>
                       )}
+
                     {payment.release_status === "release_requested" && (
                       <span className="text-blue-600 font-semibold">Paid</span>
                     )}
+
                     {payment.release_status === "released" && (
                       <span className="text-green-700 font-semibold">Paid</span>
                     )}
-                    {payment.release_status === "refunded" && (
+
+                    {payment.release_status === "rejected" && (
                       <span className="text-red-600 font-semibold">
-                        Refunded
+                        Admin Rejected
                       </span>
                     )}
                   </div>
 
                   {/* Amount */}
-                  <div className="font-semibold mx-3">₹{payment.amount}</div>
+                  <div className="col-span-3 text-right font-semibold pr-3">
+                    ₹{payment.amount}
+                  </div>
                 </div>
               ))
             ) : (
@@ -195,7 +198,7 @@ export default function Accepted({
             )}
           </div>
         )}
-					<p className="font-bold m-3 text-gray-900">
+        <p className="font-bold m-3 text-gray-900">
           Note:&nbsp;
           <span className="text-sm text-red-600 font-semibold">
             Amount will be deposited within 7 to 8 working days.
@@ -225,10 +228,12 @@ export default function Accepted({
                 <td className="border p-2">
                   ₹
                   {paymentHistory
-                  .filter((p) =>
-                    ["release_requested", "released"].includes(p.release_status)
-                  )
-                  .reduce((sum, p) => sum + p.amount, 0)}
+                    .filter((p) =>
+                      ["release_requested", "released"].includes(
+                        p.release_status
+                      )
+                    )
+                    .reduce((sum, p) => sum + p.amount, 0)}
                 </td>
                 {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
               </tr>

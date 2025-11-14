@@ -1,6 +1,6 @@
 // RateWorkerModal.jsx
 import React, { useState } from "react";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 import Swal from "sweetalert2";
@@ -36,7 +36,7 @@ export default function ReviewModal({
       if (orderId) formData.append("orderId", orderId);
       if (type) formData.append("type", type);
       images.forEach((img) => formData.append("images", img));
-			console.log("imgggg",images)
+      console.log("imgggg", images);
 
       await axios.post(`${BASE_URL}/user/add-review`, formData, {
         headers: {
@@ -46,28 +46,28 @@ export default function ReviewModal({
       });
 
       Swal.fire({
-      title: "Success!",
-      text: "Thank you for rating the Worker!",
-      icon: "success",
-      confirmButtonColor: "#228B22",
-    }).then(() => {
-      setRating(0);
-      setFeedback("");
-      setImages([]);
-      onClose();
-    });
-  } catch (err) {
-    console.error(err);
+        title: "Success!",
+        text: "Thank you for rating the Worker!",
+        icon: "success",
+        confirmButtonColor: "#228B22",
+      }).then(() => {
+        setRating(0);
+        setFeedback("");
+        setImages([]);
+        onClose();
+      });
+    } catch (err) {
+      console.error(err);
 
-    // ❌ Error SweetAlert
-    Swal.fire({
-      title: "Error!",
-      text: "Failed to submit rating. Please try again.",
-      icon: "error",
-      confirmButtonColor: "#d33",
-    });
-  }
-};
+      // ❌ Error SweetAlert
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to submit rating. Please try again.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
 
   if (!show) return null;
 
@@ -108,7 +108,7 @@ export default function ReviewModal({
         />
 
         {/* Upload Images */}
-        <div className="mb-4">
+        {/*<* className="mb-4">
           <label className="block mb-2 font-semibold text-gray-700">
             Upload Images (max 5)
           </label>
@@ -118,7 +118,7 @@ export default function ReviewModal({
             multiple
             onChange={(e) => {
               const files = Array.from(e.target.files).slice(0, 5);
-							console.log("files", files)
+							// console.log("files", files)
               setImages(files);
             }}
             className="w-full mb-2"
@@ -131,11 +131,61 @@ export default function ReviewModal({
             className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-green-500 cursor-pointer"
             onClick={() => document.querySelector('input[type="file"]').click()}
           />
+				
+          {/* Preview */}
+        {/* <div className="flex flex-wrap mt-2 gap-2">
+            {images.map((img, index) => (
+							// console.log("kdkdkd",img),
+              <img
+                key={index}
+                src={URL.createObjectURL(img)}
+                alt={`preview-${index}`}
+                className="w-20 h-20 object-cover rounded border"
+              />
+            ))}
+          </div>
+        </div> */}
+
+        <div className="mb-4">
+          <label className="block mb-2 font-semibold text-gray-700">
+            Upload Images (max 5)
+          </label>
+
+          {/* HIDDEN INPUT */}
+          <input
+            id="imageUploadInput"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files).slice(0, 5);
+              setImages(files);
+            }}
+            className="hidden"
+          />
+
+          {/* CUSTOM BUTTON */}
+          <button
+            type="button"
+            onClick={() => document.getElementById("imageUploadInput").click()}
+            className="bg-[#228B22] text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700"
+          >
+            Upload Images
+          </button>
+
+          {/* FILE NAMES BOX */}
+          <input
+            type="text"
+            readOnly
+            placeholder="No images selected"
+            value={images.map((img) => img.name).join(", ")}
+            className="w-full border border-gray-300 mt-2 p-2 rounded focus:outline-none focus:border-green-500 cursor-pointer"
+            onClick={() => document.getElementById("imageUploadInput").click()}
+          />
 
           {/* Preview */}
           <div className="flex flex-wrap mt-2 gap-2">
             {images.map((img, index) => (
-							// console.log("kdkdkd",img),
               <img
                 key={index}
                 src={URL.createObjectURL(img)}

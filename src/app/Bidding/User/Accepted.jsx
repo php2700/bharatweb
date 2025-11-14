@@ -416,39 +416,53 @@ export default function Accepted({
             {paymentHistory.map((payment, index) => (
               <div
                 key={payment._id}
-                className="flex items-center justify-between p-5 bg-white border-4 border-[#F5F5F5] py-3 first:border-t-0 w-full"
+                className="grid grid-cols-12 items-center bg-white border-b border-gray-200 py-4 px-3"
               >
-                <div className="flex items-center space-x-5">
+                {/* Index + Description */}
+                <div className="col-span-5 flex items-center gap-4">
                   <span className="font-semibold">{index + 1}.</span>
                   <span>{payment.description || "Starting Payment"}</span>
                 </div>
-                <div className="mx-2">
+
+                {/* Status + Pay Button */}
+                <div className="col-span-4 text-center">
                   {payment.status === "success" &&
                     payment.release_status === "pending" && (
-                      <button
-                        onClick={() => handlePay(payment._id)}
-                        className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                      >
-                        Pay to app
-                      </button>
+                      <>
+                        <span className="text-[#228B22] me-2 font-semibold">
+                          Waiting for Approval
+                        </span>
+
+                        {hireStatus === "accepted" && (
+                          <button
+                            onClick={() => handlePay(payment._id)}
+                            className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                          >
+                            Pay
+                          </button>
+                        )}
+                      </>
                     )}
+
                   {payment.release_status === "release_requested" && (
-                    <span className="text-yellow-700 font-semibold">
-                      Requested for Pay
-                    </span>
+                    <span className="text-[#228B22] font-semibold">Paid</span>
                   )}
+
                   {payment.release_status === "released" && (
-                    <span className="text-[#228B22] font-semibold">
-                      Paid to Provider
-                    </span>
+                    <span className="text-[#228B22] font-semibold">Paid</span>
                   )}
-                  {payment.release_status === "refunded" && (
-                    <span className="text-blue-600 font-semibold">
-                      Refunded
+
+                  {payment.release_status === "rejected" && (
+                    <span className="text-red-600 font-semibold">
+                      Admin Rejected
                     </span>
                   )}
                 </div>
-                <div className="font-semibold">₹{payment.amount}</div>
+
+                {/* Amount */}
+                <div className="col-span-3 text-right font-semibold pr-3">
+                  ₹{payment.amount}
+                </div>
               </div>
             ))}
 

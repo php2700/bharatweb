@@ -574,7 +574,9 @@ export default function Bid() {
           <div className="flex space-x-4">
             <Link to={`/dispute/${id}/bidding`}>
               <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                Cancel Task and Create Dispute
+                {worker?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
               </button>
             </Link>
           </div>

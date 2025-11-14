@@ -37,7 +37,7 @@ export default function ViewProfileDetails() {
     platform_fee,
     orderId,
   } = statuslocation.state || {};
-  console.log("ddddd", statuslocation.state);
+  // console.log("ddddd", statuslocation.state);
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
@@ -111,7 +111,7 @@ export default function ViewProfileDetails() {
             },
           }
         );
-        console.log("Worker profile response:", response.data);
+        // console.log("Worker profile response:", response.data);
         if (response.data?.success) {
           setWorker(response.data.data);
         } else {
@@ -218,7 +218,7 @@ export default function ViewProfileDetails() {
 
         handler: async function (paymentResponse) {
           try {
-            console.log(paymentResponse, "paymentres");
+            // console.log(paymentResponse, "paymentres");
             const verifyRes = await axios.post(
               `${BASE_URL}/emergency-order/verify-platform-payment`,
               {
@@ -458,7 +458,7 @@ export default function ViewProfileDetails() {
             <div className="relative">
               {testimage ? (
                 <img
-                  src={profilePic}
+                  src={businessImage[0] || defaultPic}
                   alt="User Profile"
                   className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
                   onError={(e) => {
@@ -567,7 +567,7 @@ export default function ViewProfileDetails() {
               >
                 Customer Review
               </button>
-              {isShop && businessImage?.length > 0 && (
+              {/*isShop && businessImage?.length > 0 && (
                 <button
                   onClick={() => {
                     setWorkerTab("business");
@@ -582,7 +582,7 @@ export default function ViewProfileDetails() {
                 >
                   Business Images
                 </button>
-              )}
+              )*/}
             </div>
             {WorkerTab === "work" && (
               <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">

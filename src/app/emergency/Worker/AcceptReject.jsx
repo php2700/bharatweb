@@ -7,7 +7,7 @@ import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
-import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

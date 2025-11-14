@@ -18,6 +18,8 @@ import "slick-carousel/slick/slick-theme.css";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import Warning1 from "../../../assets/warning1.png";
+import Warning2 from "../../../assets/warning2.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -802,7 +804,7 @@ export default function ViewProfile() {
                   <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                     Cancelled ({disputeInfo.unique_id || "No Id"})
                   </button>
-									<p className="text-sm text-gray-700 mt-3">
+                  <p className="text-sm text-gray-700 mt-3">
                     Note:{" "}
                     <span className="text-red-600 font-semibold">
                       Freezed by Platform
@@ -896,17 +898,25 @@ export default function ViewProfile() {
                   />
 
                   {(orderData?.hire_status === "assigned" ||
-                  orderData?.hire_status === "completed") && (
+                    orderData?.hire_status === "completed") && (
                     <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                       <div className="relative max-w-2xl mx-auto">
-                        <div className="relative z-10">
+                        {/* Top Images */}
+                        <div className="relative z-10 flex justify-center gap-4">
                           <img
-                            src={Warning}
+                            src={Warning1}
                             alt="Warning"
-                            className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                          />
+                          <img
+                            src={Warning2}
+                            alt="Warning2"
+                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                           />
                         </div>
-                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+
+                        {/* Yellow Box */}
+                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
                           <h2 className="text-[#FE2B2B] font-bold -mt-2">
                             Warning Message
                           </h2>
@@ -935,7 +945,9 @@ export default function ViewProfile() {
                         />
                         <Link to={`/dispute/${id}/emergency`}>
                           <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                            Cancel Task and Create Dispute
+                            {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
                           </button>
                         </Link>
                       </div>*/}
@@ -966,7 +978,9 @@ export default function ViewProfile() {
                         )}
                         <Link to={`/dispute/${id}/emergency`}>
                           <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                            Cancel Task and Create Dispute
+                            {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
                           </button>
                         </Link>
                       </div>

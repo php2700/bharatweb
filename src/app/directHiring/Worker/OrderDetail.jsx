@@ -574,7 +574,7 @@ export default function ViewProfile() {
                       <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">
                         Project is Cancelled by User
                       </div>
-                    ) : offerStatus === "accepted" ? (
+                    ) : (offerStatus === "accepted") ? (
                       <>
                         <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
                           Accepted
@@ -625,6 +625,13 @@ export default function ViewProfile() {
             ) : (
               <></>
             )}
+							{orderData?.hire_status === "completed" && (
+              <div className="flex justify-center">
+                <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-not-allowed">
+                  Task Completed
+                </button>
+              </div>
+            )}
 
             {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed" ||
@@ -664,19 +671,12 @@ export default function ViewProfile() {
                     <div className="flex space-x-4">
                       <Link to={`/dispute/${id}/direct`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          Cancel Task and Create Dispute
+                          {orderData?.hire_status === "completed" ? "Create Dispute": "Cancel Task and Create Dispute"}
                         </button>
                       </Link>
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-            {orderData?.hire_status === "completed" && (
-              <div className="flex justify-center">
-                <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-not-allowed">
-                  Task Completed
-                </button>
               </div>
             )}
           </div>

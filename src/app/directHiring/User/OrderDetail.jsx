@@ -4,7 +4,9 @@ import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
-import Warning from "../../../assets/ViewProfile/warning.svg";
+// import Warning from "../../../assets/ViewProfile/warning.svg";
+import Warning1 from "../../../assets/warning1.png";
+import Warning2 from "../../../assets/warning2.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import CallIcon from "../../../assets/call.png";
 import ChatIcon from "../../../assets/chat.png";
@@ -20,7 +22,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSelector } from "react-redux";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import defaultWorkImage from "../../../assets/workcategory/image.png";
+import defaultWorkImage from "../../../assets/directHiring/his-work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 
@@ -1403,14 +1405,22 @@ export default function ViewProfile() {
                   orderData?.hire_status === "completed") && (
                   <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                     <div className="relative max-w-2xl mx-auto">
-                      <div className="relative z-10">
+                      {/* Top Images */}
+                      <div className="relative z-10 flex justify-center gap-4">
                         <img
-                          src={Warning}
+                          src={Warning1}
                           alt="Warning"
-                          className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                        />
+                        <img
+                          src={Warning2}
+                          alt="Warning2"
+                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                         />
                       </div>
-                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+
+                      {/* Yellow Box */}
+                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
                         <h2 className="text-[#FE2B2B] font-bold -mt-2">
                           Warning Message
                         </h2>
@@ -1448,7 +1458,9 @@ export default function ViewProfile() {
                       )}
                       <Link to={`/dispute/${id}/direct`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          Cancel Task and Create Dispute
+                          {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
                         </button>
                       </Link>
                     </div>

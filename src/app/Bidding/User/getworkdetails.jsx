@@ -25,6 +25,8 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
+import Warning1 from "../../../assets/warning1.png";
+import Warning2 from "../../../assets/warning2.png";
 
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
@@ -910,7 +912,9 @@ export default function BiddinggetWorkDetail() {
                   disabled
                   className="w-full px-4 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold opacity-75 cursor-not-allowed"
                 >
-                  {orderDetail?.refundStatus == "pending" ? "Refund Request Submitted" : "Refunded"}
+                  {orderDetail?.refundStatus == "pending"
+                    ? "Refund Request Submitted"
+                    : "Refunded"}
                 </button>
               )}
 
@@ -1198,7 +1202,7 @@ export default function BiddinggetWorkDetail() {
           </div>
         )}
         {(orderDetail?.hire_status === "accepted" ||
-				orderDetail?.hire_status === "cancelled" ||
+          orderDetail?.hire_status === "cancelled" ||
           orderDetail?.hire_status === "completed" ||
           orderDetail?.hire_status === "cancelledDispute") &&
           orderDetail?.platform_fee_paid && (
@@ -1217,19 +1221,28 @@ export default function BiddinggetWorkDetail() {
           orderDetail?.platform_fee_paid && (
             <div className="flex flex-col items-center justify-center space-y-6 mt-6">
               <div className="relative max-w-2xl mx-auto">
-                <div className="relative z-10">
+                {/* Top Images */}
+                <div className="relative z-10 flex justify-center gap-4">
                   <img
-                    src={warningIcon}
+                    src={Warning1}
                     alt="Warning"
-                    className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                  />
+                  <img
+                    src={Warning2}
+                    alt="Warning2"
+                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                   />
                 </div>
-                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
+
+                {/* Yellow Box */}
+                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
                   <h2 className="text-[#FE2B2B] font-bold -mt-2">
                     Warning Message
                   </h2>
                   <p className="text-gray-700 text-sm md:text-base">
-                    Lorem Ipsum is simply dummy text...
+                    Pay securely — no extra charges from the platform. Choose
+                    simple and safe transactions.
                   </p>
                 </div>
               </div>
@@ -1254,7 +1267,9 @@ export default function BiddinggetWorkDetail() {
                 />
                 <Link to={`/dispute/${id}/bidding`}>
                   <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                    Cancel Task and Create Dispute
+                    {orderDetail?.hire_status === "completed"
+                      ? "Create Dispute"
+                      : "Cancel Task and Create Dispute"}
                   </button>
                 </Link>
               </div>
