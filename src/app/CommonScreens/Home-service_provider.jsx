@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "../../redux/userSlice";
 import defaultWorkImage from "../../assets/directHiring/his-work.png";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const IMAGE_URL = import.meta.env.VITE_SOCKET_URL;
@@ -38,10 +39,19 @@ export default function ServiceProviderHome() {
   const [emergency, setEmergency] = useState([]);
   const [emergencyLoading, setEmergencyLoading] = useState(false);
   const [emergencyError, setEmergencyError] = useState(null);
+  const [expanded, setExpanded] = useState({});
+  const [expandedLocation, setExpandedLocation] = useState(null);
 
   const capitalizeFirst = (str) => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const toggleExpand = (id) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   // Fetch banner images
@@ -98,8 +108,7 @@ export default function ServiceProviderHome() {
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id,
-              image:
-                item.image_url[0] || defaultWorkImage,
+              image: item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -148,8 +157,7 @@ export default function ServiceProviderHome() {
           setBidding(
             data.data.map((item) => ({
               id: item._id,
-              image:
-                item.image_url[0] || defaultWorkImage,
+              image: item.image_url[0] || defaultWorkImage,
               work: item.title || "Make a chair",
               description:
                 item.description ||
@@ -199,8 +207,7 @@ export default function ServiceProviderHome() {
           setEmergency(
             data?.data.map((item) => ({
               id: item._id,
-              image:
-                item.image_urls[0] || defaultWorkImage,
+              image: item.image_urls[0] || defaultWorkImage,
               work: item.title || "Emergency task",
 
               description: item.description || "No description",
@@ -520,17 +527,54 @@ export default function ServiceProviderHome() {
                         </h3>
                         <p className="text-black font-medium max-md:text-sm">
                           ₹{card.amount}
-                        </p> 
+                        </p>
                       </div>
-                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">
-                        {capitalizeFirst(card.description)}
-                      </p>
-                      <div
-                        className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                        style={{ backgroundColor: "#F27773", width: "100px" }}
+                      <p
+                        key={card._id}
+                        className="text-gray-600 max-w-[87%] text-xs mt-1"
                       >
-                        {capitalizeFirst(card.location)}
+                        {expanded[card._id]
+                          ? capitalizeFirst(card.description)
+                          : capitalizeFirst(card.description).slice(0, 80)}
+
+                        {card.description.length > 80 && (
+                          <span
+                            onClick={() => toggleExpand(card._id)}
+                            className="text-blue-600 cursor-pointer ml-1"
+                          >
+                            {expanded[card._id] ? "See less" : "... See more"}
+                          </span>
+                        )}
+                      </p>
+
+                      <div className="flex items-center gap-2 px-0 mt-2 rounded-full text-gray-600 text-sm">
+                        <FaMapMarkerAlt
+                          className="text-[#228B22] flex-shrink-0"
+                          size={20}
+                        />
+
+                        <span className="truncate max-w-[200px]">
+                          {expandedLocation === card._id
+                            ? capitalizeFirst(card.location)
+                            : capitalizeFirst(card.location).slice(0, 30)}
+                        </span>
+
+                        {card.location.length > 30 && (
+                          <span
+                            onClick={() =>
+                              setExpandedLocation(
+                                expandedLocation === card._id ? null : card._id
+                              )
+                            }
+                            className="text-blue-600 cursor-pointer text-xs ml-1"
+                          >
+                            {expandedLocation === card._id
+                              ? "See less"
+                              : "See more"}
+                          </span>
+                        )}
                       </div>
+
                       <div
                         className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
                         onClick={() =>
@@ -605,15 +649,52 @@ export default function ServiceProviderHome() {
                           ₹{card.amount}
                         </p>
                       </div>
-                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">
-                        {capitalizeFirst(card.description)}
-                      </p>
-                      <div
-                        className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                        style={{ backgroundColor: "#F27773", width: "100px" }}
+                      <p
+                        key={card._id}
+                        className="text-gray-600 max-w-[87%] text-xs mt-1"
                       >
-                        {capitalizeFirst(card.location)}
+                        {expanded[card._id]
+                          ? capitalizeFirst(card.description)
+                          : capitalizeFirst(card.description).slice(0, 80)}
+
+                        {card.description.length > 80 && (
+                          <span
+                            onClick={() => toggleExpand(card._id)}
+                            className="text-blue-600 cursor-pointer ml-1"
+                          >
+                            {expanded[card._id] ? "See less" : "... See more"}
+                          </span>
+                        )}
+                      </p>
+
+                      <div className="flex items-center gap-2 px-0 mt-2 rounded-full text-gray-600 text-sm">
+                        <FaMapMarkerAlt
+                          className="text-[#228B22] flex-shrink-0"
+                          size={20}
+                        />
+
+                        <span className="truncate max-w-[200px]">
+                          {expandedLocation === card._id
+                            ? capitalizeFirst(card.location)
+                            : capitalizeFirst(card.location).slice(0, 30)}
+                        </span>
+
+                        {card.location.length > 30 && (
+                          <span
+                            onClick={() =>
+                              setExpandedLocation(
+                                expandedLocation === card._id ? null : card._id
+                              )
+                            }
+                            className="text-blue-600 cursor-pointer text-xs ml-1"
+                          >
+                            {expandedLocation === card._id
+                              ? "See less"
+                              : "See more"}
+                          </span>
+                        )}
                       </div>
+
                       <div
                         className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
                         onClick={() =>
@@ -657,7 +738,7 @@ export default function ServiceProviderHome() {
                 //     Please Turn on Emergency Button to get Emergency Task
                 //   </p>
                 // )
-								
+
                 emergency.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {visibleEmergency.map((card, index) => (
@@ -684,14 +765,51 @@ export default function ServiceProviderHome() {
                             ₹{card.amount}
                           </p>*/}
                         </div>
-                        <p className="text-gray-600 max-w-[87%] text-xs mt-1">
-                          {capitalizeFirst(card.description)}
-                        </p>
-                        <div
-                          className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                          style={{ backgroundColor: "#F27773", width: "100px" }}
+                        <p
+                          key={card._id}
+                          className="text-gray-600 max-w-[87%] text-xs mt-1"
                         >
-                          {capitalizeFirst(card.location)}
+                          {expanded[card._id]
+                            ? capitalizeFirst(card.description)
+                            : capitalizeFirst(card.description).slice(0, 80)}
+
+                          {card.description.length > 80 && (
+                            <span
+                              onClick={() => toggleExpand(card._id)}
+                              className="text-blue-600 cursor-pointer ml-1"
+                            >
+                              {expanded[card._id] ? "See less" : "... See more"}
+                            </span>
+                          )}
+                        </p>
+                        <div className="flex items-center gap-2 px-0 mt-2 rounded-full text-gray-600 text-sm">
+                          <FaMapMarkerAlt
+                            className="text-[#228B22] flex-shrink-0"
+                            size={20}
+                          />
+
+                          <span className="truncate max-w-[400px]">
+                            {expandedLocation === card._id
+                              ? capitalizeFirst(card.location)
+                              : capitalizeFirst(card.location).slice(0, 30)}
+                          </span>
+
+                          {card.location.length > 30 && (
+                            <span
+                              onClick={() =>
+                                setExpandedLocation(
+                                  expandedLocation === card._id
+                                    ? null
+                                    : card._id
+                                )
+                              }
+                              className="text-blue-600 cursor-pointer text-xs ml-1"
+                            >
+                              {expandedLocation === card._id
+                                ? "See less"
+                                : "See more"}
+                            </span>
+                          )}
                         </div>
                         <div
                           className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"

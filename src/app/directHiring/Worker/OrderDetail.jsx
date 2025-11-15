@@ -261,8 +261,8 @@ export default function ViewProfile() {
       }
     } catch (err) {
       console.error("Error accepting offer:", err);
-			const errorMessage =
-    err?.response?.data?.message || "Something went wrong.";
+      const errorMessage =
+        err?.response?.data?.message || "Something went wrong.";
       await Swal.fire({
         icon: "error",
         title: "Oops!",
@@ -270,7 +270,9 @@ export default function ViewProfile() {
         confirmButtonColor: "#FF0000",
         showConfirmButton: false,
         timer: 2000, // Auto-close after 2 seconds
-      }).then(() => {fetchData(false);});
+      }).then(() => {
+        fetchData(false);
+      });
     } finally {
       setIsAccepting(false);
     }
@@ -438,7 +440,7 @@ export default function ViewProfile() {
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
                 <div>
-                  <div className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
+                  <div className=" text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
                     <FaMapMarkerAlt
                       size={25}
                       color="#228B22"
@@ -447,8 +449,13 @@ export default function ViewProfile() {
                     {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
                   </div>
+									<span className="text-gray-600 text-sm font-semibold block">
+              Deadline Date&Time:{" "}
+              {orderData?.deadline
+                ? new Date(orderData.deadline).toLocaleString()
+                : "N/A"}
+            </span>
                 </div>
-								<span>One Time Project fee :- ₹{orderData?.platform_fee || "0"}</span>
               </div>
               <div className="text-right space-y-2 tracking-tight">
                 <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
@@ -496,19 +503,18 @@ export default function ViewProfile() {
                       }`}
                   >
                     {orderData?.hire_status === "cancelledDispute"
-                      ?`Cancelled ${" "} Dispute` : orderData.hire_status
+                      ? `Cancelled ${" "} Dispute`
+                      : orderData.hire_status
                           .split(" ")
                           .map(
                             (word) =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                           )
-                          .join(" ")
-                      || "Unknown Status"}
+                          .join(" ") || "Unknown Status"}
                   </span>
                 </span>
               </div>
             </div>
-
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
                 {orderData?.description}
@@ -531,7 +537,13 @@ export default function ViewProfile() {
                       />
                       <div>
                         <p className="text-lg font-semibold">
-                          {orderData?.user_id?.full_name.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Unknown User"}
+                          {orderData?.user_id?.full_name
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ") || "Unknown User"}
                         </p>
                         {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
@@ -546,38 +558,53 @@ export default function ViewProfile() {
                       </div>
                     </div>
 
-                    {(orderData?.hire_status === "cancelled" || orderData?.hire_status === "cancelledDispute") ? " " : <div className="text-center">
-                      <p className="text-gray-600 font-medium mb-2">Contact</p>
-                      <div className="flex space-x-2 justify-center mt-1">
-                        <button
-                          className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                          title="Call"
-                          onClick={() =>
-                            window.open(
-                              `tel:${orderData.user_id.phone}`,
-                              "_self"
-                            )
-                          }
-                        >
-                          <img src={CallIcon} alt="Call" className="w-6 h-6" />
-                        </button>
-                        <button
-                          className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                          title="Chat"
-                          onClick={() =>
-                            handleChatOpen(orderData.user_id._id, userId)
-                          }
-                        >
-                          <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
-                        </button>
+                    {orderData?.hire_status === "cancelled" ||
+                    orderData?.hire_status === "cancelledDispute" ? (
+                      " "
+                    ) : (
+                      <div className="text-center">
+                        <p className="text-gray-600 font-medium mb-2">
+                          Contact
+                        </p>
+                        <div className="flex space-x-2 justify-center mt-1">
+                          <button
+                            className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                            title="Call"
+                            onClick={() =>
+                              window.open(
+                                `tel:${orderData.user_id.phone}`,
+                                "_self"
+                              )
+                            }
+                          >
+                            <img
+                              src={CallIcon}
+                              alt="Call"
+                              className="w-6 h-6"
+                            />
+                          </button>
+                          <button
+                            className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                            title="Chat"
+                            onClick={() =>
+                              handleChatOpen(orderData.user_id._id, userId)
+                            }
+                          >
+                            <img
+                              src={ChatIcon}
+                              alt="Chat"
+                              className="w-6 h-6"
+                            />
+                          </button>
+                        </div>
                       </div>
-                    </div>}
+                    )}
 
                     {orderData?.hire_status === "cancelled" ? (
                       <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">
                         Project is Cancelled by User
                       </div>
-                    ) : (offerStatus === "accepted") ? (
+                    ) : offerStatus === "accepted" ? (
                       <>
                         <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
                           Accepted
@@ -628,7 +655,7 @@ export default function ViewProfile() {
             ) : (
               <></>
             )}
-							{orderData?.hire_status === "completed" && (
+            {orderData?.hire_status === "completed" && (
               <div className="flex justify-center">
                 <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-not-allowed">
                   Task Completed
@@ -645,7 +672,7 @@ export default function ViewProfile() {
                   user_id={orderData?.service_provider_id?._id}
                   assignedWorker={assignedWorker}
                   paymentHistory={orderData?.service_payment?.payment_history}
-									fullPaymentHistory={orderData?.service_payment}
+                  fullPaymentHistory={orderData?.service_payment}
                   orderId={id}
                   hireStatus={orderData?.hire_status}
                 />
@@ -674,7 +701,9 @@ export default function ViewProfile() {
                     <div className="flex space-x-4">
                       <Link to={`/dispute/${id}/direct`}>
                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          {orderData?.hire_status === "completed" ? "Create Dispute": "Cancel Task and Create Dispute"}
+                          {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
                         </button>
                       </Link>
                     </div>

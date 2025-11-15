@@ -1021,7 +1021,13 @@ const handleMarkComplete = async () => {
                     {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
-								<span>One Time Project fee :- ₹{orderData?.platform_fee || "0"}</span>
+								<span className="text-gray-600 text-sm font-semibold block" >One Time Project fee :- ₹{orderData?.platform_fee || "0"}</span>
+								<span className="text-gray-600 text-sm font-semibold block">
+                  Deadline Date&Time:{" "}
+                  {orderData?.deadline
+                    ? new Date(orderData.deadline).toLocaleString()
+                    : "N/A"}
+                </span>
               </div>
               <div className="text-right space-y-2 tracking-tight">
                 <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
@@ -1102,12 +1108,6 @@ const handleMarkComplete = async () => {
                     </span>
                   </span>
                 )}
-                <span className="text-gray-600 font-semibold block">
-                  Deadline Date:{" "}
-                  {orderData?.deadline
-                    ? new Date(orderData.deadline).toLocaleDateString()
-                    : "N/A"}
-                </span>
               </div>
             </div>
 

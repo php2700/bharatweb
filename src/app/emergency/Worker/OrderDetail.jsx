@@ -117,7 +117,7 @@ export default function ViewProfile() {
     fetchData();
   }, [id, orderData?.hire_status]);
 
-	const sliderSettings = {
+  const sliderSettings = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -198,7 +198,7 @@ export default function ViewProfile() {
                   {orderData?.sub_category_ids
                     .map((sub) => sub.name)
                     .join(", ") || "No Address Provided"}
-                  <div className="text-gray-600 flex justify-center items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                  <div className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
                     {" "}
                     <span>
                       <FaMapMarkerAlt
@@ -209,6 +209,12 @@ export default function ViewProfile() {
                     </span>
                     {orderData?.google_address || "Unknown Location"}
                   </div>
+                  <span className="text-gray-600 text-sm font-semibold block">
+                    Deadline Date&Time:{" "}
+                    {orderData?.deadline
+                      ? new Date(orderData.deadline).toLocaleString()
+                      : "N/A"}
+                  </span>
                 </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">

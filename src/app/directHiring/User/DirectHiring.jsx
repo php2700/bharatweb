@@ -295,17 +295,19 @@ const DirectHiring = () => {
             <span className="text-sm font-medium text-gray-600 flex items-center justify-between">
               Address
             </span>
+
             <div className="relative">
               <input
                 id="address-input"
                 type="text"
                 readOnly
-                value={address || profile?.location?.address}
+                value={address || profile?.location?.address || ""}
                 placeholder="Enter or select address"
                 className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
                 aria-invalid={errors.address ? "true" : "false"}
                 onClick={() => setShowOptions(!showOptions)}
               />
+
               <button
                 type="button"
                 onClick={() => setShowOptions(!showOptions)}
@@ -313,6 +315,7 @@ const DirectHiring = () => {
               >
                 {showOptions ? "▲" : "▼"}
               </button>
+
               {showOptions && (
                 <div className="absolute top-full left-0 mt-2 w-full rounded-lg border border-gray-300 bg-white shadow-lg p-3 z-50">
                   {profile?.full_address?.map((loc) => (
@@ -324,13 +327,18 @@ const DirectHiring = () => {
                         type="radio"
                         name="address"
                         value={loc.address}
-                        checked={address === loc.address}
+                        checked={
+                          address
+                            ? address === loc.address
+                            : profile?.location?.address === loc.address
+                        }
                         onClick={() => {
                           setAddress(loc.address);
                           setShowOptions(false);
                           updateAddress(loc);
                         }}
                       />
+
                       <div className="flex flex-col bg-gray-50 rounded-lg p-2 w-full">
                         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
                           <div>
@@ -341,22 +349,34 @@ const DirectHiring = () => {
                               {loc.title}
                             </span>
                           </div>
+
                           <div>
                             <span className="block font-semibold text-xs">
                               House No
                             </span>
                             <span className="text-gray-700 text-[12px]">
-                              {loc.houseno ? loc?.houseno : "N/A"}
+                              {loc.houseno || "N/A"}
                             </span>
                           </div>
+
                           <div>
                             <span className="block font-semibold text-xs">
                               Area
                             </span>
                             <span className="text-gray-700 text-[12px]">
-                              {loc.area ? loc.area : "N/A"}
+                              {loc.area || "N/A"}
                             </span>
                           </div>
+
+                          <div>
+                            <span className="block font-semibold text-xs">
+                              Pincode
+                            </span>
+                            <span className="text-gray-700 text-[12px]">
+                              {loc.pincode || "N/A"}
+                            </span>
+                          </div>
+
                           <div className="col-span-2">
                             <span className="block font-semibold text-xs">
                               Full Address
@@ -372,6 +392,7 @@ const DirectHiring = () => {
                 </div>
               )}
             </div>
+
             {errors.address && (
               <p className="text-red-500 text-sm mt-1">{errors.address}</p>
             )}

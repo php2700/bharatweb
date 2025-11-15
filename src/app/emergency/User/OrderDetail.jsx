@@ -750,7 +750,12 @@ export default function ViewProfile() {
                 )}
               </div>
             </div>
-
+            <span className="text-gray-600 text-sm font-semibold block">
+              Deadline Date&Time:{" "}
+              {orderData?.deadline
+                ? new Date(orderData.deadline).toLocaleString()
+                : "N/A"}
+            </span>
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
                 {orderData?.description || "No details available."}
@@ -979,8 +984,8 @@ export default function ViewProfile() {
                         <Link to={`/dispute/${id}/emergency`}>
                           <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
                             {orderData?.hire_status === "completed"
-                            ? "Create Dispute"
-                            : "Cancel Task and Create Dispute"}
+                              ? "Create Dispute"
+                              : "Cancel Task and Create Dispute"}
                           </button>
                         </Link>
                       </div>
