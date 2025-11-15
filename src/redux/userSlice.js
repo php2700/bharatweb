@@ -27,6 +27,16 @@ export const fetchUserProfile = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
+      if(res.status===403){
+        console.log("fetchUserProfile: 403 Forbidden, clearing token");
+          localStorage.removeItem("bharat_token");
+          localStorage.removeItem("isProfileComplete");
+          localStorage.removeItem("role");
+          localStorage.removeItem("otp");
+          localStorage.removeItem("selectedAddressId");
+          window.location.href = "/login"; // Redirect to login
+          return rejectWithValue("Access forbidden, please log in again");
+      }
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
@@ -37,9 +47,16 @@ export const fetchUserProfile = createAsyncThunk(
           localStorage.removeItem("role");
           localStorage.removeItem("otp");
           localStorage.removeItem("selectedAddressId");
+          toast.error( "Admin has disabled your account.");
+          window.location.href = "/login"; // Redirect to login
+          
           return rejectWithValue("Session expired, please log in again");
         }
         console.log("fetchUserProfile: Failed with status", res.status, errorData?.message);
+  //       localStorage.removeItem("bharat_token");
+  // localStorage.removeItem("isProfileComplete");
+  // localStorage.removeItem("otp");
+  // localStorage.removeItem("role");
         return rejectWithValue(errorData?.message || "Failed to fetch profile");
       }
 

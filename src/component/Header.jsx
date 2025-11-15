@@ -17,6 +17,8 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
+
+  
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -271,15 +273,18 @@ if (isLoggedIn) {
           }
           if (result.payload?.location) {
             const addressTitle =
-              result.payload.location.title ||
-              result.payload.location.address ||
+              result.payload.full_address?.[0]?.address ||
+              result.payload.full_address?.[0]?.address ||
               "Location";
             setSelectedAddress(addressTitle);
             localStorage.setItem("selectedAddressTitle", addressTitle);
-            if (result.payload.location._id) {
-              setSelectedAddressId(result.payload.location._id);
-              localStorage.setItem("selectedAddressId", result.payload.location._id);
-            }
+            if (result.payload.full_address?.length > 0) {
+  const firstAddressId = result.payload.full_address[0]._id;
+
+  setSelectedAddressId(firstAddressId);
+  localStorage.setItem("selectedAddressId", firstAddressId);
+}
+
           }
         } else if (fetchUserProfile.rejected.match(result)) {
           toast.error(result.payload || "Failed to fetch user profile");
@@ -317,34 +322,80 @@ if (isLoggedIn) {
           return;
         }
 
-        const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
+      //   const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+      //     method: "GET",
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   });
+      //   const data = await res.json();
 
-        if (res.ok && data.success) {
-          const combinedNotifications = [
-            ...reduxNotifications,
-            ...(data.notifications || []),
-          ];
-          setNotifications(combinedNotifications);
+      //   if (res.ok && data.success) {
+      //     const combinedNotifications = [
+      //       ...reduxNotifications,
+      //       ...(data.notifications || []),
+      //     ];
+      //     setNotifications(combinedNotifications);
 
-          const count = combinedNotifications.filter((notif) => !notif.isRead);
-          setNotificationCount(count.length);
-        } else {
-          if (res.status === 401) {
-            handleUnauthorized();
-            return;
-          }
-          setNotifError(data.message || "Failed to fetch notifications");
-          toast.error(data.message || "Failed to fetch notifications");
-        }
-      } catch (err) {
-        setNotifError("Something went wrong while fetching notifications");
-      } finally {
-        setIsNotifLoading(false);
-      }
+      //     const count = combinedNotifications.filter((notif) => !notif.isRead);
+      //     setNotificationCount(count.length);
+      //   } else {
+      //     if (res.status === 401) {
+      //       handleUnauthorized();
+      //       return;
+      //     }
+      //     setNotifError(data.message || "Failed to fetch notifications");
+      //     toast.error(data.message || "Failed to fetch notifications");
+      //   }
+      // } catch (err) {
+      //   setNotifError("Something went wrong while fetching notifications");
+      // } finally {
+      //   setIsNotifLoading(false);
+      // }
+      const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+  method: "GET",
+  headers: { Authorization: `Bearer ${token}` },
+});
+const data = await res.json();
+
+if (res.ok && data.success) {
+  const combinedNotifications = [
+    ...reduxNotifications,
+    ...(data.notifications || []),
+  ];
+  setNotifications(combinedNotifications);
+
+  const count = combinedNotifications.filter((notif) => !notif.isRead);
+  setNotificationCount(count.length);
+
+} else {
+  if (res.status === 401) {
+    handleUnauthorized();
+    return;
+  }
+
+  // 🔥🔥 ADMIN DISABLED ACCOUNT CHECK (added without changing your structure)
+  if (
+    data?.status === false &&
+    data?.message === "Admin has disabled your account."
+  ) {
+    localStorage.removeItem("bharat_token");
+    localStorage.removeItem("isProfileComplete");
+    localStorage.removeItem("otp");
+    localStorage.removeItem("role");
+     toast.error( "Admin has disabled your account.");
+    
+    return;
+  }
+
+  setNotifError(data.message || "Failed to fetch notifications");
+  toast.error(data.message || "Failed to fetch notifications");
+}
+
+} catch (err) {
+  setNotifError("Something went wrong while fetching notifications");
+} finally {
+  setIsNotifLoading(false);
+}
+
     };
 
     if (isLoggedIn) {
