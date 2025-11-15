@@ -271,15 +271,18 @@ if (isLoggedIn) {
           }
           if (result.payload?.location) {
             const addressTitle =
-              result.payload.location.title ||
-              result.payload.location.address ||
+              result.payload.full_address?.[0]?.address ||
+              result.payload.full_address?.[0]?.address ||
               "Location";
             setSelectedAddress(addressTitle);
             localStorage.setItem("selectedAddressTitle", addressTitle);
-            if (result.payload.location._id) {
-              setSelectedAddressId(result.payload.location._id);
-              localStorage.setItem("selectedAddressId", result.payload.location._id);
-            }
+            if (result.payload.full_address?.length > 0) {
+  const firstAddressId = result.payload.full_address[0]._id;
+
+  setSelectedAddressId(firstAddressId);
+  localStorage.setItem("selectedAddressId", firstAddressId);
+}
+
           }
         } else if (fetchUserProfile.rejected.match(result)) {
           toast.error(result.payload || "Failed to fetch user profile");
