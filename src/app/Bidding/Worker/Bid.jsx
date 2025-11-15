@@ -346,7 +346,13 @@ export default function Bid() {
                     <span className="truncate">{worker.location || "N/A"}</span>
                   </span>
                   <p className="font-semibold text-lg my-2 text-[#008000]">
-                    ₹{worker.amount}/-
+                    Cost :- ₹{worker.amount}/-
+                  </p>
+									<p className="text-sm">
+                    <span className="font-semibold">
+                      Completion Date:{" "}
+                      {new Date(worker.completionDate).toLocaleString()}
+                    </span>
                   </p>
                 </div>
                 <div className="text-right">
@@ -357,14 +363,6 @@ export default function Bid() {
                     <span className="font-semibold">
                       Posted Date:{" "}
                       {new Date(worker.date).toLocaleDateString("en-GB")}
-                    </span>
-                  </p>
-                  <p className="text-md">
-                    <span className="font-semibold">
-                      Completion Date:{" "}
-                      {new Date(worker.completionDate).toLocaleDateString(
-                        "en-GB"
-                      )}
                     </span>
                   </p>
                   <span className="text-gray-600 font-semibold block">
