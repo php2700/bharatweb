@@ -849,15 +849,18 @@ export default function BiddinggetWorkDetail() {
                 )}
               </div>
             </div>
-						<p className="text-sm">
-                  <span className="font-semibold">
-                    Completion Date: {orderDetail?.deadline.toLocaleString()}
-                  </span>
-                </p>
+            <p className="text-sm">
+              <span className="font-semibold">
+                Completion Date:{" "}
+                {orderDetail?.deadline
+                  ? new Date(orderDetail.deadline).toLocaleString()
+                  : "N/A"}
+              </span>
+            </p>
             <p className="font-semibold">
               Category: {orderDetail?.category_id?.name}
             </p>
-						
+
             <p className="font-semibold">
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}

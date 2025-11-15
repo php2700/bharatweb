@@ -449,12 +449,12 @@ export default function ViewProfile() {
                     {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
                   </div>
-									<span className="text-gray-600 text-sm font-semibold block">
-              Deadline Date&Time:{" "}
-              {orderData?.deadline
-                ? new Date(orderData.deadline).toLocaleString()
-                : "N/A"}
-            </span>
+                  <span className="text-gray-600 text-sm font-semibold block">
+                    Deadline Date&Time:{" "}
+                    {orderData?.deadline
+                      ? new Date(orderData.deadline).toLocaleString()
+                      : "N/A"}
+                  </span>
                 </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">
@@ -520,6 +520,14 @@ export default function ViewProfile() {
                 {orderData?.description}
               </p>
             </div>
+            {orderData?.hire_status === "cancelledDispute" && (
+              <p className="text-sm text-gray-700 mt-3 flex items-center">
+                Note:{" "}
+                <span className="text-red-600 font-semibold ml-1">
+                  Freezed by Platform
+                </span>
+              </p>
+            )}
             {orderData?.hire_status === "pending" ||
             orderData?.hire_status === "cancelled" ? (
               <div className="mb-6">

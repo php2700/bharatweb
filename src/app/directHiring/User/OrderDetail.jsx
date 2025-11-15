@@ -1060,7 +1060,7 @@ const handleMarkComplete = async () => {
                       }
                       ${
                         orderData?.hire_status === "cancelledDispute"
-                          ? "bg-orange-500"
+                          ? "bg-[#FF0000]"
                           : ""
                       }
                       ${
@@ -1425,7 +1425,7 @@ const handleMarkComplete = async () => {
                 </button>
               ) : orderData?.hire_status === "cancelledDispute" ? (
                 <>
-                  <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                  <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                     Cancelled ({disputeInfo.unique_id || "No Id"})
                   </span>
 
