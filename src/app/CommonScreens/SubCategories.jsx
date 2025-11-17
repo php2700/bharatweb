@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import defaultImage from "../../assets/workcategory/barber.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -168,7 +169,7 @@ export default function OurSubCategories() {
                         src={
                           sub.image
                             ? sub.image
-                            : "/src/assets/workcategory/default.png"
+                            : defaultImage
                         }
                         alt={sub.name}
                         className="w-[39px] h-[39px]"
@@ -216,11 +217,11 @@ export default function OurSubCategories() {
             {bannerImages.map((banner, index) => (
               <div key={index}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
+                  src={banner || defaultImage} // Fallback image
                   alt={`Banner ${index + 1}`}
                   className="w-full h-[400px] object-cover"
                   onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
+                    e.target.src = defaultImage; // Fallback on image load error
                   }}
                 />
               </div>

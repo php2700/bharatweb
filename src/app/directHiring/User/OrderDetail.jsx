@@ -59,6 +59,7 @@ export default function ViewProfile() {
   const [showChangeProvider, setShowChangeProvider] = useState(false);
   const [expandedAddresses, setExpandedAddresses] = useState({});
   const [disputeInfo, setDisputeInfo] = useState(null);
+	 const [openImage, setOpenImage] = useState(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -647,129 +648,128 @@ export default function ViewProfile() {
   //   }
   // };
 
+  const handleMarkComplete = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
 
-const handleMarkComplete = async () => {
-  try {
-    const token = localStorage.getItem("bharat_token");
+      const response = await axios.post(
+        `${BASE_URL}/direct-order/completeOrderUser`,
+        { order_id: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    const response = await axios.post(
-      `${BASE_URL}/direct-order/completeOrderUser`,
-      { order_id: id },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    // ✅ Success: order completed
-    if (response.status === 200 && response.data.status) {
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Order marked as complete successfully!",
-        confirmButtonColor: "#228B22",
-      })
-        .then(() => fetchData())
-        .then(() => {
-          setTimeout(() => {
-            setShowCompletedModal(true);
-          }, 150);
-        });
-    }
-  } catch (err) {
-    console.error(err);
-
-    // ⚠️ If payment is pending (status 400)
-    if (err.response && err.response.status === 400) {
-      const { pendingPaymentsCount, message } = err.response.data;
-
-      Swal.fire({
-        icon: "error",
-        title: `Pending Payments: ${pendingPaymentsCount}`,
-        text: message,
-        confirmButtonText: "OK",
-        confirmButtonColor: "#FF0000",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-
-          // 🟢 Ask user if they want to release all payments
-          const confirmRelease = await Swal.fire({
-            title: "Release All Payments?",
-            text: "Do you want to release all pending payments now?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#228B22",
-            cancelButtonColor: "#FF0000",
-            confirmButtonText: "Yes, release all",
+      // ✅ Success: order completed
+      if (response.status === 200 && response.data.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Order marked as complete successfully!",
+          confirmButtonColor: "#228B22",
+        })
+          .then(() => fetchData())
+          .then(() => {
+            setTimeout(() => {
+              setShowCompletedModal(true);
+            }, 150);
           });
+      }
+    } catch (err) {
+      console.error(err);
 
-          if (confirmRelease.isConfirmed) {
-            try {
-              const token = localStorage.getItem("bharat_token");
-              const releaseResponse = await axios.put(
-                `${BASE_URL}/direct-order/requestAllPaymentReleases/${id}`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
+      // ⚠️ If payment is pending (status 400)
+      if (err.response && err.response.status === 400) {
+        const { pendingPaymentsCount, message } = err.response.data;
 
-              if (releaseResponse.status === 200 && releaseResponse.data.status) {
-                
-                // 🎉 Payments released successfully
-                Swal.fire({
-                  icon: "success",
-                  title: "Payments Released!",
-                  text: "All pending payments have been successfully released.",
-                  confirmButtonColor: "#228B22",
-                }).then(async () => {
+        Swal.fire({
+          icon: "error",
+          title: `Pending Payments: ${pendingPaymentsCount}`,
+          text: message,
+          confirmButtonText: "OK",
+          confirmButtonColor: "#FF0000",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // 🟢 Ask user if they want to release all payments
+            const confirmRelease = await Swal.fire({
+              title: "Release All Payments?",
+              text: "Do you want to release all pending payments now?",
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonColor: "#228B22",
+              cancelButtonColor: "#FF0000",
+              confirmButtonText: "Yes, release all",
+            });
 
-                  // ⭐ NEW STEP ADDED HERE ⭐
-                  const askToComplete = await Swal.fire({
-                    title: "Complete Order?",
-                    text: "All payments are released. Do you want to complete the order now?",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, Complete Order",
-                    cancelButtonText: "No",
+            if (confirmRelease.isConfirmed) {
+              try {
+                const token = localStorage.getItem("bharat_token");
+                const releaseResponse = await axios.put(
+                  `${BASE_URL}/direct-order/requestAllPaymentReleases/${id}`,
+                  {},
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                if (
+                  releaseResponse.status === 200 &&
+                  releaseResponse.data.status
+                ) {
+                  // 🎉 Payments released successfully
+                  Swal.fire({
+                    icon: "success",
+                    title: "Payments Released!",
+                    text: "All pending payments have been successfully released.",
                     confirmButtonColor: "#228B22",
-                    cancelButtonColor: "#FF0000",
+                  }).then(async () => {
+                    // ⭐ NEW STEP ADDED HERE ⭐
+                    const askToComplete = await Swal.fire({
+                      title: "Complete Order?",
+                      text: "All payments are released. Do you want to complete the order now?",
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Yes, Complete Order",
+                      cancelButtonText: "No",
+                      confirmButtonColor: "#228B22",
+                      cancelButtonColor: "#FF0000",
+                    });
+
+                    if (askToComplete.isConfirmed) {
+                      handleMarkComplete(); // 🔁 Call again to complete order
+                    }
                   });
-
-                  if (askToComplete.isConfirmed) {
-                    handleMarkComplete(); // 🔁 Call again to complete order
-                  }
-                });
-
-              } else {
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Failed!",
+                    text:
+                      releaseResponse.data.message ||
+                      "Failed to release payments.",
+                    confirmButtonColor: "#FF0000",
+                  });
+                }
+              } catch (releaseErr) {
+                console.error(releaseErr);
                 Swal.fire({
                   icon: "error",
-                  title: "Failed!",
-                  text: releaseResponse.data.message || "Failed to release payments.",
+                  title: "Error!",
+                  text: "Something went wrong while releasing payments.",
                   confirmButtonColor: "#FF0000",
                 });
               }
-            } catch (releaseErr) {
-              console.error(releaseErr);
-              Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: "Something went wrong while releasing payments.",
-                confirmButtonColor: "#FF0000",
-              });
             }
           }
-        }
-      });
-    } else {
-      // 🚫 Other errors
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to mark order as complete. Please try again.",
-        confirmButtonColor: "#FF0000",
-      });
+        });
+      } else {
+        // 🚫 Other errors
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Failed to mark order as complete. Please try again.",
+          confirmButtonColor: "#FF0000",
+        });
+      }
     }
-  }
-};
+  };
 
-
-	const handleConfirmCancel = async () => {
+  const handleConfirmCancel = async () => {
     setShowModal(false);
     try {
       const token = localStorage.getItem("bharat_token");
@@ -959,7 +959,7 @@ const handleMarkComplete = async () => {
     }
     return address.substring(0, maxLength) + "...";
   };
-
+  const images = Array.isArray(orderData?.image_url) ? orderData.image_url : [];
   return (
     <>
       <Header />
@@ -975,24 +975,30 @@ const handleMarkComplete = async () => {
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          {orderData?.image_url?.length > 0 ? (
-            <Carousel
-              showArrows={true}
-              showThumbs={false}
-              infiniteLoop={true}
-              autoPlay={true}
-              className="w-full h-[360px]"
-            >
-              {orderData.image_url.map((url, index) => (
-                <div key={index}>
-                  <img
-                    src={url}
-                    alt={`Project image ${index + 1}`}
-                    className="w-full h-[360px] object-cover"
-                  />
-                </div>
-              ))}
-            </Carousel>
+          {images.length > 0 ? (
+            // give the carousel a fixed height wrapper so images show reliably
+            <div className="w-full" style={{ maxWidth: "100%", height: 360 }}>
+              <Carousel
+                showArrows={true}
+                showThumbs={false}
+                infiniteLoop={true}
+                autoPlay={true}
+                interval={3000}
+                emulateTouch={true}
+                showStatus={false}
+                onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+              >
+                {images.map((url, index) => (
+                  <div key={index} className="h-[360px]">
+                    <img
+                      src={url}
+                      className="h-[360px] w-full object-cover"
+                      alt={`Project image ${index + 1}`}
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            </div>
           ) : (
             <img
               src={defaultWorkImage}
@@ -1000,7 +1006,28 @@ const handleMarkComplete = async () => {
               className="w-full h-[360px] object-cover mt-5"
             />
           )}
+        
+					{openImage && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              onClick={() => setOpenImage(null)}
+            >
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
+                <img
+                  src={openImage}
+                  alt="Preview"
+                  className="max-w-[85vw] max-h-[85vh] rounded-xl shadow-2xl"
+                />
 
+                <button
+                  onClick={() => setOpenImage(null)}
+                  className="absolute -top-4 -right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
@@ -1021,8 +1048,10 @@ const handleMarkComplete = async () => {
                     {orderData?.address || "Unknown Location"}
                   </div>
                 </div>
-								<span className="text-gray-600 text-sm font-semibold block" >One Time Project fee :- ₹{orderData?.platform_fee || "0"}</span>
-								<span className="text-gray-600 text-sm font-semibold block">
+                <span className="text-gray-600 text-sm font-semibold block">
+                  One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+                </span>
+                <span className="text-gray-600 text-sm font-semibold block">
                   Deadline Date&Time:{" "}
                   {orderData?.deadline
                     ? new Date(orderData.deadline).toLocaleString()
@@ -1167,7 +1196,8 @@ const handleMarkComplete = async () => {
                               .map(
                                 (word) =>
                                   word.charAt(0).toUpperCase() + word.slice(1)
-                              ).join(" ") || "Unknown Provider"}{" "}
+                              )
+                              .join(" ") || "Unknown Provider"}{" "}
                             <span className="text-gray-500 text-sm">
                               ({provider.provider_id.unique_id})
                             </span>

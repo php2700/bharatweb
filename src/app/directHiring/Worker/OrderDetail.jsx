@@ -42,6 +42,7 @@ export default function ViewProfile() {
   const [showCompletedModal, setShowCompletedModal] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [openImage, setOpenImage] = useState(null);
 
   const user = useSelector((state) => state.user.profile);
   const userId = user?._id;
@@ -392,7 +393,8 @@ export default function ViewProfile() {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-
+  const images = Array.isArray(orderData?.image_url) ? orderData.image_url : [];
+  
   return (
     <>
       <Header />
@@ -408,30 +410,58 @@ export default function ViewProfile() {
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          {orderData?.image_url?.length > 0 ? (
-            <Carousel
-              showArrows={true}
-              showThumbs={false}
-              infiniteLoop={true}
-              autoPlay={false}
-              className="w-full h-[360px]"
-            >
-              {orderData.image_url.map((url, index) => (
-                <div key={index}>
-                  <img
-                    src={url}
-                    alt={`Project image ${index + 1}`}
-                    className="w-full h-[360px] object-cover"
-                  />
-                </div>
-              ))}
-            </Carousel>
+          {images.length > 0 ? (
+            // give the carousel a fixed height wrapper so images show reliably
+            <div className="w-full" style={{ maxWidth: "100%", height: 360 }}>
+              <Carousel
+                showArrows={true}
+                showThumbs={false}
+                infiniteLoop={true}
+                autoPlay={true}
+                interval={3000}
+                emulateTouch={true}
+                showStatus={false}
+                onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+              >
+                {images.map((url, index) => (
+                  <div key={index} className="h-[360px]">
+                    <img
+                      src={url}
+                      className="h-[360px] w-full object-cover"
+                      alt={`Project image ${index + 1}`}
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            </div>
           ) : (
             <img
               src={defaultWorkImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
+          )}
+
+          {openImage && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              onClick={() => setOpenImage(null)}
+            >
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
+                <img
+                  src={openImage}
+                  alt="Preview"
+                  className="max-w-[85vw] max-h-[85vh] rounded-xl shadow-2xl"
+                />
+
+                <button
+                  onClick={() => setOpenImage(null)}
+                  className="absolute -top-4 -right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
           )}
 
           <div className="p-6">
