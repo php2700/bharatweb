@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "../assets/logo.svg";
 import Dropdown from "../assets/dropdown.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, clearUserProfile } from "../redux/userSlice";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,8 +17,6 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
-
-  
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -63,24 +61,35 @@ export default function Header() {
   const { notifications: reduxNotifications } = useSelector(
     (state) => state.emergency
   );
-// const role = localStorage.getItem("role");
-	const role = profile?.role || "service_provider";
+  const location = useLocation();
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // const role = localStorage.getItem("role");
+  const role = profile?.role || "service_provider";
 
   // let homeLink = "/";
   // if (isLoggedIn) {
   //   homeLink = role === "service_provider" ? "/homeservice" : "/homeuser";
   // }
 
-let homeLink = "/";
+  let homeLink = "/";
 
-if (isLoggedIn) {
-  if (role === "both" || role === "service_provider") {
-    homeLink = "/homeservice";
-  } else if (role === "user") {
-    homeLink = "/homeuser";
+  if (isLoggedIn) {
+    if (role === "both" || role === "service_provider") {
+      homeLink = "/homeservice";
+    } else if (role === "user") {
+      homeLink = "/homeuser";
+    }
   }
-}
-
 
   const handleUnauthorized = async () => {
     try {
@@ -122,9 +131,14 @@ if (isLoggedIn) {
   // Outside click handler for dropdowns (FIXED)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const outsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
-      const outsideAddress = addressDropdownRef.current && !addressDropdownRef.current.contains(event.target);
-      const outsideNotif = notifDropdownRef.current && !notifDropdownRef.current.contains(event.target);
+      const outsideDropdown =
+        dropdownRef.current && !dropdownRef.current.contains(event.target);
+      const outsideAddress =
+        addressDropdownRef.current &&
+        !addressDropdownRef.current.contains(event.target);
+      const outsideNotif =
+        notifDropdownRef.current &&
+        !notifDropdownRef.current.contains(event.target);
 
       if (outsideDropdown && outsideAddress && outsideNotif) {
         setIsOpen(false);
@@ -203,10 +217,13 @@ if (isLoggedIn) {
 
     const input = document.getElementById("address");
     if (input) {
-      autocompleteRef.current = new window.google.maps.places.Autocomplete(input, {
-        fields: ["formatted_address", "geometry", "address_components"],
-        types: ["address"],
-      });
+      autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        input,
+        {
+          fields: ["formatted_address", "geometry", "address_components"],
+          types: ["address"],
+        }
+      );
 
       autocompleteRef.current.addListener("place_changed", () => {
         const place = autocompleteRef.current.getPlace();
@@ -221,14 +238,21 @@ if (isLoggedIn) {
             longitude: lng,
             address: place.formatted_address,
             pincode:
-              place.address_components.find((c) => c.types.includes("postal_code"))?.long_name || prev.pincode,
+              place.address_components.find((c) =>
+                c.types.includes("postal_code")
+              )?.long_name || prev.pincode,
             houseno:
-              place.address_components.find((c) => c.types.includes("street_number"))?.long_name || prev.houseno,
+              place.address_components.find((c) =>
+                c.types.includes("street_number")
+              )?.long_name || prev.houseno,
             street:
-              place.address_components.find((c) => c.types.includes("route"))?.long_name || prev.street,
+              place.address_components.find((c) => c.types.includes("route"))
+                ?.long_name || prev.street,
             area:
               place.address_components.find(
-                (c) => c.types.includes("sublocality") || c.types.includes("locality")
+                (c) =>
+                  c.types.includes("sublocality") ||
+                  c.types.includes("locality")
               )?.long_name || prev.area,
           }));
         } else {
@@ -247,14 +271,18 @@ if (isLoggedIn) {
           ...prev,
           address: results[0].formatted_address,
           pincode:
-            addressComponents.find((c) => c.types.includes("postal_code"))?.long_name || prev.pincode,
+            addressComponents.find((c) => c.types.includes("postal_code"))
+              ?.long_name || prev.pincode,
           houseno:
-            addressComponents.find((c) => c.types.includes("street_number"))?.long_name || prev.houseno,
+            addressComponents.find((c) => c.types.includes("street_number"))
+              ?.long_name || prev.houseno,
           street:
-            addressComponents.find((c) => c.types.includes("route"))?.long_name || prev.street,
+            addressComponents.find((c) => c.types.includes("route"))
+              ?.long_name || prev.street,
           area:
             addressComponents.find(
-              (c) => c.types.includes("sublocality") || c.types.includes("locality")
+              (c) =>
+                c.types.includes("sublocality") || c.types.includes("locality")
             )?.long_name || prev.area,
         }));
       } else {
@@ -279,12 +307,11 @@ if (isLoggedIn) {
             setSelectedAddress(addressTitle);
             localStorage.setItem("selectedAddressTitle", addressTitle);
             if (result.payload.full_address?.length > 0) {
-  const firstAddressId = result.payload.full_address[0]._id;
+              const firstAddressId = result.payload.full_address[0]._id;
 
-  setSelectedAddressId(firstAddressId);
-  localStorage.setItem("selectedAddressId", firstAddressId);
-}
-
+              setSelectedAddressId(firstAddressId);
+              localStorage.setItem("selectedAddressId", firstAddressId);
+            }
           }
         } else if (fetchUserProfile.rejected.match(result)) {
           toast.error(result.payload || "Failed to fetch user profile");
@@ -322,80 +349,77 @@ if (isLoggedIn) {
           return;
         }
 
-      //   const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-      //     method: "GET",
-      //     headers: { Authorization: `Bearer ${token}` },
-      //   });
-      //   const data = await res.json();
+        //   const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+        //     method: "GET",
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   });
+        //   const data = await res.json();
 
-      //   if (res.ok && data.success) {
-      //     const combinedNotifications = [
-      //       ...reduxNotifications,
-      //       ...(data.notifications || []),
-      //     ];
-      //     setNotifications(combinedNotifications);
+        //   if (res.ok && data.success) {
+        //     const combinedNotifications = [
+        //       ...reduxNotifications,
+        //       ...(data.notifications || []),
+        //     ];
+        //     setNotifications(combinedNotifications);
 
-      //     const count = combinedNotifications.filter((notif) => !notif.isRead);
-      //     setNotificationCount(count.length);
-      //   } else {
-      //     if (res.status === 401) {
-      //       handleUnauthorized();
-      //       return;
-      //     }
-      //     setNotifError(data.message || "Failed to fetch notifications");
-      //     toast.error(data.message || "Failed to fetch notifications");
-      //   }
-      // } catch (err) {
-      //   setNotifError("Something went wrong while fetching notifications");
-      // } finally {
-      //   setIsNotifLoading(false);
-      // }
-      const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-  method: "GET",
-  headers: { Authorization: `Bearer ${token}` },
-});
-const data = await res.json();
+        //     const count = combinedNotifications.filter((notif) => !notif.isRead);
+        //     setNotificationCount(count.length);
+        //   } else {
+        //     if (res.status === 401) {
+        //       handleUnauthorized();
+        //       return;
+        //     }
+        //     setNotifError(data.message || "Failed to fetch notifications");
+        //     toast.error(data.message || "Failed to fetch notifications");
+        //   }
+        // } catch (err) {
+        //   setNotifError("Something went wrong while fetching notifications");
+        // } finally {
+        //   setIsNotifLoading(false);
+        // }
+        const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
 
-if (res.ok && data.success) {
-  const combinedNotifications = [
-    ...reduxNotifications,
-    ...(data.notifications || []),
-  ];
-  setNotifications(combinedNotifications);
+        if (res.ok && data.success) {
+          const combinedNotifications = [
+            ...reduxNotifications,
+            ...(data.notifications || []),
+          ];
+          setNotifications(combinedNotifications);
 
-  const count = combinedNotifications.filter((notif) => !notif.isRead);
-  setNotificationCount(count.length);
+          const count = combinedNotifications.filter((notif) => !notif.isRead);
+          setNotificationCount(count.length);
+        } else {
+          if (res.status === 401) {
+            handleUnauthorized();
+            return;
+          }
 
-} else {
-  if (res.status === 401) {
-    handleUnauthorized();
-    return;
-  }
+          // 🔥🔥 ADMIN DISABLED ACCOUNT CHECK (added without changing your structure)
+          if (
+            data?.status === false &&
+            data?.message === "Admin has disabled your account."
+          ) {
+            localStorage.removeItem("bharat_token");
+            localStorage.removeItem("isProfileComplete");
+            localStorage.removeItem("otp");
+            localStorage.removeItem("role");
+            toast.error("Admin has disabled your account.");
 
-  // 🔥🔥 ADMIN DISABLED ACCOUNT CHECK (added without changing your structure)
-  if (
-    data?.status === false &&
-    data?.message === "Admin has disabled your account."
-  ) {
-    localStorage.removeItem("bharat_token");
-    localStorage.removeItem("isProfileComplete");
-    localStorage.removeItem("otp");
-    localStorage.removeItem("role");
-     toast.error( "Admin has disabled your account.");
-    
-    return;
-  }
+            return;
+          }
 
-  setNotifError(data.message || "Failed to fetch notifications");
-  toast.error(data.message || "Failed to fetch notifications");
-}
-
-} catch (err) {
-  setNotifError("Something went wrong while fetching notifications");
-} finally {
-  setIsNotifLoading(false);
-}
-
+          setNotifError(data.message || "Failed to fetch notifications");
+          toast.error(data.message || "Failed to fetch notifications");
+        }
+      } catch (err) {
+        setNotifError("Something went wrong while fetching notifications");
+      } finally {
+        setIsNotifLoading(false);
+      }
     };
 
     if (isLoggedIn) {
@@ -459,7 +483,9 @@ if (res.ok && data.success) {
       !currentAddress.latitude ||
       !currentAddress.longitude
     ) {
-      toast.error("Please fill in required fields: Title, Landmark, and Address.");
+      toast.error(
+        "Please fill in required fields: Title, Landmark, and Address."
+      );
       return;
     }
     try {
@@ -478,7 +504,9 @@ if (res.ok && data.success) {
         street: currentAddress.street || null,
         area: currentAddress.area || null,
         pincode: currentAddress.pincode || null,
-        ...(editingAddress !== null && currentAddress._id ? { _id: currentAddress._id } : {}),
+        ...(editingAddress !== null && currentAddress._id
+          ? { _id: currentAddress._id }
+          : {}),
       };
       let updatedAddresses;
       if (editingAddress !== null) {
@@ -507,11 +535,17 @@ if (res.ok && data.success) {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
-        const newIndex = editingAddress !== null ? editingAddress : updatedAddresses.length - 1;
+        const newIndex =
+          editingAddress !== null
+            ? editingAddress
+            : updatedAddresses.length - 1;
         setSelectedAddressId(newAddress._id || newIndex);
         setSelectedAddress(newAddress.title || newAddress.address);
         localStorage.setItem("selectedAddressId", newAddress._id || newIndex);
-        localStorage.setItem("selectedAddressTitle", newAddress.title || newAddress.address);
+        localStorage.setItem(
+          "selectedAddressTitle",
+          newAddress.title || newAddress.address
+        );
         setEditingAddress(null);
         dispatch(fetchUserProfile());
       } else {
@@ -546,48 +580,60 @@ if (res.ok && data.success) {
         handleUnauthorized();
         return;
       }
-      const response = await fetch(`${BASE_URL}/user/deleteAddress/${addressId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${BASE_URL}/user/deleteAddress/${addressId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await response.json();
       if (response.ok && data.success) {
         toast.success("Address deleted successfully!");
-        const updatedAddresses = savedAddresses.filter((_, idx) => idx !== index);
+        const updatedAddresses = savedAddresses.filter(
+          (_, idx) => idx !== index
+        );
         setSavedAddresses(updatedAddresses);
         let newLocation = profile.location;
         if (selectedAddressId === addressId) {
           newLocation = updatedAddresses[0] || null;
-          const newSelectedAddress = newLocation ? newLocation.title || newLocation.address : "Location";
+          const newSelectedAddress = newLocation
+            ? newLocation.title || newLocation.address
+            : "Location";
           setSelectedAddressId(newLocation?._id || null);
           setSelectedAddress(newSelectedAddress);
           localStorage.setItem("selectedAddressId", newLocation?._id || "");
           localStorage.setItem("selectedAddressTitle", newSelectedAddress);
         }
-        const updateResponse = await fetch(`${BASE_URL}/user/updateUserProfile`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            full_address: updatedAddresses,
-            location: newLocation
-              ? {
-                  latitude: newLocation.latitude,
-                  longitude: newLocation.longitude,
-                  address: newLocation.address,
-                }
-              : null,
-          }),
-        });
+        const updateResponse = await fetch(
+          `${BASE_URL}/user/updateUserProfile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              full_address: updatedAddresses,
+              location: newLocation
+                ? {
+                    latitude: newLocation.latitude,
+                    longitude: newLocation.longitude,
+                    address: newLocation.address,
+                  }
+                : null,
+            }),
+          }
+        );
         const updateData = await updateResponse.json();
         if (!updateResponse.ok) {
           if (updateResponse.status === 401) {
             handleUnauthorized();
             return;
           }
-          toast.error(updateData.message || "Failed to update profile after deletion");
+          toast.error(
+            updateData.message || "Failed to update profile after deletion"
+          );
         }
         dispatch(fetchUserProfile());
       } else {
@@ -674,11 +720,14 @@ if (res.ok && data.success) {
       month: "long",
       year: "numeric",
     });
-    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    );
     let section = date;
     if (date === today) section = "Today";
     else if (date === yesterday) section = "Yesterday";
@@ -687,39 +736,41 @@ if (res.ok && data.success) {
     return acc;
   }, {});
 
-  const notificationSections = Object.keys(groupedNotifications).map((section) => ({
-    section,
-    items: groupedNotifications[section].map((notif) => ({
-      ...notif,
-      title: notif.title || "Notification",
-      message: notif.message || "No message available",
-    })),
-  }));
+  const notificationSections = Object.keys(groupedNotifications).map(
+    (section) => ({
+      section,
+      items: groupedNotifications[section].map((notif) => ({
+        ...notif,
+        title: notif.title || "Notification",
+        message: notif.message || "No message available",
+      })),
+    })
+  );
 
   // FIXED: Notification click handler
   const handleRedirectNotification = (notif) => {
     console.log("Notification clicked:", notif);
-	let	orderId = notif.orderId;
-	// let userId = notif.userId
-   if(notif.userType === "user"){
-    if(notif.orderType === "direct"){
-			window.location.href = `/my-hire/order-detail/${orderId}`
-		} else if(notif.orderType === "bidding"){
-      window.location.href = `/bidding/order-detail/${orderId}`
-		} else{
-			window.location.href = `/emergency/order-detail/${orderId}`
-		}
-	 }else if(notif.userType === "service_provider"){
-    if(notif.orderType === "direct"){
-			window.location.href = `/hire/worker/order-detail/${orderId}`
-		} else if(notif.orderType === "bidding"){
-      window.location.href = `/bidding/worker/order-detail/${orderId}`
-		} else{
-			window.location.href = `/emergency/worker/order-detail/${orderId}`
-		}
-	 }else{
-    window.location.href = `/disputes`
-	 }
+    let orderId = notif.orderId;
+    // let userId = notif.userId
+    if (notif.userType === "user") {
+      if (notif.orderType === "direct") {
+        window.location.href = `/my-hire/order-detail/${orderId}`;
+      } else if (notif.orderType === "bidding") {
+        window.location.href = `/bidding/order-detail/${orderId}`;
+      } else {
+        window.location.href = `/emergency/order-detail/${orderId}`;
+      }
+    } else if (notif.userType === "service_provider") {
+      if (notif.orderType === "direct") {
+        window.location.href = `/hire/worker/order-detail/${orderId}`;
+      } else if (notif.orderType === "bidding") {
+        window.location.href = `/bidding/worker/order-detail/${orderId}`;
+      } else {
+        window.location.href = `/emergency/worker/order-detail/${orderId}`;
+      }
+    } else {
+      window.location.href = `/disputes`;
+    }
   };
 
   return (
@@ -765,7 +816,9 @@ if (res.ok && data.success) {
                   placeholder={selectedAddress}
                   className="bg-transparent focus:outline-none text-sm text-gray-700 w-full truncate"
                   aria-label="Location input"
-                  onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+                  onClick={() =>
+                    setIsAddressDropdownOpen(!isAddressDropdownOpen)
+                  }
                   readOnly
                 />
               </div>
@@ -784,7 +837,9 @@ if (res.ok && data.success) {
                             type="radio"
                             name="selectedAddress"
                             checked={selectedAddressId === address._id}
-                            onChange={() => handleSelectAddress(index, address._id)}
+                            onChange={() =>
+                              handleSelectAddress(index, address._id)
+                            }
                             className="form-radio h-4 w-4 text-[#228B22] flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
@@ -798,13 +853,17 @@ if (res.ok && data.success) {
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <button
-                            onClick={() => handleEditAddress(index, address._id)}
+                            onClick={() =>
+                              handleEditAddress(index, address._id)
+                            }
                             className="text-sm text-[#228B22] hover:underline"
                           >
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDeleteAddress(index, address._id)}
+                            onClick={() =>
+                              handleDeleteAddress(index, address._id)
+                            }
                             className="text-sm text-red-600 hover:underline"
                           >
                             Delete
@@ -840,10 +899,20 @@ if (res.ok && data.success) {
             </div>
           )}
           <nav className="hidden lg:flex items-center gap-6 text-[#969696] text-base font-medium">
-            <Link to={homeLink} className="hover:text-black">Home</Link>
-            <Link to="/aboutus" className="hover:text-black">About</Link>
-            <Link to="/ourservices" className="hover:text-black">Services</Link>
-            {isLoggedIn && <Link to="/chats" className="hover:text-black">Chats</Link>}
+            <Link to={homeLink} className="hover:text-black">
+              Home
+            </Link>
+            <Link to="/aboutus" className="hover:text-black">
+              About
+            </Link>
+            <Link to="/ourservices" className="hover:text-black">
+              Services
+            </Link>
+            {isLoggedIn && (
+              <Link to="/chats" className="hover:text-black">
+                Chats
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -874,7 +943,11 @@ if (res.ok && data.success) {
                   className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
                   onClick={handleNotificationClick}
                 >
-                  <img src={Notification} alt="Notification" className="w-6 h-6 text-gray-700" />
+                  <img
+                    src={Notification}
+                    alt="Notification"
+                    className="w-6 h-6 text-gray-700"
+                  />
                   {notificationCount > 0 && (
                     <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
                       {notificationCount}
@@ -894,28 +967,46 @@ if (res.ok && data.success) {
                         </div>
                       </div>
                     ) : notifError ? (
-                      <div className="p-4 text-center text-red-500 text-sm">{notifError}</div>
+                      <div className="p-4 text-center text-red-500 text-sm">
+                        {notifError}
+                      </div>
                     ) : notificationSections.length === 0 ? (
-                      <div className="p-4 text-center text-gray-600 text-sm">No recent update</div>
+                      <div className="p-4 text-center text-gray-600 text-sm">
+                        No recent update
+                      </div>
                     ) : (
                       <>
                         {notificationSections.map((section, i) => (
                           <div key={i}>
-                            <div className="p-3 text-sm font-medium text-gray-700 border-b">{section.section}</div>
+                            <div className="p-3 text-sm font-medium text-gray-700 border-b">
+                              {section.section}
+                            </div>
                             {section.items.map((notif, idx) => (
                               <div
                                 key={idx}
                                 className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
-                                onClick={() => handleRedirectNotification(notif)}
+                                onClick={() =>
+                                  handleRedirectNotification(notif)
+                                }
                               >
                                 <div className="flex items-center gap-3">
-                                  <img src={Logo} alt="coin" className="w-10 h-10" />
+                                  <img
+                                    src={Logo}
+                                    alt="coin"
+                                    className="w-10 h-10"
+                                  />
                                   <div>
-                                    <p className="text-sm font-medium text-gray-800">{notif.title}</p>
-                                    <p className="text-xs text-gray-500">{notif.message}</p>
+                                    <p className="text-sm font-medium text-gray-800">
+                                      {notif.title}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      {notif.message}
+                                    </p>
                                   </div>
                                 </div>
-                                <span className="text-gray-400 text-xs font-medium">{section.section}</span>
+                                <span className="text-gray-400 text-xs font-medium">
+                                  {section.section}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -944,11 +1035,15 @@ if (res.ok && data.success) {
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
                   >
-                    <span className="truncate max-w-[120px] sm:max-w-[150px]">{fullName}</span>
+                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                      {fullName}
+                    </span>
                     <img
                       src={Dropdown}
                       alt="Dropdown"
-                      className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}
+                      className={`w-5 h-5 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : "rotate-0"
+                      }`}
                     />
                   </button>
                 ) : (
@@ -962,36 +1057,63 @@ if (res.ok && data.success) {
                 )}
                 {isOpen && fullName && (
                   <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                    <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
-                      <img src={Account} alt="Account" className="w-5 h-5" /> Account
+                    <Link
+                      to="/account"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <img src={Account} alt="Account" className="w-5 h-5" />{" "}
+                      Account
                     </Link>
-                    <Link to="/details" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
-                      <img src={Profile} alt="Profile" className="w-5 h-5" /> Profile
+                    <Link
+                      to="/details"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <img src={Profile} alt="Profile" className="w-5 h-5" />{" "}
+                      Profile
                     </Link>
-                    <Link to="/user/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                    <Link
+                      to="/user/work-list/My Hire"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
                       <FaUserTie className="w-5 h-5" /> My Hire
                     </Link>
-                    <Link to="/worker/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                    <Link
+                      to="/worker/work-list/My Hire"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
                       <FaBriefcase className="w-5 h-5" /> My Work
                     </Link>
-                    <Link to="/disputes" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                    <Link
+                      to="/disputes"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
                       <FaGavel className="w-5 h-5" /> Disputes
                     </Link>
-                    <Link to="/promotion" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                    <Link
+                      to="/promotion"
+                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
                       <FaTrophy className="w-5 h-5" /> Promotion
                     </Link>
                     <button
                       onClick={logoutdestroy}
                       className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
                     >
-                      <img src={Logout} alt="Logout" className="w-5 h-5" /> Logout
+                      <img src={Logout} alt="Logout" className="w-5 h-5" />{" "}
+                      Logout
                     </button>
                   </div>
                 )}
               </div>
             </>
           )}
-          <button
+          {/*<button
             className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
@@ -1005,7 +1127,31 @@ if (res.ok && data.success) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
-          </button>
+          </button> */}
+
+          {!(
+            location.pathname === "/service-provider-list" && isLargeScreen
+          ) && (
+            <button
+              className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6 text-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1013,10 +1159,36 @@ if (res.ok && data.success) {
       {isMenuOpen && (
         <div className="lg:hidden bg-white shadow-lg fixed top-[60px] left-0 w-full z-40">
           <div className="px-4 py-4 space-y-3 text-[#969696] font-medium flex flex-col items-center text-center">
-            <Link to={homeLink} className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Home</Link>
-            <Link to="/aboutus" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>About</Link>
-            <Link to="/ourservices" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Services</Link>
-            {isLoggedIn && <Link to="/chats" className="hover:text-black" onClick={() => setIsMenuOpen(false)}>Chats</Link>}
+            <Link
+              to={homeLink}
+              className="hover:text-black"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/aboutus"
+              className="hover:text-black"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              to="/ourservices"
+              className="hover:text-black"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Services
+            </Link>
+            {isLoggedIn && (
+              <Link
+                to="/chats"
+                className="hover:text-black"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Chats
+              </Link>
+            )}
             {isLoggedIn && (
               <Link to="/bidding/newtask" onClick={() => setIsMenuOpen(false)}>
                 <button className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-6 py-2 rounded-xl shadow">
@@ -1032,7 +1204,11 @@ if (res.ok && data.success) {
                     className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
                     onClick={handleNotificationClick}
                   >
-                    <img src={Notification} alt="Notification" className="w-6 h-6 text-gray-700" />
+                    <img
+                      src={Notification}
+                      alt="Notification"
+                      className="w-6 h-6 text-gray-700"
+                    />
                     {notificationCount > 0 && (
                       <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
                         {notificationCount}
@@ -1052,33 +1228,51 @@ if (res.ok && data.success) {
                           </div>
                         </div>
                       ) : notifError ? (
-                        <div className="p-4 text-center text-red-500 text-sm">{notifError}</div>
+                        <div className="p-4 text-center text-red-500 text-sm">
+                          {notifError}
+                        </div>
                       ) : notificationSections.length === 0 ? (
-                        <div className="p-4 text-center text-gray-600 text-sm">No recent update</div>
+                        <div className="p-4 text-center text-gray-600 text-sm">
+                          No recent update
+                        </div>
                       ) : (
                         <>
                           {notificationSections.map((section, i) => (
                             <div key={i}>
-                              <div className="p-3 text-sm font-medium text-gray-700 border-b">{section.section}</div>
+                              <div className="p-3 text-sm font-medium text-gray-700 border-b">
+                                {section.section}
+                              </div>
                               {section.items.map((notif, idx) => (
                                 <div
                                   key={idx}
                                   className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
-                                  onClick={() => handleRedirectNotification(notif)}
+                                  onClick={() =>
+                                    handleRedirectNotification(notif)
+                                  }
                                 >
                                   <div className="flex items-center gap-3">
-                                    <img src={Logo} alt="coin" className="w-10 h-10" />
+                                    <img
+                                      src={Logo}
+                                      alt="coin"
+                                      className="w-10 h-10"
+                                    />
                                     <div>
-                                      <p className="text-sm font-medium text-gray-800">{notif.title}</p>
-                                      <p className="text-xs text-gray-500">{notif.message}</p>
+                                      <p className="text-sm font-medium text-gray-800">
+                                        {notif.title}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        {notif.message}
+                                      </p>
                                     </div>
                                   </div>
-                                  <span className="text-gray-400 text-xs font-medium">{section.section}</span>
+                                  <span className="text-gray-400 text-xs font-medium">
+                                    {section.section}
+                                  </span>
                                 </div>
                               ))}
                             </div>
                           ))}
-                          <div className="border-t p-3 flex justify-center">
+                          {/*<div className="border-t p-3 flex justify-center">
                             <button
                               onClick={() => {
                                 setIsNotifOpen(false);
@@ -1088,18 +1282,9 @@ if (res.ok && data.success) {
                             >
                               See all messages
                             </button>
-                          </div>
+                          </div>*/}
                         </>
                       )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log("Test button clicked (mobile)!");
-                        }}
-                        className="w-full mt-2 p-2 bg-blue-600 text-white text-sm font-medium"
-                      >
-                        Test
-                      </button>
                     </div>
                   )}
                 </div>
@@ -1111,11 +1296,15 @@ if (res.ok && data.success) {
                       onClick={() => setIsOpen(!isOpen)}
                       className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
                     >
-                      <span className="truncate max-w-[120px] sm:max-w-[150px]">{fullName}</span>
+                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                        {fullName}
+                      </span>
                       <img
                         src={Dropdown}
                         alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"}`}
+                        className={`w-5 h-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : "rotate-0"
+                        }`}
                       />
                     </button>
                   ) : (
@@ -1130,29 +1319,56 @@ if (res.ok && data.success) {
                   )}
                   {isOpen && fullName && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                      <Link to="/account" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
-                        <img src={Account} alt="Account" className="w-5 h-5" /> Account
+                      <Link
+                        to="/account"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <img src={Account} alt="Account" className="w-5 h-5" />{" "}
+                        Account
                       </Link>
-                      <Link to="/details" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
-                        <img src={Profile} alt="Profile" className="w-5 h-5" /> Profile
+                      <Link
+                        to="/details"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <img src={Profile} alt="Profile" className="w-5 h-5" />{" "}
+                        Profile
                       </Link>
-                      <Link to="/user/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <Link
+                        to="/user/work-list/My Hire"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
                         <FaUserTie className="w-5 h-5" /> My Hire
                       </Link>
-                      <Link to="/worker/work-list/My Hire" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <Link
+                        to="/worker/work-list/My Hire"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
                         <FaBriefcase className="w-5 h-5" /> My Work
                       </Link>
-                      <Link to="/disputes" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <Link
+                        to="/disputes"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
                         <FaGavel className="w-5 h-5" /> Disputes
                       </Link>
-                      <Link to="/promotion" className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100" onClick={() => setIsOpen(false)}>
+                      <Link
+                        to="/promotion"
+                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        onClick={() => setIsOpen(false)}
+                      >
                         <FaTrophy className="w-5 h-5" /> Promotion
                       </Link>
                       <button
                         onClick={logoutdestroy}
                         className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
                       >
-                        <img src={Logout} alt="Logout" className="w-5 h-5" /> Logout
+                        <img src={Logout} alt="Logout" className="w-5 h-5" />{" "}
+                        Logout
                       </button>
                     </div>
                   )}

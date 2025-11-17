@@ -16,7 +16,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Worklist() {
   const { task } = useParams();
-  const [activeTab, setActiveTab] = useState(task ? decodeURIComponent(task) : "Emergency Tasks");
+  const [activeTab, setActiveTab] = useState(
+    task ? decodeURIComponent(task) : "Emergency Tasks"
+  );
   const [taskData, setTaskData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -26,6 +28,12 @@ export default function Worklist() {
   const [bannerError, setBannerError] = useState(null);
   const [downloadingIds, setDownloadingIds] = useState([]);
   const [expandedAddresses, setExpandedAddresses] = useState({});
+		const [expandedIds, setExpandedIds] = useState({});
+	
+		const toggleExpand = (id) => {
+			setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+		};
+	
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -56,14 +64,21 @@ export default function Worklist() {
     try {
       if (!token) throw new Error("No authentication token found");
 
-      const response = await axios.get(`${BASE_URL}/banner/getAllBannerImages`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${BASE_URL}/banner/getAllBannerImages`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      if (response.data?.success && Array.isArray(response.data.images) && response.data.images.length > 0) {
+      if (
+        response.data?.success &&
+        Array.isArray(response.data.images) &&
+        response.data.images.length > 0
+      ) {
         setBannerImages(response.data.images);
       } else {
         setBannerImages([]);
@@ -140,7 +155,8 @@ export default function Worklist() {
           image: task.image_urls?.[0] || task.image_url?.[0] || Work,
           name: task.title || null,
           category_name: task.category_id?.name || "N/A",
-          subcategory_name: task.sub_category_ids?.map((sub) => sub.name).join(", ") || "N/A",
+          subcategory_name:
+            task.sub_category_ids?.map((sub) => sub.name).join(", ") || "N/A",
           description: task.description || null,
           date: task.createdAt
             ? new Date(task.createdAt).toLocaleDateString()
@@ -156,7 +172,10 @@ export default function Worklist() {
             : "No deadline",
           status: task.hire_status || task.status || "N/A",
           location:
-            task.google_address || task.location || task.address || "Unknown Location",
+            task.google_address ||
+            task.location ||
+            task.address ||
+            "Unknown Location",
           milestone: task.service_payment?.payment_history || [],
         }));
 
@@ -188,7 +207,7 @@ export default function Worklist() {
       (task.description?.toLowerCase().includes(q) ?? false) ||
       (task.skills?.toLowerCase().includes(q) ?? false) ||
       (task.location?.toLowerCase().includes(q) ?? false) ||
-			(task.project_id?.toLowerCase().includes(q) ?? false)
+      (task.project_id?.toLowerCase().includes(q) ?? false)
     );
   });
 
@@ -203,9 +222,12 @@ export default function Worklist() {
 
     try {
       let endpoint = "";
-      if (type === "bidding") endpoint = `${BASE_URL}/user/invoice/bidding/${id}`;
-      else if (type === "my-hire") endpoint = `${BASE_URL}/user/invoice/direct/${id}`;
-      else if (type === "emergency") endpoint = `${BASE_URL}/user/invoice/emergency/${id}`;
+      if (type === "bidding")
+        endpoint = `${BASE_URL}/user/invoice/bidding/${id}`;
+      else if (type === "my-hire")
+        endpoint = `${BASE_URL}/user/invoice/direct/${id}`;
+      else if (type === "emergency")
+        endpoint = `${BASE_URL}/user/invoice/emergency/${id}`;
       else throw new Error("Invalid invoice type");
 
       const response = await axios.get(endpoint, {
@@ -400,15 +422,20 @@ export default function Worklist() {
                 className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Image */}
-                <div className="relative w-full sm:w-1/3 h-48 sm:h-auto">
+                <div className="relative w-full sm:w-[300px] aspect-video bg-gray-100 overflow-hidden rounded-lg">
                   <img
-                    src={task.image}
-                    alt={task.name || "Task"}
+                    src={task?.image}
+                    alt={task?.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => (e.currentTarget.src = Work)}
                   />
-									{console.log("Task Image URL:", task.image)}
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
-                    {task.project_id}
+
+                  <span
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
+                   bg-black/80 backdrop-blur text-white text-xs 
+                   px-4 py-1 rounded-full shadow-md"
+                  >
+                    {task?.project_id}
                   </span>
                 </div>
 
@@ -440,9 +467,23 @@ export default function Worklist() {
 
                   {/* Description */}
                   {task.description && (
-                    <p className="text-sm text-[#334247] mt-2 italic line-clamp-3 bg-gray-50 p-2 rounded">
-                      {task.description}
-                    </p>
+                    <div className="mt-2">
+                      <p
+                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
+      transition-all duration-300 break-words ${
+        expandedIds[task._id] ? "line-clamp-none" : "line-clamp-3"
+      }`}
+                      >
+                        {task.description}
+                      </p>
+
+                      <button
+                        onClick={() => toggleExpand(task._id)}
+                        className="text-green-600 mt-1 text-xs font-medium hover:underline"
+                      >
+                        {expandedIds[task._id] ? "See Less" : "See More"}
+                      </button>
+                    </div>
                   )}
 
                   {/* Skills + PDF */}
@@ -450,16 +491,25 @@ export default function Worklist() {
                     {/*<p className="text-sm text-[#334247]  line-clamp-2 flex-1 pr-2">
                       {task.skills}
                     </p> */}
-										<p className="text-green-600 font-bold mt-2">₹{activeTab === "My Bidding" ? task.cost : task.price}</p>
+                    <p className="text-green-600 font-bold mt-2">
+                      ₹{activeTab === "My Bidding" ? task.cost : task.price}
+                    </p>
                     {task.milestone.length > 0 && (
                       <button
-                        onClick={() => handledownload(task.id, downloadTypeFromTab(activeTab))}
+                        onClick={() =>
+                          handledownload(
+                            task.id,
+                            downloadTypeFromTab(activeTab)
+                          )
+                        }
                         disabled={downloadingIds.includes(task.id)}
                         className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs flex-shrink-0"
                         title="Download Invoice"
                       >
                         <img src={pdf} alt="PDF" className="w-5 h-5" />
-                        {downloadingIds.includes(task.id) ? "Downloading..." : "Download PDF"}
+                        {downloadingIds.includes(task.id)
+                          ? "Downloading..."
+                          : "Download PDF"}
                       </button>
                     )}
                   </div>
@@ -478,7 +528,8 @@ export default function Worklist() {
                           ? "bg-green-100 text-green-800"
                           : task.status === "cancelledDispute"
                           ? "bg-orange-100 text-orange-800"
-                          : task.status === "accepted" || task.status === "assigned"
+                          : task.status === "accepted" ||
+                            task.status === "assigned"
                           ? "bg-blue-100 text-blue-800"
                           : "bg-gray-100 text-gray-800"
                       }`}
@@ -498,7 +549,9 @@ export default function Worklist() {
                           "My Hire": "my-hire",
                           "Emergency Tasks": "emergency",
                         };
-                        navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
+                        navigate(
+                          `/${routes[activeTab]}/order-detail/${task.id}`
+                        );
                       }}
                       className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
                     >

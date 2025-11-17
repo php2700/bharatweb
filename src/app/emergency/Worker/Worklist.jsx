@@ -28,6 +28,11 @@ export default function Worklist() {
   const [bannerError, setBannerError] = useState(null);
   const [downloadingIds, setDownloadingIds] = useState([]);
   const [expandedAddresses, setExpandedAddresses] = useState({}); // For "See More"
+  const [expandedIds, setExpandedIds] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -220,7 +225,7 @@ export default function Worklist() {
       (t.description?.toLowerCase().includes(q) ?? false) ||
       (t.skills?.toLowerCase().includes(q) ?? false) ||
       (t.location?.toLowerCase().includes(q) ?? false) ||
-			(t.project_id?.toLowerCase().includes(q) ?? false)
+      (t.project_id?.toLowerCase().includes(q) ?? false)
     );
   });
 
@@ -388,15 +393,20 @@ export default function Worklist() {
                 className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
               >
                 {/* Image */}
-                <div className="relative w-full sm:w-[300px] h-48 sm:h-auto bg-gray-100">
+                <div className="relative w-full sm:w-[300px] aspect-video bg-gray-100 overflow-hidden rounded-lg">
                   <img
-                    src={task.image}
-                    alt={task.name}
+                    src={task?.image}
+                    alt={task?.name}
                     className="w-full h-full object-cover"
                     onError={(e) => (e.currentTarget.src = Work)}
                   />
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
-                    {task.project_id}
+
+                  <span
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
+                   bg-black/80 backdrop-blur text-white text-xs 
+                   px-4 py-1 rounded-full shadow-md"
+                  >
+                    {task?.project_id}
                   </span>
                 </div>
 
@@ -428,9 +438,23 @@ export default function Worklist() {
 
                   {/* Description */}
                   {task.description && (
-                    <p className="text-sm text-[#334247] mt-2 italic line-clamp-3 bg-gray-50 p-2 rounded">
-                      {task.description}
-                    </p>
+                    <div className="mt-2">
+                      <p
+                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
+      transition-all duration-300 break-words ${
+        expandedIds[task._id] ? "line-clamp-none" : "line-clamp-3"
+      }`}
+                      >
+                        {task.description}
+                      </p>
+
+                      <button
+                        onClick={() => toggleExpand(task._id)}
+                        className="text-green-600 mt-1 text-xs font-medium hover:underline"
+                      >
+                        {expandedIds[task._id] ? "See Less" : "See More"}
+                      </button>
+                    </div>
                   )}
 
                   {/* Skills + PDF */}
