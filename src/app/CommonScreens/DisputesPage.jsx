@@ -17,13 +17,17 @@ export default function DisputesPage() {
   const [subTab, setSubTab] = useState("Direct");
 
   const handleUnauthorized = () => {
-    console.log("handleUnauthorized: Clearing localStorage and redirecting to login");
+    console.log(
+      "handleUnauthorized: Clearing localStorage and redirecting to login"
+    );
     localStorage.removeItem("bharat_token");
     localStorage.removeItem("isProfileComplete");
     localStorage.removeItem("role");
     localStorage.removeItem("otp");
     localStorage.removeItem("selectedAddressId");
-    toast.error("Session expired, please log in again", { toastId: "unauthorized" });
+    toast.error("Session expired, please log in again", {
+      toastId: "unauthorized",
+    });
     navigate("/login");
   };
 
@@ -31,41 +35,60 @@ export default function DisputesPage() {
     const fetchDisputes = async () => {
       try {
         const token = localStorage.getItem("bharat_token");
-        if (!token || !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
+        if (
+          !token ||
+          !token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+        ) {
           console.log("fetchDisputes: No valid token, redirecting to login");
           handleUnauthorized();
           return;
         }
 
         // Fetch disputes raised by user
-        const resRaisedBy = await fetch(`${BASE_URL}/dispute/getDisputesRaisedBy`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resRaisedBy = await fetch(
+          `${BASE_URL}/dispute/getDisputesRaisedBy`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const dataRaisedBy = await resRaisedBy.json();
 
         if (!resRaisedBy.ok) {
           if (resRaisedBy.status === 401) {
-            console.log("fetchDisputes: 401 Unauthorized, redirecting to login");
+            console.log(
+              "fetchDisputes: 401 Unauthorized, redirecting to login"
+            );
             handleUnauthorized();
             return;
           }
-          toast.error(dataRaisedBy.message || "Failed to fetch disputes raised by", { toastId: "fetchDisputesRaisedByError" });
+          toast.error(
+            dataRaisedBy.message || "Failed to fetch disputes raised by",
+            { toastId: "fetchDisputesRaisedByError" }
+          );
           return;
         }
 
         // Fetch disputes against user
-        const resAgainst = await fetch(`${BASE_URL}/dispute/getDisputesAgainst`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resAgainst = await fetch(
+          `${BASE_URL}/dispute/getDisputesAgainst`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const dataAgainst = await resAgainst.json();
 
         if (!resAgainst.ok) {
           if (resAgainst.status === 401) {
-            console.log("fetchDisputes: 401 Unauthorized, redirecting to login");
+            console.log(
+              "fetchDisputes: 401 Unauthorized, redirecting to login"
+            );
             handleUnauthorized();
             return;
           }
-          toast.error(dataAgainst.message || "Failed to fetch disputes against", { toastId: "fetchDisputesAgainstError" });
+          toast.error(
+            dataAgainst.message || "Failed to fetch disputes against",
+            { toastId: "fetchDisputesAgainstError" }
+          );
           return;
         }
 
@@ -74,7 +97,9 @@ export default function DisputesPage() {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching disputes:", error);
-        toast.error("Something went wrong while fetching disputes!", { toastId: "fetchDisputesGeneralError" });
+        toast.error("Something went wrong while fetching disputes!", {
+          toastId: "fetchDisputesGeneralError",
+        });
         setLoading(false);
       }
     };
@@ -98,22 +123,24 @@ export default function DisputesPage() {
         <div>
           <p className="text-gray-700">
             <span className="font-semibold">Order ID:</span>{" "}
-            {dispute.order_id.project_id}
+            {dispute?.order_id?.project_id || "N/A"}
           </p>
           <p className="text-gray-700">
             <span className="font-semibold">Order Title:</span>{" "}
-            {dispute.order_id.title}
+            {dispute?.order_id?.title || "N/A"}
           </p>
           <p className="text-gray-700">
             <span className="font-semibold">Order Description:</span>{" "}
-            {dispute.order_id.description}
+            {dispute?.order_id?.description || "N/A"}
           </p>
           <p className="text-gray-700">
             <span className="font-semibold">Flow Type:</span>{" "}
-            {dispute.flow_type.charAt(0).toUpperCase() + dispute.flow_type.slice(1)}
+            {dispute.flow_type.charAt(0).toUpperCase() +
+              dispute.flow_type.slice(1)}
           </p>
           <p className="text-gray-700">
-            <span className="font-semibold">Amount:</span> ₹{dispute.amount.toLocaleString()}
+            <span className="font-semibold">Amount:</span> ₹
+            {dispute.amount.toLocaleString()}
           </p>
           <p className="text-gray-700">
             <span className="font-semibold">Status:</span>{" "}
@@ -161,13 +188,24 @@ export default function DisputesPage() {
             <span className="font-semibold">Requirement:</span>{" "}
             {dispute.requirement}
           </p>
-          {dispute.reason && (
-            <p className="text-gray-700">
-              <span className="font-semibold">Reason:</span> {dispute.reason}
-            </p>
-          )}
         </div>
       </div>
+			 {dispute.reason && (
+          <div className="flex justify-center">
+            <p
+              className={`inline-block px-4 py-2 rounded-lg font-medium text-center ${
+                dispute.status === "resolved"
+                  ? "bg-green-100 text-green-800"
+                  : dispute.status === "rejected"
+                  ? "bg-red-100 text-red-800"
+                  : "text-gray-700"
+              }`}
+            >
+              <span className="font-semibold">Admin Reason:</span>{" "}
+              {dispute.reason}
+            </p>
+          </div>
+        )}
       {dispute.images && dispute.images.length > 0 && (
         <div className="mt-4">
           <h4 className="text-lg font-semibold text-gray-800">
@@ -183,7 +221,9 @@ export default function DisputesPage() {
                   onClick={() => handleImageClick(image)}
                   onError={() =>
                     toast.error(
-                      `Failed to load image ${index + 1}. Please check the URL.`,
+                      `Failed to load image ${
+                        index + 1
+                      }. Please check the URL.`,
                       { toastId: `imageError-${index}` }
                     )
                   }

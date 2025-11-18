@@ -24,14 +24,14 @@ export default function WorkerList() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      console.log("data", data)
+      // console.log("data", data)
       if (data.success) {
   // ✅ Sirf approved workers ko rakho
 
   const approvedWorkers = data.workers.filter(
     (worker) => worker.verifyStatus?.toLowerCase() === "approved"
   );
-  console.log("apppr", approvedWorkers);
+  // console.log("apppr", approvedWorkers);
   setWorkers(approvedWorkers);
 } else {
   setWorkers([]);
@@ -45,6 +45,7 @@ export default function WorkerList() {
     }
   };
 
+	// console.log("workder", workers)
   useEffect(() => {
     fetchWorkers();
   }, []);
@@ -172,7 +173,7 @@ export default function WorkerList() {
                       className="w-36 h-36 sm:w-60 sm:h-45 rounded-lg object-cover"
                     />
                     <span className="absolute bottom-9 left-1/2 -translate-x-1/2 translate-y-1/2 bg-[#6DEA6D] text-[#FFFFFF] font-[500] text-xs px-3 py-1 rounded-full shadow w-[125px] sm:w-[131px] sm:h-[25px] lg:w-[184px] lg:p-[0px] lg:text-center lg:text-[15px]">
-                      {worker.status || "Pending"}
+                      {worker.verifyStatus.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Pending"}
                     </span>
                   </div>
                   <div className="lg:mb-[123px]">

@@ -158,7 +158,7 @@ export default function Accepted({
                   {/* Index + Description */}
                   <div className="col-span-5 flex items-center gap-3">
                     <span className="font-semibold">{index + 1}.</span>
-                    <span>{payment.description || "Starting Payment"}</span>
+                    <span>{payment.description.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Starting Payment"}</span>
                   </div>
 
                   {/* Status */}

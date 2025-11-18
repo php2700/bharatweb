@@ -59,7 +59,7 @@ export default function ViewProfile() {
   const [showChangeProvider, setShowChangeProvider] = useState(false);
   const [expandedAddresses, setExpandedAddresses] = useState({});
   const [disputeInfo, setDisputeInfo] = useState(null);
-	 const [openImage, setOpenImage] = useState(null);
+  const [openImage, setOpenImage] = useState(null);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
@@ -1006,8 +1006,8 @@ export default function ViewProfile() {
               className="w-full h-[360px] object-cover mt-5"
             />
           )}
-        
-					{openImage && (
+
+          {openImage && (
             <div
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
               onClick={() => setOpenImage(null)}
@@ -1123,7 +1123,13 @@ export default function ViewProfile() {
                         orderData?.refundStatus === "processed"
                           ? "bg-blue-500"
                           : ""
-                      }`}
+                      }
+											${
+                        orderData?.refundStatus === "rejected"
+                          ? "bg-red-500"
+                          : ""
+                      }`
+											}
                     >
                       {orderData?.refundStatus
                         ? orderData.refundStatus
@@ -1494,11 +1500,34 @@ export default function ViewProfile() {
                 </button>
               )}
               {orderData?.refundRequest && (
-                <button className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700">
-                  {orderData?.refundStatus == "pending"
-                    ? "Refund Request Submitted"
-                    : "Refunded"}
+                <button
+                  className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${
+                    orderData?.refundStatus === "pending"
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : orderData?.refundStatus === "processed"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : orderData?.refundStatus === "rejected"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-gray-500"
+                  }`}
+                >
+                  {orderData?.refundStatus === "pending" &&
+                    "Refund Request Submitted"}
+                  {orderData?.refundStatus === "processed" && "Processed"}
+                  {orderData?.refundStatus === "rejected" && "Rejected"}
                 </button>
+              )}
+              {(orderData?.refundStatus === "processed" ||
+                orderData?.refundStatus === "rejected") && (
+                <p
+                  className={`mt-2 text-sm font-medium ${
+                    orderData?.refundStatus === "processed"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  Admin Remark: {orderData?.refundReasonDetails}
+                </p>
               )}
               {/* ✅ Refund Modal */}
               {showRefundModal && (
