@@ -281,16 +281,11 @@ export default function ServiceProviderList() {
         <div className="container max-w-5xl mx-auto my-10">
           {/* ---------- STYLISH FILTER BAR ---------- */}
           <div
-            className="
-    flex flex-col lg:flex-row justify-between lg:items-center
-    p-5 gap-6
-    bg-white/80 backdrop-blur-xl 
-    rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)]
+            className=" flex flex-col lg:flex-row justify-between lg:items-center p-5 gap-6 bg-white/80 backdrop-blur-xl 
+  rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.08)]
     border border-gray-200
     transition-all
-    w-full
-  "
-          >
+    w-full" >
             {/* Title */}
             <h1 className="text-xl font-bold text-gray-600 tracking-tight">
               Direct Hiring

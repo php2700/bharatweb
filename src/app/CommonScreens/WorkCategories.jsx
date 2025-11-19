@@ -204,9 +204,9 @@ export default function WorkCategories() {
   return (
     <>
       <Header />
-      <div className="font-sans text-gray-800 mt-35">
+      <div className="font-sans text-gray-800 mt-25 md:mt-35">
         {/* Hero Section with Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-2 md:mt-5">
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
               Loading banners...

@@ -69,52 +69,52 @@ export default function WorkerDetail() {
     arrows: true,
   };
 
-  const workers = [
-    {
-      id: 1,
-      name: "Dipak Sharma",
-      location: "Indore MP",
-      status: "Add Feature",
-      image: image,
-      amount: "200",
-      rating: 4.5,
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime",
-    },
-    {
-      id: 2,
-      name: "Dipak Sharma",
-      location: "Indore MP",
-      status: "Add Feature",
-      image: image,
-      amount: "200",
-      rating: 4.5,
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-    {
-      id: 3,
-      name: "Dipak Sharma",
-      location: "Indore MP",
-      status: "Add Feature",
-      image: image,
-      amount: "200",
-      rating: 4.5,
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-    {
-      id: 4,
-      name: "Dipak Sharma",
-      location: "Indore MP",
-      status: "Add Feature",
-      image: image,
-      amount: "200",
-      rating: 4.5,
-      skills:
-        "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
-    },
-  ];
+  // const workers = [
+  //   {
+  //     id: 1,
+  //     name: "Dipak Sharma",
+  //     location: "Indore MP",
+  //     status: "Add Feature",
+  //     image: image,
+  //     amount: "200",
+  //     rating: 4.5,
+  //     skills:
+  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Dipak Sharma",
+  //     location: "Indore MP",
+  //     status: "Add Feature",
+  //     image: image,
+  //     amount: "200",
+  //     rating: 4.5,
+  //     skills:
+  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Dipak Sharma",
+  //     location: "Indore MP",
+  //     status: "Add Feature",
+  //     image: image,
+  //     amount: "200",
+  //     rating: 4.5,
+  //     skills:
+  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias  consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Dipak Sharma",
+  //     location: "Indore MP",
+  //     status: "Add Feature",
+  //     image: image,
+  //     amount: "200",
+  //     rating: 4.5,
+  //     skills:
+  //       "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime tempora accusantium minima repellendus alias consectetur adipisicing elit. Eum itaque mollitia culpa ratione iusto iste dignissimos cupiditate. Sequi id alias ab ea. Amet maxime ",
+  //   },
+  // ];
 
   return (
     <>

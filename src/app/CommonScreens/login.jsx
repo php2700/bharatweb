@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -122,7 +122,7 @@ export default function LoginPage() {
               <img
                 src={logo}
                 alt="The Bharat Works"
-                className="w-[180px] sm:w-[220px] md:w-[260px] lg:w-[286px] h-auto object-contain mb-32"
+                className="w-[180px] sm:w-[220px] md:w-[260px] lg:w-[286px] h-auto object-contain "
               />
 
               <h2 className="font-bold text-gray-900 text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] mb-1">
