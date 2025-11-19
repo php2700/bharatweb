@@ -123,7 +123,7 @@ export default function OtpVerification() {
               <img
                 src={logo}
                 alt="The Bharat Works"
-                className="w-[200px] md:w-[286px] h-auto object-contain mb-24"
+                className="w-[200px] md:w-[286px] h-auto object-contain "
               />
               <h1 className="text-[#ff2108] text-[20px]">Otp is : {otpv}</h1>
               <h2 className="text-2xl font-bold text-gray-900 relative top-[18px]">

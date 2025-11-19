@@ -49,7 +49,8 @@ export default function RoleSelection() {
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -94,7 +95,7 @@ export default function RoleSelection() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-4  mt-20">
         <Link
           to="/"
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold"
@@ -108,9 +109,12 @@ export default function RoleSelection() {
           <h2 className="text-[22px] font-bold text-gray-800">
             Select Your Role
           </h2>
-          <p className="text-[16px] text-gray-500 font-medium mt-1">
+          <p className="text-[16px] text-gray-500  hidden md:block font-medium mt-1">
             Please choose whether you are a Worker or a <br /> Customer to
             proceed
+          </p>
+          <p className="text-[16px] text-gray-500 font-medium mt-1 md:hidden text-center">
+            Please choose whether you are a Worker or a Customer to proceed
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 mt-6">
             <div
@@ -187,7 +191,9 @@ export default function RoleSelection() {
               }`}
             disabled={!selectedRole}
           >
-            {selectedRole ? `Continue as ${roleMap[selectedRole]}` : "Select Any One"}
+            {selectedRole
+              ? `Continue as ${roleMap[selectedRole]}`
+              : "Select Any One"}
           </button>
         </div>
       </div>
