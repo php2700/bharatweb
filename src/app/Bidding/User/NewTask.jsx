@@ -266,17 +266,20 @@ export default function BiddingNewTask() {
 
       <div className="flex justify-center items-center min-h-screen bg-white px-4">
         <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-[72rem] shadow">
+        <h2 className="text-[30px] font-[700] text-center  text-[#191A1D]">
+              Post New Task
+            </h2>
+            
+
+        
           <form
             onSubmit={handleSubmit}
             className="w-full max-w-[51rem] p-8 space-y-6 text-left md:text-center mx-auto"
           >
-            <h2 className="text-[30px] font-[700] text-center mb-6 text-[#191A1D]">
-              Post New Task
-            </h2>
-
+            
             {/* Title */}
             <div>
-              <label className="block text-[17px] font-[500]  mb-1">Title</label>
+              <label className="block text-sm mb-1 font-bold">Title</label>
               <input
                 type="text"
                 name="title"
@@ -289,7 +292,7 @@ export default function BiddingNewTask() {
 
             {/* Category */}
             <div>
-              <label className="block mb-2 font-semibold text-gray-700">
+              <label className="block text-sm mb-1 font-bold">
                 Category
               </label>
               <Select
@@ -304,7 +307,7 @@ export default function BiddingNewTask() {
 
             {/* Subcategories */}
             <div>
-              <label className="block mb-2 font-semibold text-gray-700">
+              <label className="block text-sm mb-1 font-bold">
                 Subcategories
               </label>
               <Select
@@ -322,7 +325,7 @@ export default function BiddingNewTask() {
 
             {/* Address Selection */}
             <div className="relative">
-              <label className="block text-[17px] font-[500] mb-1">
+              <label className="block text-sm mb-1 font-bold">
                 Current Address
               </label>
               <input
@@ -397,7 +400,7 @@ export default function BiddingNewTask() {
 
             {/* Other Fields */}
             <div>
-              <label className="block text-[17px] font-[500] mb-1">
+              <label className="block text-sm mb-1 font-bold">
                 Description
               </label>
               <textarea
@@ -410,7 +413,7 @@ export default function BiddingNewTask() {
             </div>
 
             <div>
-              <label className="block text-[17px] font-[500] mb-1">Cost</label>
+              <label className="block text-sm mb-1 font-bold">Cost</label>
               <input
                 type="number"
                 name="cost"
@@ -422,7 +425,7 @@ export default function BiddingNewTask() {
             </div>
 
             <div>
-              <label className="block text-[17px] font-[500] text-[#191A1D] mb-1 text-left">
+              <label className="block text-sm mb-1 font-bold">
                 Add Deadline
               </label>
               <div className="relative">
@@ -457,7 +460,7 @@ export default function BiddingNewTask() {
             </div>
 
             <div className="border-2 border-[#777777] rounded-xl p-6 text-center">
-              <label className="cursor-pointer flex flex-col items-center">
+              <label className="cursor-pointer flex flex-col items-center block text-sm mb-1 font-bold">
                 <svg
                   className="w-10 h-10 text-[#228B22] mb-2"
                   fill="none"
