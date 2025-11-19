@@ -463,7 +463,7 @@ export default function Accepted({
                           Waiting for Approval
                         </span>
 
-                        {hireStatus === "accepted" && (
+                        {hireStatus === "assigned" && (
                           <button
                             onClick={() => handlePay(payment._id)}
                             className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
