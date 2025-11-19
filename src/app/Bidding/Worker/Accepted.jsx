@@ -11,7 +11,7 @@ export default function Accepted({
   paymentHistory,
   fullPaymentHistory,
   orderId,
-	hireStatus,
+  hireStatus,
   user_id,
 }) {
   if (!serviceProvider && !assignedWorker) {
@@ -70,17 +70,17 @@ export default function Accepted({
                 View Profile
               </button> */}
               {hireStatus === "completed" ? null : assignedWorker ? (
-                      <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
-                        Assigned
-                      </button>
-                    ) : (
-                      <Link
-                        to={`/assign-work/${orderId}/direct`}
-                        className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white text-center"
-                      >
-                        Assign work
-                      </Link>
-                    )}
+                <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
+                  Assigned
+                </button>
+              ) : (
+                <Link
+                  to={`/assign-work/${orderId}/direct`}
+                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white text-center"
+                >
+                  Assign work
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -152,7 +152,9 @@ export default function Accepted({
                     )}
 
                   {payment.release_status === "release_requested" && (
-                    <span className="text-blue-600 font-semibold">Paid</span>
+                    <span className="text-blue-600 font-semibold">
+                      In Progress
+                    </span>
                   )}
 
                   {payment.release_status === "released" && (

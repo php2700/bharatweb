@@ -170,8 +170,8 @@ export default function Accepted({
                         </span>
                       )}
 
-                    {payment.release_status === "release_requested" && (
-                      <span className="text-blue-600 font-semibold">Paid</span>
+                     {payment.release_status === "release_requested" && (
+                      <span className="text-blue-600 font-semibold">In Progress</span>
                     )}
 
                     {payment.release_status === "released" && (
