@@ -268,7 +268,7 @@ export default function BiddingNewTask() {
         <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-[72rem] shadow">
           <form
             onSubmit={handleSubmit}
-            className="w-full max-w-[51rem] p-8 space-y-6 ml-[155px]"
+            className="w-full max-w-[51rem] p-8 space-y-6 text-center mx-auto"
           >
             <h2 className="text-[30px] font-[700] text-center mb-6 text-[#191A1D]">
               Post New Task
@@ -451,7 +451,7 @@ export default function BiddingNewTask() {
                       : new Date(0, 0, 0, 0, 0) // else allow all times
                   }
                   maxTime={new Date(0, 0, 0, 23, 59)}
-                  className="w-[754px] border-2 border-[#777777] rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className=" w-full md:w-[754px] border-2 border-[#777777] rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -547,12 +547,14 @@ export default function BiddingNewTask() {
             </span>
 
             <br />
-            <button
-              type="submit"
-              className="w-80 bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-xl shadow-md mt-[20px]"
+            <div className="w-full flex justify-center">
+              <button
+                type="submit"
+                className="w-80 bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-xl shadow-md mt-[20px] mx-auto block"
             >
               Post Task
             </button>
+            </div>
           </form>
         </div>
       </div>
