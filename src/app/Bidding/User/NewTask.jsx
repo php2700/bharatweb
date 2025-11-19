@@ -43,7 +43,7 @@ export default function BiddingNewTask() {
     location = profile.data.full_address || "";
   }
 
-  const [errors, setErrors] = useState({});
+  // const [errors, setErrors] = useState({});
 
   // 🔹 Fetch categories
   useEffect(() => {
@@ -109,9 +109,9 @@ export default function BiddingNewTask() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, images: e.target.files });
-  };
+  // const handleFileChange = (e) => {
+  //   setFormData({ ...formData, images: e.target.files });
+  // };
 
   // 🔹 Handle address selection
   const handleSelect = (addr, index) => {
@@ -268,7 +268,7 @@ export default function BiddingNewTask() {
         <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-[72rem] shadow">
           <form
             onSubmit={handleSubmit}
-            className="w-full max-w-[51rem] p-8 space-y-6 text-center mx-auto"
+            className="w-full max-w-[51rem] p-8 space-y-6 text-left md:text-center mx-auto"
           >
             <h2 className="text-[30px] font-[700] text-center mb-6 text-[#191A1D]">
               Post New Task
@@ -276,7 +276,7 @@ export default function BiddingNewTask() {
 
             {/* Title */}
             <div>
-              <label className="block text-[17px] font-[500] mb-1">Title</label>
+              <label className="block text-[17px] font-[500]  mb-1">Title</label>
               <input
                 type="text"
                 name="title"
