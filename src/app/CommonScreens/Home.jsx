@@ -326,27 +326,27 @@ console.log("profile role:",profile?.role);
         </div>
 
         {/* Right Image */}
-        <div className="flex justify-center">
+        <div className="  flex justify-center ">
           <img
             src={Banner}
             alt="Service Provider"
-            className="w-full max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
+            className="w-full  max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
           />
         </div>
       </div>
 
       {/* Overlay Section */}
-      <div className="relative w-full h-48 sm:h-64 md:h-[252px] mt-5">
+      <div className="relative w-full h-auto min-h-64 sm:h-64 md:h-[252px] mt-5">
         <img
           src={Mask}
           alt="Background"
-          className="w-full h-full object-cover"
+          className=" absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[#382C28] opacity-75"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12 md:gap-[100px] text-center text-white">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+              <h2 className="text-2xl md:text-4xl font-bold">
                 9,168+
               </h2>
               <p className="text-sm sm:text-lg mt-2">Project Completed</p>

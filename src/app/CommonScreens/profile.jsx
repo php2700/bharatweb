@@ -320,7 +320,7 @@ export default function Profile() {
         </Link>
       </div>
 
-      <div className="flex justify-center items-center bg-white px-4 py-8 mt-20">
+      <div className="flex justify-center items-center bg-white px-4 py-6 ">
         <div className="bg-white rounded-2xl p-6 sm:p-8 text-center w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow">
           <h2 className="text-center text-[24px] font-[700] mb-6">
             Complete Profile
