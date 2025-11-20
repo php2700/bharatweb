@@ -372,8 +372,8 @@ export default function Home() {
                       alt={work.title}
                       className="w-full h-40 object-cover rounded-t-lg mb-4"
                     />
-
                     <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.address}</h3>
                     <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
                     <button
                       onClick={() => navigate(`/bidding/task/${work._id}`)}
@@ -456,8 +456,8 @@ export default function Home() {
                     className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
                   >
 
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.full_name}</h3>
-                    <p className="text-gray-600 text-sm mb-4 break-words">{worker.specialization}</p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 break-words">{worker.address}</p>
                     <button
                       onClick={() => navigate(`/worker/profile/${worker.id}`)}
                       className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
