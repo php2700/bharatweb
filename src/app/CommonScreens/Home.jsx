@@ -412,12 +412,14 @@ export default function Home() {
                     >
                        {/* Image at the top with default fallback */}
                     <img
-                      src={work.imageUrl || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+                      src={work.image_urls || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
                       alt={work.title}
                       className="w-full h-40 object-cover rounded-t-lg mb-4"
                     />
                       <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
                       <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
+                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.google_address}</p>
+                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.contact}</p>
                       <button
                         onClick={() => navigate(`/emergency/task/${work._id}`)}
                         className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
@@ -453,7 +455,7 @@ export default function Home() {
                     key={index}
                     className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
                   >
-                    
+
                     <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.full_name}</h3>
                     <p className="text-gray-600 text-sm mb-4 break-words">{worker.specialization}</p>
                     <button
