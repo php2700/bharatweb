@@ -12,9 +12,6 @@ import Profile from "../assets/profile.svg";
 import Logout from "../assets/logout.svg";
 import Account from "../assets/account.svg";
 import axios from "axios";
-import { AiFillCloseCircle } from "react-icons/ai";
-import Biding from "../assets/Homepage/bidding.svg";
-import Emergency from "../assets/Homepage/emergency.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -66,7 +63,6 @@ export default function Header() {
   );
   const location = useLocation();
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
-  const [isPostATastDropdown, setPostATaskDropdown] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -932,56 +928,13 @@ export default function Header() {
               <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
             </Link>
           )}
-          {/* {isLoggedIn && (
+          {isLoggedIn && (
             <Link to="/bidding/newtask" className="hidden lg:block">
               <button className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow">
                 + Post a Task
               </button>
             </Link>
-          )} */}
-          {isLoggedIn && (
-            <div className="relative hidden lg:block">
-              <button
-                onClick={() => setPostATaskDropdown(!isPostATastDropdown)}
-                className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow"
-              >
-                + Post a Task
-              </button>
-              {isPostATastDropdown && (
-                <div className="absolute right-0 mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.1)] py-2 z-50 border border-gray-100 animate-fadeIn">
-                  <Link
-                    to="/bidding/newtask"
-                    className="flex items-center gap-2 font-bold  px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
-                    onClick={() => setPostATaskDropdown(false)}
-                  >
-                    <img
-                      src={Biding}
-                      alt=""
-                      className="w-6 h-6 text-gray-700"
-                    />
-                    <span>Bidding Task</span>
-                  </Link>
-
-                  <div className="w-full h-px bg-gray-200 my-1"></div>
-
-                  <Link
-                    to="/emergency/userpost"
-                    className="flex items-center font-bold gap-2 px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
-                    onClick={() => setPostATaskDropdown(false)}
-                  >
-                    <img
-                      src={Emergency}
-                      alt=""
-                      className="w-6 h-6 text-gray-700"
-                    />
-
-                    <span>Emergency Task</span>
-                  </Link>
-                </div>
-              )}
-            </div>
           )}
-
           {isLoggedIn && (
             <>
               {/* Desktop Notification */}
@@ -1134,45 +1087,7 @@ export default function Header() {
                     >
                       <FaBriefcase className="w-5 h-5" /> My Work
                     </Link>
-
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Direct Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/bidding/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Bidding Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-                       {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/emergency/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-
-
+                    
                     <Link
                       to="/disputes"
                       className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
@@ -1214,6 +1129,7 @@ export default function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button> */}
+
           {!(
             location.pathname === "/service-provider-list" && isLargeScreen
           ) && (
@@ -1275,46 +1191,11 @@ export default function Header() {
               </Link>
             )}
             {isLoggedIn && (
-              <div className="relative lg:hidden">
-                <button
-                  onClick={() => setPostATaskDropdown(!isPostATastDropdown)}
-                  className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow"
-                >
+              <Link to="/bidding/newtask" onClick={() => setIsMenuOpen(false)}>
+                <button className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-6 py-2 rounded-xl shadow">
                   + Post a Task
                 </button>
-                {isPostATastDropdown && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.1)] py-2 z-50 border border-gray-100 animate-fadeIn">
-                    <Link
-                      to="/bidding/newtask"
-                      className="flex items-center gap-2 font-bold  px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
-                      onClick={() => setPostATaskDropdown(false)}
-                    >
-                      <img
-                        src={Biding}
-                        alt=""
-                        className="w-6 h-6 text-gray-700"
-                      />
-                      <span>Bidding Task</span>
-                    </Link>
-
-                    <div className="w-full h-px bg-gray-200 my-1"></div>
-
-                    <Link
-                      to="/emergency/userpost"
-                      className="flex items-center font-bold gap-2 px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
-                      onClick={() => setPostATaskDropdown(false)}
-                    >
-                      <img
-                        src={Emergency}
-                        alt=""
-                        className="w-6 h-6 text-gray-700"
-                      />
-
-                      <span>Emergency Task</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
+              </Link>
             )}
             {isLoggedIn && (
               <>
@@ -1469,51 +1350,6 @@ export default function Header() {
                       >
                         <FaBriefcase className="w-5 h-5" /> My Work
                       </Link>
-                         {/* {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Rejected Work
-                      </Link> */}
-                    {/* )} */}
-                        {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Direct Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/bidding/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Bidding Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-                       {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/emergency/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
-                      </Link>
-                      
-                      
-                      
-                    )}
                       <Link
                         to="/disputes"
                         className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
