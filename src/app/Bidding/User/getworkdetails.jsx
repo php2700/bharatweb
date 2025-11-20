@@ -32,6 +32,7 @@ export default function BiddinggetWorkDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isCancelled, setIsCancelled] = useState(false);
+   const [orderData, setOrderData] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,6 +210,17 @@ export default function BiddinggetWorkDetail() {
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
+    }
+  };
+  const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      // origin (शुरुआत) खाली छोड़ने पर गूगल मैप्स यूज़र की current location ले लेता है।
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      toast.warn("Destination address not found!");
     }
   };
 
@@ -776,7 +788,13 @@ export default function BiddinggetWorkDetail() {
                     {orderDetail?.address || "N/A"}
                   </span>
                 </span>
-                {showMap && (
+                 <span className="text-gray-600 text-sm font-semibold block">
+
+                  One Time Project fee :- ₹{orderDetail?.platform_fee || "0"}
+
+                </span>
+                
+                {/* {showMap && (
                   <div className="mt-4 w-full h-96 rounded-xl overflow-hidden shadow-lg">
                     <iframe
                       width="100%"
@@ -790,7 +808,43 @@ export default function BiddinggetWorkDetail() {
                       )}`}
                     ></iframe>
                   </div>
-                )}
+                )} */}
+                {showMap && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Location on Map</h2>
+        <button
+          onClick={() => setShowMap(false)}
+          className="text-red-500 font-bold text-2xl"
+        >
+          &times;
+        </button>
+      </div>
+      <div className="w-full h-96 rounded-lg overflow-hidden border">
+        <iframe
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+          src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+            orderDetail?.address || ""
+          )}`}
+        ></iframe>
+      </div>
+      <div className="mt-4 text-center">
+        <button
+          onClick={() => handleGetDirections(orderDetail?.address)}
+          className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+        >
+          Get Directions
+        </button>
+      </div>
+    </div>
+  </div>
+)}
               </div>
               <div className="text-right">
                 <p className="bg-black text-white text-md px-4 rounded-full inline-block">

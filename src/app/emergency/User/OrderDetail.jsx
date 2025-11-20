@@ -22,6 +22,7 @@ import Warning1 from "../../../assets/warning1.png";
 import Warning2 from "../../../assets/warning2.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function ViewProfile() {
   const navigate = useNavigate();
@@ -43,6 +44,8 @@ export default function ViewProfile() {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
   const [disputeInfo, setDisputeInfo] = useState(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [mapAddress, setMapAddress] = useState("");
   const token = localStorage.getItem("bharat_token");
 
   // Sort state
@@ -72,12 +75,29 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
+  const openMapModal = (address) => {
+    setMapAddress(address);
+    setIsMapModalOpen(true);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
-
+  const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Location Not Found",
+        text: "The destination address is not available.",
+      });
+    }
+  };
   const fetchData = async () => {
     if (!token) {
       setError("Authentication token not found. Please log in.");
@@ -93,8 +113,8 @@ export default function ViewProfile() {
         }),
         orderData?.hire_status === "pending"
           ? axios.get(`${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
+            headers: { Authorization: `Bearer ${token}` },
+          })
           : { data: { providers: [] } },
       ]);
 
@@ -384,10 +404,18 @@ export default function ViewProfile() {
                 <span>Category :- {orderData?.category_id?.name || "Unknown Category"}</span>
                 <div>
                   Sub Category :- {orderData?.sub_category_ids?.map(s => s.name).join(", ") || "N/A"}
-                  <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                  {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
+                    {orderData?.google_address || "Unknown Location"}
+                  </div> */}
+                  <div
+                    onClick={() => openMapModal(orderData?.google_address)}
+                    className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                  >
                     <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
                     {orderData?.google_address || "Unknown Location"}
                   </div>
+
                 </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">
@@ -411,6 +439,11 @@ export default function ViewProfile() {
             <span className="text-gray-600 text-sm font-semibold block">
               Deadline: {orderData?.deadline ? new Date(orderData.deadline).toLocaleString() : "N/A"}
             </span>
+              {orderData?.platform_fee_paid && (
+              <span className="text-gray-600 text-sm font-semibold block mt-1">
+                One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+              </span>
+            )}
             <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">{orderData?.description || "No details available."}</p>
             </div>
@@ -449,7 +482,7 @@ export default function ViewProfile() {
               )}
               {orderData?.hire_status === "assigned" && orderData?.platform_fee_paid && !orderData?.refundRequest && (
                 <p className="text-gray-800 text-sm font-medium text-center mt-3">
-                 <span className="text-gray-700 font-bold">Note :-</span> <span className="text-red-600 font-semibold">Use "Cancel & Get Refund" to cancel and request refund.</span>
+                  <span className="text-gray-700 font-bold">Note :-</span> <span className="text-red-600 font-semibold">Use "Cancel & Get Refund" to cancel and request refund.</span>
                 </p>
               )}
             </div>
@@ -480,7 +513,7 @@ export default function ViewProfile() {
                       <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
                         <h2 className="text-[#FE2B2B] font-bold -mt-2">Warning Message</h2>
                         <p className="text-gray-700 text-sm md:text-base">Pay securely — no extra charges from the platform. Choose simple and
-            safe transactions.</p>
+                          safe transactions.</p>
                       </div>
                     </div>
                     <div className="flex space-x-4">
@@ -560,7 +593,14 @@ export default function ViewProfile() {
                     {provider.rating !== undefined && (
                       <p className="text-sm text-yellow-600">Rating: {provider.rating.toFixed(1)} / 5.0</p>
                     )}
-                    <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                    {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
+                      <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
+                      {provider?.location?.address || "No Address Provided"}
+                    </div> */}
+                    <div
+                      onClick={() => openMapModal(provider?.location?.address)}
+                      className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                    >
                       <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
                       {provider?.location?.address || "No Address Provided"}
                     </div>
@@ -612,7 +652,41 @@ export default function ViewProfile() {
       </div>
 
       <Footer />
-
+      {isMapModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Location on Map</h2>
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="text-red-500 font-bold text-2xl"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="w-full h-96 rounded-lg overflow-hidden border">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+                  mapAddress || ""
+                )}`}
+              ></iframe>
+            </div>
+            <div className="mt-5 text-center">
+              <button
+                onClick={() => handleGetDirections(mapAddress)}
+                className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                Get Directions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Cancel Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true">

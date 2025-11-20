@@ -14,6 +14,8 @@ import workImage from "../../../assets/directHiring/Work.png";
 import Slider from "react-slick";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
 
 export default function ViewProfile() {
   const navigate = useNavigate();
@@ -25,6 +27,7 @@ export default function ViewProfile() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   const fetchBannerImages = async () => {
     try {
@@ -66,6 +69,18 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
+    const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      // आप चाहें तो यहाँ Swal या toast का इस्तेमाल कर सकते हैं
+      alert("Destination address not found!");
+    }
+  };
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -198,7 +213,7 @@ export default function ViewProfile() {
                   {orderData?.sub_category_ids
                     .map((sub) => sub.name)
                     .join(", ") || "No Address Provided"}
-                  <div className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
+                  {/* <div className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
                     {" "}
                     <span>
                       <FaMapMarkerAlt
@@ -208,7 +223,21 @@ export default function ViewProfile() {
                       />
                     </span>
                     {orderData?.google_address || "Unknown Location"}
-                  </div>
+                  </div> */}
+                  <div 
+  onClick={() => setIsMapModalOpen(true)}
+  className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+>
+    {" "}
+    <span>
+      <FaMapMarkerAlt
+        size={25}
+        color="#228B22"
+        className="mr-2"
+      />
+    </span>
+    {orderData?.google_address || "Unknown Location"}
+</div>
                   <span className="text-gray-600 text-sm font-semibold block">
                     Deadline Date&Time:{" "}
                     {orderData?.deadline
@@ -362,6 +391,41 @@ export default function ViewProfile() {
       </div>
 
       <Footer />
+       {isMapModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Work Location on Map</h2>
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="text-red-500 font-bold text-2xl"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="w-full h-96 rounded-lg overflow-hidden border">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+                  orderData?.google_address || ""
+                )}`}
+              ></iframe>
+            </div>
+            <div className="mt-5 text-center">
+              <button
+                onClick={() => handleGetDirections(orderData?.google_address)}
+                className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                Get Directions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
