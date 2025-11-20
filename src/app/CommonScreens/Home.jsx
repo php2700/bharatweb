@@ -8,9 +8,6 @@ import Plumber from "../../assets/Homepage/Plumber.svg";
 import Electrician from "../../assets/Homepage/Electrician.svg";
 import Technician from "../../assets/Homepage/Technician.svg";
 import Image from "../../assets/Homepage/Images.png";
-import Recent from "../../assets/Homepage/Recent.png";
-import Worker from "../../assets/Homepage/worker.png";
-import Star from "../../assets/Homepage/Star.svg";
 import Choose from "../../assets/Homepage/choose.png";
 import one from "../../assets/Homepage/one.jpg";
 import two from "../../assets/Homepage/two.jpg";
@@ -20,13 +17,17 @@ import man2 from "../../assets/Homepage/man2.jpg";
 import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
 import footer from "../../assets/Homepage/footer.svg";
-import { Link } from "react-router-dom";
+import axios from "axios";
+
 import { useSelector } from "react-redux";
 
 export default function Home() {
+  const [works, setWorks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
- const { profile } = useSelector((state) => state.user);
-console.log("profile role:",profile?.role);
+  const { profile } = useSelector((state) => state.user);
+  console.log("profile role:", profile?.role);
   // 🔹 1. If user is already logged in, redirect to home (or dashboard)
   useEffect(() => {
     const token = localStorage.getItem("bharat_token"); // change key as per your login storage
@@ -43,6 +44,79 @@ console.log("profile role:",profile?.role);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // call API for silder data
+
+  // call API for bidding silder data
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/bidding-order/getAllPostedBiddingOrders`
+        );
+        console.log("bedding works response:", response.data);
+
+        // FIX: use response.data.data
+        setWorks(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching recent works:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorks();
+  }, []);
+
+  // Api call for Emergency Tasks slider data
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}}/emergency-order/getAllPostedEmergencyOrders`
+        );
+        console.log("bedding works response:", response.data);
+
+        // FIX: use response.data.data
+        setWorks(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching recent works:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorks();
+  }, []);
+
+  //Api call for Feature Workers slider data
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}}api/user/getAllUsersSortedByPlan`
+        );
+        console.log("bedding works response:", response.data);
+
+        // FIX: use response.data.data
+        setWorks(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching recent works:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorks();
+  }, []);
+
+  // Render rest of page while loading; show loading/empty messages
+  // inside the Bidding Posted Work section so the whole page remains visible.
+
+
   const servicesData = [
     {
       id: 1,
@@ -111,120 +185,6 @@ console.log("profile role:",profile?.role);
   const [showAll, setShowAll] = useState(false);
   const visibleServices = showAll ? servicesData : servicesData.slice(0, 6); // Reduced to 6 for better mobile display
 
-  const professionals = [
-    {
-      id: 1,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 2,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 3,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 4,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 5,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 6,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-    {
-      id: 7,
-      name: "Mohan Sharma",
-      role: "Plumber",
-      rating: 4.7,
-      image: Worker,
-    },
-  ];
-
-  const works = [
-    {
-      id: 1,
-      title: "Furniture",
-      price: "1200",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "12/02/25",
-      image: Recent,
-    },
-    {
-      id: 2,
-      title: "Furniture",
-      price: "800",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "15/02/25",
-      image: Recent,
-    },
-    {
-      id: 3,
-      title: "Furniture",
-      price: "1500",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "20/02/25",
-      image: Recent,
-    },
-    {
-      id: 4,
-      title: "Furniture",
-      price: "1500",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "20/02/25",
-      image: Recent,
-    },
-    {
-      id: 5,
-      title: "Furniture",
-      price: "1500",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "20/02/25",
-      image: Recent,
-    },
-    {
-      id: 6,
-      title: "Furniture",
-      price: "1500",
-      description: "Make Chair Make Chair....Make Chair....Make Chair....",
-      date: "20/02/25",
-      image: Recent,
-    },
-  ];
-
-  // Slider state and refs for Recent Posted Work
-  const sliderRef = useRef(null);
-  const [isDown, setIsDown] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  // Slider state and refs for Feature Workers
-  const workerSliderRef = useRef(null);
-  const [isWorkerDown, setIsWorkerDown] = useState(false);
-  const [workerStartX, setWorkerStartX] = useState(0);
-  const [workerScrollLeft, setWorkerScrollLeft] = useState(0);
 
   const handleClick = (e) => {
     const img = e.target;
@@ -243,54 +203,23 @@ console.log("profile role:",profile?.role);
     }
   };
 
-  const handleMouseDown = (e) => {
-    setIsDown(true);
-    setStartX(e.pageX - sliderRef.current.offsetLeft);
-    setScrollLeft(sliderRef.current.scrollLeft);
-    sliderRef.current.style.cursor = "grabbing";
-  };
 
-  const handleMouseLeave = () => {
-    setIsDown(false);
-    sliderRef.current.style.cursor = "grab";
-  };
 
-  const handleMouseUp = () => {
-    setIsDown(false);
-    sliderRef.current.style.cursor = "grab";
+  const handlePostWorkClick = () => {
+    const isLoggedIn = !!localStorage.getItem("bharat_token");
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/bidding/newtask");
+    }
   };
-
-  const handleMouseMove = (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Adjust drag speed
-    sliderRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleWorkerMouseDown = (e) => {
-    setIsWorkerDown(true);
-    setWorkerStartX(e.pageX - workerSliderRef.current.offsetLeft);
-    setWorkerScrollLeft(workerSliderRef.current.scrollLeft);
-    workerSliderRef.current.style.cursor = "grabbing";
-  };
-
-  const handleWorkerMouseLeave = () => {
-    setIsWorkerDown(false);
-    workerSliderRef.current.style.cursor = "grab";
-  };
-
-  const handleWorkerMouseUp = () => {
-    setIsWorkerDown(false);
-    workerSliderRef.current.style.cursor = "grab";
-  };
-
-  const handleWorkerMouseMove = (e) => {
-    if (!isWorkerDown) return;
-    e.preventDefault();
-    const x = e.pageX - workerSliderRef.current.offsetLeft;
-    const walk = (x - workerStartX) * 2; // Adjust drag speed
-    workerSliderRef.current.scrollLeft = workerScrollLeft - walk;
+  const handleBookNowClick = () => {
+    const isLoggedIn = !!localStorage.getItem("bharat_token");
+    if (isLoggedIn) {
+      navigate("/subscription");
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -319,34 +248,34 @@ console.log("profile role:",profile?.role);
                 navigate("/login");
               }
             }}
-            className="bg-[#228B22] hover:bg-green-800 text-white text-base sm:text-lg font-semibold px-6 sm:px-10 py-2 sm:py-3 rounded-md transition"
+            className="bg-[#228B22] hover:bg-green-800 text-white text-base sm:text-lg font-semibold px-6 sm:px-10 py-2 sm:py-3 rounded-md transition cursor-pointer"
           >
             Book Now
           </button>
         </div>
 
         {/* Right Image */}
-        <div className="  flex justify-center ">
+        <div className="flex justify-center">
           <img
             src={Banner}
             alt="Service Provider"
-            className="w-full  max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
+            className="w-full max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
           />
         </div>
       </div>
 
       {/* Overlay Section */}
-      <div className="relative w-full h-auto min-h-64 sm:h-64 md:h-[252px] mt-5">
+      <div className="relative w-full h-48 sm:h-64 md:h-[252px] mt-5">
         <img
           src={Mask}
           alt="Background"
-          className=" absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-[#382C28] opacity-75"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12 md:gap-[100px] text-center text-white">
             <div>
-              <h2 className="text-2xl md:text-4xl font-bold">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
                 9,168+
               </h2>
               <p className="text-sm sm:text-lg mt-2">Project Completed</p>
@@ -418,110 +347,132 @@ console.log("profile role:",profile?.role);
         />
       </div>
 
-      {/* Recent Posted Work & Feature Workers */}
+      {/* Bidding Posted Work */}
       <div className="bg-[#EDFFF3] py-8 md:py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-            Recent Posted Work
-          </h2>
+
+      <div className="container mx-auto px-4">
+  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+    Emergency Tasks
+  </h2>
+
+  {loading ? (
+    <p className="text-gray-600 text-center">Loading recent works...</p>
+  ) : works.length === 0 ? (
+    <p className="text-gray-600 text-center">No recent works available.</p>
+  ) : (
+    <div className="overflow-hidden relative w-full">
+      <div className="flex flex-nowrap animate-slide">
+        {works.concat(works).map((work, index) => (
           <div
-            ref={sliderRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide cursor-grab select-none snap-x snap-mandatory"
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            style={{
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
-            }}
+            key={index}
+            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6"
           >
-            {works.map((work) => (
-              <div
-                key={work.id}
-                className="bg-white rounded-lg shadow-md min-w-[240px] sm:min-w-[280px] max-w-[240px] sm:max-w-[280px] flex-shrink-0 snap-center"
-              >
-                <img
-                  src={work.image}
-                  alt={work.title}
-                  className="w-full h-32 sm:h-40 object-cover rounded-t-lg"
-                />
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold text-base sm:text-lg">
-                      {work.title}
-                    </h3>
-                    <span className="text-green-600 font-bold text-sm sm:text-base">
-                      Rs: {work.price}/-
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">
-                    {work.description}
-                  </p>
-                  <p className="text-xs sm:text-sm font-semibold text-gray-700">
-                    Completion Date: {work.date}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <style>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{work.title}</h3>
+            <p className="text-gray-600 text-sm mb-4">{work.description}</p>
+            <button
+              onClick={() => navigate(`/emergency/task/${work._id}`)}
+              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition"
+            >
+              View Details
+            </button>
           </div>
-        </div>
-        <div className="container mx-auto px-4 mt-6 md:mt-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-            Feature Workers
-          </h2>
+        ))}
+      </div>
+    </div>
+  )}
+
+
+</div>
+
+
+
+
+        {/*Recent Emergency Tasks*/}
+
+       <div className="bg-[#EDFFF3] py-8 md:py-16">
+      <div className="container mx-auto px-4">
+  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+    Emergency Tasks
+  </h2>
+
+  {loading ? (
+    <p className="text-gray-600 text-center">Loading recent works...</p>
+  ) : works.length === 0 ? (
+    <p className="text-gray-600 text-center">No recent works available.</p>
+  ) : (
+    <div className="overflow-hidden relative w-full">
+      <div className="flex flex-nowrap animate-slide">
+        {works.concat(works).map((work, index) => (
           <div
-            ref={workerSliderRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide cursor-grab select-none snap-x snap-mandatory"
-            onMouseDown={handleWorkerMouseDown}
-            onMouseLeave={handleWorkerMouseLeave}
-            onMouseUp={handleWorkerMouseUp}
-            onMouseMove={handleWorkerMouseMove}
-            style={{
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
-            }}
+            key={index}
+            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
           >
-            {professionals.map((pro) => (
-              <div
-                key={pro.id}
-                className="min-w-[180px] sm:min-w-[200px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex-shrink-0 snap-center"
-              >
-                <img
-                  src={pro.image}
-                  alt={pro.name}
-                  className="w-full h-40 sm:h-48 object-cover rounded-t-xl"
-                />
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-base sm:text-lg font-semibold">
-                      {pro.name}
-                    </h3>
-                    <div className="flex items-center text-green-600 font-medium text-sm sm:text-base">
-                      <img
-                        src={Star}
-                        alt="star"
-                        className="w-3 h-3 sm:w-4 sm:h-4 mr-1"
-                      />
-                      {pro.rating}
-                    </div>
-                  </div>
-                  <p className="text-gray-500 text-xs sm:text-sm">{pro.role}</p>
-                </div>
-              </div>
-            ))}
-            <style>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
+            <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
+            <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
+            <button
+              onClick={() => navigate(`/emergency/task/${work._id}`)}
+              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
+            >
+              View Details
+            </button>
           </div>
-        </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+
+</div>
+
+    </div>
+
+        {/* & Feature Workers */}
+       <div className="container mx-auto px-4 mt-6 md:mt-8">
+  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+    Feature Workers
+  </h2>
+
+  {loading ? (
+    <p className="text-gray-600 text-center">Loading recent works...</p>
+  ) : works.length === 0 ? (
+    <p className="text-gray-600 text-center">No recent works available.</p>
+  ) : (
+    <div className="overflow-hidden relative w-full">
+      <div className="flex flex-nowrap animate-slide">
+        {works.concat(works).map((worker, index) => (
+          <div
+            key={index}
+            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.name}</h3>
+            <p className="text-gray-600 text-sm mb-4 break-words">{worker.specialization}</p>
+            <button
+              onClick={() => navigate(`/worker/profile/${worker.id}`)}
+              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
+            >
+              View Profile
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {/* Tailwind CSS Custom Animation */}
+  <style>
+            {`
+          @keyframes slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-slide {
+            animation: slide 30s linear infinite;
+          }
+        `}
+          </style>
+</div>
+
+
       </div>
 
       {/* Why Choose Us Section */}
@@ -748,11 +699,12 @@ console.log("profile role:",profile?.role);
                   ))}
                 </ul>
               </div>
-              <Link to="/subscription">
-                <button className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-2 sm:py-3 px-5 sm:px-7 rounded transition mt-6">
-                  BOOK NOW
-                </button>
-              </Link>
+              <button
+                onClick={handleBookNowClick}
+                className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-2 sm:py-3 px-5 sm:px-7 rounded transition mt-6 cursor-pointer"
+              >
+                BOOK NOW
+              </button>
             </div>
           ))}
         </div>
@@ -812,13 +764,13 @@ console.log("profile role:",profile?.role);
         />
         <div className="absolute bg-[#228B22] w-[90%] sm:w-[82%] h-[60%] rounded-lg flex flex-col items-center justify-center">
           <p className="text-white text-xl sm:text-2xl md:text-4xl font-bold text-center px-4">
-            Click here to post your project and get <br /> started!
+            Click here to post your project and get <br /> started! ffff
           </p>
-          <Link to="/bidding/newtask">
-            <button className="mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold px-6 sm:px-9 py-2 sm:py-3 rounded-sm shadow hover:bg-gray-100">
-              Post Work
-            </button>
-          </Link>
+
+          <button onClick={handlePostWorkClick} className=" mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold px-6 sm:px-9 py-2 sm:py-3 rounded-sm shadow hover:bg-gray-100 cursor-pointer">
+            Post Work
+          </button>
+
         </div>
       </div>
 
