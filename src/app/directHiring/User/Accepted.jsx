@@ -429,6 +429,7 @@ export default function Accepted({
         )}
 
         {/* Payment History */}
+				
         {paymentHistory && Array.isArray(paymentHistory) && (
           <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
             <div className="flex justify-between items-center mb-4">
