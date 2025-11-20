@@ -90,6 +90,9 @@ import DirectProviderordetail from "./app/directHiring/Worker/OrderDetail";
 import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
 import Chat from "./app/CommonScreens/Chat";
 import Promotion from "./app/CommonScreens/Promotion";
+import  RejectedWork from "./app/CommonScreens/RejectedWork"
+import BiddingRejectedWork from "./app/Bidding/Worker/BiddingRejectedWork"
+import EmergencyRejectedWork from "./app/emergency/Worker/EmergencyRejectedWork"
 
 export default function App() {
   if ("serviceWorker" in navigator) {
@@ -224,6 +227,12 @@ export default function App() {
         {/* common page for user's worker list */}
         <Route path="/user/work-list/:task" element={<UserWorklist />} />
         <Route path="/worker/work-list/:task" element={<WorkerWorklist />} />
+        {/* rejected work */}
+        <Route path="/worker/rejected-work" element={<RejectedWork />} />
+        <Route path="/worker/bidding/rejected-work" element={<BiddingRejectedWork/>} />
+        <Route path="/worker/emergency/rejected-work" element={<EmergencyRejectedWork/>}/>
+
+
         {/* // Emergency Routes- User */}
         <Route path="/emergency/userpost" element={<Post />} />
         <Route

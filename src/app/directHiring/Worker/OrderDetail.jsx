@@ -23,6 +23,7 @@ import defaultWorkImage from "../../../assets/directHiring/his-work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function ViewProfile() {
   const navigate = useNavigate();
@@ -43,9 +44,24 @@ export default function ViewProfile() {
   const [isRejecting, setIsRejecting] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
   const [openImage, setOpenImage] = useState(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   const user = useSelector((state) => state.user.profile);
   const userId = user?._id;
+   const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      Swal.fire({
+        icon: "warning",
+        title: "Location Not Found",
+        text: "The destination address is not available.",
+      });
+    }
+  };
 
   const fetchBannerImages = async () => {
     try {
@@ -470,7 +486,7 @@ export default function ViewProfile() {
                 <span>Title :- {orderData?.title || "Unknown Title"}</span>
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
                 <div>
-                  <div className=" text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
+                  {/* <div className=" text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
                     <FaMapMarkerAlt
                       size={25}
                       color="#228B22"
@@ -478,7 +494,25 @@ export default function ViewProfile() {
                     />{" "}
                     {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
+                  </div> */}
+                  <div
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                  >
+                    <FaMapMarkerAlt
+                      size={25}
+                      color="#228B22"
+                      className="mr-2"
+                    />{" "}
+                    {orderData?.user_id?.location?.address || "Unknown Location"}
                   </div>
+                  <span className="text-gray-600 text-sm font-semibold block">
+                    Deadline Date&Time:{" "}
+                    {orderData?.deadline
+                      ? new Date(orderData.deadline).toLocaleString()
+                      : "N/A"}
+                  </span>
+                
                   <span className="text-gray-600 text-sm font-semibold block">
                     Deadline Date&Time:{" "}
                     {orderData?.deadline
@@ -785,6 +819,41 @@ export default function ViewProfile() {
       </div>
 
       <Footer />
+       {isMapModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">User Location on Map</h2>
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="text-red-500 font-bold text-2xl"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="w-full h-96 rounded-lg overflow-hidden border">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+                  orderData?.user_id?.location?.address || ""
+                )}`}
+              ></iframe>
+            </div>
+            <div className="mt-5 text-center">
+              <button
+                onClick={() => handleGetDirections(orderData?.user_id?.location?.address)}
+                className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                Get Directions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showModal && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"

@@ -489,6 +489,16 @@ export default function ViewProfile() {
       },
     });
   };
+  const handleGetDirections = (destinationAddress) => {
+  if (destinationAddress) {
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      destinationAddress
+    )}`;
+    window.open(googleMapsUrl, "_blank");
+  } else {
+    alert("Destination address not found!");
+  }
+};
 
   const handleCancelOffer = async () => {
     const result = await Swal.fire({
@@ -1914,6 +1924,7 @@ export default function ViewProfile() {
 
       {isMapOpen && isLoaded && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          
           <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
             <div className="flex justify-between mb-2">
               <h1 className="text-black text-[20px] font-semibold">
@@ -1937,6 +1948,14 @@ export default function ViewProfile() {
                 <Marker position={markerLocationAddress} />
               )}
             </GoogleMap>
+               <div className="mt-4 text-center">
+        <button
+          onClick={() => handleGetDirections(orderData?.address)}
+          className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+        >
+          Get Directions
+        </button>
+      </div>
           </div>
         </div>
       )}

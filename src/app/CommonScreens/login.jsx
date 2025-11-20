@@ -113,7 +113,7 @@ export default function LoginPage() {
             <img
               src={image}
               alt="Plumber working"
-              className="w-full h-full object-cover"
+              className="w-full h-auto object-contain"
             />
           </div>
 

@@ -19,6 +19,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 export default function Bid() {
+  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
@@ -47,6 +48,7 @@ export default function Bid() {
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   // Slider settings
   const sliderSettings = {
@@ -144,6 +146,17 @@ export default function Bid() {
 
     fetchWorkDetails();
   }, [id, BASE_URL]);
+
+  const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      toast.warn("Destination address not found!");
+    }
+  };
 
   // Fetch Existing Bid (Only if provider has placed one)
   useEffect(() => {
@@ -341,10 +354,17 @@ export default function Bid() {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-lg font-semibold">{worker.workName}</h2>
-                  <span className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2">
+                  {/* <span className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2">
                     <FaMapMarkerAlt size={18} color="#228B22" />
                     <span className="truncate">{worker.location || "N/A"}</span>
-                  </span>
+                  </span> */}
+                  <span 
+  onClick={() => setIsMapModalOpen(true)}
+  className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
+>
+    <FaMapMarkerAlt size={18} color="#228B22" />
+    <span className="truncate">{worker.location || "N/A"}</span>
+</span>
                   <p className="font-semibold text-lg my-2 text-[#008000]">
                     Cost :- ₹{worker.amount}/-
                   </p>
@@ -614,6 +634,41 @@ export default function Bid() {
       </div>
 
       <Footer />
+      {isMapModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Work Location on Map</h2>
+              <button
+                onClick={() => setIsMapModalOpen(false)}
+                className="text-red-500 font-bold text-2xl"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="w-full h-96 rounded-lg overflow-hidden border">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+                  worker?.location || ""
+                )}`}
+              ></iframe>
+            </div>
+            <div className="mt-5 text-center">
+              <button
+                onClick={() => handleGetDirections(worker?.location)}
+                className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                Get Directions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {isBidModal && (

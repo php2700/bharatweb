@@ -109,7 +109,7 @@ export default function OtpVerification() {
             <img
               src={image}
               alt="Plumber working"
-              className="w-full h-full object-cover [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
+              className="w-full h-full object-contain [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
             />
           </div>
 
