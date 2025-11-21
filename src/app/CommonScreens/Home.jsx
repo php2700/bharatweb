@@ -350,116 +350,128 @@ export default function Home() {
       {/* Bidding Posted Work */}
       <div className="bg-[#EDFFF3] py-8 md:py-16">
 
-      <div className="container mx-auto px-4">
-  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-    Emergency Tasks
-  </h2>
-
-  {loading ? (
-    <p className="text-gray-600 text-center">Loading recent works...</p>
-  ) : works.length === 0 ? (
-    <p className="text-gray-600 text-center">No recent works available.</p>
-  ) : (
-    <div className="overflow-hidden relative w-full">
-      <div className="flex flex-nowrap animate-slide">
-        {works.concat(works).map((work, index) => (
-          <div
-            key={index}
-            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{work.title}</h3>
-            <p className="text-gray-600 text-sm mb-4">{work.description}</p>
-            <button
-              onClick={() => navigate(`/emergency/task/${work._id}`)}
-              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition"
-            >
-              View Details
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-
-
-</div>
-
+        <div className="container mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+            Bidding Posted Work
+          </h2>
+          {loading ? (
+            <p className="text-gray-600 text-center">Loading recent works...</p>
+          ) : works.length === 0 ? (
+            <p className="text-gray-600 text-center">No recent works available.</p>
+          ) : (
+            <div className="overflow-hidden relative w-full">
+              <div className="flex flex-nowrap animate-slide">
+                {works.concat(works).map((work, index) => (
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
+                  >
+                    {/* Image at the top with default fallback */}
+                    <img
+                      src={work.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+                      alt={work.title}
+                      className="w-full h-40 object-cover rounded-t-lg mb-4"
+                    />
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.address}</h3>
+                    <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
+                    <button
+                      onClick={() => navigate(`/bidding/task/${work._id}`)}
+                      className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
 
 
         {/*Recent Emergency Tasks*/}
 
-       <div className="bg-[#EDFFF3] py-8 md:py-16">
-      <div className="container mx-auto px-4">
-  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-    Emergency Tasks
-  </h2>
+        <div className="bg-[#EDFFF3] py-8 md:py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+              Emergency Tasks
+            </h2>
 
-  {loading ? (
-    <p className="text-gray-600 text-center">Loading recent works...</p>
-  ) : works.length === 0 ? (
-    <p className="text-gray-600 text-center">No recent works available.</p>
-  ) : (
-    <div className="overflow-hidden relative w-full">
-      <div className="flex flex-nowrap animate-slide">
-        {works.concat(works).map((work, index) => (
-          <div
-            key={index}
-            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
-            <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
-            <button
-              onClick={() => navigate(`/emergency/task/${work._id}`)}
-              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
-            >
-              View Details
-            </button>
+            {loading ? (
+              <p className="text-gray-600 text-center">Loading recent works...</p>
+            ) : works.length === 0 ? (
+              <p className="text-gray-600 text-center">No recent works available.</p>
+            ) : (
+              <div className="overflow-hidden relative w-full">
+                <div className="flex flex-nowrap animate-slide">
+                  {works.concat(works).map((work, index) => (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
+                    >
+                       {/* Image at the top with default fallback */}
+                    <img
+                      src={work.image_urls || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+                      alt={work.title}
+                      className="w-full h-40 object-cover rounded-t-lg mb-4"
+                    />
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
+                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.google_address}</p>
+                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.contact}</p>
+                      <button
+                        onClick={() => navigate(`/emergency/task/${work._id}`)}
+                        className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+
           </div>
-        ))}
-      </div>
-    </div>
-  )}
 
-
-</div>
-
-    </div>
+        </div>
 
         {/* & Feature Workers */}
-       <div className="container mx-auto px-4 mt-6 md:mt-8">
-  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-    Feature Workers
-  </h2>
+        <div className="container mx-auto px-4 mt-6 md:mt-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+            Feature Workers
+          </h2>
 
-  {loading ? (
-    <p className="text-gray-600 text-center">Loading recent works...</p>
-  ) : works.length === 0 ? (
-    <p className="text-gray-600 text-center">No recent works available.</p>
-  ) : (
-    <div className="overflow-hidden relative w-full">
-      <div className="flex flex-nowrap animate-slide">
-        {works.concat(works).map((worker, index) => (
-          <div
-            key={index}
-            className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.name}</h3>
-            <p className="text-gray-600 text-sm mb-4 break-words">{worker.specialization}</p>
-            <button
-              onClick={() => navigate(`/worker/profile/${worker.id}`)}
-              className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
-            >
-              View Profile
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+          {loading ? (
+            <p className="text-gray-600 text-center">Loading recent works...</p>
+          ) : works.length === 0 ? (
+            <p className="text-gray-600 text-center">No recent works available.</p>
+          ) : (
+            <div className="overflow-hidden relative w-full">
+              <div className="flex flex-nowrap animate-slide">
+                {works.concat(works).map((worker, index) => (
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
+                  >
 
-  {/* Tailwind CSS Custom Animation */}
-  <style>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 break-words">{worker.address}</p>
+                    <button
+                      onClick={() => navigate(`/worker/profile/${worker.id}`)}
+                      className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
+                    >
+                      View Profile
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tailwind CSS Custom Animation */}
+          <style>
             {`
           @keyframes slide {
             0% { transform: translateX(0); }
@@ -470,7 +482,7 @@ export default function Home() {
           }
         `}
           </style>
-</div>
+        </div>
 
 
       </div>
