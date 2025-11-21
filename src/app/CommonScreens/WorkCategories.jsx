@@ -417,7 +417,7 @@ export default function WorkCategories() {
                 Post Work
               </button>
             </div>
-            <img src={banner2} alt="Emergency"  className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" /> />
+            <img src={banner2} alt="Emergency"  className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
           </div>
         </div>
 
