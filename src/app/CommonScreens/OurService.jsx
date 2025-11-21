@@ -18,6 +18,9 @@ export default function OurServices() {
 
   // Navigate to subcategories with the full service object
   const handleServicecategoryClick = (service) => {
+    if (!token) {
+      return navigate("/login");
+    }
     setTimeout(() => {
       navigate("/subcategories", { state: { service } });
     }, 150); // 150ms delay
@@ -26,10 +29,6 @@ export default function OurServices() {
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
-
       const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +47,8 @@ export default function OurServices() {
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -112,7 +112,9 @@ export default function OurServices() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-[60px]">
           {services.length === 0 ? (
             <p className="text-center text-gray-500 col-span-full">
-              No services found.<br />Login to get all the services.
+              No services found.
+              <br />
+              Login to get all the services.
             </p>
           ) : (
             services.map((service) => (

@@ -234,10 +234,22 @@ export default function ViewProfileDetails() {
                 },
               }
             );
+            if (verifyRes.status === 200) {
+              // 1. सफलता का संदेश दिखाएँ
+              toast.success("Payment successful! Redirecting to order details...");
+
+              // 2. कुछ देर बाद रीडायरेक्ट करें ताकि यूज़र संदेश देख सके
+              setTimeout(() => {
+                navigate(`/emergency/order-detail/${orderId}`);
+              }, 2000); // 2 सेकंड का इंतज़ार
+            } else {
+              toast.error("Payment verification failed.");
+            }
 
             console.log("Verify Response:", verifyRes.data);
           } catch (err) {
             console.error("Error verifying payment:", err);
+             toast.error("Payment verification failed. Please contact support.");
           }
         },
         prefill: {
@@ -295,8 +307,17 @@ export default function ViewProfileDetails() {
                 },
               }
             );
+                if (verifyRes.status === 200) {
+              toast.success("Payment successful! Redirecting to order details...");
+              setTimeout(() => {
+                navigate(`/emergency/order-detail/${orderId}`);
+              }, 2000);
+            } else {
+              toast.error("Payment verification failed.");
+            }
           } catch (err) {
             console.error("Error verifying payment:", err);
+            toast.error("Payment verification failed. Please contact support.");
           }
         },
         prefill: {
