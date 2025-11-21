@@ -363,6 +363,8 @@ export default function ViewProfile() {
         case "name-desc": return (b.full_name || "").localeCompare(a.full_name || "");
         case "rating-desc": return (b.rating || 0) - (a.rating || 0);
         case "rating-asc": return (a.rating || 0) - (b.rating || 0);
+        case "tasks-desc": return (b.totalTasks || 0) - (a.totalTasks || 0);
+      case "tasks-asc": return (a.totalTasks || 0) - (b.totalTasks || 0);
         default: return 0;
       }
     });
@@ -410,7 +412,7 @@ export default function ViewProfile() {
                   </div> */}
                   <div
                     onClick={() => openMapModal(orderData?.google_address)}
-                    className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                    className="text-gray-600 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
                   >
                     <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
                     {orderData?.google_address || "Unknown Location"}
@@ -439,7 +441,7 @@ export default function ViewProfile() {
             <span className="text-gray-600 text-sm font-semibold block">
               Deadline: {orderData?.deadline ? new Date(orderData.deadline).toLocaleString() : "N/A"}
             </span>
-              {orderData?.platform_fee_paid && (
+            {orderData?.platform_fee_paid && (
               <span className="text-gray-600 text-sm font-semibold block mt-1">
                 One Time Project fee :- ₹{orderData?.platform_fee || "0"}
               </span>
@@ -571,6 +573,8 @@ export default function ViewProfile() {
               <option value="name-desc">Name Z-A</option>
               <option value="rating-desc">Rating High to Low</option>
               <option value="rating-asc">Rating Low to High</option>
+              <option value="tasks-desc">Task count High to Low</option>
+  <option value="tasks-asc">Task count Low to High</option>
             </select>
             <span className="absolute left-3 top-2.5 pointer-events-none">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

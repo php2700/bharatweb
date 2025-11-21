@@ -172,9 +172,9 @@ export default function ServiceProviderList() {
   const capitalizeWords = (text) =>
     text
       ? text
-          .split(" ")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-          .join(" ")
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ")
       : "";
 
   const getTruncated = (text, limit = 25) => {
@@ -231,6 +231,19 @@ export default function ServiceProviderList() {
         ? a.full_name.localeCompare(b.full_name)
         : b.full_name.localeCompare(a.full_name)
     );
+    list = [...list].sort((a, b) => {
+      switch (sortOrder) {
+        case "tasks-desc":
+          return (b.totalTasks || 0) - (a.totalTasks || 0);
+        case "tasks-asc":
+          return (a.totalTasks || 0) - (b.totalTasks || 0);
+        case "desc":
+          return b.full_name.localeCompare(a.full_name);
+        case "asc":
+        default:
+          return a.full_name.localeCompare(b.full_name);
+      }
+    });
 
     return list;
   }, [workers, searchQuery, selectedSubcats, sortOrder, minRating]);
@@ -412,6 +425,9 @@ export default function ServiceProviderList() {
                   <option value="asc|2">2 stars & up</option>
                   <option value="asc|1">1 star & up</option>
                   <option value="asc|">All Ratings</option>
+                  <option disabled>───── Tasks ─────</option>
+                  <option value="tasks-desc|">Task Count High → Low</option>
+                  <option value="tasks-asc|">Task Count Low → High</option>
                 </select>
 
                 {/* Arrow */}
@@ -503,17 +519,19 @@ export default function ServiceProviderList() {
                           {worker?.category_name}
                         </span>
                       </p>
+                      <p className="text-gray-600 mt-1">
+                        Total Tasks: <span className="font-medium">{worker?.totalTasks ?? 0}</span>
+                      </p>
 
                       {/* Sub‑categories */}
                       <div className="flex items-center gap-1 text-gray-700 mt-2">
                         <span className="font-medium">SubCategories:</span>
                         <div className="flex items-center flex-1 overflow-hidden">
                           <span
-                            className={`inline-block ${
-                              worker.isSubcatExpanded
-                                ? ""
-                                : "whitespace-nowrap overflow-hidden text-ellipsis"
-                            }`}
+                            className={`inline-block ${worker.isSubcatExpanded
+                              ? ""
+                              : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              }`}
                           >
                             {displayedSubcat}
                           </span>
@@ -540,11 +558,10 @@ export default function ServiceProviderList() {
                         <div className="flex items-center gap-1">
                           <div className="flex items-center flex-1 overflow-hidden">
                             <span
-                              className={`inline-block ${
-                                worker.isSkillExpanded
-                                  ? ""
-                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
-                              }`}
+                              className={`inline-block ${worker.isSkillExpanded
+                                ? ""
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                }`}
                             >
                               {displayedSkill}
                             </span>
@@ -574,11 +591,10 @@ export default function ServiceProviderList() {
                           />
                           <div className="flex items-center overflow-hidden">
                             <span
-                              className={`inline-block ${
-                                worker.isAddressExpanded
-                                  ? ""
-                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
-                              }`}
+                              className={`inline-block ${worker.isAddressExpanded
+                                ? ""
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                }`}
                               title={fullAddress}
                             >
                               {displayedAddress}
