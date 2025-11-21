@@ -781,7 +781,7 @@ export default function BiddinggetWorkDetail() {
                 <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
                 <span
                   onClick={() => setShowMap(true)}
-                  className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
+                  className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
                 >
                   <FaMapMarkerAlt size={18} color="#228B22" />
                   <span className="truncate">
@@ -911,11 +911,11 @@ export default function BiddinggetWorkDetail() {
                   : "N/A"}
               </span>
             </p>
-            <p className="font-semibold">
+            <p className="text-green-600 text-lg font-semibold">
               Category: {orderDetail?.category_id?.name}
             </p>
 
-            <p className="font-semibold">
+            <p className="font-semibold text-sm">
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../component/Header";
-import Footer from "../../component/Footer";
+import Footer from "../../component/footer";
 import Arrow from "../../assets/profile/arrow_back.svg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;

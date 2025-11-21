@@ -668,7 +668,7 @@ export default function ViewProfile() {
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <p>Title :- {orderData?.title || "Unknown Title"}</p>
                 <span>
-                  Category :-{" "}
+                  Categoryssss :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
                 </span>
 

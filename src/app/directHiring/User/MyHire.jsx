@@ -126,7 +126,7 @@ export default function MyHire() {
             <button className="px-6 py-2 rounded-full bg-[#228B22] text-white">
               Direct Hiring
             </button>
-            <button className="px-6 py-2 rounded-full border border-[#228B22] text-[#228B22]">
+            <button className="px-6 py-2 rounded-full border border-[#228B22] text-[#228B22] cursor-pointer">
               Emergency Tasks
             </button>
           </div>
