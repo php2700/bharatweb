@@ -6,7 +6,8 @@ import images from "../../assets/workcategory/image.png";
 import hire1 from "../../assets/workcategory/hire1.jpg";
 import hire2 from "../../assets/workcategory/hire2.jpg";
 import hire3 from "../../assets/workcategory/hire3.jpeg";
-import banner1 from "../../assets/workcategory/banner1.png";
+import banner1 from "../../assets/workcategory/biddingTask.jpg";
+import banner2 from "../../assets/workcategory/emergencyTask.png";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -381,23 +382,14 @@ export default function WorkCategories() {
         </div>
 
         {/* About Section */}
-        <div className="mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2 gap-6 items-center lg:pl-0">
-          <img src={banner1} alt="Worker" className="rounded-lg w-full" />
-          <div>
+        <div className="mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2 gap-6 items-stretch lg:pl-0">
+          <img src={banner1} alt="Worker"   className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
+          <div className="flex flex-col justify-center h-full">
             <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
               Post Work with bidder
             </h2>
             <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
+             The “Post Work With Bidder” feature helps you connect with a wide network of professionals. Once you submit your project details, qualified bidders review your requirements and submit their offers. You can compare bids, check profiles, verify experience, and communicate directly before selecting the right professional. This ensures you get the best talent at the best price.
             </p>
             <button
               onClick={postWork}
@@ -416,16 +408,7 @@ export default function WorkCategories() {
                 Emergency Work
               </h2>
               <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum.
+               When you post an Emergency Work request, our platform instantly connects you with nearby qualified service providers who are ready to respond without delay. Whether it’s an urgent repair, last-minute support, or time-sensitive assistance, your request is prioritized so professionals can quickly review the details and reach out with immediate help. Get fast responses, transparent communication, and reliable service exactly when you need it the most.
               </p>
               <button
                 onClick={postEmergencyWork}
@@ -434,7 +417,7 @@ export default function WorkCategories() {
                 Post Work
               </button>
             </div>
-            <img src={banner1} alt="Emergency" className="rounded-lg w-full" />
+            <img src={banner2} alt="Emergency"  className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" /> />
           </div>
         </div>
 

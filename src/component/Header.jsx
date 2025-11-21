@@ -402,7 +402,7 @@ export default function Header() {
             return;
           }
 
-          // 🔥🔥 ADMIN DISABLED ACCOUNT CHECK (added without changing your structure)
+       
           if (
             data?.status === false &&
             data?.message === "Admin has disabled your account."
@@ -1141,24 +1141,14 @@ export default function Header() {
                         className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
                         onClick={() => setIsOpen(false)}
                       >
-                        <AiFillCloseCircle className="w-5 h-5" /> Direct Work
+                        <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
+                        
                       </Link>
                       
                       
                       
                     )}
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/bidding/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Bidding Work
-                      </Link>
-                      
-                      
-                      
-                    )}
+                 
                        {(role === "service_provider" || role === "both") && (
                       <Link
                         to="/worker/emergency/rejected-work"
@@ -1191,7 +1181,7 @@ export default function Header() {
                       onClick={logoutdestroy}
                       className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
                     >
-                      <img src={Logout} alt="Logout" className="w-5 h-5" />{" "}
+                      <img src={Logout} alt="Logout" className="w-5 h-5" />
                       Logout
                     </button>
                   </div>
@@ -1469,36 +1459,16 @@ export default function Header() {
                       >
                         <FaBriefcase className="w-5 h-5" /> My Work
                       </Link>
-                         {/* {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Rejected Work
-                      </Link> */}
-                    {/* )} */}
+                        
+                    
                         {(role === "service_provider" || role === "both") && (
                       <Link
                         to="/worker/rejected-work"
                         className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
                         onClick={() => setIsOpen(false)}
                       >
-                        <AiFillCloseCircle className="w-5 h-5" /> Direct Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/bidding/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Bidding Work
-                      </Link>
-                      
+                        <AiFillCloseCircle className="w-5 h-5" />Rejected Task
+                      </Link>                   
                       
                       
                     )}
