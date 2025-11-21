@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
-import img1 from "../../assets/aboutus/img1.png";
-// import img1 from "../../assets/aboutus/about1.png";
+// import img1 from "../../assets/aboutus/img1.png";
+import about from "../../assets/aboutus/aboutus.png";
 
-import img2 from "../../assets/aboutus/img2.png";
-import emg from "../../assets/aboutus/emegency.png";
 
-import img3 from "../../assets/aboutus/img3.png";
+import direct from "../../assets/aboutus/direct.png";
+import emg from "../../assets/aboutus/emegency1.png";
+
+import img3 from "../../assets/aboutus/bidding.png";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function AboutUs() {
@@ -96,7 +97,7 @@ export default function AboutUs() {
           {/* Right Column: Image */}
           <div>
             <img
-              src={img1}
+              src={about}
               alt="Home Services"
               className="rounded-[44px] w-full shadow-lg"
             />
@@ -108,7 +109,7 @@ export default function AboutUs() {
           {/* Left Column: Image */}
           <div>
             <img
-              src={img2}
+              src={direct}
               alt="Effortless Services"
               className="rounded-[44px] w-full shadow-lg"
             />
