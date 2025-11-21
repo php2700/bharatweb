@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+
 import { useSelector } from "react-redux";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -17,6 +19,7 @@ import defaultWork from "../../assets/directHiring/Work.png";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
+  const profile = useSelector((state) => state.user.profile);   // <-- ADDED
   const token = localStorage.getItem("bharat_token");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
@@ -62,6 +65,7 @@ export default function WorkCategories() {
       setLoading(false);
     }
   };
+  
 
   // Fetch direct hiring
   const fetchDirectHiring = async () => {
@@ -107,6 +111,7 @@ export default function WorkCategories() {
       setDirectHiringLoading(false);
     }
   };
+  
 
   // Fetch banner images
   // Fetch banner images
@@ -150,6 +155,32 @@ export default function WorkCategories() {
       setBannerLoading(false);
     }
   };
+useEffect(() => {
+  if (!profile) return;
+
+  const bankdetail = profile?.bankdetail;
+  const hasSeen = sessionStorage.getItem("hasSeenIDModal");
+
+  const isBankFilled =
+    bankdetail &&
+    bankdetail.bankName &&
+    bankdetail.accountNumber &&
+    bankdetail.ifscCode &&
+    bankdetail.accountHolderName;
+
+  if (!hasSeen && !isBankFilled) {
+    Swal.fire({
+      title: "Bank Details Required",
+      text: "Please add your bank details to continue using the app.",
+      icon: "warning",
+      confirmButtonText: "OK",
+    }).then(() => {
+      sessionStorage.setItem("hasSeenIDModal", "true");
+    });
+  }
+}, [profile]);
+
+
 
   useEffect(() => {
     window.scrollTo(0, 0);

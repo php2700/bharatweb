@@ -88,6 +88,32 @@ export default function ServiceProviderHome() {
       setBannerLoading(false);
     }
   };
+useEffect(() => {
+  if (!profile) return;
+
+  const bankdetail = profile?.bankdetail;
+  const hasSeen = sessionStorage.getItem("hasSeenIDModal");
+
+  const isBankFilled =
+    bankdetail &&
+    bankdetail.bankName &&
+    bankdetail.accountNumber &&
+    bankdetail.ifscCode &&
+    bankdetail.accountHolderName;
+
+  if (!hasSeen && !isBankFilled) {
+    Swal.fire({
+      title: "Bank Details Required",
+      text: "Please add your bank details to continue using the app.",
+      icon: "warning",
+      confirmButtonText: "OK",
+    }).then(() => {
+      sessionStorage.setItem("hasSeenIDModal", "true");
+    });
+  }
+}, [profile]);
+
+
 
   // Fetch direct hiring
   const fetchDirectHiring = async () => {

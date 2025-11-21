@@ -208,8 +208,9 @@ export default function Accepted({
           <table className="w-full border border-gray-300 rounded-md overflow-hidden">
             <thead style={{ backgroundColor: "#228B22", color: "white" }}>
               <tr>
-                <th className="border p-2 text-left">Description</th>
+                <th className="border p-2 text-left">Descriptionsss</th>
                 <th className="border p-2 text-left">Amount (₹)</th>
+                {/* <th className="border p-2 text-left">Payment Method (₹)</th> */}
               </tr>
             </thead>
             <tbody>
