@@ -10,6 +10,9 @@ export default function BankDetails() {
   const { profile } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const bankdetail = profile ? profile.bankdetail : null;
+  const [isSaved, setIsSaved] = useState(false); // Add vs Update mode
+  const [loading, setLoading] = useState(false); // Loader
+
   const [formData, setFormData] = useState({
     bankName: bankdetail ? bankdetail.bankName : "",
     accountNumber: bankdetail ? bankdetail.accountNumber : "",
@@ -21,6 +24,14 @@ export default function BankDetails() {
     window.scrollTo(0, 0);
     dispatch(fetchUserProfile());
   }, [dispatch]);
+
+  // detect backend data
+  useEffect(() => {
+    if (bankdetail && bankdetail.bankName) {
+      setIsSaved(true);
+    }
+  }, [bankdetail]);
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -61,10 +72,14 @@ export default function BankDetails() {
     return Object.keys(newErrors).length === 0;
   };
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      setLoading(true); // Loader Start
       try {
+
         const token = localStorage.getItem("bharat_token"); // token yaha se milega
 
         const response = await fetch(
@@ -83,14 +98,24 @@ export default function BankDetails() {
 
         if (response.ok) {
           dispatch(fetchUserProfile());
-          toast.success("bank Detail Added Successfully!");
+          if (isSaved) {
+            toast.success("Bank details updated successfully!");
+          } else {
+            toast.success("Bank details added successfully!");
+          }
+
+          setIsSaved(true); // now button switches to UPDATE
+          setTimeout(() => {
+            setLoading(false);
+          }, 3000);
+
         } else {
           toast.error("API Error ❌", data);
-          
+          setLoading(false); // Stop loader
         }
       } catch (error) {
         toast.error("Network Error ❌", error);
-       
+        setLoading(false); // Stop loader
       }
     }
   };
@@ -98,7 +123,7 @@ export default function BankDetails() {
   return (
     <>
       {/* <Header /> */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       <div className="p-10">
         <div className="p-10 container max-w-5xl mx-auto">
           <div className="flex justify-center">
@@ -188,9 +213,14 @@ export default function BankDetails() {
               <div className="flex justify-center w-full">
                 <button
                   type="submit"
-                  className="py-2 px-2 bg-[#228B22] w-1/2 text-white rounded-xl"
+                  disabled={loading}
+                  className="py-2 px-2 bg-[#228B22] w-1/2 text-white rounded-xl cursor-pointer flex justify-center items-center gap-2 disabled:opacity-50"
                 >
-                  Add
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    isSaved ? "Update" : "Add"
+                  )}
                 </button>
               </div>
             </form>
