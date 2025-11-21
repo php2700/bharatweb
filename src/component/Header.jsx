@@ -108,6 +108,7 @@ export default function Header() {
     } catch (error) {
       console.error("Logout API failed:", error);
     } finally {
+      sessionStorage.removeItem("hasSeenIDModal");
       localStorage.removeItem("bharat_token");
       localStorage.removeItem("isProfileComplete");
       localStorage.removeItem("role");
@@ -943,7 +944,7 @@ export default function Header() {
             <div className="relative hidden lg:block">
               <button
                 onClick={() => setPostATaskDropdown(!isPostATastDropdown)}
-                className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow"
+                className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow cursor-pointer"
               >
                 + Post a Task
               </button>
@@ -987,7 +988,7 @@ export default function Header() {
               {/* Desktop Notification */}
               <div className="relative lg:flex hidden">
                 <button
-                  className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100"
+                  className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full shadow hover:bg-gray-100 cursor-pointer"
                   onClick={handleNotificationClick}
                 >
                   <img
@@ -1076,11 +1077,11 @@ export default function Header() {
               </div>
 
               {/* Profile Dropdown */}
-              <div className="relative lg:flex hidden" ref={dropdownRef}>
+              <div className="relative lg:flex hidden " ref={dropdownRef}>
                 {fullName ? (
                   <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
                   >
                     <span className="truncate max-w-[120px] sm:max-w-[150px]">
                       {fullName}
@@ -1103,7 +1104,7 @@ export default function Header() {
                   </Link>
                 )}
                 {isOpen && fullName && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                  <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
                     <Link
                       to="/account"
                       className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"

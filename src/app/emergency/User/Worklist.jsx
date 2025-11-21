@@ -374,7 +374,7 @@ export default function Worklist() {
             <button
               key={tab}
               onClick={() => handleTabClick(tab)}
-              className={`px-6 sm:px-9 py-2 rounded-full font-semibold text-sm sm:text-base transition-all ${
+              className={`px-6 sm:px-9 py-2 rounded-full font-semibold text-sm sm:text-base transition-all cursor-pointer ${
                 activeTab === tab
                   ? "bg-[#228B22] text-white"
                   : "text-[#228B22] border border-[#228B22] hover:bg-[#228B22] hover:text-white"
@@ -452,14 +452,14 @@ export default function Worklist() {
                   </div>
 
                   {/* Category / Subcategory – ONLY SHOW IF NOT "N/A" */}
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 mt-1">
+                  <div className="flex flex-wrap  gap-4 text-sm text-gray-700 mt-1 ">
                     {task.category_name !== "N/A" && (
-                      <span>
-                        <strong>Category:</strong> {task.category_name}
+                      <span className="text-green-600">
+                        <strong >Category: </strong > {task.category_name}
                       </span>
                     )}
                     {task.subcategory_name !== "N/A" && (
-                      <span>
+                      <span className="text-xs">
                         <strong>Subcategory:</strong> {task.subcategory_name}
                       </span>
                     )}
@@ -555,7 +555,7 @@ export default function Worklist() {
                       }}
                       className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
                     >
-                      View Details
+                      View Details 
                     </button>
                   </div>
                 </div>

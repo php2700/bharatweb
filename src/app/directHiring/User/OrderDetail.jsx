@@ -123,19 +123,26 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
-  // console.log("orderdata", orderData);
-  useEffect(() => {
+ useEffect(() => {
+  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
+
+  if (!hasSeenModal) {
     Swal.fire({
       title: "Important!",
-      text: "Before starting the work, please verify the worker's ID proof.",
+      text: " For your safety kindly match the worker id proof phycically with id prrof in the App",
       icon: "warning",
       confirmButtonText: "OK",
     }).then(() => {
-      // run after alert is closed
       window.scrollTo(0, 0);
       fetchBannerImages();
+
+      // Mark modal as seen for this login session
+      sessionStorage.setItem("hasSeenIDModal", "true");
     });
-  }, []);
+  }
+}, []);
+
+
 
   // Fetch related workers based on category and subcategory
   const fetchRelatedWorkers = async (category_id, subcategory_ids) => {

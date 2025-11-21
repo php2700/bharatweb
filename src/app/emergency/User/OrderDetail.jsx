@@ -401,8 +401,8 @@ export default function ViewProfile() {
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
                 <p>Title :- {orderData?.title || "Unknown Title"}</p>
-                <span>Category :- {orderData?.category_id?.name || "Unknown Category"}</span>
-                <div>
+                <span className="text-green-600">Category :- {orderData?.category_id?.name || "Unknown Category"}</span>
+                <div className="text-[13px]">
                   Sub Category :- {orderData?.sub_category_ids?.map(s => s.name).join(", ") || "N/A"}
                   {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
                     <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
@@ -410,7 +410,7 @@ export default function ViewProfile() {
                   </div> */}
                   <div
                     onClick={() => openMapModal(orderData?.google_address)}
-                    className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                    className="text-gray-600 flex items-center py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
                   >
                     <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
                     {orderData?.google_address || "Unknown Location"}
