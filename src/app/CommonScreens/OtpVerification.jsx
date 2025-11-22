@@ -1,6 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState,useEffect, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 
 import { ToastContainer, toast } from "react-toastify";
@@ -16,8 +19,52 @@ export default function OtpVerification() {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+   const [bannerImages, setBannerImages] = useState([]);
+  const [bannerLoading, setBannerLoading] = useState(false);
+  const [bannerError, setBannerError] = useState(null);
 
   const mobile = localStorage.getItem("mobileNumber");
+  const token = localStorage.getItem("bharat_token");
+  const fetchBannerImages = async () => {
+    try {
+      setBannerLoading(true);
+      // Note: Usually public banners don't need a token, but included as per your request
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+        headers: headers,
+      });
+      const data = await res.json();
+      
+      if (res.ok && Array.isArray(data.images)) {
+        setBannerImages(data.images);
+      } else {
+        setBannerImages([]);
+      }
+    } catch (err) {
+      setBannerError(err.message);
+    } finally {
+      setBannerLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchBannerImages();
+  }, []);
+
+  // ✅ Slider Settings
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false, // Arrows hidden for cleaner look on OTP page
+  };
 
   // ✅ Verify OTP (form submit)
   const handleSubmit = async (e) => {
@@ -198,12 +245,40 @@ export default function OtpVerification() {
       </div>
 
       {/* Banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+      {/* <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
         <img
           src={banner}
           alt="Gardening illustration"
           className="absolute inset-0 w-full h-full object-cover"
         />
+        
+      </div> */}
+         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5 shadow-lg">
+        {bannerLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500 text-lg">Loading banners...</p>
+          </div>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((imgUrl, index) => (
+              <div key={index} className="h-[400px] outline-none">
+                <img
+                  src={imgUrl}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png"; // Fallback if image fails
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          // Fallback if no banners are returned
+          <div className="flex items-center justify-center h-full bg-gray-200">
+             <p className="text-gray-500">No banners available</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-[50px]">

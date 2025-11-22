@@ -835,12 +835,12 @@ export default function BiddinggetWorkDetail() {
         ></iframe>
       </div>
       <div className="mt-4 text-center">
-        <button
+        {/* <button
           onClick={() => handleGetDirections(orderDetail?.address)}
           className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
         >
           Get Directions
-        </button>
+        </button> */}
       </div>
     </div>
   </div>
