@@ -381,7 +381,7 @@ export default function RejectedWorklist() {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log(data?.data);
-       
+
         const mapped = (data?.data || []).map((t) => ({
           id: t._id,
 
@@ -633,8 +633,55 @@ export default function RejectedWorklist() {
                     onClick={() =>
                       navigate(
                         activeTab === "Direct Rejected"
-                          ? `/hire/worker/order-detail/${task.id}`
-                          : `/bidding/worker/order-detail/${task.id}`
+                          ? `/worker/reject-worker/rejected-details`
+                          : `/bidding/worker/order-detail/${task.id}`,
+                        {
+                          state: {
+                            task: {
+                              title:
+                                task.title ||
+                                task.name ||
+                                task.workName ||
+                                "Untitled Work",
+                              location:
+                                task.location ||
+                                task.google_address ||
+                                task.address,
+                              deadline:
+                                task.deadline ||
+                                task.completionDate ||
+                                task.completion_date ||
+                                task.endDate ||
+                                task.to_be_completed ||
+                                task.due_date ||
+                                task.date,
+                              createdAt:
+                                task.createdAt ||
+                                task.date ||
+                                task.postedAt ||
+                                task.created_on ||
+                                task.created,
+                              amount:
+                                task.amount ||
+                                task.price ||
+                                task.service_payment?.amount,
+                              project_id: task.project_id,
+
+                              images:
+                                task.images ||
+                                task.image_urls ||
+                                task.image_url ||
+                                [],
+
+                              reason:
+                                task.reason ||
+                                task.rejected_reason ||
+                                task.rejected_offer?.reason,
+
+                              description: task.description,
+                            },
+                          },
+                        }
                       )
                     }
                     className="border border-green-600 text-green-600 px-4 py-1 rounded-lg"

@@ -93,6 +93,7 @@ import Promotion from "./app/CommonScreens/Promotion";
 import  RejectedWork from "./app/CommonScreens/RejectedWork"
 import BiddingRejectedWork from "./app/Bidding/Worker/BiddingRejectedWork"
 import EmergencyRejectedWork from "./app/emergency/Worker/EmergencyRejectedWork"
+import RejectedDetail from "./app/directHiring/Worker/RejectedDetail"
 
 export default function App() {
   if ("serviceWorker" in navigator) {
@@ -231,6 +232,10 @@ export default function App() {
         <Route path="/worker/rejected-work" element={<RejectedWork />} />
         <Route path="/worker/bidding/rejected-work" element={<BiddingRejectedWork/>} />
         <Route path="/worker/emergency/rejected-work" element={<EmergencyRejectedWork/>}/>
+         <Route
+          path="/worker/reject-worker/rejected-details"
+          element={<RejectedDetail/>}
+        />
 
 
         {/* // Emergency Routes- User */}
