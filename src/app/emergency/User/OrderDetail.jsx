@@ -1015,12 +1015,12 @@ export default function ViewProfile() {
               ></iframe>
             </div>
             <div className="mt-5 text-center">
-              <button
+              {/* <button
                 onClick={() => handleGetDirections(mapAddress)}
                 className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
               >
                 Get Directions
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

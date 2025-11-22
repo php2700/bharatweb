@@ -253,17 +253,319 @@
 //   );
 // }
 
+// import React, { useState, useEffect } from "react";
+// import Header from "../../component/Header";
+// import Footer from "../../component/footer";
+// import { motion } from "framer-motion";
+
+// // --- Assets ---
+// import aboutImage from "../../assets/aboutus/abouts.jpg";
+// import directHiringImage from "../../assets/aboutus/directs.jpg";
+// import biddingImage from "../../assets/aboutus/biddings.jpg";
+// import emergencyHiringImage from "../../assets/aboutus/emergencys.jpg";
+
+// const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// const fadeInUp = {
+//   hidden: { opacity: 0, y: 60 },
+//   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+// };
+
+// const imgVariant = {
+//   hidden: { opacity: 0, scale: 0.95 },
+//   visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
+// };
+
+// const staggerContainer = {
+//   hidden: { opacity: 0 },
+//   visible: {
+//     opacity: 1,
+//     transition: {
+//       staggerChildren: 0.2,
+//     },
+//   },
+// };
+
+// // --- Reusable Components ---
+// const FeatureSection = ({
+//   imageUrl,
+//   altText,
+//   title,
+//   description,
+//   points,
+//   imageSide = "right",
+// }) => {
+//   const ImageColumn = (
+//     <motion.div className="flex justify-center items-center"
+    
+//     variants={imgVariant}
+//       initial="hidden"
+//       whileInView="visible"
+//       viewport={{ once: true, amount: 0.3 }}
+//       >
+//       <img
+//         src={imageUrl}
+//         alt={altText}
+//         className="rounded-3xl w-full sm:w-11/12 shadow-lg"
+//       />
+//     </motion.div>
+//   );
+
+//   const TextColumn = (
+//     <motion.div className="space-y-4">
+//       <motion.h3 className="text-3xl font-bold text-gray-800"variants={fadeInUp}>{title}</motion.h3>
+//       <motion.p className="text-lg text-gray-600 leading-relaxed"variants={fadeInUp}>{description}</motion.p>
+//       {points && (
+//         <motion.ul  variants={staggerContainer}
+//           initial="hidden"
+//           whileInView="visible"
+//           viewport={{ once: true }}
+//           className="list-disc pl-6 space-y-3 text-lg text-gray-600 leading-relaxed">
+//           {points.map((point, index) => (
+//             <motion.lili key={index} variants={fadeInUp}>
+//               <strong className="font-semibold text-gray-700">{point.title}</strong>
+//               {point.text}
+//             </motion.lili>
+//           ))}
+//         </motion.ul>
+//       )}
+//     </motion.div>
+//   );
+
+//   return (
+//     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+//       {imageSide === "left" ? (
+//         <>
+//           {ImageColumn}
+//           <div className="md:order-last">{TextColumn}</div>
+//         </>
+//       ) : (
+//         <>
+//           <div className="md:order-last">{ImageColumn}</div>
+//           {TextColumn}
+//         </>
+//       )}
+//     </div>
+//   );
+// };
+
+// // --- Main AboutUs Component ---
+// export default function AboutUs() {
+//   const [aboutData, setAboutData] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     window.scrollTo(0, 0);
+//     fetch(`${BASE_URL}/CompanyDetails/getAboutUs`)
+//       .then((res) => {
+//         if (!res.ok) throw new Error("Failed to fetch data");
+//         return res.json();
+//       })
+//       .then((data) => {
+//         setAboutData(data);
+//         setLoading(false);
+//       })
+//       .catch((err) => {
+//         setError(err.message);
+//         setLoading(false);
+//       });
+//   }, []);
+
+//   // --- Static Data for Sections ---
+//   const directHiringData = {
+//     title: "Direct Hiring",
+//     description: "Direct Hiring allows users to instantly book a specific service provider of their choice for any required task. This option is ideal when you already know which professional you want to work with or when you prefer a fast and straightforward booking process without comparing multiple options.",
+//     points: [
+//       { title: "Choose your preferred provider: ", text: "View profiles, ratings, experience, and customer reviews to select the provider you trust." },
+//       { title: "Book instantly without waiting: ", text: "Send booking requests immediately without waiting for multiple bids or quotes." },
+//       { title: "Enjoy faster service confirmation: ", text: "Providers receive your request instantly, ensuring quicker acceptance and task initiation." },
+//       { title: "Clarity and confidence: ", text: "Know exactly who will handle your service, building trust and reducing uncertainty." },
+//       { title: "Save time: ", text: "Direct Hiring makes the process simple, fast, and dependable." }
+//     ],
+//     imageUrl: directHiringImage,
+//     altText: "Effortless Services",
+//     imageSide: "left",
+//   };
+
+//   const emergencyHiringData = {
+//     title: "Emergency Hiring",
+//     description: "Emergency Hiring is designed for situations where immediate assistance is required. Whether it's a sudden plumbing leak, electrical issue, or any urgent household problem, this option connects you instantly with the nearest available professional.",
+//     points: [
+//       { title: "Instant professional assignment: ", text: "The system quickly identifies and assigns the closest verified service provider who can reach your location immediately." },
+//       { title: "Priority service response: ", text: "Emergency bookings are given top priority, ensuring faster acceptance and quick arrival of the professional." },
+//       { title: "Verified and trained experts: ", text: "Only certified and experienced professionals handle emergency tasks to ensure safety, reliability, and quality." },
+//       { title: "Real-time tracking: ", text: "Users can track the professional’s live location and estimated arrival time." },
+//       { title: "Perfect for unexpected issues: ", text: "Ideal for sudden breakdowns, urgent repairs, or any situation where immediate action is required." }
+//     ],
+//     imageUrl: emergencyHiringImage,
+//     altText: "Emergency Services",
+//     imageSide: "left",
+//   };
+
+//   // --- Render Logic ---
+//   if (loading) {
+//     return (
+//       <>
+//         <Header />
+//         <div className="text-center py-40">Loading...</div>
+//         <Footer />
+//       </>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <>
+//         <Header />
+//         <div className="text-center py-40 text-red-500">Error: {error}</div>
+//         <Footer />
+//       </>
+//     );
+//   }
+
+//   if (!aboutData || !aboutData.content) {
+//     return (
+//       <>
+//         <Header />
+//         <div className="text-center py-40">No data available</div>
+//         <Footer />
+//       </>
+//     );
+//   }
+
+//   // ---- YAHAN BADLAV KIYA GAYA HAI ----
+//   // API से आए कंटेंट में मौजूद अतिरिक्त खाली लाइनों को हटा दिया गया है
+//   const processedContent = aboutData.content.replace(/(\r\n|\n|\r){2,}/g, "$1");
+
+//   return (
+//     <>
+//       <Header />
+//       <div className="mx-auto px-4 sm:px-10 md:px-20 py-16 mt-20 font-poppins">
+//         <motion.h2 initial={{ opacity: 0, y: -20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ duration: 0.8 }}
+//           className="text-center text-4xl md:text-5xl font-bold mb-16 text-gray-900 tracking-tight">About Us</motion.h2>
+
+//         {/* --- Main Content Section (from API) --- */}
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+//           <motion.div initial="hidden"
+//             whileInView="visible"
+//             viewport={{ once: true, amount: 0.3 }}
+//             variants={fadeInUp}>
+//             <div
+//               className="text-lg text-gray-700 leading-relaxed whitespace-pre-line"
+//               dangerouslySetInnerHTML={{ __html: processedContent }}
+//             />
+//           </motion.div>
+//           <motion.div className="flex justify-center items-center"
+//             initial="hidden"
+//             whileInView="visible"
+//             viewport={{ once: true, amount: 0.3 }}
+//             variants={imgVariant}>
+//             <img
+//               src={aboutImage}
+//               alt="Home Services"
+//               className="rounded-3xl w-full sm:w-11/12 shadow-lg"
+//             />
+//           </motion.div>
+//         </div>
+
+//         {/* --- Sections Container --- */}
+//         <div className="space-y-24 mt-24">
+          
+//           {/* Direct Hiring Section */}
+//           <FeatureSection {...directHiringData} />
+
+//           {/* Bidding Section */}
+//           <motion.div  initial="hidden"
+//             whileInView="visible"
+//             viewport={{ once: true, amount: 0.2 }}
+//             className="w-full bg-green-50 rounded-3xl py-16 px-4 sm:px-6 lg:px-20 shadow-sm">
+//               <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+//                   <motion.div  variants={imgVariant}
+//                     className="flex justify-center">
+//                       <img
+//                           src={biddingImage}
+//                           alt="Bidding Process"
+//                           className="w-[250px] sm:w-[300px] md:w-[350px] lg:w-[400px] object-contain"
+//                       />
+//                   </motion.div>
+//                   <motion.div className="space-y-4">
+//                       <motion.h3 variants={fadeInUp} className="text-3xl font-bold text-gray-800">Bidding Hiring</motion.h3>
+//                       <motion.p variants={fadeInUp} className="text-lg text-gray-600 leading-relaxed">
+//                           The Bidding Option allows users to post their service requirements and receive
+//                           multiple offers from verified providers. This helps you choose the best professional
+//                           based on price, experience, and reviews.
+//                       </motion.p>
+//                       <motion.ul c  variants={staggerContainer}
+//                         className="list-disc pl-6 space-y-3 text-lg text-gray-600 leading-relaxed">
+//                               {[
+//                             { t: "Post Your Task:", d: "Add details about the work you need." },
+//                             { t: "Receive Multiple Bids:", d: "Providers submit offers with pricing and timelines." },
+//                             { t: "Compare & Select:", d: "Review bids based on cost, ratings, and proposal quality." },
+//                             { t: "Confirm & Hire:", d: "Choose the best offer and proceed with booking." }
+//                           ].map((item, idx) => (
+//                             <motion.li key={idx} variants={fadeInUp}>
+//                               <strong className="font-semibold text-gray-700">{item.t}</strong> {item.d}
+//                             </motion.li>
+//                           ))}
+//                       </motion.ul>
+//                   </motion.div>
+//               </div>
+//           </motion.div>
+          
+//           {/* Emergency Hiring Section */}
+//           <FeatureSection {...emergencyHiringData} />
+
+//         </div>
+//       </div>
+//        <motion.div 
+//         initial={{ opacity: 0 }}
+//         whileInView={{ opacity: 1 }}
+//         transition={{ delay: 1, duration: 1 }}
+//         // className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-xs"
+//       >
+//         {/* &copy; {new Date().getFullYear()} The Bharat Works. All Rights Reserved. */}
+//       </motion.div>
+//       <Footer />
+//     </>
+//   );
+// }
+
+
 import React, { useState, useEffect } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
+import { motion } from "framer-motion";
 
 // --- Assets ---
-import aboutImage from "../../assets/aboutus/aboutus.png";
-import directHiringImage from "../../assets/aboutus/direct.png";
-import biddingImage from "../../assets/aboutus/bidding.png";
-import emergencyHiringImage from "../../assets/aboutus/emegency1.png";
+import aboutImage from "../../assets/aboutus/abouts.jpg";
+import directHiringImage from "../../assets/aboutus/directs.jpg";
+import biddingImage from "../../assets/aboutus/biddings.jpg";
+import emergencyHiringImage from "../../assets/aboutus/emergencys.jpg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 60 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+};
+
+const imgVariant = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
 
 // --- Reusable Components ---
 const FeatureSection = ({
@@ -275,30 +577,42 @@ const FeatureSection = ({
   imageSide = "right",
 }) => {
   const ImageColumn = (
-    <div className="flex justify-center items-center">
+    <motion.div 
+      className="flex justify-center items-center"
+      variants={imgVariant}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+    >
       <img
         src={imageUrl}
         alt={altText}
         className="rounded-3xl w-full sm:w-11/12 shadow-lg"
       />
-    </div>
+    </motion.div>
   );
 
   const TextColumn = (
-    <div className="space-y-4">
-      <h3 className="text-3xl font-bold text-gray-800">{title}</h3>
-      <p className="text-lg text-gray-600 leading-relaxed">{description}</p>
+    <motion.div className="space-y-4">
+      <motion.h3 className="text-3xl font-bold text-gray-800" variants={fadeInUp}>{title}</motion.h3>
+      <motion.p className="text-lg text-gray-600 leading-relaxed" variants={fadeInUp}>{description}</motion.p>
       {points && (
-        <ul className="list-disc pl-6 space-y-3 text-lg text-gray-600 leading-relaxed">
+        <motion.ul 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="list-disc pl-6 space-y-3 text-lg text-gray-600 leading-relaxed"
+        >
           {points.map((point, index) => (
-            <li key={index}>
+            <motion.li key={index} variants={fadeInUp}>
               <strong className="font-semibold text-gray-700">{point.title}</strong>
               {point.text}
-            </li>
+            </motion.li>
           ))}
-        </ul>
+        </motion.ul>
       )}
-    </div>
+    </motion.div>
   );
 
   return (
@@ -310,6 +624,7 @@ const FeatureSection = ({
         </>
       ) : (
         <>
+          {/* ImageSide Right Logic: Text First, Image Last (visually right on desktop) */}
           <div className="md:order-last">{ImageColumn}</div>
           {TextColumn}
         </>
@@ -355,6 +670,21 @@ export default function AboutUs() {
     imageUrl: directHiringImage,
     altText: "Effortless Services",
     imageSide: "left",
+  };
+
+  // ✅ NEW: Bidding Data Object created for cleaner code
+  const biddingHiringData = {
+    title: "Bidding Hiring",
+    description: "The Bidding Option allows users to post their service requirements and receive multiple offers from verified providers. This helps you choose the best professional based on price, experience, and reviews.",
+    points: [
+      { title: "Post Your Task: ", text: "Add details about the work you need." },
+      { title: "Receive Multiple Bids: ", text: "Providers submit offers with pricing and timelines." },
+      { title: "Compare & Select: ", text: "Review bids based on cost, ratings, and proposal quality." },
+      { title: "Confirm & Hire: ", text: "Choose the best offer and proceed with booking." }
+    ],
+    imageUrl: biddingImage,
+    altText: "Bidding Process",
+    imageSide: "right", // ✅ Content Left, Image Right
   };
 
   const emergencyHiringData = {
@@ -403,31 +733,47 @@ export default function AboutUs() {
     );
   }
 
-  // ---- YAHAN BADLAV KIYA GAYA HAI ----
-  // API से आए कंटेंट में मौजूद अतिरिक्त खाली लाइनों को हटा दिया गया है
   const processedContent = aboutData.content.replace(/(\r\n|\n|\r){2,}/g, "$1");
 
   return (
     <>
       <Header />
       <div className="mx-auto px-4 sm:px-10 md:px-20 py-16 mt-20 font-poppins">
-        <h2 className="text-center text-4xl font-bold mb-16">About Us</h2>
+        <motion.h2 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center text-4xl md:text-5xl font-bold mb-16 text-gray-900 tracking-tight"
+        >
+          About Us
+        </motion.h2>
 
         {/* --- Main Content Section (from API) --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+          >
             <div
               className="text-lg text-gray-700 leading-relaxed whitespace-pre-line"
               dangerouslySetInnerHTML={{ __html: processedContent }}
             />
-          </div>
-          <div className="flex justify-center items-center">
+          </motion.div>
+          <motion.div 
+            className="flex justify-center items-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={imgVariant}
+          >
             <img
               src={aboutImage}
               alt="Home Services"
               className="rounded-3xl w-full sm:w-11/12 shadow-lg"
             />
-          </div>
+          </motion.div>
         </div>
 
         {/* --- Sections Container --- */}
@@ -436,38 +782,22 @@ export default function AboutUs() {
           {/* Direct Hiring Section */}
           <FeatureSection {...directHiringData} />
 
-          {/* Bidding Section */}
-          <div className="w-full bg-green-50 rounded-3xl py-12 px-4 sm:px-6 lg:px-20">
-              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                  <div className="flex justify-center">
-                      <img
-                          src={biddingImage}
-                          alt="Bidding Process"
-                          className="w-[250px] sm:w-[300px] md:w-[350px] lg:w-[400px] object-contain"
-                      />
-                  </div>
-                  <div className="space-y-4">
-                      <h3 className="text-3xl font-bold text-gray-800">Bidding Hiring</h3>
-                      <p className="text-lg text-gray-600 leading-relaxed">
-                          The Bidding Option allows users to post their service requirements and receive
-                          multiple offers from verified providers. This helps you choose the best professional
-                          based on price, experience, and reviews.
-                      </p>
-                      <ul className="list-disc pl-6 space-y-2 text-lg text-gray-600 leading-relaxed">
-                          <li><strong>Post Your Task:</strong> Add details about the work you need.</li>
-                          <li><strong>Receive Multiple Bids:</strong> Providers submit offers with pricing and timelines.</li>
-                          <li><strong>Compare & Select:</strong> Review bids based on cost, ratings, and proposal quality.</li>
-                          <li><strong>Confirm & Hire:</strong> Choose the best offer and proceed with booking.</li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
+          {/* Bidding Section - Updated to match style */}
+          <FeatureSection {...biddingHiringData} />
           
           {/* Emergency Hiring Section */}
           <FeatureSection {...emergencyHiringData} />
 
         </div>
       </div>
+      
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+      >
+        {/* Footer animation placeholder */}
+      </motion.div>
       <Footer />
     </>
   );
