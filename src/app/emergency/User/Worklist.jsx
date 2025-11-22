@@ -553,7 +553,7 @@ export default function Worklist() {
                           `/${routes[activeTab]}/order-detail/${task.id}`
                         );
                       }}
-                      className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition flex-shrink-0"
+                      class="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
                     >
                       View Details 
                     </button>

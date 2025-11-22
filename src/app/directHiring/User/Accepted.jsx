@@ -365,7 +365,7 @@ export default function Accepted({
                 </p>
 
                 {hireStatus === "cancelled" ||
-                hireStatus === "cancelledDispute" ? (
+                  hireStatus === "cancelledDispute" ? (
                   ""
                 ) : (
                   <div className="flex ml-auto items-center space-x-3 ml-6">
@@ -384,7 +384,7 @@ export default function Accepted({
                 )}
 
                 <button
-                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
                   onClick={() => handleRouteHire(serviceProvider._id, true)}
                 >
                   View Profile
@@ -429,7 +429,7 @@ export default function Accepted({
         )}
 
         {/* Payment History */}
-				
+
         {paymentHistory && Array.isArray(paymentHistory) && (
           <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
             <div className="flex justify-between items-center mb-4">
@@ -596,6 +596,56 @@ export default function Accepted({
             </tr>
           </tbody>
         </table>
+        {/* OPEN MODAL BUTTON */}
+        <div className="text-right mt-4">
+          <button
+            onClick={() => {
+              Swal.fire({
+                title: "Payment Details",
+                html: `
+                <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                  <thead>
+                    <tr style="background-color:#228B22; color:white;">
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Payment ID</th>
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Amount</th>
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${paymentHistory
+                    .map(
+                      (p) => `
+                      <tr>
+                        <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
+                        <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                          ${p.amount || "N/A"}
+                        </td>
+                        <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                          ${p.method || "N/A"}
+                        </td>
+                         
+                      </tr>
+                    `
+                    )
+                    .join("")}
+                  </tbody>
+                </table>
+              `,
+                confirmButtonText: "Close",
+                width: 600,
+                backdrop: `
+                rgba(0,0,0,0.4)
+                blur(6px)
+              `,
+                background: "white",
+              });
+            }}
+            class="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
+          >
+            View Payment Details
+          </button>
+
+        </div>
       </div>
     </>
   );

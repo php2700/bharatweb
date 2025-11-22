@@ -21,6 +21,7 @@
     "leaflet-control-geocoder": "^3.3.0",
     "lucide-react": "^0.540.0",
     "react": "^18.2.0",
+    "react-countup": "^6.5.3",
     "react-datepicker": "^8.7.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.6.0",
