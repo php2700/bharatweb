@@ -5,6 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import Swal from "sweetalert2";
+import postTask from "../../../assets/postTask.png";
+import Logo from "../../../assets/logo.svg";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -29,6 +31,7 @@ const Post = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState();
 
@@ -48,18 +51,169 @@ const Post = () => {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
-  const mapRef = useRef(null);
   const autocompleteRef = useRef(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [razorpayOrder, setRazorpayOrder] = useState(null);
+ // ====== NEW ADDRESS MODAL STATES (were missing) ======
+  const [newTitle, setNewTitle] = useState("");
+  const [newHouseNo, setNewHouseNo] = useState("");
+  const [newStreet, setNewStreet] = useState("");
+  const [newArea, setNewArea] = useState("");
+  const [newPincode, setNewPincode] = useState("");
+  const [newLandmark, setNewLandmark] = useState("");
 
-  // Load Google Maps API
-  // const { isLoaded } = useJsApiLoader({
-  //   googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
-  //   libraries: ["places"],
-  // });
+  // pickedLocation for map (latitude, longitude, address)
+  const [pickedLocation, setPickedLocation] = useState({
+    latitude: null,
+    longitude: null,
+    address: "",
+  });
 
-  // Load Razorpay SDK dynamically
+  // map refs (you can wire Google Maps or other map library here)
+  const mapRef = useRef(null);
+  const mapAutocompleteRef = useRef(null);
+
+
+
+  let location = "";
+  if (profile && profile.data) {
+    location = profile.data.full_address || "";
+  }
+
+  const loadGoogleMapsScript = (callback) => {
+  if (window.google && window.google.maps) {
+    callback();
+    return;
+  }
+  const existing = document.getElementById("google-maps-script");
+  if (existing) {
+    existing.addEventListener("load", callback);
+    return;
+  }
+  const script = document.createElement("script");
+  script.id = "google-maps-script";
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  }&libraries=places`;
+  script.async = true;
+  script.defer = true;
+
+  script.onload = callback;
+  script.onerror = () => console.error("Google Maps failed to load");
+
+  document.head.appendChild(script);
+};
+
+useEffect(() => {
+  if (!isAddAddressModalOpen) return;
+
+  loadGoogleMapsScript(() => {
+    if (!mapRef.current) return;
+
+    const center = {
+      lat: pickedLocation.latitude || 28.6139,
+      lng: pickedLocation.longitude || 77.2090
+    };
+
+    const map = new window.google.maps.Map(mapRef.current, {
+      center,
+      zoom: 15,
+    });
+
+    const geocoder = new window.google.maps.Geocoder();
+
+    let marker = new window.google.maps.Marker({
+      position: center,
+      map,
+      draggable: true,
+    });
+
+    const updateAddress = (lat, lng) => {
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          setPickedLocation({
+            latitude: lat,
+            longitude: lng,
+            address: results[0].formatted_address,
+          });
+        }
+      });
+    };
+
+    map.addListener("click", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      marker.setPosition({ lat, lng });
+      updateAddress(lat, lng);
+    });
+
+    marker.addListener("dragend", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      updateAddress(lat, lng);
+    });
+
+    // AUTOCOMPLETE FIX
+    if (mapAutocompleteRef.current) {
+      const auto = new window.google.maps.places.Autocomplete(
+        mapAutocompleteRef.current
+      );
+      auto.addListener("place_changed", () => {
+        const place = auto.getPlace();
+        if (!place.geometry) return;
+
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        map.setCenter({ lat, lng });
+        map.setZoom(16);
+        marker.setPosition({ lat, lng });
+
+        setPickedLocation({
+          latitude: lat,
+          longitude: lng,
+          address: place.formatted_address,
+        });
+      });
+    }
+  });
+}, [isAddAddressModalOpen]);
+
+
+// Save New Address Function (Fix)
+const handleSaveNewAddress = async () => {
+  if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
+    Swal.fire({
+      icon: "error",
+      text: "Please fill required fields!",
+    });
+    return;
+  }
+
+  const obj = {
+    title: newTitle,
+    landmark: newLandmark,
+    address: pickedLocation.address,
+    latitude: pickedLocation.latitude,
+    longitude: pickedLocation.longitude,
+  };
+
+  try {
+    await axios.post(`${BASE_URL}/user/addAddress`, obj, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    Swal.fire({
+      icon: "success",
+      text: "Address Added Successfully!",
+    });
+
+    setIsAddAddressModalOpen(false);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -118,7 +272,7 @@ const Post = () => {
     fetchBannerImages();
   }, []);
 
-  
+
   useEffect(() => {
     const fetchPlatformFee = async () => {
       try {
@@ -301,93 +455,93 @@ const Post = () => {
   };
 
   // Handle form submission
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  const errors = validateForm();
-  setValidationErrors(errors);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = validateForm();
+    setValidationErrors(errors);
 
-  if (Object.keys(errors).length > 0) {
-    setError("Please fill in all required fields.");
-    Swal.fire({
-      icon: "error",
-      title: "Validation Error",
-      text: "Please fill in all required fields.",
-      timer: 2500,
-      showConfirmButton: false,
-    });
-    return;
-  }
-
-  const submissionData = new FormData();
-  submissionData.append("category_id", selectedCategory);
-  submissionData.append(
-    "sub_category_ids",
-    selectedSubcategories.map((option) => option.value).join(",")
-  );
-  submissionData.append(
-    "google_address",
-    address || profile?.location?.address
-  );
-  submissionData.append("title", formData.title);
-  submissionData.append("description", formData.description);
-  submissionData.append("address", address || profile?.location?.address);
-  submissionData.append("detailed_address", formData.detailed_address);
-  submissionData.append("contact", formData.contact);
-  submissionData.append("deadline", formData.deadline);
-  formData.images.forEach((image) => {
-    submissionData.append("images", image);
-  });
-
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/emergency-order/create`,
-      submissionData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.data) {
-      // ✅ SweetAlert on success
-      Swal.fire({
-        icon: "success",
-        title: "Order Created Successfully!",
-        text: "Redirecting to order details...",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-
-      // Redirect after small delay
-      setTimeout(() => {
-        navigate(`/emergency/order-detail/${response.data?.order?._id}`);
-      }, 2000);
-    } else {
-      setError("Not add a post");
+    if (Object.keys(errors).length > 0) {
+      setError("Please fill in all required fields.");
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Failed to add a post. Please try again.",
+        title: "Validation Error",
+        text: "Please fill in all required fields.",
+        timer: 2500,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const submissionData = new FormData();
+    submissionData.append("category_id", selectedCategory);
+    submissionData.append(
+      "sub_category_ids",
+      selectedSubcategories.map((option) => option.value).join(",")
+    );
+    submissionData.append(
+      "google_address",
+      address || profile?.location?.address
+    );
+    submissionData.append("title", formData.title);
+    submissionData.append("description", formData.description);
+    submissionData.append("address", address || profile?.location?.address);
+    submissionData.append("detailed_address", formData.detailed_address);
+    submissionData.append("contact", formData.contact);
+    submissionData.append("deadline", formData.deadline);
+    formData.images.forEach((image) => {
+      submissionData.append("images", image);
+    });
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/create`,
+        submissionData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        // ✅ SweetAlert on success
+        Swal.fire({
+          icon: "success",
+          title: "Order Created Successfully!",
+          text: "Redirecting to order details...",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        // Redirect after small delay
+        setTimeout(() => {
+          navigate(`/emergency/order-detail/${response.data?.order?._id}`);
+        }, 2000);
+      } else {
+        setError("Not add a post");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to add a post. Please try again.",
+          timer: 2500,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error("Submission Error:", err);
+      setError(
+        "Failed to submit task: " + (err.response?.data?.message || err.message)
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: err.response?.data?.message || err.message,
         timer: 2500,
         showConfirmButton: false,
       });
     }
-  } catch (err) {
-    console.error("Submission Error:", err);
-    setError(
-      "Failed to submit task: " + (err.response?.data?.message || err.message)
-    );
-    Swal.fire({
-      icon: "error",
-      title: "Submission Failed",
-      text: err.response?.data?.message || err.message,
-      timer: 2500,
-      showConfirmButton: false,
-    });
-  }
-};
+  };
 
   // Handle confirm from payment modal
   const handlePayConfirm = () => {
@@ -487,10 +641,10 @@ const Post = () => {
     : "N/A";
   const formattedTime = formData.deadline
     ? new Date(formData.deadline).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
     : "N/A";
 
   const updateAddress = async (location) => {
@@ -519,431 +673,289 @@ const Post = () => {
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
         </button>
-
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-semibold text-center mb-6">
-            Post Emergency Task
-          </h2>
-
-          {error && <p className="text-red-500 text-center">{error}</p>}
-          {loading && <p className="text-center">Loading...</p>}
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* TItle */}
-            <div>
-              <label className="block text-sm mb-1 font-bold">Title</label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                placeholder="Enter Title"
-                className={`w-full border ${
-                  validationErrors.title ? "border-red-500" : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-              />
-              {validationErrors.title && (
-                <p className="text-red-500 text-sm">{validationErrors.title}</p>
-              )}
-            </div>
-            {/* Description */}
-            <div className="mt-4">
-              <label className="block text-sm mb-1 font-bold">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Enter description"
-                className={`w-full border ${
-                  validationErrors.description
-                    ? "border-red-500"
-                    : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-                rows={4}
-              />
-              {validationErrors.description && (
-                <p className="text-red-500 text-sm mt-1">
-                  {validationErrors.description}
-                </p>
-              )}
-            </div>
-
-            {/* Work Category */}
-            <div>
-              <label className="block text-sm mb-1 font-bold">
-                Work Category<span className="text-red-500">*</span>
-              </label>
-              <select
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-                className={`w-full border ${
-                  validationErrors.category_id
-                    ? "border-red-500"
-                    : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-              >
-                <option value="">Select category</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              {validationErrors.category_id && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.category_id}
-                </p>
-              )}
-            </div>
-
-            {/* SubCategories */}
-            <div>
-              <label className="block text-sm mb-1 font-bold">
-                Emergency SubCategories<span className="text-red-500">*</span>
-              </label>
-              <Select
-                isMulti
-                options={subcategoryOptions}
-                value={selectedSubcategories}
-                onChange={handleSubcategoryChange}
-                className="w-full"
-                classNamePrefix="select"
-                placeholder="Select Emergency SubCategories"
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    borderColor: validationErrors.sub_category_ids
-                      ? "#EF4444"
-                      : "#10B981",
-                    "&:hover": { borderColor: "#10B981" },
-                    boxShadow: "none",
-                    "&:focus": {
-                      boxShadow: "0 0 0 2px rgba(16, 185, 129, 0.5)",
-                    },
-                  }),
-                }}
-              />
-              {validationErrors?.sub_category_ids && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.sub_category_ids}
-                </p>
-              )}
-            </div>
-
-            {/* Google Address */}
-            {/* <div>
-              <label className="block text-sm mb-1 font-bold">
-                Google Address (Search or Click on Map)
-              </label>
-              {isLoaded ? (
-                <>
-                  <Autocomplete
-                    onLoad={(ref) => (autocompleteRef.current = ref)}
-                    onPlaceChanged={handlePlaceChanged}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Search for an address"
-                      className={`w-full border ${
-                        validationErrors.google_address
-                          ? "border-red-500"
-                          : "border-green-500"
-                      } rounded-md px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-                    />
-                  </Autocomplete>
-                  <GoogleMap
-                    mapContainerStyle={mapContainerStyle}
-                    center={
-                      formData.coordinates.lat
-                        ? formData.coordinates
-                        : defaultCenter
-                    }
-                    zoom={12}
-                    onClick={handleMapClick}
-                    onLoad={(map) => (mapRef.current = map)}
-                  >
-                    {formData.coordinates.lat && (
-                      <Marker position={formData.coordinates} />
-                    )}
-                  </GoogleMap>
-                  <input
-                    type="text"
-                    name="google_address"
-                    value={formData.google_address}
-                    onChange={handleInputChange}
-                    placeholder="Selected address will appear here"
-                    className={`w-full border ${
-                      validationErrors.google_address
-                        ? "border-red-500"
-                        : "border-green-500"
-                    } rounded-md px-3 py-2 mt-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-                    readOnly
-                  />
-                </>
-              ) : (
-                <p>Loading Google Maps...</p>
-              )}
-              {validationErrors.google_address && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.google_address}
-                </p>
-              )}
-            </div> */}
-
-            <label className="block">
-              <span className="text-sm font-bold flex items-center justify-between">
-                Address
-              </span>
-              <div className="relative">
-                <input
-                  id="address-input"
-                  type="text"
-                  readOnly
-                  value={address || profile?.location?.address}
-                  placeholder="Enter or select address"
-                  className="mt-1 block w-full rounded-lg border border-gray-300 pr-9 pl-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22]"
-                  aria-invalid={validationErrors.address ? "true" : "false"}
-                  onClick={() => setShowOptions(!showOptions)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowOptions(!showOptions)}
-                  className="absolute right-3 top-2 px-2 py-1 text-sm rounded-lg border bg-gray-100 hover:bg-gray-200"
-                >
-                  {showOptions ? "▲" : "▼"}
-                </button>
-                {showOptions && (
-                  <div className="absolute top-full left-0 mt-2 w-full rounded-lg border border-gray-300 bg-white shadow-lg p-3 z-50">
-                    {profile?.full_address?.map((loc) => (
-                      <label
-                        key={loc.address}
-                        className="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 rounded"
-                      >
-                        <input
-                          type="radio"
-                          name="address"
-                          value={loc.address}
-                          checked={address === loc?.address}
-                          onClick={() => {
-                            setAddress(loc.address);
-                            setShowOptions(false);
-                            updateAddress(loc);
-                          }}
-                        />
-                        <div className="flex flex-col bg-gray-50 rounded-lg p-2 w-full">
-                          <div className="grid grid-cols-3 gap-x-4 gap-y-2">
-                            <div>
-                              <span className="block font-semibold text-xs">
-                                Title
-                              </span>
-                              <span className="text-[12px] text-gray-800">
-                                {loc.title}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="block font-semibold text-xs">
-                                House No
-                              </span>
-                              <span className="text-gray-700 text-[12px]">
-                                {loc.houseno ? loc?.houseno : "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="block font-semibold text-xs">
-                                Area
-                              </span>
-                              <span className="text-gray-700 text-[12px]">
-                                {loc.area ? loc.area : "N/A"}
-                              </span>
-                            </div>
-                            <div className="col-span-2">
-                              <span className="block font-semibold text-xs">
-                                Full Address
-                              </span>
-                              <span className="text-gray-600 text-[12px]">
-                                {loc.address}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {validationErrors.address && (
-                <p className="text-red-500 text-sm mt-1">
-                  {validationErrors.address}
-                </p>
-              )}
-            </label>
-
-            {/* Contact */}
-            <div>
-              <label className="block text-sm mb-1 font-bold">
-                Contact <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="contact"
-                value={formData.contact}
-                // onChange={handleInputChange}
-                onChange={(e) => {
-                  const onlyNums = e.target.value.replace(/\D/g, "");
-                  handleInputChange({
-                    target: { name: "contact", value: onlyNums },
-                  });
-                }}
-                placeholder="Enter Contact Number"
-                className={`w-full border ${
-                  validationErrors.contact
-                    ? "border-red-500"
-                    : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-              />
-              {validationErrors.contact && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.contact}
-                </p>
-              )}
-            </div>
-
-            {/* Deadline */}
-            {/* <div>
-              <label className="block text-sm mb-1 font-bold">
-                Add Completion time{" "}
-              </label>
-              <input
-                type="datetime-local"
-                name="deadline"
-                value={formData.deadline}
-                onChange={handleInputChange}
-                className={`w-full border ${
-                  validationErrors.deadline
-                    ? "border-red-500"
-                    : "border-green-500"
-                } rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500`}
-              />
-              {validationErrors.deadline && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.deadline}
-                </p>
-              )}
-            </div> */}
-            <div>
-              <label className="block text-sm mb-1 font-bold">
-                Add Completion time<span className="text-red-500">*</span>
-              </label>
-
-              <div
-                className={`w-full border rounded-md px-3 py-2 cursor-pointer ${
-                  validationErrors.deadline
-                    ? "border-red-500"
-                    : "border-green-500"
-                }`}
-                onClick={() =>
-                  document.getElementById("deadlineInput").showPicker?.()
-                }
-              >
-                <input
-                  id="deadlineInput"
-                  type="datetime-local"
-                  name="deadline"
-                  value={formData.deadline}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                    // ✅ this ensures picker closes after selection
-                    // e.target.blur();
-                  }}
-                  min={new Date().toISOString().slice(0, 16)} // ✅ blocks past dates
-                  className="w-full bg-white text-gray-800 outline-none cursor-pointer appearance-none"
-                />
-              </div>
-              {validationErrors.deadline && (
-                <p className="text-red-500 text-sm mt-1">
-                  {validationErrors.deadline}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1 font-bold">
-                Upload Image (Optional, 5 Max)
-              </label>
-              {/* <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileChange}
-                className={`w-full border
-                 rounded-md px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500`}
-              /> */}
-              <label
-                htmlFor="fileInput"
-                className="
-    flex flex-col items-center justify-center
-    w-full h-28
-    border border-gray-300
-    text-green-700 text-base font-medium text-center
-    rounded-lg
-    bg-gray-50
-    cursor-pointer
-    hover:bg-green-50 hover:border-green-500
-    focus-within:ring-2 focus-within:ring-green-500
-    transition-all duration-200
-  "
-              >
-                Upload image
-                <input
-                  id="fileInput"
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  className="hidden"
-                />
-              </label>
-
-              {/* {validationErrors.images && (
-                <p className="text-red-500 text-sm">
-                  {validationErrors.images}
-                </p>
-              )} */}
-              {formData.images.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.images.map((file, index) => (
-                    <div
-                      key={index}
-                      className="w-16 h-16 rounded-md overflow-hidden border"
-                    >
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`preview-${index}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Emergency Task Fees */}
-            {/* <p className="text-center text-green-700 font-medium">
-              Emergency Task Fees - Rs. {platformFee || 250}/-
-            </p> */}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-green-700 text-white py-3 rounded-md font-medium hover:bg-green-800"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
       </div>
+     <div className="flex flex-col lg:flex-row justify-center items-start bg-white px-3 gap-6 py-6">
+
+  {/* LEFT IMAGE BLOCK (same styling as first code) */}
+  <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
+    <img
+      src={postTask}
+      alt="Task Banner"
+      className="w-full h-auto object-contain rounded-2xl shadow-lg"
+    />
+  </div>
+
+  {/* RIGHT FORM BLOCK (same compact card UI as first code) */}
+  <div className="bg-white rounded-xl p-4 w-full lg:w-[380px] shadow-md max-h-screen overflow-y-auto">
+
+    <h2 className="text-[26px] font-bold text-center text-[#191A1D] mb-3">
+      Post Emergency Task
+    </h2>
+
+    {error && <p className="text-red-500 text-center">{error}</p>}
+    {loading && <p className="text-center">Loading...</p>}
+
+    <form className="w-full space-y-3 text-left text-sm" onSubmit={handleSubmit}>
+
+      {/* Title */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Title</label>
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleInputChange}
+          placeholder="Enter Title"
+          className={`w-full border rounded-md px-3 py-2 text-sm ${
+            validationErrors.title ? "border-red-500" : "border-green-500"
+          }`}
+        />
+        {validationErrors.title && (
+          <p className="text-red-500 text-xs">{validationErrors.title}</p>
+        )}
+      </div>
+
+      {/* Description */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Description</label>
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Enter description"
+          rows={3}
+          className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${
+            validationErrors.description ? "border-red-500" : "border-green-500"
+          }`}
+        />
+        {validationErrors.description && (
+          <p className="text-red-500 text-xs mt-1">
+            {validationErrors.description}
+          </p>
+        )}
+      </div>
+
+      {/* Category */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Work Category</label>
+        <select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          className={`w-full border rounded-md px-3 py-2 text-sm ${
+            validationErrors.category_id ? "border-red-500" : "border-green-500"
+          }`}
+        >
+          <option value="">Select category</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c._id}>{c.name}</option>
+          ))}
+        </select>
+        {validationErrors.category_id && (
+          <p className="text-red-500 text-xs">{validationErrors.category_id}</p>
+        )}
+      </div>
+
+      {/* Subcategories */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Emergency Subcategories</label>
+        <Select
+          isMulti
+          options={subcategoryOptions}
+          value={selectedSubcategories}
+          onChange={handleSubcategoryChange}
+          placeholder="Select Emergency Subcategories"
+          className="text-sm"
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderColor: validationErrors.sub_category_ids
+                ? "#EF4444"
+                : "#10B981",
+              minHeight: 36
+            }),
+          }}
+        />
+
+        {validationErrors.sub_category_ids && (
+          <p className="text-red-500 text-xs">{validationErrors.sub_category_ids}</p>
+        )}
+      </div>
+
+      {/* Address Section (same UI as first code + Add New Address button added) */}
+      <div className="relative">
+        <div className="flex justify-between items-center mb-1">
+          <label className="text-xs font-bold text-gray-600">Address</label>
+
+          {/* ADD NEW ADDRESS BUTTON (copied from first code) */}
+          <button
+            type="button"
+            onClick={() => setIsAddAddressModalOpen(true)}
+            className="text-xs text-[#228B22] font-semibold underline cursor-pointer"
+          >
+            + Add New Address
+          </button>
+        </div>
+
+        <input
+          type="text"
+          readOnly
+          value={address}
+          onClick={() => setShowOptions(!showOptions)}
+          placeholder="Click to select location"
+          className="w-full border rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
+        />
+
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+        </svg>
+
+        {showOptions && (
+          <ul className="absolute z-10 bg-white border rounded-lg shadow-md w-full mt-1 max-h-44 overflow-y-auto text-sm">
+            <li className="px-3 py-2 bg-gray-100">
+              <h3 className="text-sm font-semibold text-[#191A1D]">Select an Address</h3>
+            </li>
+
+            {profile?.full_address?.length > 0 ? (
+              profile.full_address.map((loc, i) => (
+                <li
+                  key={i}
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-start text-xs"
+                  onClick={() => {
+                    setAddress(loc.address);
+                    updateAddress(loc);
+                    setShowOptions(false);
+                  }}
+                >
+                  <input type="radio" className="mr-2 mt-1" checked={address === loc.address} />
+                  <p className="flex-1">
+                    <span className="font-medium block">{loc.title}</span>
+                    <span className="text-gray-600 block">{loc.landmark}</span>
+                    <span className="text-gray-500 block text-xs">{loc.address}</span>
+                  </p>
+                </li>
+              ))
+            ) : (
+              <li className="px-3 py-2 text-gray-500 text-xs">No saved addresses</li>
+            )}
+          </ul>
+        )}
+      </div>
+      {/* Add Address Modal - Bilkul same, no change */}
+            {isAddAddressModalOpen && (
+              <div className="h-full fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Add New Address</h3>
+                    <button onClick={() => setIsAddAddressModalOpen(false)} className="text-red-600 font-semibold cursor-pointer">Close</button>
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+                    <div className="flex flex-col gap-3 overflow-auto pr-2">
+                      <label className="block"><span className="text-sm font-medium">Title *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Home / Office" /></label>
+                      <label className="block"><span className="text-sm font-medium">House No. *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newHouseNo} onChange={(e) => setNewHouseNo(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Street</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newStreet} onChange={(e) => setNewStreet(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Area</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newArea} onChange={(e) => setNewArea(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Pincode *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newPincode} onChange={(e) => setNewPincode(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Landmark</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newLandmark} onChange={(e) => setNewLandmark(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Selected Address (from map) *</span><input readOnly className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" value={pickedLocation.address || ""} /><p className="text-xs text-gray-500 mt-1">Pick location on map or search using box on right.</p></label>
+                      <div className="flex gap-3 mt-auto">
+                        <button type="button" onClick={() => setIsAddAddressModalOpen(false)} className="px-4 py-2 bg-gray-300 rounded-lg cursor-pointer">
+                          Cancel
+                        </button>
+                        <button type="button" onClick={handleSaveNewAddress} className="px-4 py-2 bg-[#228B22] text-white rounded-lg cursor-pointer">
+                          Save Address
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col h-full">
+                      <input ref={mapAutocompleteRef} id="add-map-autocomplete" type="text" placeholder="Search for an address" className="w-full rounded-lg border border-gray-300 px-4 py-2 mb-3" />
+                      <div ref={mapRef} className="w-full h-full rounded-lg border border-gray-300" />
+                      <p className="text-xs text-gray-500 mt-2">You can drag the marker or click on the map to pick location. The selected address will be auto-filled.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+      {/* Contact */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Contact</label>
+        <input
+          type="text"
+          name="contact"
+          value={formData.contact}
+          onChange={(e) => {
+            const onlyNums = e.target.value.replace(/\D/g, "");
+            handleInputChange({ target: { name: "contact", value: onlyNums } });
+          }}
+          placeholder="Enter Contact Number"
+          className={`w-full border rounded-md px-3 py-2 text-sm ${
+            validationErrors.contact ? "border-red-500" : "border-green-500"
+          }`}
+        />
+        {validationErrors.contact && (
+          <p className="text-red-500 text-xs">{validationErrors.contact}</p>
+        )}
+      </div>
+
+      {/* Deadline */}
+      <div>
+        <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
+        <input
+          type="datetime-local"
+          name="deadline"
+          value={formData.deadline}
+          onChange={handleInputChange}
+          min={new Date().toISOString().slice(0, 16)}
+          className={`w-full border rounded-md px-3 py-2 text-sm ${
+            validationErrors.deadline ? "border-red-500" : "border-green-500"
+          }`}
+        />
+        {validationErrors.deadline && (
+          <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
+        )}
+      </div>
+
+      {/* Image Upload */}
+      <div className="border border-gray-300 rounded-lg p-3 text-center">
+        <label className="cursor-pointer block">
+          <svg className="w-7 h-7 text-[#228B22] mx-auto mb-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3" />
+          </svg>
+          <span className="text-xs text-gray-700">Upload Photos (Optional)</span>
+
+          <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
+
+          <button type="button"
+            onClick={() => document.querySelector('input[type="file"]').click()}
+            className="block mx-auto mt-1 px-3 py-1 text-xs border border-[#228B22] text-[#228B22] rounded-md"
+          >
+            Choose Files
+          </button>
+        </label>
+
+        {formData.images.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2 justify-center">
+            {formData.images.map((file, index) => (
+              <div key={index} className="relative">
+                <img src={URL.createObjectURL(file)} className="w-14 h-14 object-cover rounded border" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-green-600 mt-1">Max 5 photos (.jpg, .png)</p>
+      </div>
+
+      <button
+        type="submit"
+        className="w-full bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-lg text-base shadow-md transition"
+      >
+        Submit
+      </button>
+    </form>
+  </div>
+</div>
+
 
       {/* Payment Confirmation Modal */}
       {showPaymentModal && (
