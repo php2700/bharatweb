@@ -120,11 +120,11 @@ export default function ViewProfile() {
         }),
         orderData?.hire_status === "pending"
           ? axios.get(
-              `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            )
+            `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
           : { data: { providers: [] } },
       ]);
 
@@ -557,39 +557,35 @@ export default function ViewProfile() {
                 <span className="text-gray-600 font-semibold block">
                   Status:{" "}
                   <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                      orderData?.hire_status === "pending"
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
                         ? "bg-yellow-500"
                         : ""
-                    } ${
-                      orderData?.hire_status === "cancelled" ||
-                      orderData?.hire_status === "cancelledDispute"
+                      } ${orderData?.hire_status === "cancelled" ||
+                        orderData?.hire_status === "cancelledDispute"
                         ? "bg-[#FF0000]"
                         : ""
-                    } ${
-                      orderData?.hire_status === "completed" ||
-                      orderData?.hire_status === "assigned"
+                      } ${orderData?.hire_status === "completed" ||
+                        orderData?.hire_status === "assigned"
                         ? "bg-[#228B22]"
                         : ""
-                    }`}
+                      }`}
                   >
                     {orderData?.hire_status === "cancelledDispute"
                       ? "Cancelled Dispute"
                       : orderData?.hire_status
-                          ?.split(" ")
-                          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ") || "Unknown"}
+                        ?.split(" ")
+                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(" ") || "Unknown"}
                   </span>
                 </span>
                 {orderData?.refundRequest && (
                   <span className="text-gray-600 font-semibold block">
                     Refund:{" "}
                     <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                        orderData?.refundStatus === "pending"
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
                           ? "bg-yellow-500"
                           : "bg-blue-500"
-                      }`}
+                        }`}
                     >
                       {orderData?.refundStatus?.charAt(0).toUpperCase() +
                         orderData?.refundStatus?.slice(1) || "Unknown"}
@@ -656,11 +652,13 @@ export default function ViewProfile() {
                     type="emergency"
                   />
                 </div>
-              ) : orderData?.hire_status === "cancelledDispute" ? (
+              ) : orderData?.hire_status === "cancelledDispute" && disputeInfo ? (
                 <>
-                  <button className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                    Cancelled ({disputeInfo?.unique_id || "No Id"})
-                  </button>
+                  <Link to={`/disputes/emergency/${disputeInfo._id}`}>
+                    <span className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-red-700">
+                      Cancelled ({disputeInfo.unique_id || "No Id"})
+                    </span>
+                  </Link>
                   <p className="text-sm text-gray-700 mt-3">
                     <span className="text-red-600 font-semibold">
                       Freezed by Platform
@@ -750,63 +748,63 @@ export default function ViewProfile() {
                   />
                   {(orderData?.hire_status === "assigned" ||
                     orderData?.hire_status === "completed") && (
-                    <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                      <div className="relative max-w-2xl mx-auto">
-                        <div className="relative z-10 flex justify-center gap-4">
-                          <img
-                            src={Warning1}
-                            alt="Warning"
-                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                          />
-                          <img
-                            src={Warning2}
-                            alt="Warning2"
-                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                          />
-                        </div>
-                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                          <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                            Warning Message
-                          </h2>
-                          <p className="text-gray-700 text-sm md:text-base">
-                            Pay securely — no extra charges from the platform.
-                            Choose simple and safe transactions.
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-4">
-                        {orderData?.hire_status !== "completed" && (
-                          <>
-                            <button
-                              className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                              onClick={handleMarkComplete}
-                            >
-                              Mark as Complete
-                            </button>
-                            <ReviewModal
-                              show={showCompletedModal}
-                              onClose={() => {
-                                setShowCompletedModal(false);
-                                fetchData();
-                              }}
-                              service_provider_id={
-                                orderData?.service_provider_id._id
-                              }
-                              orderId={id}
-                              type="direct"
+                      <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                        <div className="relative max-w-2xl mx-auto">
+                          <div className="relative z-10 flex justify-center gap-4">
+                            <img
+                              src={Warning1}
+                              alt="Warning"
+                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                             />
-                          </>
-                        )}
-                        <Link to={`/dispute/${id}/emergency`}>
-                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                            {orderData?.hire_status === "completed"
-                              ? "Create Dispute"
-                              : "Cancel Task and Create Dispute"}
-                          </button>
-                        </Link>
+                            <img
+                              src={Warning2}
+                              alt="Warning2"
+                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                            />
+                          </div>
+                          <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
+                            <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                              Warning Message
+                            </h2>
+                            <p className="text-gray-700 text-sm md:text-base">
+                              Pay securely — no extra charges from the platform.
+                              Choose simple and safe transactions.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-4">
+                          {orderData?.hire_status !== "completed" && (
+                            <>
+                              <button
+                                className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                                onClick={handleMarkComplete}
+                              >
+                                Mark as Complete
+                              </button>
+                              <ReviewModal
+                                show={showCompletedModal}
+                                onClose={() => {
+                                  setShowCompletedModal(false);
+                                  fetchData();
+                                }}
+                                service_provider_id={
+                                  orderData?.service_provider_id._id
+                                }
+                                orderId={id}
+                                type="direct"
+                              />
+                            </>
+                          )}
+                          <Link to={`/dispute/${id}/emergency`}>
+                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                              {orderData?.hire_status === "completed"
+                                ? "Create Dispute"
+                                : "Cancel Task and Create Dispute"}
+                            </button>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </>
               )}
           </div>
@@ -896,10 +894,13 @@ export default function ViewProfile() {
                           ({provider.unique_id || "#N/A"})
                         </span>
                       </p>
-											
-                      {provider.rating !== undefined && (
+                      {typeof provider.rating === 'number' ? (
                         <p className="text-sm text-yellow-600">
-                          Rating: {Number(provider.rating).toFixed(1)} / 5.0
+                          Rating: {provider.rating.toFixed(1)} / 5.0
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          No rating available
                         </p>
                       )}
                       {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">

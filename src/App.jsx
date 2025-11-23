@@ -275,10 +275,12 @@ export default function App() {
           element={<DirectProviderordetail />}
         />
         <Route path="/disputes" element={<DisputePage />} />
+         <Route path="/disputes/:flowType/:id" element={<DisputePage />} />
 
         <Route
           path="/bidding/order-detail/:id"
           element={<BiddinggetWorkDetail />}
+          
         />
       </Routes>
     </>

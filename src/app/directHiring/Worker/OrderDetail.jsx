@@ -513,12 +513,7 @@ export default function ViewProfile() {
                       : "N/A"}
                   </span>
                 
-                  <span className="text-gray-600 text-sm font-semibold block">
-                    Deadline Date&Time:{" "}
-                    {orderData?.deadline
-                      ? new Date(orderData.deadline).toLocaleString()
-                      : "N/A"}
-                  </span>
+                  
                 </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">

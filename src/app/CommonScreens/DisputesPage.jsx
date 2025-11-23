@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../component/Header";
@@ -9,12 +10,16 @@ import Arrow from "../../assets/profile/arrow_back.svg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function DisputesPage() {
+    const { flowType } = useParams();
   const navigate = useNavigate();
   const [disputesRaisedBy, setDisputesRaisedBy] = useState([]);
   const [disputesAgainst, setDisputesAgainst] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("raisedBy");
-  const [subTab, setSubTab] = useState("Direct");
+  // const [subTab, setSubTab] = useState("Direct");
+  const [subTab, setSubTab] = useState(
+  flowType ? flowType.charAt(0).toUpperCase() + flowType.slice(1) : "Direct"
+);
 
   const handleUnauthorized = () => {
     console.log(
@@ -43,6 +48,7 @@ export default function DisputesPage() {
           handleUnauthorized();
           return;
         }
+        
 
         // Fetch disputes raised by user
         const resRaisedBy = await fetch(

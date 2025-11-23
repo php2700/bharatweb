@@ -50,6 +50,7 @@ export default function BiddinggetWorkDetail() {
   const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
+   const [disputeInfo, setDisputeInfo] = useState(null);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -162,6 +163,7 @@ export default function BiddinggetWorkDetail() {
         setAssignedWorker(response.data.assignedWorker || null);
         const order = response.data.data;
         setOrderDetail(order);
+         setDisputeInfo(response.data.DisputeInfo || null);
         setCategoryId(order?.category_id?._id || null);
         setSubCategoryIds(
           Array.isArray(order?.sub_category_ids)
@@ -1036,11 +1038,18 @@ export default function BiddinggetWorkDetail() {
                     </span>
                   )}
                 </div>
-              ) : orderDetail?.hire_status === "cancelledDispute" ? (
-                <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-                  Cancelled (Dispute)
-                </span>
-              ) : null}
+              // ) : orderDetail?.hire_status === "cancelledDispute" ? (
+              //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+              //     Cancelled (Dispute)
+              //   </span>
+              // ) : null}
+                 ) : orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
+  <Link to={`/disputes/bidding/${disputeInfo._id}`}>
+    <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-orange-600">
+      Cancelled ( {disputeInfo.unique_id || "N/A"})
+    </span>
+  </Link>
+) : null}
               <ReviewModal
                 show={showCompletedModal}
                 onClose={() => {

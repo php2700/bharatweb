@@ -540,10 +540,10 @@ import Footer from "../../component/footer";
 import { motion } from "framer-motion";
 
 // --- Assets ---
-import aboutImage from "../../assets/aboutus/abouts.jpg";
-import directHiringImage from "../../assets/aboutus/directs.jpg";
-import biddingImage from "../../assets/aboutus/biddings.jpg";
-import emergencyHiringImage from "../../assets/aboutus/emergencys.jpg";
+import aboutImage from "../../assets/aboutus/BHARAT4.jpg";
+import directHiringImage from "../../assets/aboutus/BHARAT2.jpg";
+import biddingImage from "../../assets/aboutus/BHARAT3.jpg";
+import emergencyHiringImage from "../../assets/aboutus/BHARAT1.jpg";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
