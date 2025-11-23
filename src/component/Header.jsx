@@ -297,46 +297,116 @@ export default function Header() {
     });
   };
 
-  useEffect(() => {
-    if (isLoggedIn && !profile && !loading && !error) {
-      dispatch(fetchUserProfile()).then((result) => {
-        if (fetchUserProfile.fulfilled.match(result)) {
-          if (result.payload?.full_address) {
-            setSavedAddresses(result.payload.full_address);
-          }
-          if (result.payload?.location) {
-            const addressTitle =
-              result.payload.full_address?.[0]?.address ||
-              result.payload.full_address?.[0]?.address ||
-              "Location";
-            setSelectedAddress(addressTitle);
-            localStorage.setItem("selectedAddressTitle", addressTitle);
-            if (result.payload.full_address?.length > 0) {
-              const firstAddressId = result.payload.full_address[0]._id;
+  // useEffect(() => {
+  //   if (isLoggedIn && !profile && !loading && !error) {
+  //     dispatch(fetchUserProfile()).then((result) => {
+  //       if (fetchUserProfile.fulfilled.match(result)) {
+  //         if (result.payload?.full_address) {
+  //           setSavedAddresses(result.payload.full_address);
+  //         }
+  //         if (result.payload?.location) {
+  //           const addressTitle =
+  //             result.payload.full_address?.[0]?.address ||
+  //             result.payload.full_address?.[0]?.address ||
+  //             "Location";
+  //           setSelectedAddress(addressTitle);
+  //           localStorage.setItem("selectedAddressTitle", addressTitle);
+  //           if (result.payload.full_address?.length > 0) {
+  //             const firstAddressId = result.payload.full_address[0]._id;
 
-              setSelectedAddressId(firstAddressId);
-              localStorage.setItem("selectedAddressId", firstAddressId);
-            }
-          }
-        } else if (fetchUserProfile.rejected.match(result)) {
-          toast.error(result.payload || "Failed to fetch user profile");
-          if (result.payload === "Session expired, please log in again") {
-            handleUnauthorized();
+  //             setSelectedAddressId(firstAddressId);
+  //             localStorage.setItem("selectedAddressId", firstAddressId);
+  //           }
+  //         }
+  //       } else if (fetchUserProfile.rejected.match(result)) {
+  //         toast.error(result.payload || "Failed to fetch user profile");
+  //         if (result.payload === "Session expired, please log in again") {
+  //           handleUnauthorized();
+  //         }
+  //       }
+  //     });
+  //   } else if (profile?.location) {
+  //     const addressTitle =
+  //       profile.location.title || profile.location.address || "Location";
+  //     setSelectedAddress(addressTitle);
+  //     setSavedAddresses(profile.full_address || []);
+  //     localStorage.setItem("selectedAddressTitle", addressTitle);
+  //     if (profile.location._id) {
+  //       setSelectedAddressId(profile.location._id);
+  //       localStorage.setItem("selectedAddressId", profile.location._id);
+  //     }
+  //   }
+  // }, [dispatch, isLoggedIn, profile, loading, error]);
+
+useEffect(() => {
+  if (isLoggedIn && !profile && !loading && !error) {
+    dispatch(fetchUserProfile()).then((result) => {
+      if (fetchUserProfile.fulfilled.match(result)) {
+        const data = result.payload;
+
+        // 1. Save all addresses
+        if (data?.full_address) {
+          setSavedAddresses(data.full_address);
+        }
+
+        // 2. If location exists → match the correct addressId
+        if (data?.location && data?.full_address?.length > 0) {
+          const matchedAddress = data.full_address.find(
+            (addr) => addr.address === data.location.address
+          );
+
+          if (matchedAddress) {
+            // Use matched address
+            setSelectedAddress(matchedAddress.address);
+            setSelectedAddressId(matchedAddress._id);
+
+            localStorage.setItem("selectedAddressTitle", matchedAddress.address);
+            localStorage.setItem("selectedAddressId", matchedAddress._id);
+          } else {
+            // Fallback to first address
+            const firstAddress = data.full_address[0];
+
+            setSelectedAddress(firstAddress.address);
+            setSelectedAddressId(firstAddress._id);
+
+            localStorage.setItem("selectedAddressTitle", firstAddress.address);
+            localStorage.setItem("selectedAddressId", firstAddress._id);
           }
         }
-      });
-    } else if (profile?.location) {
-      const addressTitle =
-        profile.location.title || profile.location.address || "Location";
-      setSelectedAddress(addressTitle);
-      setSavedAddresses(profile.full_address || []);
-      localStorage.setItem("selectedAddressTitle", addressTitle);
-      if (profile.location._id) {
-        setSelectedAddressId(profile.location._id);
-        localStorage.setItem("selectedAddressId", profile.location._id);
+
+      } else if (fetchUserProfile.rejected.match(result)) {
+        toast.error(result.payload || "Failed to fetch user profile");
+
+        if (result.payload === "Session expired, please log in again") {
+          handleUnauthorized();
+        }
       }
+    });
+
+  } else if (profile?.location) {
+    // When profile already loaded in redux
+    const matchedAddress = profile.full_address?.find(
+      (addr) => addr.address === profile.location.address
+    );
+
+    if (matchedAddress) {
+      setSelectedAddress(matchedAddress.address);
+      setSelectedAddressId(matchedAddress._id);
+
+      localStorage.setItem("selectedAddressTitle", matchedAddress.address);
+      localStorage.setItem("selectedAddressId", matchedAddress._id);
+    } else if (profile.full_address?.length > 0) {
+      const firstAddress = profile.full_address[0];
+
+      setSelectedAddress(firstAddress.address);
+      setSelectedAddressId(firstAddress._id);
+
+      localStorage.setItem("selectedAddressTitle", firstAddress.address);
+      localStorage.setItem("selectedAddressId", firstAddress._id);
     }
-  }, [dispatch, isLoggedIn, profile, loading, error]);
+  }
+}, [dispatch, isLoggedIn, profile, loading, error]);
+
 
   useEffect(() => {
     const fetchNotifications = async () => {

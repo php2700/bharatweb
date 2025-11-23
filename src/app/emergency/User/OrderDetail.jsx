@@ -896,9 +896,10 @@ export default function ViewProfile() {
                           ({provider.unique_id || "#N/A"})
                         </span>
                       </p>
+											
                       {provider.rating !== undefined && (
                         <p className="text-sm text-yellow-600">
-                          Rating: {provider.rating.toFixed(1)} / 5.0
+                          Rating: {Number(provider.rating).toFixed(1)} / 5.0
                         </p>
                       )}
                       {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
