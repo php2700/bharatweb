@@ -357,7 +357,7 @@ export default function Accepted({
                 </div>
 
                 <button
-                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
                   onClick={() =>
                     navigate(`/profile-details/${serviceProvider._id}/bidding`)
                   }
@@ -527,40 +527,89 @@ export default function Accepted({
           </div>
         )}
         <div className="p-4 bg-white shadow-md rounded-lg mt-10">
-        <table className="w-full border border-gray-300 rounded-md overflow-hidden">
-          <thead style={{ backgroundColor: "#228B22", color: "white" }}>
-            <tr>
-              <th className="border p-2 text-left">Description</th>
-              <th className="border p-2 text-left">Amount (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border p-2">Total Amount Paid</td>
-              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
-            </tr>
-            <tr>
-              <td className="border p-2">Pending with App</td>
-              <td className="border p-2">
-                ₹{fullPaymentHistory.remaining_amount}
-              </td>
-            </tr>
-            <tr>
-              <td className="border p-2">Paid to Worker</td>
-              <td className="border p-2">
-                ₹
-                {paymentHistory
-                  .filter((p) =>
-                    ["release_requested", "released"].includes(p.release_status)
-                  )
-                  .reduce((sum, p) => sum + p.amount, 0)}
-              </td>
-              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          <table className="w-full border border-gray-300 rounded-md overflow-hidden">
+            <thead style={{ backgroundColor: "#228B22", color: "white" }}>
+              <tr>
+                <th className="border p-2 text-left">Description</th>
+                <th className="border p-2 text-left">Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border p-2">Total Amount Paid</td>
+                <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              </tr>
+              <tr>
+                <td className="border p-2">Pending with App</td>
+                <td className="border p-2">
+                  ₹{fullPaymentHistory.remaining_amount}
+                </td>
+              </tr>
+              <tr>
+                <td className="border p-2">Paid to Worker</td>
+                <td className="border p-2">
+                  ₹
+                  {paymentHistory
+                    .filter((p) =>
+                      ["release_requested", "released"].includes(p.release_status)
+                    )
+                    .reduce((sum, p) => sum + p.amount, 0)}
+                </td>
+                {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {/* OPEN MODAL BUTTON */}
+        <div className="text-right mt-4">
+          <button
+            onClick={() => {
+              Swal.fire({
+                title: "Payment Details",
+                html: `
+                <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                  <thead>
+                    <tr style="background-color:#228B22; color:white;">
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Payment ID</th>
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Amount</th>
+                      <th style="padding:8px; border:1px solid #ddd; text-align:left;">Method</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${paymentHistory
+                    .map(
+                      (p) => `
+                      <tr>
+                        <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
+                        <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                          ${p.amount || "N/A"}
+                        </td>
+                        <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                          ${p.method || "N/A"}
+                        </td>
+                         
+                      </tr>
+                    `
+                    )
+                    .join("")}
+                  </tbody>
+                </table>
+              `,
+                confirmButtonText: "Close",
+                width: 600,
+                backdrop: `
+                rgba(0,0,0,0.4)
+                blur(6px)
+              `,
+                background: "white",
+              });
+            }}
+            class="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
+          >
+            View Payment Details
+          </button>
 
+        </div>
       </div>
     </>
   );

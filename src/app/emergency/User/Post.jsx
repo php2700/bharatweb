@@ -117,6 +117,8 @@ const Post = () => {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
+
+  
   useEffect(() => {
     const fetchPlatformFee = async () => {
       try {

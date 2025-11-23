@@ -18,7 +18,8 @@ import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
 import footer from "../../assets/Homepage/footer.svg";
 import axios from "axios";
-
+import { motion } from "framer-motion";
+import CountUp from "react-countup";
 import { useSelector } from "react-redux";
 
 export default function Home() {
@@ -185,6 +186,15 @@ export default function Home() {
   const [showAll, setShowAll] = useState(false);
   const visibleServices = showAll ? servicesData : servicesData.slice(0, 6); // Reduced to 6 for better mobile display
 
+  const navigateWithAuth = (path) => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      navigate(path);
+    } else {
+      navigate("/login");
+    }
+  };
 
   const handleClick = (e) => {
     const img = e.target;
@@ -193,13 +203,13 @@ export default function Home() {
 
     if (clickX < imgWidth / 3) {
       // Left 1/3
-      navigate("/ourservices");
+      navigateWithAuth("/ourservices");
     } else if (clickX < (2 / 3) * imgWidth) {
       // Middle 1/3
-      navigate("/bidding/newtask");
+      navigateWithAuth("/bidding/newtask");
     } else {
       // Right 1/3
-      navigate("/emergency/userpost");
+      navigateWithAuth("/emergency/userpost");
     }
   };
 
@@ -221,6 +231,14 @@ export default function Home() {
       navigate("/login");
     }
   };
+  const slideVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, delay: i * 0.12 },
+    }),
+  };
 
   return (
     <>
@@ -228,18 +246,39 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="container mx-auto mt-20 px-4 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-6">
+
         {/* Left Content */}
-        <div className="text-center md:text-left">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+          className="text-center md:text-left"
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: "easeInOut" }}
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4"
+          >
             Transform Your Space <br />
             with Our Expert Service <br />
             Provider
-          </h1>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, delay: 0.1, ease: "easeInOut" }}
+            className="text-gray-600 mb-6 text-sm sm:text-base"
+          >
             Welcome to a World of Immaculate Services and Freshness! Our expert
             services are designed to transform your space into a pristine haven.
-          </p>
-          <button
+          </motion.p>
+
+          <motion.button
             onClick={() => {
               const isLoggedIn = !!localStorage.getItem("bharat_token");
               if (isLoggedIn) {
@@ -248,321 +287,487 @@ export default function Home() {
                 navigate("/login");
               }
             }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="bg-[#228B22] hover:bg-green-800 text-white text-base sm:text-lg font-semibold px-6 sm:px-10 py-2 sm:py-3 rounded-md transition cursor-pointer"
           >
             Book Now
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
         {/* Right Image */}
-        <div className="flex justify-center">
-          <img
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: "easeInOut" }}
+          className="flex justify-center"
+        >
+          <motion.img
             src={Banner}
             alt="Service Provider"
+            initial={{ scale: 0.95, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             className="w-full max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
           />
-        </div>
+        </motion.div>
+
       </div>
 
+
       {/* Overlay Section */}
-      <div className="relative w-full h-48 sm:h-64 md:h-[252px] mt-5">
-        <img
+      <div className="relative w-full h-auto py-8 sm:py-12 md:py-16 mt-5">
+
+        {/* BACKGROUND IMAGE */}
+        <motion.img
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           src={Mask}
           alt="Background"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover absolute inset-0"
         />
-        <div className="absolute inset-0 bg-[#382C28] opacity-75"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-12 md:gap-[100px] text-center text-white">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                9,168+
+
+        {/* DARK OVERLAY */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 0.75 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="absolute inset-0 bg-[#382C28]"
+        ></motion.div>
+
+        {/* CENTER CONTENT */}
+        <div className="relative z-10 flex items-center justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-20 text-center text-white px-4">
+
+            {/* Stat 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+                <CountUp start={0} end={9168} duration={4.5} separator="," />+
               </h2>
               <p className="text-sm sm:text-lg mt-2">Project Completed</p>
-            </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                4,573+
+            </motion.div>
+
+            {/* Stat 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+            >
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+                <CountUp start={0} end={4573} duration={4.5} separator="," />+
               </h2>
               <p className="text-sm sm:text-lg mt-2">Happy Customers</p>
-            </div>
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                500+
+            </motion.div>
+
+            {/* Stat 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+                <CountUp start={0} end={547} duration={4.5} separator="," />+
               </h2>
               <p className="text-sm sm:text-lg mt-2">Dedicated Cleaners</p>
-            </div>
+            </motion.div>
+
           </div>
         </div>
+
       </div>
 
       {/* Services Section */}
       <div className="w-full flex justify-center items-center mt-8 md:mt-12">
-        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-black text-center px-4">
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-2xl sm:text-3xl md:text-5xl font-bold text-black text-center px-4"
+        >
           Comprehensive Services to <br /> Your Needs
-        </h2>
+        </motion.h2>
       </div>
       <div className="container mx-auto px-4 py-8 md:py-16">
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 text-center">
           {visibleServices.map((service) => (
-            <div
+            <motion.div
               key={service.id}
+
+              // Animation Only ↓↓↓
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+
+              whileHover={{ scale: 1.05 }}
+
               className="p-4 md:p-6 hover:shadow-lg transition"
             >
               <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-[#008000]">
+                <motion.div
+                  className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-[#008000]"
+
+                  whileHover={{ scale: 1.12 }}
+                >
                   <img
                     src={service.icon}
                     alt={service.title}
                     className="w-6 h-6 md:w-8 md:h-8"
                   />
-                </div>
+                </motion.div>
               </div>
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
+
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="text-lg md:text-xl font-bold text-gray-900 mb-2"
+              >
                 {service.title}
-              </h3>
-              <p className="text-gray-600 text-xs sm:text-sm">
+              </motion.h3>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-gray-600 text-xs sm:text-sm"
+              >
                 {service.description}
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           ))}
         </div>
+
+        {/* Button (No Logic Changed) */}
         <div className="flex justify-center mt-6 md:mt-10">
-          <button
+          <motion.button
             onClick={() => setShowAll(!showAll)}
+
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+
             className="text-[#008000] font-semibold text-base md:text-lg hover:underline"
           >
             {showAll ? "Show Less" : "See All"}
-          </button>
+          </motion.button>
         </div>
+
       </div>
 
       {/* Center Image Section */}
       <div className="flex justify-center items-center mt-8 md:mt-12">
-        <img
+        <motion.img
           src={Image}
           alt="Centered"
           onClick={handleClick}
-          className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain cursor-pointer"
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          whileHover={{ scale: 1.03 }}
+          className="w-full max-w-[90%] sm:max-w-[80%] md:max-w-[1200px] h-auto object-contain cursor-pointer rounded-xl shadow-lg"
         />
       </div>
 
       {/* Bidding Posted Work */}
-      <div className="bg-[#EDFFF3] py-8 md:py-16">
+      <div className="bg-[#EDFFF3] py-8 md:py-1">
 
+        {/* ====================== BIDDING POSTED WORK ====================== */}
         <div className="container mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
+          <motion.h2
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8"
+          >
             Bidding Posted Work
-          </h2>
-          {loading ? (
-            <p className="text-gray-600 text-center">Loading recent works...</p>
-          ) : works.length === 0 ? (
-            <p className="text-gray-600 text-center">No recent works available.</p>
-          ) : (
-            <div className="overflow-hidden relative w-full">
-              <div className="flex flex-nowrap animate-slide">
-                {works.concat(works).map((work, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
-                  >
-                    {/* Image at the top with default fallback */}
-                    <img
-                      src={work.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
-                      alt={work.title}
-                      className="w-full h-40 object-cover rounded-t-lg mb-4"
-                    />
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.address}</h3>
-                    <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
-                    <button
-                      onClick={() => navigate(`/bidding/task/${work._id}`)}
-                      className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
-                    >
-                      View Details
-                    </button>
+          </motion.h2>
+
+          <div className="overflow-hidden relative w-full">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="flex flex-nowrap animate-slide"
+            >
+              {works.concat(works).map((work, index) => (
+                <motion.div
+                  key={index}
+                  custom={index}
+                  variants={slideVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ scale: 1.07 }}
+                  className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
+                >
+                  <img
+                    src={work.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop"}
+                    className="w-full h-[120px] object-cover rounded-md"
+                  />
+
+                  <div className="flex-1 mt-2">
+                    <h3 className="text-sm font-bold text-gray-900 break-words">
+                      {work.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 break-words">
+                      {work.description}
+                    </p>
+                    <p className="text-xs font-semibold text-gray-800 break-words">
+                      {work.address}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-
-
-        {/*Recent Emergency Tasks*/}
-
-        <div className="bg-[#EDFFF3] py-8 md:py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-              Emergency Tasks
-            </h2>
-
-            {loading ? (
-              <p className="text-gray-600 text-center">Loading recent works...</p>
-            ) : works.length === 0 ? (
-              <p className="text-gray-600 text-center">No recent works available.</p>
-            ) : (
-              <div className="overflow-hidden relative w-full">
-                <div className="flex flex-nowrap animate-slide">
-                  {works.concat(works).map((work, index) => (
-                    <div
-                      key={index}
-                      className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
-                    >
-                       {/* Image at the top with default fallback */}
-                    <img
-                      src={work.image_urls || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
-                      alt={work.title}
-                      className="w-full h-40 object-cover rounded-t-lg mb-4"
-                    />
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{work.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4 break-words">{work.description}</p>
-                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.google_address}</p>
-                      <p className="text-lg font-bold text-gray-900 mb-2 break-words">{work.contact}</p>
-                      <button
-                        onClick={() => navigate(`/emergency/task/${work._id}`)}
-                        className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
-                      >
-                        View Details
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
-
         </div>
 
-        {/* & Feature Workers */}
-        <div className="container mx-auto px-4 mt-6 md:mt-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8 text-left">
-            Feature Workers
-          </h2>
+        {/* ====================== EMERGENCY TASKS ====================== */}
+        <div className="bg-[#EDFFF3] py-8 md:py-10 -mt-4">
+          <div className="container mx-auto px-4">
+            <motion.h2
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8"
+            >
+              Emergency Tasks
+            </motion.h2>
 
-          {loading ? (
-            <p className="text-gray-600 text-center">Loading recent works...</p>
-          ) : works.length === 0 ? (
-            <p className="text-gray-600 text-center">No recent works available.</p>
-          ) : (
             <div className="overflow-hidden relative w-full">
-              <div className="flex flex-nowrap animate-slide">
-                {works.concat(works).map((worker, index) => (
-                  <div
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="flex flex-nowrap animate-slide"
+              >
+                {works.concat(works).map((work, index) => (
+                  <motion.div
                     key={index}
-                    className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow hover:shadow-lg transition mr-6 relative overflow-hidden"
+                    custom={index}
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover={{ scale: 1.07 }}
+                    className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
                   >
+                    <img
+                      src={work.image_urls || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop"}
+                      className="w-full h-[120px] object-cover rounded-md"
+                    />
 
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 break-words">{worker.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 break-words">{worker.address}</p>
-                    <button
-                      onClick={() => navigate(`/worker/profile/${worker.id}`)}
-                      className="bg-[#228B22] text-white text-sm font-semibold px-4 py-2 rounded hover:bg-green-800 transition w-full truncate"
-                    >
-                      View Profile
-                    </button>
-                  </div>
+                    <div className="flex-1 mt-2">
+                      <h3 className="text-sm font-bold text-gray-900 break-words">
+                        {work.title}
+                      </h3>
+                      <p className="text-xs text-gray-700 break-words">
+                        {work.description}
+                      </p>
+                      <p className="text-xs font-semibold text-gray-900 break-words">
+                        {work.google_address}
+                      </p>
+                      <p className="text-xs font-bold text-gray-900 break-words">
+                        {work.contact}
+                      </p>
+                    </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Tailwind CSS Custom Animation */}
-          <style>
-            {`
+        {/* ====================== FEATURE WORKERS ====================== */}
+        <div className="container mx-auto px-4 mt-6 md:mt-8">
+          <motion.h2
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-black mb-6 md:mb-8"
+          >
+            Feature Workers
+          </motion.h2>
+
+          <div className="overflow-hidden relative w-full">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="flex flex-nowrap animate-slide"
+            >
+              {works.concat(works).map((worker, index) => (
+                <motion.div
+                  key={index}
+                  custom={index}
+                  variants={slideVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover={{ scale: 1.08 }}
+                  className="flex-shrink-0 w-[200px] h-[200px] bg-white p-4 rounded-xl shadow hover:shadow-xl transition mr-5 flex flex-col justify-center text-center"
+                >
+                  <h3 className="text-base font-bold text-gray-900 break-words">
+                    {worker.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-2 break-words">
+                    {worker.address}
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+
+        {/* SLIDER ANIMATION CSS */}
+        <style>
+          {`
           @keyframes slide {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
           }
           .animate-slide {
-            animation: slide 30s linear infinite;
+            animation: slide 25s linear infinite;
           }
         `}
-          </style>
-        </div>
-
-
+        </style>
       </div>
+
 
       {/* Why Choose Us Section */}
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6 md:gap-8">
-          <div className="flex justify-center">
+
+          {/* Left Image Animated */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
             <img
               src={Choose}
               alt="Team collaboration"
               className="rounded-xl shadow-lg w-full max-w-[300px] sm:max-w-[400px] h-auto object-cover"
             />
-          </div>
-          <div className="mt-6 md:mt-0">
+          </motion.div>
+
+          {/* Right Text Area Animated */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="mt-6 md:mt-0"
+          >
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-gray-900 text-center md:text-left">
               Why Should You Choose?
             </h2>
+
             <div className="space-y-6 md:space-y-8 mt-6 md:mt-10">
-              <div className="flex items-start">
+
+              {/* Item 1 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-start"
+              >
                 <div className="bg-[#382C28] text-white rounded-full w-15 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   1
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
-                    Exceptional Expertise
-                  </h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">Exceptional Expertise</h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    Choose us because of our extensive experience and expertise
-                    in the cleaning industry. Our dedicated team is highly
-                    skilled and trained to deliver top-notch services that meet
-                    your exact needs.
+                    Choose us because of our extensive experience and expertise in the cleaning industry.
+                    Our dedicated team is highly skilled and trained to deliver top-notch services that
+                    meet your exact needs.
                   </p>
                 </div>
-              </div>
-              <div className="flex items-start">
+              </motion.div>
+
+              {/* Item 2 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="flex items-start"
+              >
                 <div className="bg-[#382C28] text-white rounded-full w-19 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   2
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
-                    High-Quality Standards
-                  </h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">High-Quality Standards</h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    When you choose us, you opt for the highest standards of
-                    cleanliness and hygiene. We maintain strict quality control
-                    procedures, using industry-leading equipment and
-                    eco-friendly products to ensure exceptional results every
-                    time.
+                    When you choose us, you opt for the highest standards of cleanliness and hygiene.
+                    We maintain strict quality control procedures, using industry-leading equipment
+                    and eco-friendly products.
                   </p>
                 </div>
-              </div>
-              <div className="flex items-start">
+              </motion.div>
+
+              {/* Item 3 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="flex items-start"
+              >
                 <div className="bg-[#382C28] text-white rounded-full w-25 h-8 flex items-center justify-center font-bold mr-4 text-base">
                   3
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
-                    Customer-Centric Approach
-                  </h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">Customer-Centric Approach</h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
                     We prioritize our customers’ satisfaction and convenience.
-                    Our friendly and responsive customer support team is always
-                    ready to address your concerns, making your experience with
-                    us smooth and hassle-free. Your feedback and preferences are
-                    valued, allowing us to continuously improve our services.
+                    Our friendly and responsive support team ensures a smooth
+                    and hassle-free experience.
                   </p>
                 </div>
-              </div>
+              </motion.div>
+
             </div>
-          </div>
+          </motion.div>
+
         </div>
       </section>
 
+
       {/* Three Easy Steps Section */}
-      <div className="w-full flex justify-center items-center mt-8 md:mt-12">
+      <motion.div
+        className="w-full flex justify-center items-center mt-8 md:mt-12"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
         <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-black text-center px-4">
           Getting Our Services in Three <br /> Easy Steps
         </h2>
-      </div>
+      </motion.div>
+
       <div className="relative flex items-center justify-center w-full mt-8 md:mt-10">
         <svg
           viewBox="0 0 1000 120"
@@ -579,68 +784,87 @@ export default function Home() {
           <circle cx="0" cy="80" r="5" fill="#808080" />
           <circle cx="1000" cy="40" r="5" fill="#808080" />
         </svg>
+
         <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[850px] z-10 px-4">
-          <div className="flex flex-col items-center mb-6 sm:mb-0">
+
+          {/* Step 1 */}
+          <motion.div
+            className="flex flex-col items-center mb-6 sm:mb-0"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img
-                  src={one}
-                  alt="Step 1"
-                  className="w-full h-full object-cover"
-                />
+                <img src={one} alt="Step 1" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-1 right-4 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 1
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">
-              Book Service Online
-            </p>
-          </div>
-          <div className="flex flex-col items-center mb-6 sm:mb-0 sm:translate-y-8">
+            <p className="mt-3 font-bold text-sm sm:text-base">Book Service Online</p>
+          </motion.div>
+
+          {/* Step 2 */}
+          <motion.div
+            className="flex flex-col items-center mb-6 sm:mb-0 sm:translate-y-8"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img
-                  src={two}
-                  alt="Step 2"
-                  className="w-full h-full object-cover"
-                />
+                <img src={two} alt="Step 2" className="w-full h-full object-cover" />
               </div>
               <div className="absolute top-2 -right-1 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 2
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">
-              Wait till Completion
-            </p>
-          </div>
-          <div className="flex flex-col items-center">
+            <p className="mt-3 font-bold text-sm sm:text-base">Wait till Completion</p>
+          </motion.div>
+
+          {/* Step 3 */}
+          <motion.div
+            className="flex flex-col items-center"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img
-                  src={three}
-                  alt="Step 3"
-                  className="w-full h-full object-cover"
-                />
+                <img src={three} alt="Step 3" className="w-full h-full object-cover" />
               </div>
               <div className="absolute -bottom-1 right-3 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 3
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">
-              Enjoy the Services
-            </p>
-          </div>
+            <p className="mt-3 font-bold text-sm sm:text-base">Enjoy the Services</p>
+          </motion.div>
+
         </div>
       </div>
 
+
       {/* Pricing Section */}
       <div className="w-full bg-[#382C28] py-8 md:py-16 px-4 text-center mt-15">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+
+        {/* Heading Animation */}
+        <motion.h2
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-white"
+        >
           Transparent & Flexible Pricing <br />
           to Match Your Needs & Budget
-        </h2>
+        </motion.h2>
+
         <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col md:flex-row md:justify-center md:gap-5 max-w-[90%] lg:max-w-[70%]">
+
           {[
             {
               title: "₹999",
@@ -670,20 +894,25 @@ export default function Home() {
               ],
             },
           ].map((plan, index) => (
-            <div
+            <motion.div
               key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: index * 0.25 }}
+              viewport={{ once: true }}
               className="group bg-white p-2 sm:p-6 rounded-lg shadow-lg text-center transition-all duration-300 flex flex-col justify-between mb-6 md:mb-0 flex-1"
+              whileHover={{ scale: 1.03 }}
             >
               <div>
                 <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382C28] group-hover:text-[#228B22] mb-4 transition">
                   {plan.title}
                 </h3>
+
                 <p className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-6 md:mt-10 transition">
                   {plan.price}
-                  <span className="text-sm sm:text-base md:text-xl font-medium">
-                    /yr.
-                  </span>
+                  <span className="text-sm sm:text-base md:text-xl font-medium">/yr.</span>
                 </p>
+
                 <ul className="mt-6 md:mt-10 space-y-2 flex flex-col items-start w-full text-left px-2 sm:px-4">
                   {plan.features.map((feature, i) => (
                     <li
@@ -699,11 +928,7 @@ export default function Home() {
                           stroke="currentColor"
                           strokeWidth="3"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </span>
                       {feature}
@@ -711,22 +936,32 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
+
               <button
                 onClick={handleBookNowClick}
                 className="bg-gray-200 text-[#382C28] group-hover:bg-[#228B22] group-hover:text-white font-semibold py-2 sm:py-3 px-5 sm:px-7 rounded transition mt-6 cursor-pointer"
               >
                 BOOK NOW
               </button>
-            </div>
+
+            </motion.div>
           ))}
+
         </div>
       </div>
 
       {/* Testimonials Section */}
       <div className="w-full max-w-[90%] mx-auto py-8 md:py-16 px-4 text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-[#382C28] mb-8 md:mb-12">
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-2xl sm:text-3xl md:text-5xl font-bold text-[#382C28] mb-8 md:mb-12"
+        >
           Hear What Our Satisfied Customers <br /> Have to Say
-        </h2>
+        </motion.h2>
+
         <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {[
             {
@@ -750,41 +985,121 @@ export default function Home() {
               text: "We love the customized cleaning package they offer. It's great to choose the specific services we need, and the team always delivers a thorough and detailed cleaning. Couldn't be happier!",
             },
           ].map((testimonial, index) => (
-            <div key={index} className="text-center">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="text-center"
+            >
               <img
                 src={testimonial.image}
                 alt={testimonial.name}
                 className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full mb-4 object-cover"
               />
+
               <p className="text-[#808080] text-xs sm:text-sm md:text-base mb-4">
                 {testimonial.text}
               </p>
+
               <h3 className="font-bold text-[#382C28] text-base sm:text-lg">
                 {testimonial.name}
               </h3>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
 
       {/* Footer Image Section */}
-      <div className="relative w-full flex justify-center items-center mt-8 md:mt-12">
-        <img
+      {/* Mobile Layout (Image top, Green box below) */}
+      <div className="flex flex-col items-center justify-center mt-8 md:hidden w-full">
+
+        {/* Image */}
+        <motion.img
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           src={footer}
           alt="Service Illustration"
-          className="w-full max-w-[90%] h-auto max-h-[400px] sm:max-h-[536px] object-cover rounded-lg shadow-lg"
+          className="w-full max-w-[95%] h-auto 
+      max-h-[260px] object-cover rounded-lg shadow-lg"
         />
-        <div className="absolute bg-[#228B22] w-[90%] sm:w-[82%] h-[60%] rounded-lg flex flex-col items-center justify-center">
-          <p className="text-white text-xl sm:text-2xl md:text-4xl font-bold text-center px-4">
-            Click here to post your project and get <br /> started! ffff
+
+        {/* Green Box (Below) */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="bg-[#228B22] w-[90%] mt-4 rounded-lg flex flex-col 
+        items-center justify-center py-6 px-3"
+        >
+          <p className="text-white text-xl font-bold text-center px-2">
+            Click here to post your project <br /> and get started!
           </p>
 
-          <button onClick={handlePostWorkClick} className=" mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold px-6 sm:px-9 py-2 sm:py-3 rounded-sm shadow hover:bg-gray-100 cursor-pointer">
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            onClick={handlePostWorkClick}
+            className="mt-4 bg-white text-[#228B22] font-semibold 
+        px-6 py-2 rounded-sm shadow hover:bg-gray-100 cursor-pointer"
+          >
             Post Work
-          </button>
-
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
+
+      {/* Desktop / Tablet Layout (Same as your original) */}
+      <div className="relative w-full justify-center items-center mt-8 md:mt-12 hidden md:flex">
+
+        <motion.img
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          src={footer}
+          alt="Service Illustration"
+          className="w-full max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] h-auto 
+        max-h-[300px] sm:max-h-[380px] md:max-h-[450px] lg:max-h-[520px]
+        object-cover rounded-lg shadow-lg"
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="absolute bg-[#228B22] w-[90%] sm:w-[82%] lg:w-[70%]
+        h-[55%] sm:h-[60%] md:h-[65%]
+        rounded-lg flex flex-col items-center justify-center
+        px-2 sm:px-4"
+        >
+          <p className="text-white text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center px-2 sm:px-4">
+            Click here to post your project and get <br /> started!
+          </p>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            onClick={handlePostWorkClick}
+            className="mt-4 sm:mt-6 bg-white text-[#228B22] font-semibold 
+        px-5 sm:px-9 py-2 sm:py-3 rounded-sm shadow 
+        hover:bg-gray-100 cursor-pointer"
+          >
+            Post Work
+          </motion.button>
+        </motion.div>
+
+      </div>
+
+
 
       <div className="mt-8 md:mt-10">
         <Footer />
