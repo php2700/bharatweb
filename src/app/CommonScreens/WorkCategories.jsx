@@ -32,6 +32,9 @@ export default function WorkCategories() {
   const [directHiring, setDirectHiring] = useState([]);
   const [directHiringLoading, setDirectHiringLoading] = useState(false);
   const [directHiringError, setDirectHiringError] = useState(null);
+    const [expandedDesc, setExpandedDesc] = useState({});
+    const [expandedLoc, setExpandedLoc] = useState({});
+
   // Fetch categories
   const visibleDirectHiring = directHiring.slice(0, 4);
   // console.log("visibleDirectHiring", visibleDirectHiring);
@@ -65,7 +68,6 @@ export default function WorkCategories() {
       setLoading(false);
     }
   };
-  
 
   // Fetch direct hiring
   const fetchDirectHiring = async () => {
@@ -82,6 +84,8 @@ export default function WorkCategories() {
 
       if (res.ok) {
         if (Array.isArray(data.data)) {
+
+          
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id || "",
@@ -90,9 +94,10 @@ export default function WorkCategories() {
               description:
                 item.description ||
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-              amount: item.platform_fee || "₹200",
+              amount: item.service_payment.amount,
               location: item.address || "Indore M.P.",
             }))
+
           );
         } else {
           setDirectHiring([]);
@@ -232,7 +237,70 @@ useEffect(() => {
     autoplaySpeed: 3000,
     arrows: true,
   };
+  
+  const toggleLoc = (id) => {
+    setExpandedLoc((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
   // console.log("images",bannerImages);
+    const DescriptionText = ({ text, id, expandedDesc, toggleDesc }) => {
+    const isExpanded = expandedDesc[id];
+    const limit = 60;
+    const displayText = isExpanded ? text : text.slice(0, limit);
+    const showButton = text.length > limit;
+
+    return (
+      <div className="text-gray-600 text-xs mt-2 w-full">
+        <p className="break-words whitespace-normal leading-relaxed">
+          {capitalizeFirst(displayText)}
+          {!isExpanded && !showButton && "..."}
+          
+          {showButton && (
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDesc(id);
+              }}
+              className="text-[#228B22] font-semibold cursor-pointer ml-1 hover:underline"
+            >
+              {isExpanded ? "See less" : "See more"}
+            </span>
+          )}
+        </p>
+      </div>
+    );
+  };
+  const LocationText = ({ text, id }) => {
+      const isExpanded = expandedLoc[id];
+      const limit = 35; // Characters limit
+      const displayText = isExpanded ? text : text.slice(0, limit);
+      const showButton = text.length > limit;
+  
+      return (
+        <div className="flex items-start gap-2 mt-2 text-gray-600 text-sm w-full">
+          <FaMapMarkerAlt className="text-[#228B22] flex-shrink-0 mt-1" size={16} />
+          <div className="flex-1 min-w-0">
+            <p className="break-words whitespace-normal leading-tight text-xs">
+              {capitalizeFirst(displayText)}
+              {!isExpanded && showButton && "..."}
+              
+              {showButton && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleLoc(id);
+                  }}
+                  className="text-blue-600 font-semibold cursor-pointer ml-1 hover:underline whitespace-nowrap"
+                >
+                  {isExpanded ? "See less" : "See more"}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      );
+    };
+
+
   return (
     <>
       <Header />
@@ -337,77 +405,37 @@ useEffect(() => {
                   </button>
                 )}
               </div>
-
-              {directHiringLoading ? (
-                <p className="text-gray-500 text-center">
-                  Loading direct hiring tasks...
-                </p>
-              ) : directHiringError ? (
-                <p className="text-red-500 text-center">
-                  Error: {directHiringError}
-                </p>
-              ) : directHiring.length > 0 ? (
+              {directHiringLoading ? <p className="text-center">Loading...</p> : directHiring.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {visibleDirectHiring.map((card, index) => (
-                    <div
-                      key={index}
-                      className="bg-white rounded-xl shadow-md p-2"
-                    >
-                      <div className="relative w-full">
-                        <img
-                          src={card?.image}
-                          alt={capitalizeFirst(card?.work || "Work")}
-                          className="w-full h-36 object-cover rounded-2xl"
-                        />
-                        {/* <div
-                          className="absolute bottom-2 right-2 px-4 py-1 rounded-full text-white text-sm"
-                          style={{ backgroundColor: "#372E27" }}
-                        >
-                          Add Feature
-                        </div> */}
+                  {visibleDirectHiring.map((card) => (
+                    <div key={card.id} className="bg-white rounded-xl shadow-md p-3 flex flex-col h-full">
+                      <div className="relative w-full h-36">
+                        <img src={card.image} alt={card.work} className="w-full h-full object-cover rounded-xl" />
                       </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <h3 className="text-xl font-semibold text-[#228B22] max-md:text-lg">
-                          {capitalizeFirst(card.work)}
-                        </h3>
-                       {/* <p className="text-black font-medium max-md:text-sm">
-                          ₹{card.amount}
-                        </p> */}
+                      <div className="flex items-center justify-between mt-3">
+                        <h3 className="text-lg font-semibold text-[#228B22] truncate w-[70%]">{capitalizeFirst(card.work)}</h3>
+                        <p className="text-black font-medium text-sm">₹{card.amount}</p>
                       </div>
-                      <p className="text-gray-600 max-w-[87%] text-xs mt-1">
-                        {(() => {
-                          const words = card.description?.split(" ") || [];
-                          const limitedText = words.slice(0, 20).join(" ");
-                          return capitalizeFirst(
-                            words.length > 20
-                              ? `${limitedText}...`
-                              : limitedText
-                          );
-                        })()}
-                      </p>
 
-                      <div
-                        className="inline-block px-5 mt-2 rounded-full text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap"
-                        style={{ backgroundColor: "#F27773", width: "100px" }}
-                      >
-                        {capitalizeFirst(card.location)}
-                      </div>
-                      <div
-                        className="px-1 py-1 mt-2 rounded-lg text-[#228B22] text-base border border-[#228B22] w-[60%] font-semibold text-center mx-auto cursor-pointer hover:bg-[#228B22] hover:text-white transition max-md:text-sm"
-                        onClick={() =>
-                          navigate(`/my-hire/order-detail/${card.id}`)
-                        }
-                      >
-                        View Details
+                    
+                      <DescriptionText text={card.description || "No Description"} id={card.id}  expandedDesc={expandedDesc}
+ />
+
+                     
+                      <LocationText text={card.location || "Location not available"} id={card.id} />
+
+                      <div className="mt-auto pt-3">
+                        <div className="px-1 py-2 rounded-lg text-[#228B22] text-sm border border-[#228B22] w-full font-semibold text-center cursor-pointer hover:bg-[#228B22] hover:text-white transition"
+                          onClick={() => navigate(`/hire/worker/order-detail/${card.id}`)}>
+                          View Details
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <p className="text-gray-500 text-center">
-                  No direct hiring tasks available
-                </p>
-              )}
+              ) : <p className="text-center text-gray-500">No direct hiring tasks</p>}
+
+          
             </div>
           </div>
         </div>

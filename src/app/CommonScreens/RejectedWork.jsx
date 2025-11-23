@@ -397,10 +397,11 @@ export default function RejectedWorklist() {
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()
             : "No deadline",
-          status: t.hire_status || t.status || "rejected",
+          status: t.hire_status|| "rejected",
           location: t.google_address || t.location || t.address || "Unknown",
           latitude: t.latitude || null,
           longitude: t.longitude || null,
+            offer_history: t.offer_history || []
         }));
 
         setTaskData(mapped);
@@ -634,10 +635,11 @@ export default function RejectedWorklist() {
                       navigate(
                         activeTab === "Direct Rejected"
                           ? `/worker/reject-worker/rejected-details`
-                          : `/bidding/worker/order-detail/${task.id}`,
+                          : `/worker/rejected-worker/bid-details`,
                         {
                           state: {
                             task: {
+                               id: task.id || task.order_id || task._id, 
                               title:
                                 task.title ||
                                 task.name ||
@@ -679,8 +681,11 @@ export default function RejectedWorklist() {
                                 task.rejected_offer?.reason,
 
                               description: task.description,
-                            },
+                                 hire_status: task.status,
+                       offer_history: task.offer_history,
+                    },
                           },
+                    // state:{task}
                         }
                       )
                     }

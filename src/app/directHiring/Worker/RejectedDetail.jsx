@@ -24,7 +24,7 @@ export default function RejectedWorkDetails() {
   const navigate = useNavigate();
   const task = state?.task;
   console.log(task);
-
+  console.log(task.offer_history);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [openImage, setOpenImage] = useState(null);
@@ -109,7 +109,6 @@ export default function RejectedWorkDetails() {
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-
           {images.length > 0 ? (
             <Carousel
               showArrows={true}
@@ -138,7 +137,6 @@ export default function RejectedWorkDetails() {
             />
           )}
 
-     
           {openImage && (
             <div
               className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
@@ -197,21 +195,44 @@ export default function RejectedWorkDetails() {
                       ).toLocaleDateString("en-GB")
                     : "N/A"}
                 </span>
+               <div className="flex items-center gap-2">
+  <span className="text-gray-700 font-semibold">Order_Status:</span>
 
-                <div className="bg-red-600 text-white px-4 py-1 rounded-full text-sm block text-center">
-                  Rejected
+  <div
+    className={`px-4 py-1 rounded-full text-sm text-white flex items-center gap-2
+      ${
+        task?.hire_status === "pending"
+          ? "bg-yellow-500"
+          : task?.hire_status === "cancelled"
+          ? "bg-red-500"
+          : task?.hire_status === "completed"
+          ? "bg-[#228B22]"
+          : task?.hire_status === "cancelledDispute"
+          ? "bg-[#FF0000]"
+          : task?.hire_status === "accepted"
+          ? "bg-[#228B22]"
+          : "bg-gray-500"
+      }
+    `}
+  >
+    <p className="text-white text-sm">
+      {task?.hire_status
+        ? task.hire_status.charAt(0).toUpperCase() + task.hire_status.slice(1)
+        : ""}
+    </p>
+  </div>
+
+
                 </div>
               </div>
             </div>
 
-           
             <div className="border-2 border-green-600 rounded-xl p-4 bg-green-50 mb-8">
               <p className="text-gray-700 text-lg leading-relaxed">
                 {task.description}
               </p>
             </div>
 
-           
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-black mb-4">
                 User Details
@@ -232,12 +253,14 @@ export default function RejectedWorkDetails() {
                       </h3>
                     </div>
                   </div>
-
-                  <div className="text-center">
-                    <div className="px-3 py-2 rounded-full text-white text-sm font-medium bg-red-500">
-                      Rejected by you
-                    </div>
+                  <div className="px-3 py-2 rounded-full text-white text-sm font-medium bg-red-500">
+                    {task?.offer_history && task.offer_history.length > 0
+                      ? task.offer_history[0].isRejectedByUser
+                        ? "Rejected by you"
+                        : "Rejected by user"
+                      : "No offer history"}
                   </div>
+                
                 </div>
               </div>
             </div>
@@ -245,7 +268,6 @@ export default function RejectedWorkDetails() {
         </div>
       </div>
 
-  
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden h-[400px] my-16 bg-[#f2e7ca]">
         {bannerLoading ? (
           <div className="flex items-center justify-center h-full text-gray-600">
