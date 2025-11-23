@@ -18,13 +18,15 @@ import paymentConfirmationImage from "../../../assets/paymentconfirmation.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUserProfile } from "../../../redux/userSlice";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
 
 const Post = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.user);
   const [showOptions, setShowOptions] = useState();
   const [categories, setCategories] = useState([]);
@@ -32,6 +34,7 @@ const Post = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState();
 
@@ -103,7 +106,7 @@ const Post = () => {
 
   document.head.appendChild(script);
 };
-
+ 
 useEffect(() => {
   if (!isAddAddressModalOpen) return;
 
@@ -180,39 +183,7 @@ useEffect(() => {
 }, [isAddAddressModalOpen]);
 
 
-// Save New Address Function (Fix)
-const handleSaveNewAddress = async () => {
-  if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
-    Swal.fire({
-      icon: "error",
-      text: "Please fill required fields!",
-    });
-    return;
-  }
 
-  const obj = {
-    title: newTitle,
-    landmark: newLandmark,
-    address: pickedLocation.address,
-    latitude: pickedLocation.latitude,
-    longitude: pickedLocation.longitude,
-  };
-
-  try {
-    await axios.post(`${BASE_URL}/user/addAddress`, obj, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    Swal.fire({
-      icon: "success",
-      text: "Address Added Successfully!",
-    });
-
-    setIsAddAddressModalOpen(false);
-  } catch (err) {
-    console.log(err);
-  }
-};
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -649,19 +620,99 @@ const handleSaveNewAddress = async () => {
 
   const updateAddress = async (location) => {
     try {
-      let obj = {
-        latitude: location?.latitude,
-        longitude: location?.longitude,
-        address: location?.address,
-      };
-      let res = await axios.put(`${BASE_URL}/user/updateLocation`, obj, {
-        headers: { Authorization: `Bearer ${token}` },
+      const t = localStorage.getItem("bharat_token") || token;
+      // Call the same endpoint and flow used in NewTask.jsx so header/profile updates correctly
+      const res = await fetch(`${BASE_URL}/user/updatelocation`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${t}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          latitude: location?.latitude || 28.6139,
+          longitude: location?.longitude || 77.2090,
+          address: location?.address || "",
+        }),
       });
+
+      if (res.ok) {
+        // update local UI state to reflect chosen address
+        setAddress(location?.address || "");
+        // persist a small hint for other parts of the app (same as NewTask)
+        if (location?._id) localStorage.setItem("selectedAddressId", location._id);
+        if (location?.address) localStorage.setItem("selectedAddressTitle", location.address);
+
+        // refresh profile in redux so Header picks up the new location
+        try {
+          dispatch(fetchUserProfile());
+        } catch (e) {
+          console.warn("fetchUserProfile dispatch failed:", e);
+        }
+      } else {
+        const data = await res.json().catch(() => ({}));
+        console.error("Failed to update location:", data);
+      }
     } catch (error) {
       console.log(error, "gg");
     }
   };
+// Save New Address Function (Fix)
+  // ================= SAVE NEW ADDRESS API =================
+ const handleSaveNewAddress = async () => {
+  if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
+    return Swal.fire("Required", "Please fill all required fields and pick a location on the map", "warning");
+  }
 
+  const newAddress = {
+    title: newTitle,
+    houseno: newHouseNo,
+    street: newStreet || "",
+    area: newArea || "",
+    pincode: newPincode,
+    landmark: newLandmark || "",
+    address: pickedLocation.address,
+    latitude: pickedLocation.latitude,
+    longitude: pickedLocation.longitude,
+  };
+
+  const body = {
+    location: {
+      latitude: pickedLocation.latitude,
+      longitude: pickedLocation.longitude,
+      address: pickedLocation.address
+    },
+    full_address: [...(profile.full_address || []), newAddress]
+  };
+
+  try {
+    if (!token) throw new Error("Not authenticated");
+
+    const res = await axios.post(
+      `${BASE_URL}/user/updateUserProfile`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    Swal.fire("Success", "Address added successfully!", "success");
+
+    setIsAddAddressModalOpen(false);
+
+    // save new address in UI
+    setSelectedAddress(newAddress.address);
+
+    // refresh redux
+    dispatch(fetchUserProfile());
+
+  } catch (err) {
+    console.log("API Error Response:", err.response?.data);
+    Swal.fire("Error", err.response?.data?.message || "Failed to save new address", "error");
+  }
+};
   return (
     <>
       <Header />
