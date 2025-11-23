@@ -208,9 +208,13 @@ export default function Profile() {
     } else if (tempAddress.area.length < 3) {
       newErrors.area = "Area name should be at least 3 characters long";
     }
-    if (!tempAddress.pincode.trim()) newErrors.pincode = "Pincode is required";
-    else if (!/^\d{6}$/.test(tempAddress.pincode))
-      newErrors.pincode = "Pincode must be 6 digits";
+     if (!tempAddress.pincode.toString().trim()) {
+      newErrors.pincode = "Pincode is required";
+    } else if (tempAddress.pincode.length !== 6) {
+      newErrors.pincode = "Pincode must be exactly 6 digits";
+    } else if (!/^\d{6}$/.test(tempAddress.pincode)) {
+      newErrors.pincode = "Pincode must contain only numbers";
+    }
 
     if (!tempAddress.address)
       newErrors.address = "Please select address on map";
@@ -473,7 +477,7 @@ export default function Profile() {
               </div>
 
               {/* ---- DETAILED ADDRESS FIELDS ---- */}
-              {[
+              {/* {[
                 ["title", "Title"],
                 ["landmark", "Landmark"],
                 ["houseNo", "House No"],
@@ -488,7 +492,44 @@ export default function Profile() {
                     value={tempAddress[key]}
                     onChange={(e) =>
                       setTempAddress({ ...tempAddress, [key]: e.target.value })
+                      
                     }
+                    
+                    className="w-full border-2 border-gray-300 rounded-lg p-2"
+                  />
+                  {addressErrors[key] && (
+                    <p className="text-red-500 text-xs text-left mt-1">
+                      {addressErrors[key]}
+                    </p>
+                  )}
+                </div>
+              ))} */}
+              {/* ---- DETAILED ADDRESS FIELDS ---- */}
+              {[
+                ["title", "Title"],
+                ["landmark", "Landmark"],
+                ["houseNo", "House No"],
+                ["street", "Street"],
+                ["area", "Area"],
+                ["pincode", "Pincode"],
+              ].map(([key, label]) => (
+                <div key={key}>
+                  <input
+                    type={key === "pincode" ? "tel" : "text"} // Mobile keypad open karne ke liye tel type
+                    placeholder={label}
+                    maxLength={key === "pincode" ? 6 : undefined} // Max length attribute HTML level pe
+                    value={tempAddress[key]}
+                    onChange={(e) => {
+                      let val = e.target.value;
+                      
+                      // ✅ Yahan Validation Lagaya Hai
+                      if (key === "pincode") {
+                        // Sirf numbers allow karega aur max 6 digits rakhega
+                        val = val.replace(/[^0-9]/g, "").slice(0, 6);
+                      }
+
+                      setTempAddress({ ...tempAddress, [key]: val });
+                    }}
                     className="w-full border-2 border-gray-300 rounded-lg p-2"
                   />
                   {addressErrors[key] && (

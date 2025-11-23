@@ -6,7 +6,7 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 // import Warning from "../../../assets/ViewProfile/warning.svg";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning2.png";
+import Warning2 from "../../../assets/warning3.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import CallIcon from "../../../assets/call.png";
 import ChatIcon from "../../../assets/chat.png";
@@ -1956,12 +1956,12 @@ export default function ViewProfile() {
               )}
             </GoogleMap>
                <div className="mt-4 text-center">
-        <button
+        {/* <button
           onClick={() => handleGetDirections(orderData?.address)}
           className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
         >
           Get Directions
-        </button>
+        </button> */}
       </div>
           </div>
         </div>
