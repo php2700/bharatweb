@@ -931,7 +931,7 @@ export default function ServiceProviderHome() {
                 e.stopPropagation();
                 toggleDesc(id);
               }}
-              className="text-[#228B22] font-semibold cursor-pointer ml-1 hover:underline"
+              className="text-blue-600 font-semibold cursor-pointer ml-1 hover:underline"
             >
               {isExpanded ? "See less" : "See more"}
             </span>
