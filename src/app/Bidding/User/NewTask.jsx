@@ -173,6 +173,9 @@ export default function BiddingNewTask() {
   localStorage.setItem("selectedAddressId", addr._id);
   localStorage.setItem("selectedAddressTitle", addr.address);
 
+  // also update formData.googleAddress so form submit works immediately
+  setFormData((prev) => ({ ...prev, googleAddress: addr.address }));
+
   // Close dropdown
   setShowDropdown(false);
 
@@ -436,6 +439,8 @@ export default function BiddingNewTask() {
   useEffect(() => {
     if (profile?.location?.address) {
       setSelectedAddress(profile.location.address);
+      // ensure formData.googleAddress stays in sync with profile location
+      setFormData((prev) => ({ ...prev, googleAddress: profile.location.address }));
     }
   }, [profile?.location?.address]);
 
