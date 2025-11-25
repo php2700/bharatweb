@@ -23,6 +23,8 @@ const loadGoogleMapsScript = (callback) => {
   return () => document.body.removeChild(script);
 };
 
+
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
 
@@ -218,6 +220,7 @@ const DirectHiring = () => {
 
   // When selecting an existing address from dropdown: update main location with that address
   const updateAddress = async (locationObj) => {
+		console.log("loc", locationObj)
     try {
       const body = {
         location: {
@@ -232,9 +235,12 @@ const DirectHiring = () => {
       });
       // Set in UI immediately
       setAddress(locationObj.address);
+			localStorage.setItem("selectedAddressId", locationObj._id)
+			localStorage.setItem("selectedAddressTitle", locationObj.address)
+			 dispatch(fetchUserProfile());			
       Swal.fire("Success", "Location updated", "success");
       // refresh to get latest full_address list from server (or you can dispatch redux action)
-      window.location.reload();
+     
     } catch (err) {
       console.error("Error updating location", err);
       Swal.fire("Error", "Failed to update location", "error");

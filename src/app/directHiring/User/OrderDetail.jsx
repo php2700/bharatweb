@@ -124,6 +124,8 @@ export default function ViewProfile() {
     }
   };
  useEffect(() => {
+    fetchData();
+    fetchBannerImages();
   const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
 
   if (!hasSeenModal) {
@@ -134,13 +136,13 @@ export default function ViewProfile() {
       confirmButtonText: "OK",
     }).then(() => {
       window.scrollTo(0, 0);
-      fetchBannerImages();
 
       // Mark modal as seen for this login session
       sessionStorage.setItem("hasSeenIDModal", "true");
     });
   }
-}, []);
+}, [id]);
+
 
 
 
@@ -977,6 +979,8 @@ export default function ViewProfile() {
     return address.substring(0, maxLength) + "...";
   };
   const images = Array.isArray(orderData?.image_url) ? orderData.image_url : [];
+   console.log("Final Order Data:", orderData);
+  console.log("Dispute Info:", disputeInfo);
   return (
     <>
       <Header />
@@ -1478,9 +1482,14 @@ export default function ViewProfile() {
                 </button>
               ) : orderData?.hire_status === "cancelledDispute" ? (
                 <>
-                  <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                  {/* <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                     Cancelled ({disputeInfo.unique_id || "No Id"})
-                  </span>
+                  </span> */}
+                     <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
+      <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-red-700">
+        Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
+      </span>
+    </Link>
 
                   <p className="text-sm text-gray-700 mt-3">
                     Note:{" "}
@@ -1687,7 +1696,7 @@ export default function ViewProfile() {
         </div>
       )}
 
-      {showChangeProvider &&
+      {/* {showChangeProvider &&
         orderData?.hire_status !== "cancelled" &&
         orderData?.hire_status !== "cancelled task" &&
         !isHired &&
@@ -1737,9 +1746,7 @@ export default function ViewProfile() {
                           {worker.full_name || "Unknown Worker"}{" "}
                           <span>({worker.unique_id})</span>
                         </p>
-                        {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                          {worker.location?.address || "No Address Provided"}
-                        </p> */}
+                        
 
                         <div className="flex items-start gap-2 mt-2">
                           <FaMapMarkerAlt
@@ -1788,7 +1795,120 @@ export default function ViewProfile() {
               )}
             </div>
           </div>
+        )} */}
+        
+
+      {showChangeProvider &&
+        orderData?.hire_status !== "cancelled" &&
+        orderData?.hire_status !== "cancelled task" &&
+        !isHired && (
+          <div className="container mx-auto px-4 py-6 max-w-4xl">
+            <h2 className="text-2xl font-bold text-black mb-4 mx-auto text-center">
+              Search other worker with Same categories
+            </h2>
+            <h2 className="text-lg font-bold text-[#FB3523] mb-4 mx-auto text-center -mt-4">
+              (Note: You can hire only one worker on this task.)
+            </h2>
+            
+            {/* Search Bar - यह हमेशा दिखेगा */}
+            <div className="relative mb-4">
+              <input
+                type="text"
+                placeholder="Search providers by name..."
+                className="w-full p-2 pl-10 rounded-lg focus:outline-none bg-[#F5F5F5]"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+              <span className="absolute left-3 top-2.5">
+                <img
+                  src={Search}
+                  alt="Search"
+                  className="w-5 h-5 text-gray-400"
+                />
+              </span>
+            </div>
+
+            <div className="mb-6">
+              {relatedWorkersLoading ? (
+                <div className="text-center text-gray-600">
+                  Loading related workers...
+                </div>
+              ) : filteredRelatedWorkers.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredRelatedWorkers.map((worker) => (
+                    <div
+                      key={worker._id}
+                      className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
+                    >
+                      <img
+                        src={worker.profile_pic || Profile}
+                        alt={`Profile of ${worker.full_name || "Worker"}`}
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                      <div className="flex-1">
+                        <p className="text-lg font-semibold">
+                          {worker.full_name || "Unknown Worker"}{" "}
+                          <span>({worker.unique_id})</span>
+                        </p>
+                        <div className="flex items-start gap-2 mt-2">
+                          <FaMapMarkerAlt
+                            className="text-red-500 mt-1 flex-shrink-0"
+                            color="#228B22"
+                            size={20}
+                          />
+                          <div className="flex-1">
+                            <p className="text-gray-700 text-sm">
+                              {truncateAddress(
+                                worker.location?.address,
+                                worker._id
+                              )}
+                              {worker.location?.address &&
+                                worker.location.address.length > 50 && (
+                                  <button
+                                    onClick={() => toggleAddress(worker._id)}
+                                    className="text-green-600 font-semibold ml-2 hover:underline text-sm"
+                                  >
+                                    {expandedAddresses[worker._id]
+                                      ? "See Less"
+                                      : "See More"}
+                                  </button>
+                                )}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRouteHire(worker._id, false)}
+                          className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                        >
+                          View Profile
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+                          onClick={() => handleHire(worker._id)}
+                        >
+                          Hire
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-600 py-8">
+                  <h2 className="text-xl font-semibold">No Providers Found</h2>
+                  <p className="mt-2">
+                    {searchQuery
+                      ? `No providers found matching "${searchQuery}"`
+                      : "There are no other providers available in this category."}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         )}
+
+    
 
       {/* Related Workers Section */}
       {/*orderData?.hire_status !== "cancelled" &&

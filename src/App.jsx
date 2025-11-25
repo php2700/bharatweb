@@ -94,6 +94,7 @@ import  RejectedWork from "./app/CommonScreens/RejectedWork"
 import BiddingRejectedWork from "./app/Bidding/Worker/BiddingRejectedWork"
 import EmergencyRejectedWork from "./app/emergency/Worker/EmergencyRejectedWork"
 import RejectedDetail from "./app/directHiring/Worker/RejectedDetail"
+import BidRejectedDetails from "./app/Bidding/Worker/BidRejectedDetails"
 
 export default function App() {
   if ("serviceWorker" in navigator) {
@@ -236,6 +237,7 @@ export default function App() {
           path="/worker/reject-worker/rejected-details"
           element={<RejectedDetail/>}
         />
+        <Route path="/worker/rejected-worker/bid-details" element={<BidRejectedDetails/>} />
 
 
         {/* // Emergency Routes- User */}
@@ -275,10 +277,12 @@ export default function App() {
           element={<DirectProviderordetail />}
         />
         <Route path="/disputes" element={<DisputePage />} />
+         <Route path="/disputes/:flowType/:id" element={<DisputePage />} />
 
         <Route
           path="/bidding/order-detail/:id"
           element={<BiddinggetWorkDetail />}
+          
         />
       </Routes>
     </>

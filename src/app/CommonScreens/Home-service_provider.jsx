@@ -931,7 +931,7 @@ export default function ServiceProviderHome() {
                 e.stopPropagation();
                 toggleDesc(id);
               }}
-              className="text-[#228B22] font-semibold cursor-pointer ml-1 hover:underline"
+              className="text-blue-600 font-semibold cursor-pointer ml-1 hover:underline"
             >
               {isExpanded ? "See less" : "See more"}
             </span>
@@ -1175,6 +1175,7 @@ export default function ServiceProviderHome() {
               <div className="max-w-[90%] mx-auto mt-[100px] mb-10">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-black max-md:text-lg">Emergency</h2>
+									
                   {emergency.length > 4 && (
                     <button onClick={() => handleSeeAll("/emergency/tasks")} className="text-black font-medium hover:text-[#228B22]">See All</button>
                   )}
