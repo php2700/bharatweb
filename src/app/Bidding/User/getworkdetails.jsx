@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { SlidersHorizontal, Search } from "lucide-react";
+import { SlidersHorizontal, Search, MapPin } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
 import Slider from "react-slick";
@@ -919,7 +919,7 @@ export default function BiddinggetWorkDetail() {
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
-            <h3 className="text-lg font-semibold">Work Title</h3>
+            <h3 className="text-sm font-semibold">Project Description</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div>
@@ -1078,8 +1078,8 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("bidder")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${tab === "bidder"
-                          ? "bg-[#228B22] text-white border-3"
-                          : "bg-gray-100 text-[#228B22]"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Bidder
@@ -1087,8 +1087,8 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("related")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${tab === "related"
-                          ? "bg-[#228B22] text-white border-3"
-                          : "bg-gray-100 text-[#228B22]"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Related Worker
@@ -1130,7 +1130,8 @@ export default function BiddinggetWorkDetail() {
                                 <p className="text-sm text-gray-500 truncate max-w-[200px]">
                                   {provider.skill || "No skill listed"}
                                 </p>
-                                <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
+                                <MapPin className="text-green-600 w-4 h-4 inline-block mr-1" />
+                                <span className="text-gray-700 font-[600] text-xs">
                                   {provider.location?.address || "Unknown location"}
                                 </span>
                                 <div>
