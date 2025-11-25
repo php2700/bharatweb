@@ -1653,7 +1653,7 @@ export default function ViewProfile() {
                       ) : (
                         <>
                           <button
-                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer"
                             onClick={handleMarkComplete}
                           >
                             Mark as Complete
@@ -1673,7 +1673,7 @@ export default function ViewProfile() {
                         </>
                       )}
                       <Link to={`/dispute/${id}/direct`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
                           {orderData?.hire_status === "completed"
                             ? "Create Dispute"
                             : "Cancel Task and Create Dispute"}

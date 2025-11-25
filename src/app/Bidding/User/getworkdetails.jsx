@@ -945,7 +945,7 @@ export default function BiddinggetWorkDetail() {
                     </Link>
                     <button
                       onClick={cancelTask}
-                      className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium"
+                      className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium cursor-pointer"
                     >
                       <img src={cancelIcon} alt="Cancel" className="w-5 h-5" />
                       Cancel Task
@@ -1077,7 +1077,7 @@ export default function BiddinggetWorkDetail() {
                   <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
                     <button
                       onClick={() => setTab("bidder")}
-                      className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${tab === "bidder"
+                      className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${tab === "bidder"
                         ? "bg-[#228B22] text-white border-3"
                         : "bg-gray-100 text-[#228B22]"
                         }`}
@@ -1086,7 +1086,7 @@ export default function BiddinggetWorkDetail() {
                     </button>
                     <button
                       onClick={() => setTab("related")}
-                      className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${tab === "related"
+                      className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${tab === "related"
                         ? "bg-[#228B22] text-white border-3"
                         : "bg-gray-100 text-[#228B22]"
                         }`}
