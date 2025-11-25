@@ -6,7 +6,7 @@ import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 // import Warning from "../../../assets/ViewProfile/warning.svg";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning3.png";
+import Warning3 from "../../../assets/warning3.png";
 import ratingImg from "../../../assets/rating/ic_round-star.png";
 import CallIcon from "../../../assets/call.png";
 import ChatIcon from "../../../assets/chat.png";
@@ -1629,7 +1629,7 @@ export default function ViewProfile() {
                           className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                         />
                         <img
-                          src={Warning2}
+                          src={Warning3}
                           alt="Warning2"
                           className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                         />

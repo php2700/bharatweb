@@ -19,7 +19,7 @@ import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning2.png";
+import Warning3 from "../../../assets/warning3.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -757,7 +757,7 @@ export default function ViewProfile() {
                               className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                             />
                             <img
-                              src={Warning2}
+                              src={Warning3}
                               alt="Warning2"
                               className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                             />
