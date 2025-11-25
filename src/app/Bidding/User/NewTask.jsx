@@ -64,9 +64,9 @@ export default function BiddingNewTask() {
 
   // pickedLocation for map (latitude, longitude, address)
   const [pickedLocation, setPickedLocation] = useState({
-    latitude: null,
-    longitude: null,
-    address: "",
+    latitude: profile?.location?.latitude || null,
+    longitude: profile?.location?.longitude || null,
+    address: profile?.location?.address || "",
   });
 
   // map refs (you can wire Google Maps or other map library here)
@@ -196,6 +196,8 @@ export default function BiddingNewTask() {
     // VERY IMPORTANT:
     // This reloads profile → triggers header rerender
     dispatch(fetchUserProfile());
+    // Show success modal as in DirectHiring
+    Swal.fire("Success", "Location updated", "success");
     
   } catch (error) {
     console.error(error);
@@ -223,6 +225,8 @@ export default function BiddingNewTask() {
       const data = await response.json();
       if (response.ok) {
         setFormData((prev) => ({ ...prev, googleAddress: addr.address }));
+        // Show success modal
+        Swal.fire("Success", "Location updated", "success");
       } else toast.error(data.message || "Failed to update location");
     } catch (error) {
       console.error(error);

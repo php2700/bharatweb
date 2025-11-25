@@ -36,7 +36,11 @@ const Post = () => {
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [address, setAddress] = useState();
+  const [address, setAddress] = useState(
+    typeof window !== "undefined"
+      ? localStorage.getItem("selectedAddressTitle") || ""
+      : ""
+  );
 
   const [error, setError] = useState(null);
   const [platformFee, setPlatformFee] = useState("");
@@ -67,9 +71,9 @@ const Post = () => {
 
   // pickedLocation for map (latitude, longitude, address)
   const [pickedLocation, setPickedLocation] = useState({
-    latitude: null,
-    longitude: null,
-    address: "",
+    latitude: profile?.location?.latitude || null,
+    longitude: profile?.location?.longitude || null,
+    address: profile?.location?.address || "",
   });
 
   // map refs (you can wire Google Maps or other map library here)
@@ -242,6 +246,18 @@ useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
+
+  // keep address in sync with profile and localStorage (mirror NewTask behavior)
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('selectedAddressTitle') : null;
+    if (profile?.location?.address) {
+      setAddress(profile.location.address);
+      setSelectedAddress(profile.location.address);
+    } else if (stored) {
+      setAddress(stored);
+      setSelectedAddress(stored);
+    }
+  }, [profile?.location?.address]);
 
 
   useEffect(() => {
@@ -648,6 +664,8 @@ useEffect(() => {
         } catch (e) {
           console.warn("fetchUserProfile dispatch failed:", e);
         }
+        // Show success modal like DirectHiring
+        Swal.fire("Success", "Location updated", "success");
       } else {
         const data = await res.json().catch(() => ({}));
         console.error("Failed to update location:", data);
@@ -704,6 +722,13 @@ useEffect(() => {
 
     // save new address in UI
     setSelectedAddress(newAddress.address);
+    setAddress(newAddress.address);
+
+    // persist for other pages too (only after API OK)
+    if (res?.status === 200) {
+      if (newAddress._id) localStorage.setItem("selectedAddressId", newAddress._id);
+      if (newAddress.address) localStorage.setItem("selectedAddressTitle", newAddress.address);
+    }
 
     // refresh redux
     dispatch(fetchUserProfile());
@@ -713,6 +738,7 @@ useEffect(() => {
     Swal.fire("Error", err.response?.data?.message || "Failed to save new address", "error");
   }
 };
+
   return (
     <>
       <Header />
