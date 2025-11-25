@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import Swal from "sweetalert2";
-import postTask from "../../../assets/postTask.png";
+import EmergencyTask from "../../../assets/EmergencyTask.png";
 import Logo from "../../../assets/logo.svg";
 import {
   useJsApiLoader,
@@ -730,7 +730,7 @@ useEffect(() => {
   {/* LEFT IMAGE BLOCK (same styling as first code) */}
   <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
     <img
-      src={postTask}
+      src={EmergencyTask}
       alt="Task Banner"
       className="w-full h-auto object-contain rounded-2xl shadow-lg"
     />

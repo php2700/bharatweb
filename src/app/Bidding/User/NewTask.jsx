@@ -14,7 +14,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
-import postTask from "../../../assets/postTask.png";
+import PostNewTask3 from "../../../assets/PostNewTask3.jpg";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../../../redux/userSlice";
@@ -457,7 +457,7 @@ export default function BiddingNewTask() {
         <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
 
           <img
-            src={postTask}
+            src={PostNewTask3}
             alt="Task Banner"
             className="w-full h-auto object-contain rounded-2xl shadow-lg"
           />
