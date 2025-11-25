@@ -249,7 +249,7 @@ export default function RejectedWorkDetails() {
                     />
                     <div>
                       <h3 className="text-2xl font-bold text-gray-800">
-                        {task.title || "Unknown User"}
+                        {task.user_name || "Unknown User"}
                       </h3>
                     </div>
                   </div>

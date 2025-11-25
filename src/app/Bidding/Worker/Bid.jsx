@@ -116,6 +116,8 @@ export default function Bid() {
           throw new Error("Failed to fetch work details");
 
         const result = response.data.data;
+        console.log(result);
+        
         setWorker({
           _id: result._id,
           order_id: result._id,

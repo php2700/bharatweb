@@ -91,10 +91,12 @@ import MyHireOrderDetails from "./app/directHiring/User/OrderDetail";
 import Chat from "./app/CommonScreens/Chat";
 import Promotion from "./app/CommonScreens/Promotion";
 import  RejectedWork from "./app/CommonScreens/RejectedWork"
-import BiddingRejectedWork from "./app/Bidding/Worker/BiddingRejectedWork"
+// import BiddingRejectedWork from "./app/Bidding/Worker/BiddingRejectedWork"
 import EmergencyRejectedWork from "./app/emergency/Worker/EmergencyRejectedWork"
 import RejectedDetail from "./app/directHiring/Worker/RejectedDetail"
 import BidRejectedDetails from "./app/Bidding/Worker/BidRejectedDetails"
+import EmergencyRejectedDetails from "./app/emergency/Worker/EmergencyRejectedDetails"
+import EmergencyAcceptedDetails from "./app/emergency/Worker/EmergencyAcceptedDetails"
 
 export default function App() {
   if ("serviceWorker" in navigator) {
@@ -231,14 +233,15 @@ export default function App() {
         <Route path="/worker/work-list/:task" element={<WorkerWorklist />} />
         {/* rejected work */}
         <Route path="/worker/rejected-work" element={<RejectedWork />} />
-        <Route path="/worker/bidding/rejected-work" element={<BiddingRejectedWork/>} />
+        {/* <Route path="/worker/bidding/rejected-work" element={<BiddingRejectedWork/>} /> */}
         <Route path="/worker/emergency/rejected-work" element={<EmergencyRejectedWork/>}/>
          <Route
           path="/worker/reject-worker/rejected-details"
           element={<RejectedDetail/>}
         />
         <Route path="/worker/rejected-worker/bid-details" element={<BidRejectedDetails/>} />
-
+         <Route path="/worker/emergency-details/accepted-worker" element={<EmergencyAcceptedDetails/>} />
+   <Route path="/worker/emergency-details/rejected-worker" element={<EmergencyRejectedDetails/>} />
 
         {/* // Emergency Routes- User */}
         <Route path="/emergency/userpost" element={<Post />} />

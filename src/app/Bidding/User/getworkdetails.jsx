@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
-import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/directHiring/Work.png";
 import bannerPlaceholder from "../../../assets/workcategory/image.png";
 import noWorkImage from "../../../assets/bidding/no_related_work.png";
 import callIcon from "../../../assets/bidding/call.png";

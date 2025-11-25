@@ -5,8 +5,7 @@ import Header from "../../../component/Header";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BidModal from "./BidModel";
-import EditBidModal from "./EditBidModel";
+
 import cancel from "../../../assets/bidding/cancel.png";
 import warningIcon from "../../../assets/ViewProfile/warning.svg";
 import Slider from "react-slick";
@@ -50,8 +49,6 @@ export default function Bid() {
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
- 
-
 
   // Slider settings
   const sliderSettings = {
@@ -153,14 +150,15 @@ export default function Bid() {
   const { state } = useLocation();
 
   const task = state?.task;
-    console.log(task);
+  console.log(task);
+  console.log(task.sub_category_ids);
   const hasMyBid = !!task?.offer;
 
   useEffect(() => {
-  if (task?.offer) {
-    setExistingBid(task.offer);
-  }
-}, [task]);
+    if (task?.offer) {
+      setExistingBid(task.offer);
+    }
+  }, [task]);
 
   if (!task) {
     return (
@@ -223,9 +221,9 @@ export default function Bid() {
                     <FaMapMarkerAlt size={18} color="#228B22" />
                     <span className="truncate">{task.location || "N/A"}</span>
                   </span>
-                  <p className="font-semibold text-lg my-2 text-[#008000]">
+                  {/* <p className="font-semibold text-lg my-2 text-[#008000]">
                     Cost :- ₹{task.cost}/-
-                  </p>
+                  </p> */}
                   <div className="text-gray-600">
                     <p className="text-lg">
                       <strong>Deadline:</strong>{" "}
@@ -295,7 +293,7 @@ export default function Bid() {
               </p>
               <p className="font-semibold">
                 SubCategory:{" "}
-                {task?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+                {task.sub_category_ids.map((sub) => sub.name).join(",")}
               </p>
 
               <h3 className="text-lg font-semibold">Task Details</h3>
@@ -320,84 +318,22 @@ export default function Bid() {
                 )}
 
                 {/* Pending Case */}
-                {task.hire_status === "pending" && (
-                  <>
-                    {hasMyBid ? (
-                      <button
-                        onClick={() => setIsEditBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
-                      >
-                        Edit Bid (₹{existingBid?.bid_amount})
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setIsBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
-                      >
-                        Bid
-                      </button>
-                    )}
-                  </>
+                {/* When status is pending → show nothing */}
+                {task?.hire_status === "pending" && null}
+
+                {/* When status is completed → show message */}
+                {task?.hire_status === "completed" && (
+                  <p className="text-red-600 font-semibold">
+                    You are not selected for this task
+                  </p>
                 )}
               </div>
             </div>
           )}
 
           {/* Offer / Negotiate Section */}
-          {task?.hire_status === "pending" && (
-            <div className="flex flex-col items-center p-6">
-              <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
-                <button
-                  onClick={() => setIsOfferActive(true)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-sm ${
-                    isOfferActive
-                      ? "bg-[#228B22] text-white border border-green-600"
-                      : "border border-green-600 text-green-600"
-                  }`}
-                >
-                  Offer Price ({data?.offer_amount || 0})
-                </button>
-                <button
-                  onClick={() => setIsOfferActive(false)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-md ${
-                    !isOfferActive
-                      ? "bg-[#228B22] text-white hover:bg-[#228B22]"
-                      : "border border-green-600 text-green-600"
-                  }`}
-                >
-                  Negotiate
-                </button>
-              </div>
-
-              {!isOfferActive && (
-                <input
-                  type="number"
-                  placeholder="Enter your offer amount"
-                  value={offer}
-                  onChange={(e) => setOffer(e.target.value)}
-                  className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-                  min="0"
-                />
-              )}
-            </div>
-          )}
-
-          {task?.hire_status === "pending" && (
-            <div className="text-center">
-              <button
-                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
-                onClick={() => {
-                  if (isOfferActive) {
-                    handleAcceptNegotiation(data?._id, "service_provider");
-                  } else {
-                    handleNegotiation(offer);
-                  }
-                }}
-              >
-                {isOfferActive ? "Accept Request" : "Send Request"}
-              </button>
-            </div>
-          )}
+        
+       
         </div>
 
         {/* Accepted Section */}
