@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import Swal from "sweetalert2";
-import EmergencyTask from "../../../assets/EmergencyTask.png";
+import EmergencyTask from "../../../assets/emergTask.png";
 import Logo from "../../../assets/logo.svg";
 import {
   useJsApiLoader,
