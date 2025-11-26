@@ -37,7 +37,7 @@ export default function OurServices() {
       });
 
       const data = await res.json();
-      console.log("Banner API response:", data); // Debug response
+      console.log("Banner API response:", data); 
 
       if (res.ok) {
         if (Array.isArray(data.images) && data.images.length > 0) {
