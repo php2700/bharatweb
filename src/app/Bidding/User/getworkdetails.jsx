@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { SlidersHorizontal, Search } from "lucide-react";
+import { SlidersHorizontal, Search, MapPin } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
 import Slider from "react-slick";
@@ -26,13 +26,13 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning2.png";
+import Warning2 from "../../../assets/warning3.png";
 
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isCancelled, setIsCancelled] = useState(false);
-   const [orderData, setOrderData] = useState(null);
+  const [orderData, setOrderData] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ export default function BiddinggetWorkDetail() {
   const [showOrderReviewModal, setShowOrderReviewModal] = useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [refundReason, setRefundReason] = useState("");
-   const [disputeInfo, setDisputeInfo] = useState(null);
+  const [disputeInfo, setDisputeInfo] = useState(null);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -163,7 +163,7 @@ export default function BiddinggetWorkDetail() {
         setAssignedWorker(response.data.assignedWorker || null);
         const order = response.data.data;
         setOrderDetail(order);
-         setDisputeInfo(response.data.DisputeInfo || null);
+        setDisputeInfo(response.data.DisputeInfo || null);
         setCategoryId(order?.category_id?._id || null);
         setSubCategoryIds(
           Array.isArray(order?.sub_category_ids)
@@ -699,10 +699,10 @@ export default function BiddinggetWorkDetail() {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "2-digit",
-        })
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      })
       : "N/A";
 
   const getStatusStyles = (status) => {
@@ -795,12 +795,12 @@ export default function BiddinggetWorkDetail() {
                     {orderDetail?.address || "N/A"}
                   </span>
                 </span>
-                 <span className="text-gray-600 text-sm font-semibold block">
+                <span className="text-gray-600 text-sm font-semibold block">
 
                   One Time Project fee :- ₹{orderDetail?.platform_fee || "0"}
 
                 </span>
-                
+
                 {/* {showMap && (
                   <div className="mt-4 w-full h-96 rounded-xl overflow-hidden shadow-lg">
                     <iframe
@@ -817,41 +817,41 @@ export default function BiddinggetWorkDetail() {
                   </div>
                 )} */}
                 {showMap && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Location on Map</h2>
-        <button
-          onClick={() => setShowMap(false)}
-          className="text-red-500 font-bold text-2xl"
-        >
-          &times;
-        </button>
-      </div>
-      <div className="w-full h-96 rounded-lg overflow-hidden border">
-        <iframe
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          loading="lazy"
-          allowFullScreen
-          referrerPolicy="no-referrer-when-downgrade"
-          src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
-            orderDetail?.address || ""
-          )}`}
-        ></iframe>
-      </div>
-      <div className="mt-4 text-center">
-        {/* <button
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">Location on Map</h2>
+                        <button
+                          onClick={() => setShowMap(false)}
+                          className="text-red-500 font-bold text-2xl"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                      <div className="w-full h-96 rounded-lg overflow-hidden border">
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
+                            orderDetail?.address || ""
+                          )}`}
+                        ></iframe>
+                      </div>
+                      <div className="mt-4 text-center">
+                        {/* <button
           onClick={() => handleGetDirections(orderDetail?.address)}
           className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
         >
           Get Directions
         </button> */}
-      </div>
-    </div>
-  </div>
-)}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="text-right">
                 <p className="bg-black text-white text-md px-4 rounded-full inline-block">
@@ -871,12 +871,12 @@ export default function BiddinggetWorkDetail() {
                   >
                     {orderDetail?.hire_status
                       ? orderDetail.hire_status
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
                       : "Unknown"}
                   </span>
                 </span>
@@ -885,25 +885,23 @@ export default function BiddinggetWorkDetail() {
                     Refund Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${
-                        orderDetail?.refundStatus === "pending"
+                      ${orderDetail?.refundStatus === "pending"
                           ? "bg-yellow-500"
                           : ""
-                      }
-                      ${
-                        orderDetail?.refundStatus === "processed"
+                        }
+                      ${orderDetail?.refundStatus === "processed"
                           ? "bg-blue-500"
                           : ""
-                      }`}
+                        }`}
                     >
                       {orderDetail?.refundStatus
                         ? orderDetail.refundStatus
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ")
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
                         : "Unknown Status"}
                     </span>
                   </span>
@@ -926,7 +924,7 @@ export default function BiddinggetWorkDetail() {
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
-            <h3 className="text-lg font-semibold">Description</h3>
+            <h3 className="text-sm font-semibold">Project Description</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div>
@@ -952,7 +950,7 @@ export default function BiddinggetWorkDetail() {
                     </Link>
                     <button
                       onClick={cancelTask}
-                      className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium"
+                      className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium cursor-pointer"
                     >
                       <img src={cancelIcon} alt="Cancel" className="w-5 h-5" />
                       Cancel Task
@@ -1042,19 +1040,20 @@ export default function BiddinggetWorkDetail() {
                       Add Review
                     </span>
                   )}
+
                 </div>
-              // ) : orderDetail?.hire_status === "cancelledDispute" ? (
-              //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-              //     Cancelled (Dispute)
-              //   </span>
-              // ) : null}
-                 ) : orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
-  <Link to={`/disputes/bidding/${disputeInfo._id}`}>
-    <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-orange-600">
-      Cancelled ( {disputeInfo.unique_id || "N/A"})
-    </span>
-  </Link>
-) : null}
+                // ) : orderDetail?.hire_status === "cancelledDispute" ? (
+                //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                //     Cancelled (Dispute)
+                //   </span>
+                // ) : null}
+              ) : orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
+                <Link to={`/disputes/bidding/${disputeInfo._id}`}>
+                  <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-orange-600">
+                    Cancelled ( {disputeInfo.unique_id || "N/A"})
+                  </span>
+                </Link>
+              ) : null}
               <ReviewModal
                 show={showCompletedModal}
                 onClose={() => {
@@ -1075,281 +1074,315 @@ export default function BiddinggetWorkDetail() {
               />
             </div>
           </div>
-        </div>
-        {(orderDetail?.hire_status === "pending" ||
-          (orderDetail?.hire_status === "accepted" &&
-            !orderDetail?.platform_fee_paid)) && (
-          <div className="flex justify-center items-center w-full">
-            <div className="bg-white rounded-[42px] shadow-[0px_4px_4px_0px_#00000040] p-4 max-w-3xl w-full">
-              <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
-                <button
-                  onClick={() => setTab("bidder")}
-                  className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
-                    tab === "bidder"
-                      ? "bg-[#228B22] text-white border-3"
-                      : "bg-gray-100 text-[#228B22]"
-                  }`}
-                >
-                  Bidder
-                </button>
-                <button
-                  onClick={() => setTab("related")}
-                  className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full font-medium text-sm ${
-                    tab === "related"
-                      ? "bg-[#228B22] text-white border-3"
-                      : "bg-gray-100 text-[#228B22]"
-                  }`}
-                >
-                  Related Worker
-                </button>
-              </div>
-              <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-                <Search className="w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search for services"
-                  className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-                />
-                <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
-              </div>
-              {tab === "related" ? (
-                <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                  {Array.isArray(providers) && providers.length > 0 ? (
-                    providers
-                      .filter(
-                        (provider) =>
-                          !offers.some(
-                            (offer) => offer.provider_id?._id === provider._id
+          {(orderDetail?.hire_status === "pending" ||
+            (orderDetail?.hire_status === "accepted" &&
+              !orderDetail?.platform_fee_paid)) && (
+              <div className="flex justify-center items-center w-full">
+                <div className="bg-white rounded-[42px] shadow-[0px_4px_4px_0px_#00000040] p-4 max-w-3xl w-full">
+                  <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
+                    <button
+                      onClick={() => setTab("bidder")}
+                      className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${tab === "bidder"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
+                        }`}
+                    >
+                      Bidder
+                    </button>
+                    <button
+                      onClick={() => setTab("related")}
+                      className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${tab === "related"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
+                        }`}
+                    >
+                      Related Worker
+                    </button>
+                  </div>
+                  <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+                    <Search className="w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search for services"
+                      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+                    />
+                    <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
+                  </div>
+                  {tab === "related" ? (
+                    <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                      {Array.isArray(providers) && providers.length > 0 ? (
+                        providers
+                          .filter(
+                            (provider) =>
+                              !offers.some(
+                                (offer) => offer.provider_id?._id === provider._id
+                              )
                           )
-                      )
-                      .map((provider) => (
-                        <div
-                          key={provider._id}
-                          className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
-                        >
+                          .map((provider) => (
+                            <div
+                              key={provider._id}
+                              className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
+                            >
+                              <img
+                                src={provider.image || workImage}
+                                alt={provider.full_name}
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                              />
+                              <div className="flex-1 text-center sm:text-left">
+                                <h3 className="text-[17px] font-bold text-[#303030]">
+                                  {provider.full_name || "Unknown"}
+                                </h3>
+                                <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                                  {provider.skill || "No skill listed"}
+                                </p>
+                                <MapPin className="text-green-600 w-4 h-4 inline-block mr-1" />
+                                <span className="text-gray-700 font-[600] text-xs">
+                                  {provider.location?.address || "Unknown location"}
+                                </span>
+                                <div>
+                                  <button
+                                    onClick={() =>
+                                      handleView(provider._id, null, id)
+                                    }
+                                    className="text-green-600 font-medium text-sm mt-1"
+                                  >
+                                    View Profile
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                                <div className="flex items-center gap-4 sm:gap-7">
+                                  <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                    <img
+                                      src={callIcon}
+                                      alt="Call"
+                                      className="w-[18px] sm:w-[23px]"
+                                    />
+                                  </span>
+                                  <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                    <img
+                                      src={msgIcon}
+                                      alt="Message"
+                                      className="w-[18px] sm:w-[23px]"
+                                    />
+                                  </span>
+                                  <button
+                                    onClick={() => InviteSendWorker(provider._id)}
+                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                                  >
+                                    Invite
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
                           <img
-                            src={provider.image || workImage}
-                            alt={provider.full_name}
-                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                            src={noWorkImage}
+                            alt="No worker"
+                            className="w-48 sm:w-72 md:w-96 mb-4"
                           />
-                          <div className="flex-1 text-center sm:text-left">
-                            <h3 className="text-[17px] font-bold text-[#303030]">
-                              {provider.full_name || "Unknown"}
-                            </h3>
-                            <p className="text-sm text-gray-500 truncate max-w-[200px]">
-                              {provider.skill || "No skill listed"}
-                            </p>
-                            <span className="px-4 py-1 bg-[#F27773] text-white font-[600] text-xs rounded-full inline-block mt-1">
-                              {provider.location?.address || "Unknown location"}
-                            </span>
-                            <div>
-                              <button
-                                onClick={() =>
-                                  handleView(provider._id, null, id)
-                                }
-                                className="text-green-600 font-medium text-sm mt-1"
-                              >
-                                View Profile
-                              </button>
+                          <p>No related workers found</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="mt-6 space-y-4">
+                      {Array.isArray(offers) && offers.length > 0 ? (
+                        offers.map((offer) => (
+                          <div
+                            key={offer._id}
+                            className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
+                          >
+                            <img
+                              src={offer.provider_id?.image || workImage}
+                              alt={offer.provider_id?.full_name || "Worker"}
+                              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                            />
+                            <div className="flex-1 text-center sm:text-left">
+                              <h3 className="text-[17px] font-bold text-[#303030]">
+                                {offer.provider_id?.full_name || "Unknown"}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {offer.message || "No message provided"}
+                              </p>
+                              <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
+                                <FaMapMarkerAlt size={16} color="#228B22" />
+                                {offer.provider_id?.location?.address ||
+                                  "Unknown location"}
+                              </span>
+                              <div>
+                                <button
+                                  onClick={() =>
+                                    handleView(
+                                      offer.provider_id?._id,
+                                      offer._id,
+                                      offer.order_id
+                                    )
+                                  }
+                                  className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
+                                >
+                                  View Profile
+                                </button>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                              <span className="text-lg font-semibold text-gray-800 mb-2">
+                                ₹{offer.bid_amount || "N/A"}
+                              </span>
+                              {orderDetail?.hire_status === "pending" && (
+                                <button
+                                  onClick={() =>
+                                    handleAcceptBid(offer.provider_id?._id)
+                                  }
+                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                                >
+                                  Accept
+                                </button>
+                              )}
+                              {orderDetail?.hire_status === "accepted" &&
+                                !orderDetail?.platform_fee_paid && (
+                                  <button
+                                    onClick={() =>
+                                      handlePayment(offer.provider_id?._id)
+                                    }
+                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                                  >
+                                    Pay & Hire
+                                  </button>
+                                )}
                             </div>
                           </div>
-                          <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                            <div className="flex items-center gap-4 sm:gap-7">
-                              <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                <img
-                                  src={callIcon}
-                                  alt="Call"
-                                  className="w-[18px] sm:w-[23px]"
-                                />
-                              </span>
-                              <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                <img
-                                  src={msgIcon}
-                                  alt="Message"
-                                  className="w-[18px] sm:w-[23px]"
-                                />
-                              </span>
-                              <button
-                                onClick={() => InviteSendWorker(provider._id)}
-                                className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                              >
-                                Invite
-                              </button>
-                            </div>
-                          </div>
+                        ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                          <img
+                            src={noWorkImage}
+                            alt="No bids"
+                            className="w-48 sm:w-72 md:w-96 mb-4"
+                          />
+                          <p>No bids available</p>
                         </div>
-                      ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                      <img
-                        src={noWorkImage}
-                        alt="No worker"
-                        className="w-48 sm:w-72 md:w-96 mb-4"
-                      />
-                      <p>No related workers found</p>
+                      )}
                     </div>
                   )}
-                </div>
-              ) : (
-                <div className="mt-6 space-y-4">
-                  {Array.isArray(offers) && offers.length > 0 ? (
-                    offers.map((offer) => (
-                      <div
-                        key={offer._id}
-                        className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
-                      >
-                        <img
-                          src={offer.provider_id?.image || workImage}
-                          alt={offer.provider_id?.full_name || "Worker"}
-                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                        />
-                        <div className="flex-1 text-center sm:text-left">
-                          <h3 className="text-[17px] font-bold text-[#303030]">
-                            {offer.provider_id?.full_name || "Unknown"}
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            {offer.message || "No message provided"}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Duration-{offer.duration || "N/A"}
-                          </p>
-                          <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
-                            <FaMapMarkerAlt size={16} color="#228B22" />
-                            {offer.provider_id?.location?.address ||
-                              "Unknown location"}
-                          </span>
-                          <div>
-                            <button
-                              onClick={() =>
-                                handleView(
-                                  offer.provider_id?._id,
-                                  offer._id,
-                                  offer.order_id
-                                )
-                              }
-                              className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
-                            >
-                              View Profile
-                            </button>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                          <span className="text-lg font-semibold text-gray-800 mb-2">
-                            ₹{offer.bid_amount || "N/A"}
-                          </span>
-                          {orderDetail?.hire_status === "pending" && (
-                            <button
-                              onClick={() =>
-                                handleAcceptBid(offer.provider_id?._id)
-                              }
-                              className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                            >
-                              Accept
-                            </button>
-                          )}
-                          {orderDetail?.hire_status === "accepted" &&
-                            !orderDetail?.platform_fee_paid && (
-                              <button
-                                onClick={() =>
-                                  handlePayment(offer.provider_id?._id)
-                                }
-                                className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                              >
-                                Pay & Hire
-                              </button>
-                            )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                      <img
-                        src={noWorkImage}
-                        alt="No bids"
-                        className="w-48 sm:w-72 md:w-96 mb-4"
-                      />
-                      <p>No bids available</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        {(orderDetail?.hire_status === "accepted" ||
-          orderDetail?.hire_status === "cancelled" ||
-          orderDetail?.hire_status === "completed" ||
-          orderDetail?.hire_status === "cancelledDispute") &&
-          orderDetail?.platform_fee_paid && (
-            <Accepted
-              serviceProvider={orderDetail?.service_provider_id}
-              user_id={orderDetail?.user_id._id}
-              assignedWorker={assignedWorker}
-              paymentHistory={orderDetail?.service_payment?.payment_history}
-              fullPaymentHistory={orderDetail?.service_payment}
-              orderId={id}
-              hireStatus={orderDetail?.hire_status}
-            />
-          )}
-
-        {orderDetail?.hire_status === "accepted" &&
-          orderDetail?.platform_fee_paid && (
-            <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-              <div className="relative max-w-2xl mx-auto">
-                {/* Top Images */}
-                <div className="relative z-10 flex justify-center gap-4">
-                  <img
-                    src={Warning1}
-                    alt="Warning"
-                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                  />
-                  <img
-                    src={Warning2}
-                    alt="Warning2"
-                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                  />
-                </div>
-
-                {/* Yellow Box */}
-                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                  <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                    Warning Message
-                  </h2>
-                  <p className="text-gray-700 text-sm md:text-base">
-                    Pay securely — no extra charges from the platform. Choose
-                    simple and safe transactions.
-                  </p>
                 </div>
               </div>
-              <div className="flex space-x-4">
-                <button
-                  className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                  onClick={handleMarkComplete}
-                >
-                  Mark as Complete
-                </button>
-                <ReviewModal
-                  show={showCompletedModal}
-                  onClose={() => {
-                    setShowCompletedModal(false);
-                    fetchOrder();
-                  }}
-                  service_provider_id={
-                    orderDetail?.service_provider_id?._id || null
-                  }
-                  orderId={id}
-                  type="bidding"
-                />
-                <Link to={`/dispute/${id}/bidding`}>
-                  <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                    {orderDetail?.hire_status === "completed"
-                      ? "Create Dispute"
-                      : "Cancel Task and Create Dispute"}
+            )}
+          {(orderDetail?.hire_status === "accepted" ||
+            orderDetail?.hire_status === "cancelled" ||
+            orderDetail?.hire_status === "completed" ||
+            orderDetail?.hire_status === "cancelledDispute") &&
+            orderDetail?.platform_fee_paid && (
+              <Accepted
+                serviceProvider={orderDetail?.service_provider_id}
+                user_id={orderDetail?.user_id._id}
+                assignedWorker={assignedWorker}
+                paymentHistory={orderDetail?.service_payment?.payment_history}
+                fullPaymentHistory={orderDetail?.service_payment}
+                orderId={id}
+                hireStatus={orderDetail?.hire_status}
+              />
+            )}
+
+          {orderDetail?.hire_status === "accepted" &&
+            orderDetail?.platform_fee_paid && (
+              <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                <div className="relative max-w-2xl mx-auto">
+                  {/* Top Images */}
+                  <div className="relative z-10 flex justify-center gap-4">
+                    <img
+                      src={Warning1}
+                      alt="Warning"
+                      className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                    />
+                    <img
+                      src={Warning2}
+                      alt="Warning2"
+                      className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                    />
+                  </div>
+
+                  {/* Yellow Box */}
+                  <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
+                    <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                      Warning Message
+                    </h2>
+                    <p className="text-gray-700 text-sm md:text-base">
+                      Pay securely — no extra charges from the platform. Choose
+                      simple and safe transactions.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex space-x-4">
+                  <button
+                    className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                    onClick={handleMarkComplete}
+                  >
+                    Mark as Complete
                   </button>
-                </Link>
+                  <ReviewModal
+                    show={showCompletedModal}
+                    onClose={() => {
+                      setShowCompletedModal(false);
+                      fetchOrder();
+                    }}
+                    service_provider_id={
+                      orderDetail?.service_provider_id?._id || null
+                    }
+                    orderId={id}
+                    type="bidding"
+                  />
+                  <Link to={`/dispute/${id}/bidding`}>
+                    <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                      {orderDetail?.hire_status === "completed"
+                        ? "Create Dispute"
+                        : "Cancel Task and Create Dispute"}
+                    </button>
+                  </Link>
+
+                </div>
+
               </div>
+
+            )}
+          <div className="relative max-w-2xl mx-auto">
+            {/* Top Images */}
+            <div className="relative z-10 flex justify-center gap-4">
+              <img
+                src={Warning1}
+                alt="Warning"
+                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+              />
+              <img
+                src={Warning3}
+                alt="Warning2"
+                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+              />
             </div>
-          )}
+
+            {/* Yellow Box */}
+            <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
+              <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                Warning Message
+              </h2>
+              <p className="text-gray-700 text-sm md:text-base">
+                Pay securely — no extra charges from the platform.
+                Choose simple and safe transactions.
+              </p>
+            </div>
+            {/* Add dispute creation option for completed task (mirror DirectHiring behavior) */}
+            <div className="flex justify-center">
+              <Link to={`/dispute/${id}/bidding`}>
+                <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
+                  Create Dispute
+                </button>
+              </Link>
+            </div>
+
+          </div>
+        </div>
         <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">

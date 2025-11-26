@@ -512,7 +512,7 @@ export default function Bid() {
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
                 <button
                   onClick={() => setIsOfferActive(true)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-sm ${
+                  className={`px-16 py-2 rounded-full font-medium cursor-pointer shadow-sm ${
                     isOfferActive
                       ? "bg-[#228B22] text-white border border-green-600"
                       : "border border-green-600 text-green-600"
@@ -522,7 +522,7 @@ export default function Bid() {
                 </button>
                 <button
                   onClick={() => setIsOfferActive(false)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-md ${
+                  className={`px-16 py-2 rounded-full font-medium shadow-md cursor-pointer ${
                     !isOfferActive
                       ? "bg-[#228B22] text-white hover:bg-[#228B22]"
                       : "border border-green-600 text-green-600"
@@ -548,7 +548,7 @@ export default function Bid() {
           {worker?.hire_status === "pending" && (
             <div className="text-center">
               <button
-                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
+                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold cursor-pointer"
                 onClick={() => {
                   if (isOfferActive) {
                     handleAcceptNegotiation(data?._id, "service_provider");
