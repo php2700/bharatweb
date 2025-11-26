@@ -691,7 +691,7 @@ export default function BiddingNewTask() {
             <div className="pt-3">
               <button
                 type="submit"
-                className="w-full bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-lg text-base shadow-md transition"
+                className="w-full bg-[#228B22] hover:bg-green-700 text-white cursor-pointer font-semibold py-3 rounded-lg text-base shadow-md transition"
               >
                 Post Task
               </button>

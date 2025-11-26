@@ -23,7 +23,9 @@ import CountUp from "react-countup";
 import { useSelector } from "react-redux";
 
 export default function Home() {
-  const [works, setWorks] = useState([]);
+  const [bidding, setBidding] = useState([]);
+  const [emergency, setEmergency] = useState([]);
+  const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -59,7 +61,7 @@ export default function Home() {
         console.log("bedding works response:", response.data);
 
         // FIX: use response.data.data
-        setWorks(response.data.data || []);
+        setBidding(response.data.data || []);
       } catch (error) {
         console.error("Error fetching recent works:", error);
       } finally {
@@ -76,12 +78,12 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}}/emergency-order/getAllPostedEmergencyOrders`
+          `${import.meta.env.VITE_API_BASE_URL}/emergency-order/getAllPostedEmergencyOrders`
         );
         console.log("bedding works response:", response.data);
 
         // FIX: use response.data.data
-        setWorks(response.data.data || []);
+        setEmergency(response.data.data || []);
       } catch (error) {
         console.error("Error fetching recent works:", error);
       } finally {
@@ -98,12 +100,12 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}}api/user/getAllUsersSortedByPlan`
+          `${import.meta.env.VITE_API_BASE_URL}/user/getAllUsersSortedByPlan`
         );
         console.log("bedding works response:", response.data);
 
         // FIX: use response.data.data
-        setWorks(response.data.data || []);
+        setUser(response.data.data || []);
       } catch (error) {
         console.error("Error fetching recent works:", error);
       } finally {
@@ -508,7 +510,7 @@ export default function Home() {
               transition={{ duration: 1 }}
               className="flex flex-nowrap animate-slide"
             >
-              {works.concat(works).map((work, index) => (
+              {bidding.concat(bidding).map((bidding, index) => (
                 <motion.div
                   key={index}
                   custom={index}
@@ -519,19 +521,19 @@ export default function Home() {
                   className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
                 >
                   <img
-                    src={work.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop"}
+                    src={bidding.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop"}
                     className="w-full h-[120px] object-cover rounded-md"
                   />
 
                   <div className="flex-1 mt-2">
                     <h3 className="text-sm font-bold text-gray-900 break-words">
-                      {work.title}
+                      {bidding.title}
                     </h3>
                     <p className="text-xs text-gray-600 break-words">
-                      {work.description}
+                      {bidding.description}
                     </p>
                     <p className="text-xs font-semibold text-gray-800 break-words">
-                      {work.address}
+                      {bidding.address}
                     </p>
                   </div>
                 </motion.div>
@@ -560,7 +562,7 @@ export default function Home() {
                 transition={{ duration: 1 }}
                 className="flex flex-nowrap animate-slide"
               >
-                {works.concat(works).map((work, index) => (
+                {emergency.concat(emergency).map((emergency, index) => (
                   <motion.div
                     key={index}
                     custom={index}
@@ -571,22 +573,22 @@ export default function Home() {
                     className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
                   >
                     <img
-                      src={work.image_urls || "https://plus.unsplash.com/premium_photo-1661877737564-3dfd7282efcb?q=80&w=1200&auto=format&fit=crop"}
+                      src={ "https://plus.unsplash.com/premium_photo-1686750875768-59660514f05d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
                       className="w-full h-[120px] object-cover rounded-md"
                     />
 
                     <div className="flex-1 mt-2">
                       <h3 className="text-sm font-bold text-gray-900 break-words">
-                        {work.title}
+                        {emergency.title}
                       </h3>
                       <p className="text-xs text-gray-700 break-words">
-                        {work.description}
+                        {emergency.description}
                       </p>
                       <p className="text-xs font-semibold text-gray-900 break-words">
-                        {work.google_address}
+                        {emergency.google_address}
                       </p>
                       <p className="text-xs font-bold text-gray-900 break-words">
-                        {work.contact}
+                        {emergency.contact}
                       </p>
                     </div>
                   </motion.div>
@@ -615,7 +617,7 @@ export default function Home() {
               transition={{ duration: 1 }}
               className="flex flex-nowrap animate-slide"
             >
-              {works.concat(works).map((worker, index) => (
+              {user.concat(user).map((worker, index) => (
                 <motion.div
                   key={index}
                   custom={index}
@@ -625,12 +627,12 @@ export default function Home() {
                   whileHover={{ scale: 1.08 }}
                   className="flex-shrink-0 w-[200px] h-[200px] bg-white p-4 rounded-xl shadow hover:shadow-xl transition mr-5 flex flex-col justify-center text-center"
                 >
-                  <h3 className="text-base font-bold text-gray-900 break-words">
-                    {worker.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-2 break-words">
-                    {worker.address}
-                  </p>
+                    <h3 className="text-base font-bold text-gray-900 break-words">
+                      Name: {worker.full_name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-2 break-words">
+                      Phone: {worker.phone}
+                    </p>
                 </motion.div>
               ))}
             </motion.div>

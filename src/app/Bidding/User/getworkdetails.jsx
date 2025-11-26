@@ -1231,7 +1231,7 @@ export default function BiddinggetWorkDetail() {
                                   onClick={() =>
                                     handleAcceptBid(offer.provider_id?._id)
                                   }
-                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer"
                                 >
                                   Accept
                                 </button>
@@ -1293,7 +1293,7 @@ export default function BiddinggetWorkDetail() {
                       className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                     />
                     <img
-                      src={Warning2}
+                      src={Warning3}
                       alt="Warning2"
                       className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                     />
