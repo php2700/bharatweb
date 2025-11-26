@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import axios from "axios";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Banner from "../../assets/Homepage/banner.png";
@@ -16,8 +17,8 @@ import man1 from "../../assets/Homepage/man1.jpg";
 import man2 from "../../assets/Homepage/man2.jpg";
 import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
-import footer from "../../assets/Homepage/footer.svg";
-import axios from "axios";
+import footer from  "../../assets/Homepage/footer.svg";
+
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
 import { useSelector } from "react-redux";

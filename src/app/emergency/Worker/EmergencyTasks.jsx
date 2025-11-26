@@ -21,6 +21,7 @@ export default function EmergencyTasks() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
 
@@ -71,6 +72,19 @@ export default function EmergencyTasks() {
     window.scrollTo(0, 0);
     fetchBannerImages();
   }, []);
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
+
+  const filteredTasks = tasks.filter((task) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+
+    return (
+      (task.name?.toLowerCase().includes(q) || false) ||
+      (task.skills?.toLowerCase().includes(q) || false) ||
+      (task.location?.toLowerCase().includes(q) || false) ||
+      (task.project_id?.toString().toLowerCase().includes(q) || false)
+    );
+  });
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -206,7 +220,9 @@ export default function EmergencyTasks() {
             <input
               className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none"
               type="search"
-              placeholder="Search for services"
+              placeholder="Search by Project Id, service, skills, or location..."
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
@@ -220,59 +236,66 @@ export default function EmergencyTasks() {
         {/* Task List */}
         {!loading && !error && (
           <div className="space-y-6 max-w-5xl justify-center mx-auto">
-            {activeTab === "Emergency Tasks" &&
-              tasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex bg-white rounded-xl shadow-md overflow-hidden"
-                >
-                  {/* Left Image Section */}
-                  <div className="relative w-1/3">
-                    <img
-                      src={task.image}
-                      alt={task.name}
-                      className="h-full w-full object-cover"
-                    />
-                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-                      {task.project_id}
-                    </span>
-                  </div>
-
-                  {/* Right Content Section */}
-                  <div className="w-2/3 p-4 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
-                      <h2 className="text-lg font-semibold text-gray-800">
-                        {task.name}
-                      </h2>
-                      <p className="text-sm text-[#334247] font-semibold">
-                        Posted Date: {task.date}
-                      </p>
-                    </div>
-                    <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
-                    <div className="mt-3">
-                      <p className="text-green-600 font-bold">{task.price}</p>
-                      <p className="text-sm text-[#334247] mt-1 font-semibold">
-                        Completion Date: {task.completiondate}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-center mt-4">
-                      {/* Left side: icon + location */}
-                      <div className="flex items-center space-x-2">
-                        <FaMapMarkerAlt size={22} color="#228B22" />
-                        <span className="text-gray-700">{task.location}</span>
+            {activeTab === "Emergency Tasks" && (
+              <>
+                {filteredTasks.length > 0 ? (
+                  filteredTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      className="flex bg-white rounded-xl shadow-md overflow-hidden"
+                    >
+                      {/* Left Image Section */}
+                      <div className="relative w-1/3">
+                        <img
+                          src={task.image}
+                          alt={task.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
+                          {task.project_id}
+                        </span>
                       </div>
 
-                      {/* Right side: button */}
-                      <button
-                        className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
-                        onClick={() => navigate(`/emergency/worker/${task.id}`)}
-                      >
-                        View Details
-                      </button>
+                      {/* Right Content Section */}
+                      <div className="w-2/3 p-4 flex flex-col justify-between">
+                        <div className="flex justify-between items-start">
+                          <h2 className="text-lg font-semibold text-gray-800">
+                            {task.name}
+                          </h2>
+                          <p className="text-sm text-[#334247] font-semibold">
+                            Posted Date: {task.date}
+                          </p>
+                        </div>
+                        <p className="text-sm text-[#334247] mt-2">{task.skills}</p>
+                        <div className="mt-3">
+                          <p className="text-green-600 font-bold">{task.price}</p>
+                          <p className="text-sm text-[#334247] mt-1 font-semibold">
+                            Completion Date: {task.completiondate}
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-center mt-4">
+                          <div className="flex items-center space-x-2">
+                            <FaMapMarkerAlt size={22} color="#228B22" />
+                            <span className="text-gray-700">{task.location}</span>
+                          </div>
+
+                          <button
+                            className="text-[#228B22] py-1 px-6 border border-[#228B22] rounded-lg hover:bg-[#228B22] hover:text-white transition"
+                            onClick={() => navigate(`/emergency/worker/${task.id}`)}
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500 font-medium">
+                    No matching emergency work found.
                   </div>
-                </div>
-              ))}
+                )}
+              </>
+            )}
           </div>
         )}
 

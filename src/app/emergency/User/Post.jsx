@@ -623,16 +623,31 @@ useEffect(() => {
   };
 
   // Format deadline for display
+  // const formattedDate = formData.deadline
+  //   ? new Date(formData.deadline).toLocaleDateString("en-GB")
+  //   : "N/A";
+  // const formattedTime = formData.deadline
+  //   ? new Date(formData.deadline).toLocaleTimeString("en-US", {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //       hour12: true,
+  //     })
+  //   : "N/A";
   const formattedDate = formData.deadline
-    ? new Date(formData.deadline).toLocaleDateString("en-GB")
-    : "N/A";
-  const formattedTime = formData.deadline
-    ? new Date(formData.deadline).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
-    : "N/A";
+  ? (() => {
+      const raw = formData.deadline; // "2025-11-30T13:25"
+      const [date] = raw.split("T");
+      const [year, month, day] = date.split("-");
+
+      // weekday name
+      const weekdayIndex = new Date(raw).getDay();
+      const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayName = weekdays[weekdayIndex];
+
+      return `${dayName} ${day} / ${month} / ${year}`;
+    })()
+  : "N/A";
+
 
   const updateAddress = async (location) => {
     try {
