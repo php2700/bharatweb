@@ -11,7 +11,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
-import workImage from "../../../assets/directHiring/Work.png";
+import workImage from "../../../assets/workcategory/image.png";
 import bannerPlaceholder from "../../../assets/workcategory/image.png";
 import noWorkImage from "../../../assets/bidding/no_related_work.png";
 import callIcon from "../../../assets/bidding/call.png";
@@ -26,7 +26,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning3.png";
+import Warning3 from "../../../assets/warning3.png";
 
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
@@ -734,25 +734,20 @@ export default function BiddinggetWorkDetail() {
 
   return (
     <>
-    
       <Header />
-      <div className="container mx-auto mt-20 px-4 py-4">
-              <button
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
+        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
+          <button
             className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
             onClick={() => navigate(-1)}
           >
             <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
             Back
           </button>
-            </div>
-      <ToastContainer position="top-right" autoClose={3000} />
-      
-      <div className="min-h-screen p-4 sm:p-6 ">
-       
+        </div>
         <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
-          
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
-          
           {orderDetail?.image_url?.length > 0 ? (
             <Carousel
               showArrows={true}
