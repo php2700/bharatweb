@@ -300,9 +300,9 @@ export default function Bid() {
           },
         }
       );
-
-      if (response.data.success) {
+      if (response.status == 200) {
         toast.success("You accepted the negotiation");
+				window.location.reload();
       } else {
         toast.error(response.data.message || "Something went wrong");
       }
