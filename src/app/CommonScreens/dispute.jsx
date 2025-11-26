@@ -193,13 +193,20 @@ export default function Dispute() {
             <label className="block text-base font-medium mb-2">
               Enter Amount
             </label>
-            <input
-              type="text"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
-              placeholder="Enter Amount for which rise dispute"
-            />
+           <input
+  type="text"
+  value={amount}
+  onChange={(e) => {
+    const value = e.target.value;
+    // sirf digits allow kare
+    if (/^\d*$/.test(value)) {
+      setAmount(value);
+    }
+  }}
+  className="w-full border-2 border-[#c1b9b9] rounded-lg px-3 py-2"
+  placeholder="Enter Amount for which rise dispute"
+/>
+
             {errors.amount && (
               <p className="text-red-600 text-sm mt-1">{errors.amount}</p>
             )}
