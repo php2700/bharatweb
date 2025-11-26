@@ -267,7 +267,7 @@ export default function RejectedWorklist() {
 
       {/* Title */}
       <h1 className="text-xl sm:text-2xl text-center mt-10 font-bold">
-        Emergency Rejected Work
+        Emergency Work
       </h1>
 
       {/* Tabs */}
@@ -317,12 +317,19 @@ export default function RejectedWorklist() {
               className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md"
             >
               {/* Image */}
-              <div className="w-full sm:w-1/3 h-48 bg-gray-100">
+              <div className="w-full sm:w-1/3 h-48 bg-gray-100 relative">
                 <img
                   src={task.image}
                   className="w-full h-full object-cover"
                   onError={(e) => (e.currentTarget.src = Work)}
                 />
+                 <span
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
+                   bg-black/80 backdrop-blur text-white text-xs 
+                   px-4 py-1 rounded-full shadow-md"
+                  >
+                    {task?.project_id}
+                  </span>
               </div>
 
               {/* Content */}

@@ -319,7 +319,11 @@ export default function Bid() {
 
                 {/* Pending Case */}
                 {/* When status is pending → show nothing */}
-                {task?.hire_status === "pending" && null}
+                {task?.hire_status === "pending" && (
+                    <p className="text-red-600 font-semibold">
+                    You are not selected for this task
+                  </p>
+                )}
 
                 {/* When status is completed → show message */}
                 {task?.hire_status === "completed" && (

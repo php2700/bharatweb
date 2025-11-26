@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect  } from "react";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
@@ -17,14 +17,15 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import Accepted from "./Accepted";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { useLocation } from "react-router-dom";
-
+import { useLocation,useNavigate } from "react-router-dom";
+import Arrow from "../../../assets/profile/arrow_back.svg";
 export default function Bid() {
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
   const bidding_offer_id = localStorage.getItem("bidding_offer_id");
+    const navigate = useNavigate();
 
   // Modal States
   const [isBidModal, setIsBidModal] = useState(false);
@@ -98,58 +99,7 @@ export default function Bid() {
     window.scrollTo(0, 0);
   }, [BASE_URL]);
 
-  // const handleNegotiation = async (offerAmount) => {
-  //   if (!offerAmount || isNaN(offerAmount) || offerAmount <= 0) {
-  //     toast.error("Please enter a valid offer amount");
-  //     return;
-  //   }
-
-  //   try {
-  //     const token = localStorage.getItem("bharat_token");
-  //     const response = await axios.post(
-  //       `${BASE_URL}/negotiations/start`,
-  //       {
-  //         order_id: worker?.order_id,
-  //         bidding_offer_id,
-  //         service_provider,
-  //         user: worker?.user_id?._id,
-  //         initiator: "service_provider",
-  //         offer_amount: Number(offerAmount),
-  //         message: `Can you do it for ${offerAmount}?`,
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     if (response.status === 201) {
-  //       setOffer("");
-  //       toast.success(`You sent ₹${offerAmount} for negotiation`);
-  //     } else {
-  //       toast.error(response.data.message || "Something went wrong");
-  //     }
-  //   } catch (error) {
-  //       console.error("Negotiation API Error:", error);
-  //       toast.error("Failed to start negotiation");
-  //   }
-  // };
-
-  // Handle Bid Success (New Bid)
-  // const handleBidSuccess = (amount, description, duration, bidId) => {
-  //   setExistingBid({ bid_amount:amount, message: description, duration: duration, _id: bidId });
-  //   setIsBidModal(false);
-  // };
-
-  // // Handle Edit Bid Success
-  // const handleEditBidSuccess = (newAmount, newDesc, newDuration) => {
-  //   setExistingBid((prev) => ({ ...prev, bid_amount: newAmount, message: newDesc, duration: newDuration }));
-  //   setIsEditBidModal(false);
-  // };
-
-  // Handle Accept Negotiation
+  
   const { state } = useLocation();
 
   const task = state?.task;
@@ -174,9 +124,19 @@ export default function Bid() {
   return (
     <>
       <Header />
-      <ToastContainer position="top-right" autoClose={3000} />
+       <div className="container mx-auto px-4 py-4 mt-20">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+              >
+                <img src={Arrow} alt="Back" className="w-6 h-6 mr-2" />
+                Back
+              </button>
+            </div>
+      
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
 
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
+      <div className="min-h-screen p-4 sm:p-6">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
           <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
 

@@ -15,6 +15,7 @@ import axios from "axios";
 import { AiFillCloseCircle } from "react-icons/ai";
 import Biding from "../assets/Homepage/bidding.svg";
 import Emergency from "../assets/Homepage/emergency.png";
+import DirectHiring from "../assets/Homepage/deirecthiring.png";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -26,6 +27,7 @@ export default function Header() {
   const [isNotifLoading, setIsNotifLoading] = useState(false);
   const [notifError, setNotifError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
   const [currentAddress, setCurrentAddress] = useState({
     title: "",
@@ -67,6 +69,7 @@ export default function Header() {
   const location = useLocation();
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const [isPostATastDropdown, setPostATaskDropdown] = useState(false);
+  const postTaskRef = useRef(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -338,75 +341,78 @@ export default function Header() {
   //   }
   // }, [dispatch, isLoggedIn, profile, loading, error]);
 
-useEffect(() => {
-  if (isLoggedIn && !profile && !loading && !error) {
-    dispatch(fetchUserProfile()).then((result) => {
-      if (fetchUserProfile.fulfilled.match(result)) {
-        const data = result.payload;
+  useEffect(() => {
+    if (isLoggedIn && !profile && !loading && !error) {
+      dispatch(fetchUserProfile()).then((result) => {
+        if (fetchUserProfile.fulfilled.match(result)) {
+          const data = result.payload;
 
-        // 1. Save all addresses
-        if (data?.full_address) {
-          setSavedAddresses(data.full_address);
-        }
+          // 1. Save all addresses
+          if (data?.full_address) {
+            setSavedAddresses(data.full_address);
+          }
 
-        // 2. If location exists → match the correct addressId
-        if (data?.location && data?.full_address?.length > 0) {
-          const matchedAddress = data.full_address.find(
-            (addr) => addr.address === data.location.address
-          );
+          // 2. If location exists → match the correct addressId
+          if (data?.location && data?.full_address?.length > 0) {
+            const matchedAddress = data.full_address.find(
+              (addr) => addr.address === data.location.address
+            );
 
-          if (matchedAddress) {
-            // Use matched address
-            setSelectedAddress(matchedAddress.address);
-            setSelectedAddressId(matchedAddress._id);
+            if (matchedAddress) {
+              // Use matched address
+              setSelectedAddress(matchedAddress.address);
+              setSelectedAddressId(matchedAddress._id);
 
-            localStorage.setItem("selectedAddressTitle", matchedAddress.address);
-            localStorage.setItem("selectedAddressId", matchedAddress._id);
-          } else {
-            // Fallback to first address
-            const firstAddress = data.full_address[0];
+              localStorage.setItem(
+                "selectedAddressTitle",
+                matchedAddress.address
+              );
+              localStorage.setItem("selectedAddressId", matchedAddress._id);
+            } else {
+              // Fallback to first address
+              const firstAddress = data.full_address[0];
 
-            setSelectedAddress(firstAddress.address);
-            setSelectedAddressId(firstAddress._id);
+              setSelectedAddress(firstAddress.address);
+              setSelectedAddressId(firstAddress._id);
 
-            localStorage.setItem("selectedAddressTitle", firstAddress.address);
-            localStorage.setItem("selectedAddressId", firstAddress._id);
+              localStorage.setItem(
+                "selectedAddressTitle",
+                firstAddress.address
+              );
+              localStorage.setItem("selectedAddressId", firstAddress._id);
+            }
+          }
+        } else if (fetchUserProfile.rejected.match(result)) {
+          toast.error(result.payload || "Failed to fetch user profile");
+
+          if (result.payload === "Session expired, please log in again") {
+            handleUnauthorized();
           }
         }
+      });
+    } else if (profile?.location) {
+      // When profile already loaded in redux
+      const matchedAddress = profile.full_address?.find(
+        (addr) => addr.address === profile.location.address
+      );
 
-      } else if (fetchUserProfile.rejected.match(result)) {
-        toast.error(result.payload || "Failed to fetch user profile");
+      if (matchedAddress) {
+        setSelectedAddress(matchedAddress.address);
+        setSelectedAddressId(matchedAddress._id);
 
-        if (result.payload === "Session expired, please log in again") {
-          handleUnauthorized();
-        }
+        localStorage.setItem("selectedAddressTitle", matchedAddress.address);
+        localStorage.setItem("selectedAddressId", matchedAddress._id);
+      } else if (profile.full_address?.length > 0) {
+        const firstAddress = profile.full_address[0];
+
+        setSelectedAddress(firstAddress.address);
+        setSelectedAddressId(firstAddress._id);
+
+        localStorage.setItem("selectedAddressTitle", firstAddress.address);
+        localStorage.setItem("selectedAddressId", firstAddress._id);
       }
-    });
-
-  } else if (profile?.location) {
-    // When profile already loaded in redux
-    const matchedAddress = profile.full_address?.find(
-      (addr) => addr.address === profile.location.address
-    );
-
-    if (matchedAddress) {
-      setSelectedAddress(matchedAddress.address);
-      setSelectedAddressId(matchedAddress._id);
-
-      localStorage.setItem("selectedAddressTitle", matchedAddress.address);
-      localStorage.setItem("selectedAddressId", matchedAddress._id);
-    } else if (profile.full_address?.length > 0) {
-      const firstAddress = profile.full_address[0];
-
-      setSelectedAddress(firstAddress.address);
-      setSelectedAddressId(firstAddress._id);
-
-      localStorage.setItem("selectedAddressTitle", firstAddress.address);
-      localStorage.setItem("selectedAddressId", firstAddress._id);
     }
-  }
-}, [dispatch, isLoggedIn, profile, loading, error]);
-
+  }, [dispatch, isLoggedIn, profile, loading, error]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -473,7 +479,6 @@ useEffect(() => {
             return;
           }
 
-       
           if (
             data?.status === false &&
             data?.message === "Admin has disabled your account."
@@ -848,6 +853,23 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+      if (postTaskRef.current && !postTaskRef.current.contains(event.target)) {
+        setPostATaskDropdown(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className="w-full bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] fixed top-0 z-50">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -1011,7 +1033,7 @@ useEffect(() => {
             </Link>
           )} */}
           {isLoggedIn && (
-            <div className="relative hidden lg:block">
+            <div className="relative hidden lg:block" ref={postTaskRef}>
               <button
                 onClick={() => setPostATaskDropdown(!isPostATastDropdown)}
                 className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow cursor-pointer"
@@ -1020,6 +1042,21 @@ useEffect(() => {
               </button>
               {isPostATastDropdown && (
                 <div className="absolute right-0 mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.1)] py-2 z-50 border border-gray-100 animate-fadeIn">
+                  <Link
+                    to="/ourservices"
+                    className="flex items-center font-bold gap-2 px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
+                    onClick={() => setPostATaskDropdown(false)}
+                  >
+                    <img
+                      src={DirectHiring}
+                      alt=""
+                      className="w-6 h-6 font-bold text-gray-700"
+                    />
+
+                    <span>Direct Hiring</span>
+                  </Link>
+                  <div className="w-full h-px bg-gray-200 my-1"></div>
+
                   <Link
                     to="/bidding/newtask"
                     className="flex items-center gap-2 font-bold  px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
@@ -1147,117 +1184,141 @@ useEffect(() => {
               </div>
 
               {/* Profile Dropdown */}
-              <div className="relative lg:flex hidden " ref={dropdownRef}>
-                {fullName ? (
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
-                  >
-                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                      {fullName}
-                    </span>
-                    <img
-                      src={Dropdown}
-                      alt="Dropdown"
-                      className={`w-5 h-5 transition-transform duration-300 ${
-                        isOpen ? "rotate-180" : "rotate-0"
-                      }`}
-                    />
-                  </button>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
-                  >
-                    Login / Signup
-                    <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
-                  </Link>
-                )}
-                {isOpen && fullName && (
-                  <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                    <Link
-                      to="/account"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <img src={Account} alt="Account" className="w-5 h-5" />{" "}
-                      Account
-                    </Link>
-                    <Link
-                      to="/details"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <img src={Profile} alt="Profile" className="w-5 h-5" />{" "}
-                      Profile
-                    </Link>
-                    <Link
-                      to="/user/work-list/My Hire"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <FaUserTie className="w-5 h-5" /> My Hire
-                    </Link>
-                    <Link
-                      to="/worker/work-list/My Hire"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <FaBriefcase className="w-5 h-5" /> My Work
-                    </Link>
-
-                    {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
-                        
-                      </Link>
-                      
-                      
-                      
-                    )}
-                 
-                       {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/emergency/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
-                      </Link>
-                      
-                      
-                      
-                    )}
-
-
-                    <Link
-                      to="/disputes"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <FaGavel className="w-5 h-5" /> Disputes
-                    </Link>
-                    <Link
-                      to="/promotion"
-                      className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <FaTrophy className="w-5 h-5" /> Promotion
-                    </Link>
+                <div className="relative lg:flex hidden " ref={dropdownRef}>
+                  {fullName ? (
                     <button
-                      onClick={logoutdestroy}
-                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
                     >
-                      <img src={Logout} alt="Logout" className="w-5 h-5" />
-                      Logout
+                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                        {fullName}
+                      </span>
+                      <img
+                        src={Dropdown}
+                        alt="Dropdown"
+                        className={`w-5 h-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
                     </button>
-                  </div>
-                )}
-              </div>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                    >
+                      Login / Signup
+                      <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+                    </Link>
+                  )}
+                  {isOpen && fullName && (
+                    <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                      <Link
+                        to="/account"
+                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/account"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <img src={Account} alt="Account" className={`w-5 h-5 ${location.pathname === "/account" ? "filter brightness-0 invert" : ""}`} />{" "}
+                        Account
+                      </Link>
+                      <Link
+                        to="/details"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/details"
+                            ? "bg-[#228B22] text-white"
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <img src={Profile} alt="Profile" className={`w-6 h-6 ${location.pathname === "/details" ? "filter brightness-0 invert" : ""}`} />{" "}
+                        Profile
+                      </Link>
+                        <Link
+                          to="/user/work-list/My Hire"
+                          className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname.startsWith("/user/work-list")
+                              ? " bg-[#228B22] text-white  "
+                              : "text-black font-semibold hover:bg-gray-100"
+                          }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FaUserTie className="w-5 h-5" /> My Hire
+                      </Link>
+                      <Link
+                        to="/worker/work-list/My Hire"
+                    className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname.startsWith("/worker/work-list")
+                            ? " bg-[#228B22] text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FaBriefcase className="w-5 h-5" /> My Work
+                      </Link>
+
+                      {(role === "service_provider" || role === "both") && (
+                        <Link
+                          to="/worker/rejected-work"
+                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/worker/rejected-work"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
+                        </Link>
+                      )}
+
+                      {(role === "service_provider" || role === "both") && (
+                        <Link
+                          to="/worker/emergency/rejected-work"
+                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/worker/emergency/rejected-work"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
+                        </Link>
+                      )}
+
+                      <Link
+                        to="/disputes"
+                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/disputes"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FaGavel className="w-5 h-5" /> Disputes
+                      </Link>
+                      <Link
+                        to="/promotion"
+                          className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ==="/promotion"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FaTrophy className="w-5 h-5" /> Promotion
+                      </Link>
+                      <button
+                        onClick={logoutdestroy}
+                        className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                      >
+                        <img src={Logout} alt="Logout" className="w-5 h-5" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
             </>
           )}
           {/*<button
@@ -1336,7 +1397,7 @@ useEffect(() => {
               </Link>
             )}
             {isLoggedIn && (
-              <div className="relative lg:hidden">
+              <div className="relative  lg:block" ref={postTaskRef}>
                 <button
                   onClick={() => setPostATaskDropdown(!isPostATastDropdown)}
                   className="bg-[#228B22] hover:bg-green-800 text-white text-sm font-medium px-4 py-2 rounded-xl shadow"
@@ -1345,6 +1406,21 @@ useEffect(() => {
                 </button>
                 {isPostATastDropdown && (
                   <div className="absolute right-0 mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.1)] py-2 z-50 border border-gray-100 animate-fadeIn">
+                    <Link
+                      to="/ourservices"
+                      className="flex items-center font-bold gap-2 px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
+                      onClick={() => setPostATaskDropdown(false)}
+                    >
+                     <img
+                      src={DirectHiring}
+                      alt=""
+                      className="w-6 h-6 font-bold text-gray-700"
+                    />
+
+                      <span>Direct Hiring</span>
+                    </Link>
+                    <div className="w-full h-px bg-gray-200 my-1"></div>
+
                     <Link
                       to="/bidding/newtask"
                       className="flex items-center gap-2 font-bold  px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
@@ -1530,31 +1606,27 @@ useEffect(() => {
                       >
                         <FaBriefcase className="w-5 h-5" /> My Work
                       </Link>
-                        
-                    
-                        {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" />Rejected Task
-                      </Link>                   
-                      
-                      
-                    )}
-                       {(role === "service_provider" || role === "both") && (
-                      <Link
-                        to="/worker/emergency/rejected-work"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
-                      </Link>
-                      
-                      
-                      
-                    )}
+
+                      {(role === "service_provider" || role === "both") && (
+                        <Link
+                          to="/worker/rejected-work"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <AiFillCloseCircle className="w-5 h-5" />
+                          Rejected Task
+                        </Link>
+                      )}
+                      {(role === "service_provider" || role === "both") && (
+                        <Link
+                          to="/worker/emergency/rejected-work"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <AiFillCloseCircle className="w-5 h-5" /> Emergency
+                          Work
+                        </Link>
+                      )}
                       <Link
                         to="/disputes"
                         className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"

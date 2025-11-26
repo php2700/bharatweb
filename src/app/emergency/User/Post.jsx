@@ -833,11 +833,12 @@ useEffect(() => {
         <select
           value={selectedCategory}
           onChange={handleCategoryChange}
+          
           className={`w-full border rounded-md px-3 py-2 text-sm ${
             validationErrors.category_id ? "border-red-500" : "border-green-500"
           }`}
         >
-          <option value="">Select category</option>
+          <option   value=""  disabled selected="selected" hidden className="text-gray-400">Select category</option>
           {categories.map((c) => (
             <option key={c._id} value={c._id}>{c.name}</option>
           ))}
@@ -882,7 +883,7 @@ useEffect(() => {
           <button
             type="button"
             onClick={() => setIsAddAddressModalOpen(true)}
-            className="text-xs text-[#228B22] font-semibold underline cursor-pointer"
+            className="text-xs text-[#228B22]  font-semibold underline cursor-pointer"
           >
             + Add New Address
           </button>
@@ -894,7 +895,7 @@ useEffect(() => {
           value={address}
           onClick={() => setShowOptions(!showOptions)}
           placeholder="Click to select location"
-          className="w-full border rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
+          className="w-full border  border-green-500 rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
         />
 
         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -998,6 +999,7 @@ useEffect(() => {
           value={formData.deadline}
           onChange={handleInputChange}
           min={new Date().toISOString().slice(0, 16)}
+          onClick={(e)=>{e.target.showPicker?.()||e.target.focus()}}
           className={`w-full border rounded-md px-3 py-2 text-sm ${
             validationErrors.deadline ? "border-red-500" : "border-green-500"
           }`}
