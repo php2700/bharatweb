@@ -34,6 +34,8 @@ export default function WorkCategories() {
   const [directHiringError, setDirectHiringError] = useState(null);
     const [expandedDesc, setExpandedDesc] = useState({});
     const [expandedLoc, setExpandedLoc] = useState({});
+    const [showBankWarning, setShowBankWarning] = useState(false);
+
 
   // Fetch categories
   const visibleDirectHiring = directHiring.slice(0, 4);
@@ -164,7 +166,6 @@ useEffect(() => {
   if (!profile) return;
 
   const bankdetail = profile?.bankdetail;
-  const hasSeen = sessionStorage.getItem("hasSeenIDModal");
 
   const isBankFilled =
     bankdetail &&
@@ -173,17 +174,10 @@ useEffect(() => {
     bankdetail.ifscCode &&
     bankdetail.accountHolderName;
 
-  if (!hasSeen && !isBankFilled) {
-    Swal.fire({
-      title: "Bank Details Required",
-      text: "Please add your bank details to continue using the app.",
-      icon: "warning",
-      confirmButtonText: "OK",
-    }).then(() => {
-      sessionStorage.setItem("hasSeenIDModal", "true");
-    });
-  }
+  setShowBankWarning(!isBankFilled); // ❗Banner open if bank details missing
 }, [profile]);
+
+;
 
 
 
@@ -299,12 +293,53 @@ useEffect(() => {
         </div>
       );
     };
+const handleBankUpdate = () => {
+  navigate("/account", {
+    state: {
+      openBankSection: true,   // 👈 flag to directly open bank details
+    },
+  });
+};
 
 
   return (
     <>
       <Header />
+    
+
       <div className="font-sans text-gray-800 mt-25 md:mt-35">
+{showBankWarning && (
+  <div
+    className="
+      w-full bg-gradient-to-r from-yellow-50 to-yellow-100
+      border-l-[6px] border-yellow-600
+      text-yellow-900 p-4 px-6 text-sm font-medium
+      flex justify-between items-center shadow-lg
+      rounded-md
+      animate-slideDownFade
+    "
+  >
+    <span className="flex items-center gap-2 font-semibold">
+      ⚠️ Your bank details are incomplete.
+    </span>
+
+   <button
+  onClick={handleBankUpdate}
+  className="
+    bg-yellow-600 text-white font-semibold 
+    px-4 py-1.5 rounded-lg shadow 
+    hover:bg-yellow-700 hover:shadow-xl 
+    transition-all duration-300 cursor-pointer
+    transform hover:scale-[1.05] active:scale-[0.98]
+  "
+>
+  Update Now →
+</button>
+
+  </div>
+)}
+
+
         {/* Hero Section with Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-2 md:mt-5">
           {bannerLoading ? (

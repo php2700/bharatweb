@@ -12,6 +12,7 @@ export default function BankDetails() {
   const bankdetail = profile ? profile.bankdetail : null;
   const [isSaved, setIsSaved] = useState(false); // Add vs Update mode
   const [loading, setLoading] = useState(false); // Loader
+   const [isEdit, setIsEdit] = useState(false); // ⬅ form editable or not
 
   const [formData, setFormData] = useState({
     bankName: bankdetail ? bankdetail.bankName : "",
@@ -26,11 +27,18 @@ export default function BankDetails() {
   }, [dispatch]);
 
   // detect backend data
-  useEffect(() => {
-    if (bankdetail && bankdetail.bankName) {
-      setIsSaved(true);
-    }
-  }, [bankdetail]);
+useEffect(() => {
+  if (bankdetail && bankdetail.bankName) {
+    setIsSaved(true);     // bank details present
+    setIsEdit(false);     // keep disabled
+  } else {
+    setIsSaved(false);    // bank details empty
+    setIsEdit(true);      // keep editable until user submits
+  }
+}, [bankdetail]);
+
+
+
 
   const [errors, setErrors] = useState({});
 
@@ -76,6 +84,7 @@ export default function BankDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isEdit) return;
     if (validate()) {
       setLoading(true); // Loader Start
       try {
@@ -98,6 +107,7 @@ export default function BankDetails() {
 
         if (response.ok) {
           dispatch(fetchUserProfile());
+          setIsEdit(false); 
           if (isSaved) {
             toast.success("Bank details updated successfully!");
           } else {
@@ -124,109 +134,130 @@ export default function BankDetails() {
     <>
       {/* <Header /> */}
       {/* <ToastContainer position="top-right" autoClose={3000} /> */}
-      <div className="p-10">
-        <div className="p-10 container max-w-5xl mx-auto">
-          <div className="flex justify-center">
-            <img src={BankImg} className="h-72 w-72 object-contain" alt="Bank" />
-          </div>
-          <div className="shadow-2xl my-4 rounded-lg px-10 py-10"> {/* Removed min-h-[100vh] to reduce overall height */}
-            <div className="text-3xl font-bold">Bank Details</div>
-            <div className="mb-8">Add your bank details</div>
+       <div className="px-4 sm:px-6 md:px-10 py-8 w-full">
+  <div className="container max-w-3xl mx-auto">
 
-            <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
-              {/* Bank Name */}
-              <div>
-                <input
-                  className="py-2 px-4 w-full rounded-xl border"
-                  type="text"
-                  name="bankName"
-                  placeholder="Bank Name"
-                  value={formData.bankName}
-                  onChange={handleChange}
-                />
-                {errors.bankName && (
-                  <p className="text-red-500 text-sm">{errors.bankName}</p>
-                )}
-              </div>
+    {/* Image */}
+    <div className="flex justify-center mb-6">
+      <img 
+        src={BankImg} 
+        className="h-40 w-40 sm:h-52 sm:w-52 md:h-64 md:w-64 object-contain" 
+        alt="Bank" 
+      />
+    </div>
 
-              {/* Account Number */}
-              <div>
-                <input
-                  className="py-2 px-4 w-full rounded-xl border"
-                  type="text"
-                  name="accountNumber"
-                  placeholder="Account Number"
-                  value={formData.accountNumber}
-                  onChange={handleChange}
-                />
-                {errors.accountNumber && (
-                  <p className="text-red-500 text-sm">{errors.accountNumber}</p>
-                )}
-              </div>
+    <div className="shadow-2xl rounded-lg px-4 sm:px-8 md:px-10 py-8 bg-white">
 
-              {/* Holder Name */}
-              <div>
-                <input
-                  className="py-2 px-4 w-full rounded-xl border"
-                  type="text"
-                  name="accountHolderName"
-                  placeholder="Account Holder Name"
-                  value={formData.accountHolderName}
-                  onChange={handleChange}
-                />
-                {errors.accountHolderName && (
-                  <p className="text-red-500 text-sm">{errors.accountHolderName}</p>
-                )}
-              </div>
+      {/* Title and Edit Button */}
+      {/* Title and Edit Button */}
+<div className="flex justify-between items-center mb-6">
+  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+    Bank Details
+  </h1>
 
-              {/* IFSC Code */}
-              <div>
-                <input
-                  className="py-2 px-4 w-full rounded-xl border"
-                  type="text"
-                  name="ifscCode"
-                  placeholder="IFSC Code"
-                  value={formData.ifscCode}
-                  onChange={handleChange}
-                />
-                {errors.ifscCode && (
-                  <p className="text-red-500 text-sm">{errors.ifscCode}</p>
-                )}
-              </div>
-              {/* UPI ID */}
-              {/* UPI ID (Optional) */}
-              <div>
-                <input
-                  className="py-2 px-4 w-full rounded-xl border"
-                  type="text"
-                  name="upiId"
-                  placeholder="UPI ID (optional)"
-                  value={formData.upiId}
-                  onChange={handleChange}
-                />
-                {errors.upiId && (
-                  <p className="text-red-500 text-sm">{errors.upiId}</p>
-                )}
-              </div>
+  {/* SHOW EDIT BUTTON ONLY WHEN: bank saved & not editing */}
+  {isSaved && !isEdit && (
+    <button
+      onClick={() => setIsEdit(true)}
+      className="bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-700 cursor-pointer text-sm sm:text-base"
+    >
+      Edit
+    </button>
+  )}
+</div>
 
-              {/* Submit */}
-              <div className="flex justify-center w-full">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="py-2 px-2 bg-[#228B22] w-1/2 text-white rounded-xl cursor-pointer flex justify-center items-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    isSaved ? "Update" : "Add"
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+
+      {/* Form */}
+      <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
+        
+        {/* Bank Name */}
+        <input
+          disabled={!isEdit}
+          className={`py-2 px-4 w-full rounded-xl border ${!isEdit ? "bg-gray-100" : ""}`}
+          type="text"
+          name="bankName"
+          placeholder="Bank Name"
+          value={formData.bankName}
+          onChange={handleChange}
+        />
+        {errors.bankName && <p className="text-red-500 text-sm">{errors.bankName}</p>}
+
+        {/* Account Number */}
+        <input
+          disabled={!isEdit}
+          className={`py-2 px-4 w-full rounded-xl border ${!isEdit ? "bg-gray-100" : ""}`}
+          type="text"
+          name="accountNumber"
+          placeholder="Account Number"
+          value={formData.accountNumber}
+          onChange={handleChange}
+        />
+        {errors.accountNumber && <p className="text-red-500 text-sm">{errors.accountNumber}</p>}
+
+        {/* Account Holder */}
+        <input
+          disabled={!isEdit}
+          className={`py-2 px-4 w-full rounded-xl border ${!isEdit ? "bg-gray-100" : ""}`}
+          type="text"
+          name="accountHolderName"
+          placeholder="Account Holder Name"
+          value={formData.accountHolderName}
+          onChange={handleChange}
+        />
+        {errors.accountHolderName && <p className="text-red-500 text-sm">{errors.accountHolderName}</p>}
+
+        {/* IFSC */}
+        <input
+          disabled={!isEdit}
+          className={`py-2 px-4 w-full rounded-xl border ${!isEdit ? "bg-gray-100" : ""}`}
+          type="text"
+          name="ifscCode"
+          placeholder="IFSC Code"
+          value={formData.ifscCode}
+          onChange={handleChange}
+        />
+        {errors.ifscCode && <p className="text-red-500 text-sm">{errors.ifscCode}</p>}
+
+        {/* UPI */}
+        <input
+          disabled={!isEdit}
+          className={`py-2 px-4 w-full rounded-xl border ${!isEdit ? "bg-gray-100" : ""}`}
+          type="text"
+          name="upiId"
+          placeholder="UPI ID (optional)"
+          value={formData.upiId}
+          onChange={handleChange}
+        />
+        {errors.upiId && <p className="text-red-500 text-sm">{errors.upiId}</p>}
+
+        {/* Submit Button */}
+        <div className="flex justify-center w-full mt-4">
+          {/* Submit Button - ONLY SHOW WHEN isEdit === true */}
+{isEdit && (
+  <div className="flex justify-center w-full mt-4">
+    <button
+      type="submit"
+      disabled={loading}
+      className={`py-2 px-2 w-full sm:w-1/2 rounded-xl text-white flex justify-center items-center gap-2
+        ${loading ? "bg-[#228B22]/60 cursor-not-allowed" : "bg-[#228B22] cursor-pointer"}
+      `}
+    >
+      {loading ? (
+        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      ) : (
+        "Submit"
+      )}
+    </button>
+  </div>
+)}
+
         </div>
-      </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
       {/* <Footer /> */}
     </>
   );

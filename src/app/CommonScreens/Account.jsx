@@ -7,6 +7,7 @@ import Referral from "./Referral";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useLocation } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +16,14 @@ export default function Account() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+
+  const location = useLocation();
+  useEffect(() => {
+  if (location.state?.openBankSection) {
+    // Yaha bank details section ko auto-open kar dena
+    setActiveTab("bank"); 
+  }
+}, [location.state]);
 
   // Fetch banner images
   const fetchBannerImages = async () => {
