@@ -1342,41 +1342,6 @@ export default function BiddinggetWorkDetail() {
               </div>
 
             )}
-          <div className="relative max-w-2xl mx-auto">
-            {/* Top Images */}
-            <div className="relative z-10 flex justify-center gap-4">
-              <img
-                src={Warning1}
-                alt="Warning"
-                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-              />
-              <img
-                src={Warning3}
-                alt="Warning2"
-                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-              />
-            </div>
-
-            {/* Yellow Box */}
-            <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-              <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                Warning Message
-              </h2>
-              <p className="text-gray-700 text-sm md:text-base">
-                Pay securely — no extra charges from the platform.
-                Choose simple and safe transactions.
-              </p>
-            </div>
-            {/* Add dispute creation option for completed task (mirror DirectHiring behavior) */}
-            <div className="flex justify-center">
-              <Link to={`/dispute/${id}/bidding`}>
-                <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
-                  Create Dispute
-                </button>
-              </Link>
-            </div>
-
-          </div>
         </div>
         <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
           {bannerLoading ? (
