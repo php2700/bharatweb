@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import backArrow from "../../../assets/profile/arrow_back.svg";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -477,14 +478,15 @@ export default function ViewProfile() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4">
-        <button
-          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-          onClick={() => navigate(-1)}
-        >
-          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" /> Back
-        </button>
-      </div>
+      <div className="container mx-auto mt-20 px-4 py-4">
+                    <button
+                  className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+                  onClick={() => navigate(-1)}
+                >
+                  <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+                  Back
+                </button>
+                  </div>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">

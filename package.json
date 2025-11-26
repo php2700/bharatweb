@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "react-scripts start",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
@@ -30,6 +31,7 @@
     "react-redux": "^9.2.0",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^7.8.1",
+    "react-scripts": "^5.0.1",
     "react-select": "^5.10.2",
     "react-slick": "^0.31.0",
     "react-toastify": "^11.0.5",

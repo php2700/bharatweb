@@ -9,6 +9,7 @@ import BidModal from "./BidModel";
 import EditBidModal from "./EditBidModel";
 import cancel from "../../../assets/bidding/cancel.png";
 import warningIcon from "../../../assets/ViewProfile/warning.svg";
+import backArrow from "../../../assets/profile/arrow_back.svg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -317,8 +318,16 @@ export default function Bid() {
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
+ <div className="container mx-auto mt-20 px-4 py-4">
+                    <button
+                  className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+                  onClick={() => window.history.back()}
+                >
+                  <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+                  Back
+                </button>
+                  </div>
+      <div className="min-h-screen p-4  ">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
           <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
 

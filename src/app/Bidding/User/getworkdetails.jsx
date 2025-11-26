@@ -734,20 +734,25 @@ export default function BiddinggetWorkDetail() {
 
   return (
     <>
+    
       <Header />
-      <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button
+      <div className="container mx-auto mt-20 px-4 py-4">
+              <button
             className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
             onClick={() => navigate(-1)}
           >
             <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
             Back
           </button>
-        </div>
+            </div>
+      <ToastContainer position="top-right" autoClose={3000} />
+      
+      <div className="min-h-screen p-4 sm:p-6 ">
+       
         <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
+          
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
+          
           {orderDetail?.image_url?.length > 0 ? (
             <Carousel
               showArrows={true}
@@ -921,7 +926,7 @@ export default function BiddinggetWorkDetail() {
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
-            <h3 className="text-lg font-semibold">Work Title</h3>
+            <h3 className="text-lg font-semibold">Description</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div>
@@ -1204,6 +1209,9 @@ export default function BiddinggetWorkDetail() {
                           </h3>
                           <p className="text-sm text-gray-500">
                             {offer.message || "No message provided"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Duration-{offer.duration || "N/A"}
                           </p>
                           <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
                             <FaMapMarkerAlt size={16} color="#228B22" />
