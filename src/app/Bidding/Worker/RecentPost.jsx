@@ -12,6 +12,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import defaultWorkImage from "../../../assets/directHiring/Work.png";
+import Search from "../../../assets/search-normal.svg";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,7 +24,11 @@ export default function RecentPost() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+   const [taskData, setTaskData] = useState([]);
+   const [searchQuery, setSearchQuery] = useState("");
+
   const navigate = useNavigate();
+
 
   const fetchBannerImages = async () => {
     const token = localStorage.getItem("bharat_token");
@@ -103,6 +109,9 @@ export default function RecentPost() {
           date: item.createdAt,
           completionDate: item.deadline,
           description: item.description,
+          category: item.category_name || "",
+subcategory: item.subcategory_name || "",
+skills: item.skills || ""
         }));
 				// console.log("dhdhd", fetchedWorkers);
         setWorkers(fetchedWorkers);
@@ -114,6 +123,25 @@ export default function RecentPost() {
     };
     fetchAvailableOrders();
   }, []);
+
+
+// Is pure 'filteredTasks' wale code block ko hata kar ye paste karein:
+
+const filteredWorkers = workers.filter((worker) => {
+  const q = searchQuery.toLowerCase().trim();
+  if (!q) return true;
+
+  return (
+    (worker.workName?.toLowerCase().includes(q) || false) ||
+    (worker.description?.toLowerCase().includes(q) || false) ||
+    (worker.location?.toLowerCase().includes(q) || false) ||
+    (worker.project_id?.toString().toLowerCase().includes(q) || false) ||
+    (worker.category?.toLowerCase().includes(q) || false) ||
+    (worker.subcategory?.toLowerCase().includes(q) || false) ||
+    (worker.skills?.toLowerCase().includes(q) || false)
+  );
+});
+   const handleSearchChange = (e) => setSearchQuery(e.target.value);
 
   // Function to truncate description
   const truncateDescription = (text, maxLength = 100) => {
@@ -176,7 +204,7 @@ export default function RecentPost() {
             <div className="text-2xl sm:text-3xl font-bold my-4 text-[#191A1D]">
               Recent Posted Work
             </div>
-            <div className="flex gap-4 mb-6">
+            {/* <div className="flex gap-4 mb-6">
               <div className="relative w-full">
                 <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
@@ -186,10 +214,25 @@ export default function RecentPost() {
                 />
               </div>
               <img src={filterIcon} alt="Filter" className="w-8 h-8" />
-            </div>
-
-            <div className="grid gap-4">
-              {workers.map((worker) => (
+            </div> */}
+        <div className="flex justify-center mb-6">
+          <div className="relative w-full max-w-5xl">
+            <img
+              src={Search}
+              alt="Search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
+            />
+            <input
+              type="search"
+              placeholder="Search by Project Id, title, category, subcategory, description, skills, or location..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="rounded-lg pl-10 pr-4 py-2 w-full bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-[#228B22] text-sm"
+            />
+          </div>
+        </div>
+            {/* <div className="grid gap-4">
+              {filteredWorkers.map((worker) => (
                 <div
                   key={worker._id}
                   className="grid grid-cols-1 md:grid-cols-12 items-start bg-white rounded-lg shadow-lg p-4 h-auto md:h-64 overflow-hidden"
@@ -260,7 +303,83 @@ export default function RecentPost() {
                   </div>
                 </div>
               ))}
+            </div> */}
+            <div className="grid gap-4">
+  {filteredWorkers.length > 0 ? (
+    filteredWorkers.map((worker) => (
+      <div
+        key={worker._id}
+        className="grid grid-cols-1 md:grid-cols-12 items-start bg-white rounded-lg shadow-lg p-4 h-auto md:h-64 overflow-hidden"
+      >
+        <div className="relative col-span-1 md:col-span-4 bg-gray-100 rounded-lg overflow-hidden h-full flex items-center justify-center">
+          <img
+            src={worker.image}
+            alt={worker.workName}
+            className="w-full max-h-[500px] object-contain mx-auto block"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 flex justify-center">
+            <span className="rounded-full bg-black/80 text-white font-medium text-xs sm:text-sm px-4 py-2 text-center">
+              {worker.project_id}
+            </span>
+          </div>
+        </div>
+
+        <div className="md:col-span-8 p-4 space-y-2">
+          <div className="flex flex-col sm:flex-row justify-between gap-2">
+            <h2 className="text-base font-semibold text-gray-800">
+              {worker.workName}
+            </h2>
+            <div className="text-sm font-semibold">
+              Posted Date:{" "}
+              {new Date(worker.date).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
             </div>
+          </div>
+
+          <div className="text-sm text-gray-600">
+            {truncateDescription(worker.description)}
+          </div>
+          <p className="text-sm font-semibold text-[#008000]">
+            &#8377;{worker.amount}
+          </p>
+          <div className="text-sm font-semibold text-gray-800">
+            Completion Date:{" "}
+            {new Date(worker.completionDate).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-4">
+            <span className="text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit">
+              <FaMapMarkerAlt
+                size={25}
+                color="#228B22"
+                className="mr-2"
+              />
+              {worker.location}
+            </span>
+
+            <Link
+              to={`/bidding/worker/order-detail/${worker._id}`}
+              className="text-[#228B22] py-1 px-4 border rounded-lg hover:bg-[#228B22] hover:text-white transition"
+            >
+              View Details
+            </Link>
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <div className="text-center py-10 text-gray-500 font-medium col-span-1 md:col-span-12">
+      No matching work found.
+    </div>
+  )}
+</div>
           </div>
         </div>
 
