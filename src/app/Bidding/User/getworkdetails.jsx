@@ -736,35 +736,17 @@ export default function BiddinggetWorkDetail() {
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-        <div className="container mx-auto bg-gray-50 mt-20 px-4 py-4">
-
-        <button
-
-          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-
-          onClick={() => navigate(-1)}
-
-        >
-
-          <img src={backArrow} className="w-6 h-6 mr-2" alt="Back to work list" />
-
-          Back
-
-        </button>
-
-      </div>
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-         
-        </div>
-        <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
-           {/* <button
+          <button
             className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
             onClick={() => navigate(-1)}
           >
-            <img src={backArrow} className="w-6 h-6 mr-2  " alt="Back" />
+            <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
             Back
-          </button> */}
+          </button>
+        </div>
+        <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
           {orderDetail?.image_url?.length > 0 ? (
             <Carousel
@@ -798,7 +780,7 @@ export default function BiddinggetWorkDetail() {
                 <h2 className="text-lg font-semibold">
                   {orderDetail?.title || "N/A"}
                 </h2>
-                {/* <p className="text-lg font-semibold">Chhawani Usha Ganj</p> */}
+                <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
                 <span
                   onClick={() => setShowMap(true)}
                   className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
@@ -937,7 +919,7 @@ export default function BiddinggetWorkDetail() {
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
-            <h3 className="text-lg font-semibold">Task Details</h3>
+            <h3 className="text-sm font-semibold">Project Description</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div>
@@ -1054,12 +1036,10 @@ export default function BiddinggetWorkDetail() {
                     </span>
                   )}
 
-                  <Link to={`/dispute/${id}/bidding`}>
-                  </Link>
-
                 </div>
                 // ) : orderDetail?.hire_status === "cancelledDispute" ? (
                 //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+                //     Cancelled (Dispute)
                 //   </span>
                 // ) : null}
               ) : orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
@@ -1362,41 +1342,6 @@ export default function BiddinggetWorkDetail() {
               </div>
 
             )}
-          <div className="relative max-w-2xl mx-auto">
-            {/* Top Images */}
-            <div className="relative z-10 flex justify-center gap-4">
-              <img
-                src={Warning1}
-                alt="Warning"
-                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-              />
-              <img
-                src={Warning3}
-                alt="Warning2"
-                className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-              />
-            </div>
-
-            {/* Yellow Box */}
-            <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-              <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                Warning Message
-              </h2>
-              <p className="text-gray-700 text-sm md:text-base">
-                Pay securely — no extra charges from the platform.
-                Choose simple and safe transactions.
-              </p>
-            </div>
-            {/* Add dispute creation option for completed task (mirror DirectHiring behavior) */}
-            <div className="flex justify-center">
-              <Link to={`/dispute/${id}/bidding`}>
-                <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
-                  Create Dispute
-                </button>
-              </Link>
-            </div>
-
-          </div>
         </div>
         <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
           {bannerLoading ? (
