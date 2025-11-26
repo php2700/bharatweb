@@ -82,6 +82,7 @@ export default function RejectedWorklist() {
         console.log("RAW RESPONSE:", data);
         console.log("RAW DATA FIELD:", data?.data);
         const mapped = (data?.data || []).map((t) => ({
+          
           id: t._id,
 
           project_id: t.project_id || "N/A",
@@ -92,7 +93,9 @@ export default function RejectedWorklist() {
 
           category_name: t.category_id?.name || "N/A",
 
-          sub_category: t.sub_category_ids?.[0]?.name || "N/A",
+ sub_category_ids: Array.isArray(t.sub_category_ids)
+    ? t.sub_category_ids
+    : [],
 
           description: t.description || "",
 
@@ -125,29 +128,10 @@ export default function RejectedWorklist() {
 
           user_name: t.user_id?.full_name || "Unknown User",
           user_phone: t.user_id?.phone || "Unknown Phone",
+          cost:t.cost,
         }));
 
-        // const mapped = (data?.data || []).map((t) => ({
-        //   id: t._id,
-
-        //   project_id: t.project_id || "N/A",
-        //   image: t.image_urls?.[0] || t.image_url?.[0] || Work,
-        //   name: t.title || t.category_id?.name || "Unnamed Task",
-        //   category_name: t.category_id?.name || "N/A",
-        //   description: t.description || "",
-        //   date: t.createdAt
-        //     ? new Date(t.createdAt).toLocaleDateString()
-        //     : "Unknown",
-        //   price: t.service_payment?.amount || "0",
-        //   completiondate: t.deadline
-        //     ? new Date(t.deadline).toLocaleDateString()
-        //     : "No deadline",
-        //   status: t.hire_status || t.status || "rejected",
-        //   location: t.google_address || t.location || t.address || "Unknown",
-        //   latitude: t.latitude || null,
-        //   longitude: t.longitude || null,
-        // }));
-
+        
         setTaskData(mapped);
       } catch (err) {
         console.error(err);
@@ -283,7 +267,7 @@ export default function RejectedWorklist() {
 
       {/* Title */}
       <h1 className="text-xl sm:text-2xl text-center mt-10 font-bold">
-    Emergency Rejected Work
+        Emergency Rejected Work
       </h1>
 
       {/* Tabs */}
@@ -378,8 +362,63 @@ export default function RejectedWorklist() {
                     onClick={() =>
                       navigate(
                         activeTab === "Accepted"
-                          ? `/hire/worker/order-detail/${task.id}`
-                          : `/bidding/worker/order-detail/${task.id}`
+                          ? `/worker/emergency-details/accepted-worker`
+                          :`/worker/emergency-details/rejected-worker`,
+                            {
+                          state: {
+                            task: {
+                              id: task.id || task.order_id || task._id,
+                              title: task.title ||task.name ||task.workName ||"Untitled Work",
+                              location:task.location || task.google_address ||task.address,
+                                
+                               
+                                
+                              deadline: task.deadline ||
+                               
+                                task.completionDate ||
+                                task.completion_date || 
+                                task.endDate ||
+                                task.to_be_completed ||
+                                task.due_date ||
+                                task.date,
+                              createdAt:
+                                task.createdAt ||
+                                task.date ||
+                                task.postedAt ||
+                                task.created_on ||
+                                task.created,
+                              amount:
+                                task.amount ||
+                                task.price ||
+                                task.service_payment?.amount,
+                              project_id: task.project_id,
+
+                              images:
+                                task.images ||
+                                task.image_urls ||
+                                task.image_url ||
+                                [],
+
+                              reason:
+                                task.reason ||
+                                task.rejected_reason ||
+                                task.rejected_offer?.reason,
+
+                              description: task.description,
+                              hire_status: task.status,
+                              offer_history: task.offer_history,
+                              cost: task.cost,
+
+                              category_name: task.category_name,
+                              offer: task.offer || null,
+                              user_name:task.user_name,
+                              user_phone:task.user_phone,
+                           sub_category_ids: task.sub_category_ids || [],
+                            },
+                          },
+                          // state:{task}
+                        }
+
                       )
                     }
                     className="border border-green-600 text-green-600 px-4 py-1 rounded-lg"

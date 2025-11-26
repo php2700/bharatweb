@@ -375,6 +375,7 @@ export default function RejectedWorklist() {
       } else if (activeTab === "Bidding Rejected") {
         endpoint = `${BASE_URL}/bidding-order/getNotSelectedBiddingOrders`;
       }
+      console.log(endpoint);
 
       try {
         const { data } = await axios.get(endpoint, {
@@ -397,11 +398,17 @@ export default function RejectedWorklist() {
           completiondate: t.deadline
             ? new Date(t.deadline).toLocaleDateString()
             : "No deadline",
-          status: t.hire_status|| "rejected",
+          status: t.hire_status || "rejected",
           location: t.google_address || t.location || t.address || "Unknown",
           latitude: t.latitude || null,
           longitude: t.longitude || null,
-            offer_history: t.offer_history || []
+          offer_history: t.offer_history || [],
+          cost: t.cost || null,
+          offer: t.offer || null,
+          category:
+            typeof t.category_id === "object"
+              ? t.category_id.name
+              : t.category_id?.name || "N/A",
         }));
 
         setTaskData(mapped);
@@ -596,7 +603,7 @@ export default function RejectedWorklist() {
                   onError={(e) => (e.currentTarget.src = Work)}
                 />
               </div>
-
+              
               {/* Content */}
               <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
                 <div className="flex justify-between">
@@ -629,6 +636,7 @@ export default function RejectedWorklist() {
                 {/* Address + view details */}
                 <div className="flex justify-between mt-3 items-center">
                   <div className="w-2/3">{renderAddress(task)}</div>
+                  {/* Completion + Status */}
 
                   <button
                     onClick={() =>
@@ -639,7 +647,7 @@ export default function RejectedWorklist() {
                         {
                           state: {
                             task: {
-                               id: task.id || task.order_id || task._id, 
+                              id: task.id || task.order_id || task._id,
                               title:
                                 task.title ||
                                 task.name ||
@@ -681,11 +689,15 @@ export default function RejectedWorklist() {
                                 task.rejected_offer?.reason,
 
                               description: task.description,
-                                 hire_status: task.status,
-                       offer_history: task.offer_history,
-                    },
+                              hire_status: task.status,
+                              offer_history: task.offer_history,
+                              cost: task.cost,
+
+                              category_id: task.category,
+                              offer: task.offer || null,
+                            },
                           },
-                    // state:{task}
+                          // state:{task}
                         }
                       )
                     }
