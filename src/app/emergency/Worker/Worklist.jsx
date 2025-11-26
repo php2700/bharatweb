@@ -30,9 +30,12 @@ export default function Worklist() {
   const [expandedAddresses, setExpandedAddresses] = useState({}); // For "See More"
   const [expandedIds, setExpandedIds] = useState({});
 
-  const toggleExpand = (id) => {
-    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+const toggleExpand = (id) => {
+  setExpandedIds((prev) => ({
+    ...prev,
+    [id]: !prev[id],
+  }));
+};
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -437,25 +440,26 @@ export default function Worklist() {
                   </div>
 
                   {/* Description */}
-                  {task.description && (
-                    <div className="mt-2">
-                      <p
-                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
-      transition-all duration-300 break-words ${
-        expandedIds[task._id] ? "line-clamp-none" : "line-clamp-3"
-      }`}
-                      >
-                        {task.description}
-                      </p>
+                 {task.description && (
+  <div key={task.id} className="mt-2">
+    <p
+      className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
+        transition-all duration-300 break-words ${
+          expandedIds[task.id] ? "line-clamp-none" : "line-clamp-3"
+        }`}
+    >
+      {task.description}
+    </p>
 
-                      <button
-                        onClick={() => toggleExpand(task._id)}
-                        className="text-green-600 mt-1 text-xs font-medium hover:underline"
-                      >
-                        {expandedIds[task._id] ? "See Less" : "See More"}
-                      </button>
-                    </div>
-                  )}
+    <button
+      onClick={() => toggleExpand(task.id)}
+      className="text-green-600 mt-1 text-xs font-medium hover:underline"
+    >
+      {expandedIds[task.id] ? "See Less" : "See More"}
+    </button>
+  </div>
+)}
+
 
                   {/* Skills + PDF */}
                   <div className="flex justify-between items-start mt-2">

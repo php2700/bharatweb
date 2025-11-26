@@ -536,6 +536,7 @@ import Header from "../../component/Header";
 // import Footer from "../../component/footer";
 import { FiSend, FiPaperclip, FiImage, FiFileText, FiX } from "react-icons/fi"; // Icons for professional look
 import { BsCheck2All } from "react-icons/bs"; // Read receipts icon
+import { UserX } from "lucide-react";
 
 const Base_url = import.meta.env.VITE_SOCKET_URL;
 const socket = io("https://api.thebharatworks.com/");
@@ -735,10 +736,10 @@ const Chat = () => {
           prev.map((conv) =>
             conv._id === data.conversationId
               ? {
-                ...conv,
-                lastMessage: data.message,
-                unreadCount: conv.unreadCount + 1,
-              }
+                  ...conv,
+                  lastMessage: data.message,
+                  unreadCount: conv.unreadCount + 1,
+                }
               : conv
           )
         );
@@ -904,25 +905,27 @@ const Chat = () => {
       <Header />
       {/* Main Container - Fixed Height Calculation */}
       <div className="flex bg-gray-100 mt-[80px]" style={{ height: "calc(100vh - 80px)" }}>
-
+        
         {/* Sidebar */}
         <div className="w-80 md:w-96 bg-white border-r border-gray-200 flex flex-col h-full z-10">
           <div className="p-4 border-b border-gray-100 bg-white">
             <h2 className="text-xl font-bold text-gray-800">Messages</h2>
-            
           </div>
-
-          {/* Display 'No user found' message directly under header if there are no conversations */}
-     
+          
           <div className="flex-1 overflow-y-auto custom-scrollbar">
-            {conversations.length === 0 && !isLoading && (
-              <p className="text-center text-gray-400 mt-10">No user found</p>
-            )}
+            {conversations.length === 0 && (
+              
+              <p className="flex items-center gap-2 text-left text-gray-400 mt-4 ml-4">
+  <UserX className="w-5 h-5 text-gray-400" />
+  No user found
+</p>
 
+            )}
+            
             {conversations.map((conv) => {
               const otherUser = conv.members.find((m) => m._id !== senderId);
               const isActive = conv._id === currentChat?._id;
-
+              
               return (
                 <div
                   key={conv._id}
@@ -931,24 +934,24 @@ const Chat = () => {
                     ${isActive ? "bg-blue-50 border-l-4 border-l-[#228B22]" : "hover:bg-gray-50 border-l-4 border-l-transparent"}`}
                 >
                   <div className="relative">
-                    <img
+                     <img
                       src={otherUser?.profile_pic || defaultPic}
                       alt="User"
                       className="w-12 h-12 rounded-full object-cover border border-gray-200"
                     />
                     {/* Online Status Dot (Optional) */}
                     {onlineUsers.some(user => user.userId === otherUser?._id) && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     )}
                   </div>
 
                   <div className="ml-4 flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
                       <h3 className={`text-sm font-semibold truncate ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
-                        {otherUser?.full_name ? otherUser.full_name : "User Not Found"}
+                        {otherUser?.full_name || "User"}
                       </h3>
                       {/* Placeholder for time - add timestamps to data if available */}
-                      <span className="text-xs text-gray-400">Now</span>
+                      <span className="text-xs text-gray-400">Now</span> 
                     </div>
                     <div className="flex justify-between items-center mt-1">
                       <p className={`text-sm truncate w-4/5 ${conv.unreadCount > 0 ? "font-semibold text-gray-800" : "text-gray-500"}`}>
@@ -983,21 +986,18 @@ const Chat = () => {
                   />
                   <div>
                     <h3 className="font-bold text-gray-800">
-                      {currentChat.members.find((m) => m._id !== senderId)?.full_name
-                        ? currentChat.members.find((m) => m._id !== senderId).full_name
-                        : "User Not Found"}
-
+                      {currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat"}
                     </h3>
-                    {/* Check online status */}
+                     {/* Check online status */}
                     {/* <p className="text-xs text-[#228B22] font-medium">
                        {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? "Online" : "Offline"}
                     </p> */}
-                    <p className="text-xs font-medium">
-                      {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? (
-                        <span className="text-[#228B22]">Online</span>
-                      ) : (
-                        <span className="text-gray-500">Last seen 20 Oct at 12:30 PM</span>
-                      )}
+                       <p className="text-xs font-medium">
+                       {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? (
+                         <span className="text-[#228B22]">Online</span>
+                       ) : (
+                         <span className="text-gray-500">Last seen 20 Oct at 12:30 PM</span>
+                       )}
                     </p>
                   </div>
                 </div>
@@ -1020,8 +1020,8 @@ const Chat = () => {
                       >
                         <div
                           className={`relative max-w-[70%] lg:max-w-[50%] p-3 shadow-sm rounded-2xl
-                            ${isMe
-                              ? "bg-[#228B22] text-white rounded-tr-none"
+                            ${isMe 
+                              ? "bg-[#228B22] text-white rounded-tr-none" 
                               : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
                             }`}
                         >
@@ -1038,14 +1038,14 @@ const Chat = () => {
 
                           {/* Text Message */}
                           {msg.message && (
-                            <p className={`text-sm leading-relaxed ${isMe ? "text-white" : "text-gray-800"}`}>
-                              {msg.message}
-                            </p>
+                             <p className={`text-sm leading-relaxed ${isMe ? "text-white" : "text-gray-800"}`}>
+                                {msg.message}
+                             </p>
                           )}
 
                           {/* Time & Status (Mock) */}
                           <div className={`text-[10px] mt-1 flex items-center justify-end gap-1 ${isMe ? "text-green-100" : "text-gray-400"}`}>
-                            <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                             {isMe && <BsCheck2All size={14} />}
                           </div>
                         </div>
@@ -1064,20 +1064,20 @@ const Chat = () => {
                     {filePreviews.map((src, i) => (
                       <div key={i} className="relative w-16 h-16 flex-shrink-0 group">
                         <img src={src} className="w-full h-full object-cover rounded-md border" alt="Preview" />
-                        <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
-                          <FiX size={10} />
-                        </button>
+                         <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
+                            <FiX size={10} />
+                         </button>
                       </div>
                     ))}
                     {/* Non-image files */}
                     {files.filter(f => !f.type.startsWith('image/')).map((f, i) => (
-                      <div key={i} className="relative w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center bg-gray-100 rounded-md border">
-                        <FiFileText className="text-gray-500" />
-                        <span className="text-[8px] text-gray-500 truncate w-full text-center px-1">{f.name}</span>
-                        <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
-                          <FiX size={10} />
-                        </button>
-                      </div>
+                         <div key={i} className="relative w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center bg-gray-100 rounded-md border">
+                            <FiFileText className="text-gray-500" />
+                            <span className="text-[8px] text-gray-500 truncate w-full text-center px-1">{f.name}</span>
+                            <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
+                                <FiX size={10} />
+                            </button>
+                         </div>
                     ))}
                   </div>
                 )}
@@ -1135,7 +1135,7 @@ const Chat = () => {
             /* Empty State */
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
               <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                <FiSend size={40} className="text-gray-400 ml-2" />
+                 <FiSend size={40} className="text-gray-400 ml-2" />
               </div>
               <h3 className="text-lg font-semibold text-gray-600">Your Messages</h3>
               <p className="text-sm">Select a chat to start conversation</p>

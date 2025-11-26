@@ -5,6 +5,7 @@ import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import Profile from "../../../assets/ViewProfile/Worker.png";
 import Warning from "../../../assets/ViewProfile/warning.svg";
+import noWorkImage from "../../../assets/bidding/no_related_work.png";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -959,10 +960,30 @@ export default function ViewProfile() {
               </div>
             ) : (
               <div className="text-center text-gray-600 py-8">
-                {searchQuery
-                  ? `No providers found for "${searchQuery}"`
-                  : "No service providers available."}
-              </div>
+  {searchQuery
+    ? (
+      <>
+        <p>No providers found for "{searchQuery}"</p>
+        <img
+          src={noWorkImage}
+          alt="No providers"
+          className="mx-auto mt-4 w-74 opacity-80"
+        />
+      </>
+    )
+    : (
+      <>
+        <p>No service providers available.</p>
+        <img
+          src={noWorkImage}
+          alt="No service providers"
+          className="mx-auto mt-4 w-74 opacity-80"
+        />
+      </>
+    )
+  }
+</div>
+
             )}
           </div>
         )}

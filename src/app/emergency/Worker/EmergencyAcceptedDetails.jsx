@@ -24,7 +24,7 @@ export default function RejectedWorkDetails() {
   const navigate = useNavigate();
   const task = state?.task;
   console.log(task);
-  console.log(task.offer_history);
+  console.log(task.hire_status);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [openImage, setOpenImage] = useState(null);
@@ -195,11 +195,13 @@ export default function RejectedWorkDetails() {
                       ).toLocaleDateString("en-GB")
                     : "N/A"}
                 </span>
-               <div className="flex items-center gap-2">
-  <span className="text-gray-700 font-semibold">Order_Status:</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-700 font-semibold">
+                    Order_Status:
+                  </span>
 
-  <div
-    className={`px-4 py-1 rounded-full text-sm text-white flex items-center gap-2
+                  <div
+                    className={`px-4 py-1 rounded-full text-sm text-white flex items-center gap-2
       ${
         task?.hire_status === "pending"
           ? "bg-yellow-500"
@@ -214,15 +216,14 @@ export default function RejectedWorkDetails() {
           : "bg-gray-500"
       }
     `}
-  >
-    <p className="text-white text-sm">
-      {task?.hire_status
-        ? task.hire_status.charAt(0).toUpperCase() + task.hire_status.slice(1)
-        : ""}
-    </p>
-  </div>
-
-
+                  >
+                    <p className="text-white text-sm">
+                      {task?.hire_status
+                        ? task.hire_status.charAt(0).toUpperCase() +
+                          task.hire_status.slice(1)
+                        : ""}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -253,14 +254,17 @@ export default function RejectedWorkDetails() {
                       </h3>
                     </div>
                   </div>
-                  <div className="px-3 py-2 rounded-full text-white text-sm font-medium bg-red-500">
-                    {task?.offer_history && task.offer_history.length > 0
-                      ? task.offer_history[0].isRejectedByUser
-                        ? "Rejected by me"
-                        : "Rejected by user"
-                      : "No offer history"}
+                  <div className="px-6 py-2 rounded-full text-white text-sm font-medium bg-red-500">
+                    {task?.hire_status === "pending"
+                      ? "Waiting for user response"
+                      : task?.hire_status === "assigned"
+                      ? "You are not selected for this task "
+                      : task?.hire_status === "completed"
+                      ? "You are selected for this task"
+                      : task?.hire_status === "cancelledDispute"
+                      ? "User cancelled Dispute"
+                      : ""}
                   </div>
-                
                 </div>
               </div>
             </div>

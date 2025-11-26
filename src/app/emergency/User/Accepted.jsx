@@ -431,57 +431,63 @@ export default function Accepted({
         )}
 
         {/* Payment History */}
-              {paymentHistory && Array.isArray(paymentHistory) && (
-          <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Payment Summary</h3>
-        
-              <div className="flex items-center gap-3">
-                {/* Create Payment Button */}
-                {hireStatus == "accepted" && (
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700"
-                  >
-                    Create Payment
-                  </button>
-                )}
-        
-                {/* NEW – View Payment Details Button */}
-                
-              </div>
+        {paymentHistory && Array.isArray(paymentHistory) && (
+        <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
+      
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
+            <h3 className="text-lg font-semibold">Payment Summary</h3>
+      
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Create Payment Button */}
+              {hireStatus == "accepted" && (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
+                >
+                  Create Payment
+                </button>
+              )}
             </div>
-        
-            {/* Existing Payment List Logic - untouched */}
-            {paymentHistory.map((payment, index) => (
-              <div
-                key={payment._id}
-                className="grid grid-cols-12 items-center bg-white border-b border-gray-200 py-4 px-3"
-              >
-                <div className="col-span-5 flex items-center gap-4">
-                  <span className="font-semibold">{index + 1}.</span>
-                  <span>{payment.description || "Starting Payment"}</span>
-                </div>
-        
-                <div className="col-span-4 text-center">
-                  {payment.status === "success" &&
-                    payment.release_status === "pending" && (
-                      <>
-                        <span className="text-[#228B22] me-2 font-semibold">
-                          Waiting for Approval
-                        </span>
-        
-                        {hireStatus === "accepted" && (
-                          <button
-                            onClick={() => handlePay(payment._id)}
-                            className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                          >
-                            Pay
-                          </button>
-                        )}
-                      </>
+          </div>
+      
+          {/* Payment History List */}
+          {paymentHistory.map((payment, index) => (
+            <div
+              key={payment._id}
+              className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center bg-white border-b border-gray-200 py-4 px-3 gap-4"
+            >
+              {/* LEFT SIDE — Description */}
+              <div className="md:col-span-5 flex gap-3 items-start md:items-center">
+                <span className="font-semibold">{index + 1}.</span>
+                <span className="text-sm md:text-base">
+                  {payment.description || "Starting Payment"}
+                </span>
+              </div>
+      
+              {/* MIDDLE SECTION — Status + Buttons */}
+              <div className="md:col-span-4 flex flex-col md:flex-row md:items-center md:justify-center gap-2">
+      
+                {/* Waiting for Approval */}
+                {payment.status === "success" && payment.release_status === "pending" && (
+                  <>
+                    <span className="text-[#228B22] font-semibold text-sm text-left md:text-center">
+                      Waiting for Approval
+                    </span>
+      
+                    {hireStatus === "accepted" && (
+                      <button
+                        onClick={() => handlePay(payment._id)}
+                        className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700 w-fit"
+                      >
+                        Pay
+                      </button>
                     )}
-                    <button
+                  </>
+                )}
+      
+                {/* INFO BUTTON */}
+                <button
                   onClick={() => {
                     Swal.fire({
                       title: "Payment Details",
@@ -517,40 +523,42 @@ export default function Accepted({
                       background: "white",
                     });
                   }}
-                  className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium 
-                    hover:bg-indigo-400 border border-indigo-600 
-                    ml-[-16px] cursor-pointer inline-flex items-center"
-        
+                  className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm
+                    hover:bg-indigo-400 border border-indigo-600 cursor-pointer w-fit flex items-center"
                 >
                   info
                 </button>
-                  {payment.release_status === "release_requested" && (
-                    <span className="text-[#228B22] font-semibold px-6 py-2">Paid</span>
-                  )}
-                  
-                  {payment.release_status === "released" && (
-                    <span className="text-[#228B22] font-semibold px-6 py-2">Paid</span>
-                  )}
-        
-                  {payment.release_status === "rejected" && (
-                    <span className="text-red-600 font-semibold">Admin Rejected</span>
-                  )}
-                </div>
-        
-                <div className="col-span-3 text-right font-semibold pr-3">
-                  ₹{payment.amount}
-                </div>
+      
+                {/* PAID LABELS */}
+                {payment.release_status === "release_requested" && (
+                  <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                )}
+      
+                {payment.release_status === "released" && (
+                  <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                )}
+      
+                {payment.release_status === "rejected" && (
+                  <span className="text-red-600 font-semibold text-sm">Admin Rejected</span>
+                )}
               </div>
-            ))}
-        
-            {/* Form logic untouched */}
-            {showForm && (
-              <>
-                {/* .... your add payment form code .... */}
-              </>
-            )}
-          </div>
-        )}
+      
+              {/* RIGHT SIDE — Amount */}
+              <div className="md:col-span-3 text-right font-semibold text-base">
+                ₹{payment.amount}
+              </div>
+            </div>
+          ))}
+      
+          {/* Add Payment Form (unchanged) */}
+          {showForm && (
+            <>
+              {/* Your existing form code here */}
+            </>
+          )}
+      
+        </div>
+      )}
       </div>
       
 
