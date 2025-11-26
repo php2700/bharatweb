@@ -26,7 +26,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import OrderReviewModal from "../../CommonScreens/OrderReviewModal";
 import Warning1 from "../../../assets/warning1.png";
-import Warning2 from "../../../assets/warning3.png";
+import Warning3 from "../../../assets/warning3.png";
 
 export default function BiddinggetWorkDetail() {
   const { id } = useParams();
@@ -1298,7 +1298,7 @@ export default function BiddinggetWorkDetail() {
                       className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                     />
                     <img
-                      src={Warning2}
+                      src={Warning3}
                       alt="Warning2"
                       className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
                     />
