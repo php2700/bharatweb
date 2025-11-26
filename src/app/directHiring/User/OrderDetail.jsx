@@ -1059,7 +1059,7 @@ export default function ViewProfile() {
                     onClick={() => {
                       openMap(orderData?.address);
                     }}
-                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit"
+                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6"
                   >
                     <FaMapMarkerAlt
                       size={25}

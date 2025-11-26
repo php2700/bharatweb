@@ -61,7 +61,7 @@ const Post = () => {
   const autocompleteRef = useRef(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [razorpayOrder, setRazorpayOrder] = useState(null);
- // ====== NEW ADDRESS MODAL STATES (were missing) ======
+  // ====== NEW ADDRESS MODAL STATES (were missing) ======
   const [newTitle, setNewTitle] = useState("");
   const [newHouseNo, setNewHouseNo] = useState("");
   const [newStreet, setNewStreet] = useState("");
@@ -88,103 +88,102 @@ const Post = () => {
   }
 
   const loadGoogleMapsScript = (callback) => {
-  if (window.google && window.google.maps) {
-    callback();
-    return;
-  }
-  const existing = document.getElementById("google-maps-script");
-  if (existing) {
-    existing.addEventListener("load", callback);
-    return;
-  }
-  const script = document.createElement("script");
-  script.id = "google-maps-script";
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-  }&libraries=places`;
-  script.async = true;
-  script.defer = true;
+    if (window.google && window.google.maps) {
+      callback();
+      return;
+    }
+    const existing = document.getElementById("google-maps-script");
+    if (existing) {
+      existing.addEventListener("load", callback);
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "google-maps-script";
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+      }&libraries=places`;
+    script.async = true;
+    script.defer = true;
 
-  script.onload = callback;
-  script.onerror = () => console.error("Google Maps failed to load");
+    script.onload = callback;
+    script.onerror = () => console.error("Google Maps failed to load");
 
-  document.head.appendChild(script);
-};
- 
-useEffect(() => {
-  if (!isAddAddressModalOpen) return;
+    document.head.appendChild(script);
+  };
 
-  loadGoogleMapsScript(() => {
-    if (!mapRef.current) return;
+  useEffect(() => {
+    if (!isAddAddressModalOpen) return;
 
-    const center = {
-      lat: pickedLocation.latitude || 28.6139,
-      lng: pickedLocation.longitude || 77.2090
-    };
+    loadGoogleMapsScript(() => {
+      if (!mapRef.current) return;
 
-    const map = new window.google.maps.Map(mapRef.current, {
-      center,
-      zoom: 15,
-    });
+      const center = {
+        lat: pickedLocation.latitude || 28.6139,
+        lng: pickedLocation.longitude || 77.2090
+      };
 
-    const geocoder = new window.google.maps.Geocoder();
+      const map = new window.google.maps.Map(mapRef.current, {
+        center,
+        zoom: 15,
+      });
 
-    let marker = new window.google.maps.Marker({
-      position: center,
-      map,
-      draggable: true,
-    });
+      const geocoder = new window.google.maps.Geocoder();
 
-    const updateAddress = (lat, lng) => {
-      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === "OK" && results[0]) {
+      let marker = new window.google.maps.Marker({
+        position: center,
+        map,
+        draggable: true,
+      });
+
+      const updateAddress = (lat, lng) => {
+        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+          if (status === "OK" && results[0]) {
+            setPickedLocation({
+              latitude: lat,
+              longitude: lng,
+              address: results[0].formatted_address,
+            });
+          }
+        });
+      };
+
+      map.addListener("click", (e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        marker.setPosition({ lat, lng });
+        updateAddress(lat, lng);
+      });
+
+      marker.addListener("dragend", (e) => {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        updateAddress(lat, lng);
+      });
+
+      // AUTOCOMPLETE FIX
+      if (mapAutocompleteRef.current) {
+        const auto = new window.google.maps.places.Autocomplete(
+          mapAutocompleteRef.current
+        );
+        auto.addListener("place_changed", () => {
+          const place = auto.getPlace();
+          if (!place.geometry) return;
+
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+
+          map.setCenter({ lat, lng });
+          map.setZoom(16);
+          marker.setPosition({ lat, lng });
+
           setPickedLocation({
             latitude: lat,
             longitude: lng,
-            address: results[0].formatted_address,
+            address: place.formatted_address,
           });
-        }
-      });
-    };
-
-    map.addListener("click", (e) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-      marker.setPosition({ lat, lng });
-      updateAddress(lat, lng);
-    });
-
-    marker.addListener("dragend", (e) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-      updateAddress(lat, lng);
-    });
-
-    // AUTOCOMPLETE FIX
-    if (mapAutocompleteRef.current) {
-      const auto = new window.google.maps.places.Autocomplete(
-        mapAutocompleteRef.current
-      );
-      auto.addListener("place_changed", () => {
-        const place = auto.getPlace();
-        if (!place.geometry) return;
-
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-
-        map.setCenter({ lat, lng });
-        map.setZoom(16);
-        marker.setPosition({ lat, lng });
-
-        setPickedLocation({
-          latitude: lat,
-          longitude: lng,
-          address: place.formatted_address,
         });
-      });
-    }
-  });
-}, [isAddAddressModalOpen]);
+      }
+    });
+  }, [isAddAddressModalOpen]);
 
 
 
@@ -674,70 +673,70 @@ useEffect(() => {
       console.log(error, "gg");
     }
   };
-// Save New Address Function (Fix)
+  // Save New Address Function (Fix)
   // ================= SAVE NEW ADDRESS API =================
- const handleSaveNewAddress = async () => {
-  if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
-    return Swal.fire("Required", "Please fill all required fields and pick a location on the map", "warning");
-  }
-
-  const newAddress = {
-    title: newTitle,
-    houseno: newHouseNo,
-    street: newStreet || "",
-    area: newArea || "",
-    pincode: newPincode,
-    landmark: newLandmark || "",
-    address: pickedLocation.address,
-    latitude: pickedLocation.latitude,
-    longitude: pickedLocation.longitude,
-  };
-
-  const body = {
-    location: {
-      latitude: pickedLocation.latitude,
-      longitude: pickedLocation.longitude,
-      address: pickedLocation.address
-    },
-    full_address: [...(profile.full_address || []), newAddress]
-  };
-
-  try {
-    if (!token) throw new Error("Not authenticated");
-
-    const res = await axios.post(
-      `${BASE_URL}/user/updateUserProfile`,
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-
-    Swal.fire("Success", "Address added successfully!", "success");
-
-    setIsAddAddressModalOpen(false);
-
-    // save new address in UI
-    setSelectedAddress(newAddress.address);
-    setAddress(newAddress.address);
-
-    // persist for other pages too (only after API OK)
-    if (res?.status === 200) {
-      if (newAddress._id) localStorage.setItem("selectedAddressId", newAddress._id);
-      if (newAddress.address) localStorage.setItem("selectedAddressTitle", newAddress.address);
+  const handleSaveNewAddress = async () => {
+    if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
+      return Swal.fire("Required", "Please fill all required fields and pick a location on the map", "warning");
     }
 
-    // refresh redux
-    dispatch(fetchUserProfile());
+    const newAddress = {
+      title: newTitle,
+      houseno: newHouseNo,
+      street: newStreet || "",
+      area: newArea || "",
+      pincode: newPincode,
+      landmark: newLandmark || "",
+      address: pickedLocation.address,
+      latitude: pickedLocation.latitude,
+      longitude: pickedLocation.longitude,
+    };
 
-  } catch (err) {
-    console.log("API Error Response:", err.response?.data);
-    Swal.fire("Error", err.response?.data?.message || "Failed to save new address", "error");
-  }
-};
+    const body = {
+      location: {
+        latitude: pickedLocation.latitude,
+        longitude: pickedLocation.longitude,
+        address: pickedLocation.address
+      },
+      full_address: [...(profile.full_address || []), newAddress]
+    };
+
+    try {
+      if (!token) throw new Error("Not authenticated");
+
+      const res = await axios.post(
+        `${BASE_URL}/user/updateUserProfile`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      Swal.fire("Success", "Address added successfully!", "success");
+
+      setIsAddAddressModalOpen(false);
+
+      // save new address in UI
+      setSelectedAddress(newAddress.address);
+      setAddress(newAddress.address);
+
+      // persist for other pages too (only after API OK)
+      if (res?.status === 200) {
+        if (newAddress._id) localStorage.setItem("selectedAddressId", newAddress._id);
+        if (newAddress.address) localStorage.setItem("selectedAddressTitle", newAddress.address);
+      }
+
+      // refresh redux
+      dispatch(fetchUserProfile());
+
+    } catch (err) {
+      console.log("API Error Response:", err.response?.data);
+      Swal.fire("Error", err.response?.data?.message || "Failed to save new address", "error");
+    }
+  };
 
   return (
     <>
@@ -751,173 +750,170 @@ useEffect(() => {
           Back
         </button>
       </div>
-     <div className="flex flex-col lg:flex-row justify-center items-start bg-white px-3 gap-6 py-6">
+      <div className="flex flex-col lg:flex-row justify-center items-start bg-white px-3 gap-6 py-6">
 
-  {/* LEFT IMAGE BLOCK (same styling as first code) */}
-  <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
-    <img
-      src={EmergencyTask}
-      alt="Task Banner"
-      className="w-full h-auto object-contain rounded-2xl shadow-lg"
-    />
-  </div>
-
-  {/* RIGHT FORM BLOCK (same compact card UI as first code) */}
-  <div className="bg-white rounded-xl p-4 w-full lg:w-[380px] shadow-md max-h-screen overflow-y-auto">
-
-    <h2 className="text-[26px] font-bold text-center text-[#191A1D] mb-3">
-      Post Emergency Task
-    </h2>
-
-    {error && <p className="text-red-500 text-center">{error}</p>}
-    {loading && <p className="text-center">Loading...</p>}
-
-    <form className="w-full space-y-3 text-left text-sm" onSubmit={handleSubmit}>
-
-      {/* Title */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Title</label>
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleInputChange}
-          placeholder="Enter Title"
-          className={`w-full border rounded-md px-3 py-2 text-sm ${
-            validationErrors.title ? "border-red-500" : "border-green-500"
-          }`}
-        />
-        {validationErrors.title && (
-          <p className="text-red-500 text-xs">{validationErrors.title}</p>
-        )}
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Description</label>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Enter description"
-          rows={3}
-          className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${
-            validationErrors.description ? "border-red-500" : "border-green-500"
-          }`}
-        />
-        {validationErrors.description && (
-          <p className="text-red-500 text-xs mt-1">
-            {validationErrors.description}
-          </p>
-        )}
-      </div>
-
-      {/* Category */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Work Category</label>
-        <select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          className={`w-full border rounded-md px-3 py-2 text-sm ${
-            validationErrors.category_id ? "border-red-500" : "border-green-500"
-          }`}
-        >
-          <option value="">Select category</option>
-          {categories.map((c) => (
-            <option key={c._id} value={c._id}>{c.name}</option>
-          ))}
-        </select>
-        {validationErrors.category_id && (
-          <p className="text-red-500 text-xs">{validationErrors.category_id}</p>
-        )}
-      </div>
-
-      {/* Subcategories */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Emergency Subcategories</label>
-        <Select
-          isMulti
-          options={subcategoryOptions}
-          value={selectedSubcategories}
-          onChange={handleSubcategoryChange}
-          placeholder="Select Emergency Subcategories"
-          className="text-sm"
-          styles={{
-            control: (base) => ({
-              ...base,
-              borderColor: validationErrors.sub_category_ids
-                ? "#EF4444"
-                : "#10B981",
-              minHeight: 36
-            }),
-          }}
-        />
-
-        {validationErrors.sub_category_ids && (
-          <p className="text-red-500 text-xs">{validationErrors.sub_category_ids}</p>
-        )}
-      </div>
-
-      {/* Address Section (same UI as first code + Add New Address button added) */}
-      <div className="relative">
-        <div className="flex justify-between items-center mb-1">
-          <label className="text-xs font-bold text-gray-600">Address</label>
-
-          {/* ADD NEW ADDRESS BUTTON (copied from first code) */}
-          <button
-            type="button"
-            onClick={() => setIsAddAddressModalOpen(true)}
-            className="text-xs text-[#228B22] font-semibold underline cursor-pointer"
-          >
-            + Add New Address
-          </button>
+        {/* LEFT IMAGE BLOCK (same styling as first code) */}
+        <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
+          <img
+            src={EmergencyTask}
+            alt="Task Banner"
+            className="w-full h-auto object-contain rounded-2xl shadow-lg"
+          />
         </div>
 
-        <input
-          type="text"
-          readOnly
-          value={address}
-          onClick={() => setShowOptions(!showOptions)}
-          placeholder="Click to select location"
-          className="w-full border rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
-        />
+        {/* RIGHT FORM BLOCK (same compact card UI as first code) */}
+        <div className="bg-white rounded-xl p-4 w-full lg:w-[380px] shadow-md max-h-screen overflow-y-auto">
 
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-        </svg>
+          <h2 className="text-[26px] font-bold text-center text-[#191A1D] mb-3">
+            Post Emergency Task
+          </h2>
 
-        {showOptions && (
-          <ul className="absolute z-10 bg-white border rounded-lg shadow-md w-full mt-1 max-h-44 overflow-y-auto text-sm">
-            <li className="px-3 py-2 bg-gray-100">
-              <h3 className="text-sm font-semibold text-[#191A1D]">Select an Address</h3>
-            </li>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          {loading && <p className="text-center">Loading...</p>}
 
-            {profile?.full_address?.length > 0 ? (
-              profile.full_address.map((loc, i) => (
-                <li
-                  key={i}
-                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-start text-xs"
-                  onClick={() => {
-                    setAddress(loc.address);
-                    updateAddress(loc);
-                    setShowOptions(false);
-                  }}
+          <form className="w-full space-y-3 text-left text-sm" onSubmit={handleSubmit}>
+
+            {/* Title */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Enter Title"
+                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.title ? "border-red-500" : "border-green-500"
+                  }`}
+              />
+              {validationErrors.title && (
+                <p className="text-red-500 text-xs">{validationErrors.title}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Enter description"
+                rows={3}
+                className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${validationErrors.description ? "border-red-500" : "border-green-500"
+                  }`}
+              />
+              {validationErrors.description && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.description}
+                </p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Work Category</label>
+              <select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.category_id ? "border-red-500" : "border-green-500"
+                  }`}
+              >
+                <option value="">Select category</option>
+                {categories.map((c) => (
+                  <option key={c._id} value={c._id}>{c.name}</option>
+                ))}
+              </select>
+              {validationErrors.category_id && (
+                <p className="text-red-500 text-xs">{validationErrors.category_id}</p>
+              )}
+            </div>
+
+            {/* Subcategories */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Emergency Subcategories</label>
+              <Select
+                isMulti
+                options={subcategoryOptions}
+                value={selectedSubcategories}
+                onChange={handleSubcategoryChange}
+                placeholder="Select Emergency Subcategories"
+                className="text-sm"
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    borderColor: validationErrors.sub_category_ids
+                      ? "#EF4444"
+                      : "#10B981",
+                    minHeight: 36
+                  }),
+                }}
+              />
+
+              {validationErrors.sub_category_ids && (
+                <p className="text-red-500 text-xs">{validationErrors.sub_category_ids}</p>
+              )}
+            </div>
+
+            {/* Address Section (same UI as first code + Add New Address button added) */}
+            <div className="relative">
+              <div className="flex justify-between items-center mb-1">
+                <label className="text-xs font-bold text-gray-600">Address</label>
+
+                {/* ADD NEW ADDRESS BUTTON (copied from first code) */}
+                <button
+                  type="button"
+                  onClick={() => setIsAddAddressModalOpen(true)}
+                  className="text-xs text-[#228B22] font-semibold underline cursor-pointer"
                 >
-                  <input type="radio" className="mr-2 mt-1" checked={address === loc.address} />
-                  <p className="flex-1">
-                    <span className="font-medium block">{loc.title}</span>
-                    <span className="text-gray-600 block">{loc.landmark}</span>
-                    <span className="text-gray-500 block text-xs">{loc.address}</span>
-                  </p>
-                </li>
-              ))
-            ) : (
-              <li className="px-3 py-2 text-gray-500 text-xs">No saved addresses</li>
-            )}
-          </ul>
-        )}
-      </div>
-      {/* Add Address Modal - Bilkul same, no change */}
+                  + Add New Address
+                </button>
+              </div>
+
+              <input
+                type="text"
+                readOnly
+                value={address}
+                onClick={() => setShowOptions(!showOptions)}
+                placeholder="Click to select location"
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
+              />
+
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+              </svg>
+
+              {showOptions && (
+                <ul className="absolute z-10 bg-white border rounded-lg shadow-md w-full mt-1 max-h-44 overflow-y-auto text-sm">
+                  <li className="px-3 py-2 bg-gray-100">
+                    <h3 className="text-sm font-semibold text-[#191A1D]">Select an Address</h3>
+                  </li>
+
+                  {profile?.full_address?.length > 0 ? (
+                    profile.full_address.map((loc, i) => (
+                      <li
+                        key={i}
+                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-start text-xs"
+                        onClick={() => {
+                          setAddress(loc.address);
+                          updateAddress(loc);
+                          setShowOptions(false);
+                        }}
+                      >
+                        <input type="radio" className="mr-2 mt-1" checked={address === loc.address} />
+                        <p className="flex-1">
+                          <span className="font-medium block">{loc.title}</span>
+                          <span className="text-gray-600 block">{loc.landmark}</span>
+                          <span className="text-gray-500 block text-xs">{loc.address}</span>
+                        </p>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-3 py-2 text-gray-500 text-xs">No saved addresses</li>
+                  )}
+                </ul>
+              )}
+            </div>
+            {/* Add Address Modal - Bilkul same, no change */}
             {isAddAddressModalOpen && (
               <div className="h-full fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
@@ -953,85 +949,83 @@ useEffect(() => {
               </div>
             )}
 
-      {/* Contact */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Contact</label>
-        <input
-          type="text"
-          name="contact"
-          value={formData.contact}
-          onChange={(e) => {
-            const onlyNums = e.target.value.replace(/\D/g, "");
-            handleInputChange({ target: { name: "contact", value: onlyNums } });
-          }}
-          placeholder="Enter Contact Number"
-          className={`w-full border rounded-md px-3 py-2 text-sm ${
-            validationErrors.contact ? "border-red-500" : "border-green-500"
-          }`}
-        />
-        {validationErrors.contact && (
-          <p className="text-red-500 text-xs">{validationErrors.contact}</p>
-        )}
+            {/* Contact */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Contact</label>
+              <input
+                type="text"
+                name="contact"
+                value={formData.contact}
+                onChange={(e) => {
+                  const onlyNums = e.target.value.replace(/\D/g, "");
+                  handleInputChange({ target: { name: "contact", value: onlyNums } });
+                }}
+                placeholder="Enter Contact Number"
+                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.contact ? "border-red-500" : "border-green-500"
+                  }`}
+              />
+              {validationErrors.contact && (
+                <p className="text-red-500 text-xs">{validationErrors.contact}</p>
+              )}
+            </div>
+
+            {/* Deadline */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
+              <input
+                type="datetime-local"
+                name="deadline"
+                value={formData.deadline}
+                onChange={handleInputChange}
+                min={new Date().toISOString().slice(0, 16)}
+                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.deadline ? "border-red-500" : "border-green-500"
+                  }`}
+              />
+              {validationErrors.deadline && (
+                <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
+              )}
+            </div>
+
+            {/* Image Upload */}
+            <div className="border border-gray-300 rounded-lg p-3 text-center">
+              <label className="cursor-pointer block">
+                <svg className="w-7 h-7 text-[#228B22] mx-auto mb-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3" />
+                </svg>
+                <span className="text-xs text-gray-700">Upload Photos (Optional)</span>
+
+                <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
+
+                <button type="button"
+                  onClick={() => document.querySelector('input[type="file"]').click()}
+                  className="block mx-auto mt-1 px-3 py-1 text-xs border border-[#228B22] text-[#228B22] rounded-md"
+                >
+                  Choose Files
+                </button>
+              </label>
+
+              {formData.images.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                  {formData.images.map((file, index) => (
+                    <div key={index} className="relative">
+                      <img src={URL.createObjectURL(file)} className="w-14 h-14 object-cover rounded border" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-xs text-green-600 mt-1">Max 5 photos (.jpg, .png)</p>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-lg text-base shadow-md transition cursor-pointer"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
       </div>
-
-      {/* Deadline */}
-      <div>
-        <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
-        <input
-          type="datetime-local"
-          name="deadline"
-          value={formData.deadline}
-          onChange={handleInputChange}
-          min={new Date().toISOString().slice(0, 16)}
-          className={`w-full border rounded-md px-3 py-2 text-sm ${
-            validationErrors.deadline ? "border-red-500" : "border-green-500"
-          }`}
-        />
-        {validationErrors.deadline && (
-          <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
-        )}
-      </div>
-
-      {/* Image Upload */}
-      <div className="border border-gray-300 rounded-lg p-3 text-center">
-        <label className="cursor-pointer block">
-          <svg className="w-7 h-7 text-[#228B22] mx-auto mb-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3" />
-          </svg>
-          <span className="text-xs text-gray-700">Upload Photos (Optional)</span>
-
-          <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
-
-          <button type="button"
-            onClick={() => document.querySelector('input[type="file"]').click()}
-            className="block mx-auto mt-1 px-3 py-1 text-xs border border-[#228B22] text-[#228B22] rounded-md"
-          >
-            Choose Files
-          </button>
-        </label>
-
-        {formData.images.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2 justify-center">
-            {formData.images.map((file, index) => (
-              <div key={index} className="relative">
-                <img src={URL.createObjectURL(file)} className="w-14 h-14 object-cover rounded border" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        <p className="text-xs text-green-600 mt-1">Max 5 photos (.jpg, .png)</p>
-      </div>
-
-      <button
-        type="submit"
-        className="w-full bg-[#228B22] hover:bg-green-700 text-white font-semibold py-3 rounded-lg text-base shadow-md transition"
-      >
-        Submit
-      </button>
-    </form>
-  </div>
-</div>
 
 
       {/* Payment Confirmation Modal */}

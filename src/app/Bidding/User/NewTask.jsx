@@ -489,7 +489,7 @@ export default function BiddingNewTask() {
                 placeholder="Enter title of work"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 text-sm"
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -502,7 +502,7 @@ export default function BiddingNewTask() {
                 onChange={handleCategoryChange}
                 placeholder="Select category"
                 isClearable
-                className="text-sm"
+                className="text-sm border border-green-500"
                 styles={{ control: (base) => ({ ...base, minHeight: 36 }) }}
               />
             </div>
@@ -517,7 +517,7 @@ export default function BiddingNewTask() {
                 isMulti
                 placeholder="Select subcategory"
                 isDisabled={!formData.category}
-                className="text-sm"
+                className="text-sm border border-green-500"
                 styles={{ control: (base) => ({ ...base, minHeight: 36 }) }}
               />
             </div>
@@ -540,7 +540,7 @@ export default function BiddingNewTask() {
                 value={selectedAddress}
                 readOnly
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-full border rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
               />
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
                 className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none">
@@ -559,9 +559,9 @@ export default function BiddingNewTask() {
                         <input type="radio" name="addressSelect" checked={selectedAddress === addr.address}
                           onChange={() => handleSelect(addr, index)} className="mr-2 mt-1" />
                         <p className="flex-1">
-                          <span className="font-medium block">{addr.title}</span>
-                          <span className="text-gray-600 block">{addr.landmark}</span>
-                          <span className="text-gray-500 block text-xs">{addr.address}</span>
+                          <span className="font-medium  block">{addr.title}</span>
+                          <span className="text-gray-600  block">{addr.landmark}</span>
+                          <span className="text-gray-500  block text-xs">{addr.address}</span>
                         </p>
                       </li>
                     ))
@@ -587,8 +587,8 @@ export default function BiddingNewTask() {
                       <label className="block"><span className="text-sm font-medium">Street</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newStreet} onChange={(e) => setNewStreet(e.target.value)} /></label>
                       <label className="block"><span className="text-sm font-medium">Area</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newArea} onChange={(e) => setNewArea(e.target.value)} /></label>
                       <label className="block"><span className="text-sm font-medium">Pincode *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newPincode} onChange={(e) => setNewPincode(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Landmark</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newLandmark} onChange={(e) => setNewLandmark(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Selected Address (from map) *</span><input readOnly className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" value={pickedLocation.address || ""} /><p className="text-xs text-gray-500 mt-1">Pick location on map or search using box on right.</p></label>
+                      <label className="block"><span className="text-sm font-medium">Landmark</span><input className="w-full border  rounded-lg px-3 py-2 mt-1" value={newLandmark} onChange={(e) => setNewLandmark(e.target.value)} /></label>
+                      <label className="block"><span className="text-sm font-medium">Selected Address (from map) *</span><input readOnly className="w-full border border-green-500 rounded-lg px-3 py-2 mt-1 bg-gray-100" value={pickedLocation.address || ""} /><p className="text-xs text-gray-500 mt-1">Pick location on map or search using box on right.</p></label>
                       <div className="flex gap-3 mt-auto">
                         <button type="button" onClick={() => setIsAddAddressModalOpen(false)} className="px-4 py-2 bg-gray-300 rounded-lg cursor-pointer">
                           Cancel
@@ -610,14 +610,14 @@ export default function BiddingNewTask() {
 
             {/* Description */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Description</label>
+              <label className="block text-xs mb-1  font-bold">Description</label>
               <textarea
                 name="description"
                 placeholder="Describe your task"
                 value={formData.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full border rounded-md px-3 py-2 text-sm resize-none"
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm resize-none"
               />
             </div>
 
@@ -630,7 +630,7 @@ export default function BiddingNewTask() {
                 placeholder="Enter cost in INR"
                 value={formData.cost}
                 onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 text-sm"
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
               />
             </div>
 
@@ -648,19 +648,19 @@ export default function BiddingNewTask() {
                   dateFormat="dd MMM yyyy, hh:mm aa"
                   placeholderText="Select deadline"
                   minDate={new Date()}
-                  className="w-full border border-gray-400 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
 
             {/* Image Upload */}
-            <div className="border border-gray-300 rounded-lg p-3 text-center">
+            <div className="border border border-green-500 rounded-lg p-3 text-center">
               <label className="cursor-pointer block">
                 <svg className="w-7 h-7 text-[#228B22] mx-auto mb-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3" />
                 </svg>
                 <span className="text-xs text-gray-700">Upload Photos (Optional)</span>
-                <input type="file" className="hidden" multiple accept="image/*" onChange={(e) => {
+                <input type="file" className="hidden border border-green-500" multiple accept="image/*" onChange={(e) => {
                   const files = Array.from(e.target.files);
                   const uniqueFiles = files.filter((file) => !formData.images.some((f) => f.name === file.name && f.size === file.size));
                   if (formData.images.length + uniqueFiles.length > 5) { toast.error("You can upload max 5 photos"); e.target.value = ""; return; }
@@ -693,7 +693,7 @@ export default function BiddingNewTask() {
                 type="submit"
                 className="w-full bg-[#228B22] hover:bg-green-700 text-white cursor-pointer font-semibold py-3 rounded-lg text-base shadow-md transition"
               >
-                Post Task
+                Submit
               </button>
             </div>
           </form>
