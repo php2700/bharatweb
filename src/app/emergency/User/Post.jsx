@@ -978,6 +978,8 @@ const Post = () => {
                 value={formData.deadline}
                 onChange={handleInputChange}
                 min={new Date().toISOString().slice(0, 16)}
+                onClick={(e) => e.target.showPicker()}
+                onFocus={(e) => e.target.showPicker()}
                 className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.deadline ? "border-red-500" : "border-green-500"
                   }`}
               />

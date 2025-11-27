@@ -14,7 +14,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
-import PostNewTask3 from "../../../assets/newtaskss.png";
+import PostNewTask3 from "../../../assets/bidTask.png";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../../../redux/userSlice";
