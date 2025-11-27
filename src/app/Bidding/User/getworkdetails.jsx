@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { data, Link, useNavigate, useParams } from "react-router-dom";
 import { SlidersHorizontal, Search, MapPin } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
@@ -11,7 +11,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
-import workImage from "../../../assets/workcategory/image.png";
+// import workImage from "../../../assets/workcategory/image.png";
+import workImage from "../../../assets/directHiring/Work.png";
 import bannerPlaceholder from "../../../assets/workcategory/image.png";
 import noWorkImage from "../../../assets/bidding/no_related_work.png";
 import callIcon from "../../../assets/bidding/call.png";
@@ -53,7 +54,7 @@ export default function BiddinggetWorkDetail() {
   const [disputeInfo, setDisputeInfo] = useState(null);
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
+  const [openImage, setOpenImage] = useState(null);
   useEffect(() => {
     window.scrollTo(0, 0);
     localStorage.setItem("order_id", id);
@@ -160,6 +161,8 @@ export default function BiddinggetWorkDetail() {
       );
       // console.log("Order Response:", response);
       if (response.status === 200) {
+        console.log("Data received from API:", response);
+
         setAssignedWorker(response.data.assignedWorker || null);
         const order = response.data.data;
         setOrderDetail(order);
@@ -229,6 +232,10 @@ export default function BiddinggetWorkDetail() {
   useEffect(() => {
     fetchServiceProviders();
   }, [categoryId, subCategoryIds]);
+
+  useEffect(() => {
+    console.log("Providers updated:", providers);
+  }, [providers]);
 
   const InviteSendWorker = async (workerId) => {
     try {
@@ -699,10 +706,10 @@ export default function BiddinggetWorkDetail() {
   const formatDate = (dateString) =>
     dateString
       ? new Date(dateString).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      })
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+        })
       : "N/A";
 
   const getStatusStyles = (status) => {
@@ -731,6 +738,27 @@ export default function BiddinggetWorkDetail() {
       </div>
     );
   }
+  const getFullSizeImage = (thumbnailUrl) => {
+    if (!thumbnailUrl) return thumbnailUrl;
+
+    // Case 1: Firebase Storage (99% of apps in India)
+    if (thumbnailUrl.includes("firebasestorage.googleapis.com")) {
+      // Removes =s400-c, =s600-c, =s800-c etc. → gives original full size
+      return thumbnailUrl.replace(/=s\d+-c.*/i, "");
+    }
+
+    // Case 2: Cloudinary
+    if (thumbnailUrl.includes("res.cloudinary.com")) {
+      return thumbnailUrl.replace(
+        /\/upload\/.*/,
+        "/upload/q_auto:good,f_auto,w_2000,h_2000,c_limit/"
+      );
+    }
+
+    // Case 3: Any other CDN – force high quality
+    const separator = thumbnailUrl.includes("?") ? "&" : "?";
+    return `${thumbnailUrl}${separator}original=true`;
+  };
 
   return (
     <>
@@ -750,18 +778,26 @@ export default function BiddinggetWorkDetail() {
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
           {orderDetail?.image_url?.length > 0 ? (
             <Carousel
-              showArrows={true}
+              showArrows
               showThumbs={false}
-              infiniteLoop={true}
-              autoPlay={true}
+              infiniteLoop
+              emulateTouch
+              interval={3000}
+              showStatus={false}
+              autoPlay
               className="w-full h-[360px]"
             >
               {orderDetail.image_url.map((url, index) => (
                 <div key={index}>
+                  {console.log(url)}
                   <img
                     src={url}
                     alt={`Project image ${index + 1}`}
                     className="w-full h-[360px] object-cover"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenImage(getFullSizeImage(url)); // This is the magic line
+                    }}
                   />
                 </div>
               ))}
@@ -772,6 +808,20 @@ export default function BiddinggetWorkDetail() {
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
+          )}
+          {openImage && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              onClick={() => setOpenImage(null)}
+            >
+              <div className="relative" onClick={(e) => e.stopPropagation()}>
+                <img
+                  src={openImage}
+                  alt="Preview"
+                  className="w-auto h-auto max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl object-contain"
+                />
+              </div>
+            </div>
           )}
 
           <div className="py-6 space-y-4">
@@ -791,9 +841,7 @@ export default function BiddinggetWorkDetail() {
                   </span>
                 </span>
                 <span className="text-gray-600 text-sm font-semibold block">
-
                   One Time Project fee :- ₹{orderDetail?.platform_fee || "0"}
-
                 </span>
 
                 {/* {showMap && (
@@ -815,7 +863,9 @@ export default function BiddinggetWorkDetail() {
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-4">
                       <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold">Location on Map</h2>
+                        <h2 className="text-xl font-semibold">
+                          Location on Map
+                        </h2>
                         <button
                           onClick={() => setShowMap(false)}
                           className="text-red-500 font-bold text-2xl"
@@ -866,12 +916,12 @@ export default function BiddinggetWorkDetail() {
                   >
                     {orderDetail?.hire_status
                       ? orderDetail.hire_status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
                       : "Unknown"}
                   </span>
                 </span>
@@ -880,23 +930,25 @@ export default function BiddinggetWorkDetail() {
                     Refund Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderDetail?.refundStatus === "pending"
+                      ${
+                        orderDetail?.refundStatus === "pending"
                           ? "bg-yellow-500"
                           : ""
-                        }
-                      ${orderDetail?.refundStatus === "processed"
+                      }
+                      ${
+                        orderDetail?.refundStatus === "processed"
                           ? "bg-blue-500"
                           : ""
-                        }`}
+                      }`}
                     >
                       {orderDetail?.refundStatus
                         ? orderDetail.refundStatus
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
                         : "Unknown Status"}
                     </span>
                   </span>
@@ -1035,14 +1087,13 @@ export default function BiddinggetWorkDetail() {
                       Add Review
                     </span>
                   )}
-
                 </div>
-                // ) : orderDetail?.hire_status === "cancelledDispute" ? (
-                //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
-                //     Cancelled (Dispute)
-                //   </span>
-                // ) : null}
-              ) : orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
+              ) : // ) : orderDetail?.hire_status === "cancelledDispute" ? (
+              //   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold">
+              //     Cancelled (Dispute)
+              //   </span>
+              // ) : null}
+              orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
                 <Link to={`/disputes/bidding/${disputeInfo._id}`}>
                   <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-orange-600">
                     Cancelled ( {disputeInfo.unique_id || "N/A"})
@@ -1072,199 +1123,257 @@ export default function BiddinggetWorkDetail() {
           {(orderDetail?.hire_status === "pending" ||
             (orderDetail?.hire_status === "accepted" &&
               !orderDetail?.platform_fee_paid)) && (
-              <div className="flex justify-center items-center w-full">
-                <div className="bg-white rounded-[42px] shadow-[0px_4px_4px_0px_#00000040] p-4 max-w-3xl w-full">
-                  <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
-                    <button
-                      onClick={() => setTab("bidder")}
-                      className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${tab === "bidder"
+            <div className="flex justify-center items-center w-full">
+              <div className="bg-white rounded-[42px] shadow-[0px_4px_4px_0px_#00000040] p-4 max-w-3xl w-full">
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-6 lg:gap-10 mb-4 bg-[#D9D9D9] p-[8px] rounded-full">
+                  <button
+                    onClick={() => setTab("bidder")}
+                    className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${
+                      tab === "bidder"
                         ? "bg-[#228B22] text-white border-3"
                         : "bg-gray-100 text-[#228B22]"
-                        }`}
-                    >
-                      Bidder
-                    </button>
-                    <button
-                      onClick={() => setTab("related")}
-                      className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${tab === "related"
+                    }`}
+                  >
+                    Bidder
+                  </button>
+                  <button
+                    onClick={() => setTab("related")}
+                    className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${
+                      tab === "related"
                         ? "bg-[#228B22] text-white border-3"
                         : "bg-gray-100 text-[#228B22]"
-                        }`}
-                    >
-                      Related Worker
-                    </button>
-                  </div>
-                  <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-                    <Search className="w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search for services"
-                      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-                    />
-                    <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
-                  </div>
-                  {tab === "related" ? (
-                    <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                      {Array.isArray(providers) && providers.length > 0 ? (
-                        providers
-                          .filter(
-                            (provider) =>
-                              !offers.some(
-                                (offer) => offer.provider_id?._id === provider._id
-                              )
-                          )
-                          .map((provider) => (
-                            <div
-                              key={provider._id}
-                              className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
-                            >
-                              <img
-                                src={provider.image || workImage}
-                                alt={provider.full_name}
-                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                              />
-                              <div className="flex-1 text-center sm:text-left">
-                                <h3 className="text-[17px] font-bold text-[#303030]">
-                                  {provider.full_name || "Unknown"}
-                                </h3>
-                                <p className="text-sm text-gray-500 truncate max-w-[200px]">
-                                  {provider.skill || "No skill listed"}
-                                </p>
-                                <MapPin className="text-green-600 w-4 h-4 inline-block mr-1" />
-                                <span className="text-gray-700 font-[600] text-xs">
-                                  {provider.location?.address || "Unknown location"}
-                                </span>
-                                <div>
-                                  <button
-                                    onClick={() =>
-                                      handleView(provider._id, null, id)
-                                    }
-                                    className="text-green-600 font-medium text-sm mt-1"
-                                  >
-                                    View Profile
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                                <div className="flex items-center gap-4 sm:gap-7">
-                                  <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                    <img
-                                      src={callIcon}
-                                      alt="Call"
-                                      className="w-[18px] sm:w-[23px]"
-                                    />
-                                  </span>
-                                  <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                    <img
-                                      src={msgIcon}
-                                      alt="Message"
-                                      className="w-[18px] sm:w-[23px]"
-                                    />
-                                  </span>
-                                  <button
-                                    onClick={() => InviteSendWorker(provider._id)}
-                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                                  >
-                                    Invite
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                          <img
-                            src={noWorkImage}
-                            alt="No worker"
-                            className="w-48 sm:w-72 md:w-96 mb-4"
-                          />
-                          <p>No related workers found</p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-6 space-y-4">
-                      {Array.isArray(offers) && offers.length > 0 ? (
-                        offers.map((offer) => (
+                    }`}
+                  >
+                    Related Worker
+                  </button>
+                </div>
+                <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+                  <Search className="w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search for services"
+                    className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+                  />
+                  <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
+                </div>
+                {tab === "related" ? (
+                  <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                    {Array.isArray(providers) && providers.length > 0 ? (
+                      providers
+                        .filter(
+                          (provider) =>
+                            !offers.some(
+                              (offer) => offer.provider_id?._id === provider._id
+                            )
+                        )
+                        .map((provider) => (
                           <div
-                            key={offer._id}
-                            className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
+                            key={provider._id}
+                            className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
                           >
+                            {console.log("PROVIDER DATA →", provider)}
+
                             <img
-                              src={offer.provider_id?.image || workImage}
-                              alt={offer.provider_id?.full_name || "Worker"}
+                              src={provider.image || workImage}
+                              alt={provider.full_name}
                               className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                             />
+
                             <div className="flex-1 text-center sm:text-left">
                               <h3 className="text-[17px] font-bold text-[#303030]">
-                                {offer.provider_id?.full_name || "Unknown"}
+                                {provider.full_name || "Unknown"}
                               </h3>
-                              <p className="text-sm text-gray-500">
-                                {offer.message || "No message provided"}
+                              {provider.averageRating !== undefined ? (
+                                <p className="text-sm font-medium flex items-center gap-1">
+                                  <span className="text-yellow-600">
+                                    Rating:{" "}
+                                    {parseFloat(provider.averageRating).toFixed(
+                                      1
+                                    )}{" "}
+                                    / 5.0
+                                  </span>
+                                  {provider.totalReview > 0 ? (
+                                    <span className="text-gray-500 text-xs">
+                                      ({provider.totalReview} reviews)
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-500 text-xs">
+                                      (No reviews yet)
+                                    </span>
+                                  )}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-gray-500">
+                                  No rating yet
+                                </p>
+                              )}
+                              <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                                {provider.skill || "No skill listed"}
                               </p>
-                              <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
-                                <FaMapMarkerAlt size={16} color="#228B22" />
-                                {offer.provider_id?.location?.address ||
+                              <MapPin className="text-green-600 w-4 h-4 inline-block mr-1" />
+                              <span className="text-gray-700 font-[600] text-xs">
+                                {provider.location?.address ||
                                   "Unknown location"}
                               </span>
                               <div>
                                 <button
                                   onClick={() =>
-                                    handleView(
-                                      offer.provider_id?._id,
-                                      offer._id,
-                                      offer.order_id
-                                    )
+                                    handleView(provider._id, null, id)
                                   }
-                                  className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
+                                  className="text-green-600 font-medium text-sm mt-1"
                                 >
                                   View Profile
                                 </button>
                               </div>
                             </div>
                             <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                              <span className="text-lg font-semibold text-gray-800 mb-2">
-                                ₹{offer.bid_amount || "N/A"}
-                              </span>
-                              {orderDetail?.hire_status === "pending" && (
+                              <div className="flex items-center gap-4 sm:gap-7">
+                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                  <img
+                                    src={callIcon}
+                                    alt="Call"
+                                    className="w-[18px] sm:w-[23px]"
+                                  />
+                                </span>
+                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                  <img
+                                    src={msgIcon}
+                                    alt="Message"
+                                    className="w-[18px] sm:w-[23px]"
+                                  />
+                                </span>
                                 <button
-                                  onClick={() =>
-                                    handleAcceptBid(offer.provider_id?._id)
-                                  }
-                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer"
+                                  onClick={() => InviteSendWorker(provider._id)}
+                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
                                 >
-                                  Accept
+                                  Invite
                                 </button>
-                              )}
-                              {orderDetail?.hire_status === "accepted" &&
-                                !orderDetail?.platform_fee_paid && (
-                                  <button
-                                    onClick={() =>
-                                      handlePayment(offer.provider_id?._id)
-                                    }
-                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                                  >
-                                    Pay & Hire
-                                  </button>
-                                )}
+                              </div>
                             </div>
                           </div>
                         ))
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                        <img
+                          src={noWorkImage}
+                          alt="No worker"
+                          className="w-48 sm:w-72 md:w-96 mb-4"
+                        />
+                        <p>No related workers found</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-6 space-y-4">
+                    {Array.isArray(offers) && offers.length > 0 ? (
+                      offers.map((offer) => (
+                        <div
+                          key={offer._id}
+                          className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
+                        >
                           <img
-                            src={noWorkImage}
-                            alt="No bids"
-                            className="w-48 sm:w-72 md:w-96 mb-4"
+                            src={offer.provider_id?.image || workImage}
+                            alt={offer.provider_id?.full_name || "Worker"}
+                            className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                           />
-                          <p>No bids available</p>
+                          <div className="flex-1 text-center sm:text-left">
+                            <h3 className="text-[17px] font-bold text-[#303030]">
+                              {offer.provider_id?.full_name || "Unknown"}
+                            </h3>
+                            {offer.averageRating !== undefined ? (
+                              <p className="text-sm font-medium flex items-center gap-1">
+                                <span className="text-yellow-600">
+                                  Rating:{" "}
+                                  {parseFloat(offer.averageRating).toFixed(1)} /
+                                  5.0
+                                </span>
+                                {offer.totalReview > 0 ? (
+                                  <span className="text-gray-500 text-xs">
+                                    ({offer.totalReview} reviews)
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-500 text-xs">
+                                    (No reviews yet)
+                                  </span>
+                                )}
+                              </p>
+                            ) : (
+                              <p className="text-sm text-gray-500">
+                                No rating yet
+                              </p>
+                            )}
+                            {offer.duration && (
+                              <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
+                                Duration: {offer.duration}{" "}
+                                {offer.duration == 1 ? "day" : "days"}
+                              </span>
+                            )}
+                            <p className="text-sm text-gray-500">
+                              {offer.message || "No message provided"}
+                            </p>
+                            <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
+                              <FaMapMarkerAlt size={16} color="#228B22" />
+                              {offer.provider_id?.location?.address ||
+                                "Unknown location"}
+                            </span>
+                            <div>
+                              <button
+                                onClick={() =>
+                                  handleView(
+                                    offer.provider_id?._id,
+                                    offer._id,
+                                    offer.order_id
+                                  )
+                                }
+                                className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
+                              >
+                                View Profile
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                            <span className="text-lg font-semibold text-gray-800 mb-2">
+                              ₹{offer.bid_amount || "N/A"}
+                            </span>
+                            {orderDetail?.hire_status === "pending" && (
+                              <button
+                                onClick={() =>
+                                  handleAcceptBid(offer.provider_id?._id)
+                                }
+                                className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer"
+                              >
+                                Accept
+                              </button>
+                            )}
+                            {orderDetail?.hire_status === "accepted" &&
+                              !orderDetail?.platform_fee_paid && (
+                                <button
+                                  onClick={() =>
+                                    handlePayment(offer.provider_id?._id)
+                                  }
+                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+                                >
+                                  Pay & Hire
+                                </button>
+                              )}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                      ))
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                        <img
+                          src={noWorkImage}
+                          alt="No bids"
+                          className="w-48 sm:w-72 md:w-96 mb-4"
+                        />
+                        <p>No bids available</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+          )}
           {(orderDetail?.hire_status === "accepted" ||
             orderDetail?.hire_status === "cancelled" ||
             orderDetail?.hire_status === "completed" ||
@@ -1336,11 +1445,8 @@ export default function BiddinggetWorkDetail() {
                         : "Cancel Task and Create Dispute"}
                     </button>
                   </Link>
-
                 </div>
-
               </div>
-
             )}
         </div>
         <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">

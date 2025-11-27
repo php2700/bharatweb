@@ -9,7 +9,7 @@ import hire1 from "../../assets/workcategory/hire1.jpg";
 import hire2 from "../../assets/workcategory/hire2.jpg";
 import hire3 from "../../assets/workcategory/hire3.jpeg";
 import banner1 from "../../assets/workcategory/biddingTask.jpg";
-import banner2 from "../../assets/workcategory/emergencyTask.png";
+import banner2 from "../../assets/workcategory/emergencytask.png";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -476,7 +476,8 @@ const handleBankUpdate = () => {
         </div>
 
         {/* About Section */}
-        <div className="mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2 gap-6 items-stretch lg:pl-0">
+        
+        <div className="max-w-6xl mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2  gap-6 lg:gap-12 items-center lg:pl-0">
           <img src={banner1} alt="Worker"   className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
           <div className="flex flex-col justify-center h-full">
             <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
@@ -496,7 +497,7 @@ const handleBankUpdate = () => {
 
         {/* Emergency Section */}
         <div className="bg-white-50 py-10">
-          <div className="mx-auto px-4 sm:px-10 grid md:grid-cols-2 gap-6 items-center">
+          <div className="max-w-6xl mx-auto px-4 sm:px-10 grid md:grid-cols-2 gap-6 items-center">
             <div>
               <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
                 Emergency Work
