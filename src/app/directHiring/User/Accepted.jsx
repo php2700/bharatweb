@@ -602,7 +602,30 @@ export default function Accepted({
            </div>
          )}
       </div>
-      
+      <div className="p-4 bg-white shadow-md rounded-lg">
+        <table className="w-full border border-gray-300 rounded-md overflow-hidden">
+          <thead style={{ backgroundColor: "#228B22", color: "white" }}>
+            <tr>
+              <th className="border p-2 text-left">Amount</th>
+              <th className="border p-2 text-left">Total Paid</th>
+              <th className="border p-2 text-left">Total Tax</th>
+              <th className="border p-2 text-left">Paid to Provider</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.total_expected}
+              </td>
+              <td className="border p-2">₹{fullPaymentHistory.total_tax}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.remaining_amount}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
