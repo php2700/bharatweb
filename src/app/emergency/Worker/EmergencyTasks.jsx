@@ -105,8 +105,10 @@ export default function EmergencyTasks() {
             },
           }
         );
+        
 
         const data = await response.json(); // Parse JSON response
+        console.log("First Item from API:", data.data[0]); 
 
         if (!response.ok) {
           // Handle non-200 responses
@@ -118,15 +120,19 @@ export default function EmergencyTasks() {
         // console.log("Fetched tasks:", data);
         const transformedData = data.data.map((item) => ({
           id: item._id,
+          
           project_id: item.project_id,
-          name: item.category_id.name,
+           name: item.title || item.category_id?.name || "Untitled Task",
           image: item.image_urls[0] || defaultWorkImage,
           date: new Date(item.createdAt).toLocaleDateString("en-GB"),
           completiondate: new Date(item.deadline).toLocaleDateString("en-GB"),
           price: item.platform_fee
             ? `₹${item.platform_fee.toLocaleString()}`
             : "₹0",
-          skills: item.sub_category_ids.map((sub) => sub.name).join(", "),
+        
+           skills: item.description 
+            ? item.description 
+            : (item.sub_category_ids?.map((sub) => sub.name).join(", ") || "No Details Available"),
           location: item.google_address || "Unknown Location",
         }));
 

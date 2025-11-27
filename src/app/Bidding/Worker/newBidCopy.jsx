@@ -26,15 +26,23 @@ export default function Bid() {
   const service_provider = localStorage.getItem("user_id");
   const bidding_offer_id = localStorage.getItem("bidding_offer_id");
 
-  // ---------------- STATE DEFINITIONS ----------------
+  // Modal States
   const [isBidModal, setIsBidModal] = useState(false);
   const [isEditBidModal, setIsEditBidModal] = useState(false);
+
+  // Data States
   const [data, setData] = useState(null);
   const [worker, setWorker] = useState(null);
-  const [existingBid, setExistingBid] = useState(null); 
+
+  // Existing Bid (fetched from API)
+  const [existingBid, setExistingBid] = useState(null); // { _id, amount, description }
   const [bidLoading, setBidLoading] = useState(false);
+
+  // Offer / Negotiation
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
+
+  // Loading / Error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
@@ -42,13 +50,9 @@ export default function Bid() {
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-  
-  // ✅ Platform Fee State
-  const [platformFee, setPlatformFee] = useState(0);
-  
-  // ✅ Image Zoom State
   const [openImage, setOpenImage] = useState(null);
 
+  // Slider settings
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -60,33 +64,7 @@ export default function Bid() {
     arrows: true,
   };
 
-  // ---------------- USE EFFECTS ----------------
-
-  // 1. Fetch Platform Fee
-  useEffect(() => {
-    const fetchPlatformFee = async () => {
-      try {
-        const token = localStorage.getItem("bharat_token");
-        const response = await axios.get(`${BASE_URL}/get-fee/bidding`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        
-        if (response.data?.data?.fee) {
-            setPlatformFee(response.data.data.fee);
-        } else if (response.data?.fee) {
-            setPlatformFee(response.data.fee);
-        }
-      } catch (err) {
-        console.error("Failed to fetch platform fee:", err);
-      }
-    };
-    fetchPlatformFee();
-  }, [BASE_URL]);
-
-  // 2. Fetch Banner Images
+  // Fetch banner images
   useEffect(() => {
     const fetchBannerImages = async () => {
       try {
@@ -119,7 +97,7 @@ export default function Bid() {
     window.scrollTo(0, 0);
   }, [BASE_URL]);
 
-  // 3. Fetch Work Details
+  // Fetch Work Details
   useEffect(() => {
     const fetchWorkDetails = async () => {
       try {
@@ -140,7 +118,8 @@ export default function Bid() {
           throw new Error("Failed to fetch work details");
 
         const result = response.data.data;
-        
+        console.log(result);
+
         setWorker({
           _id: result._id,
           order_id: result._id,
@@ -148,7 +127,7 @@ export default function Bid() {
           workName: result.title,
           location: result.address,
           status: result.status,
-          image: result.image_url || [],
+          image: result.image_url || ["d"],
           amount: result.cost,
           platform_fee_paid: result.platform_fee_paid,
           date: result.createdAt,
@@ -172,7 +151,18 @@ export default function Bid() {
     fetchWorkDetails();
   }, [id, BASE_URL]);
 
-  // 4. Fetch Existing Bid
+  const handleGetDirections = (destinationAddress) => {
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      toast.warn("Destination address not found!");
+    }
+  };
+
+  // Fetch Existing Bid (Only if provider has placed one)
   useEffect(() => {
     const fetchExistingBid = async () => {
       if (!worker?.order_id || !service_provider) return;
@@ -189,6 +179,7 @@ export default function Bid() {
             },
           }
         );
+        console.log("Existing Bid Response:", res.data);
         if (res.data?.status && res.data.data) {
           setExistingBid(res.data.data);
         } else {
@@ -205,7 +196,7 @@ export default function Bid() {
     fetchExistingBid();
   }, [worker?.order_id, service_provider, BASE_URL]);
 
-  // 5. Fetch Negotiation
+  // Fetch Negotiation
   useEffect(() => {
     const fetchNegotiation = async () => {
       try {
@@ -239,34 +230,11 @@ export default function Bid() {
     fetchNegotiation();
   }, [worker, BASE_URL]);
 
-  // ---------------- HANDLER FUNCTIONS ----------------
-
-  const handleGetDirections = (destinationAddress) => {
-    if (destinationAddress) {
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-        destinationAddress
-      )}`;
-      window.open(googleMapsUrl, "_blank");
-    } else {
-      toast.warn("Destination address not found!");
-    }
-  };
-
-  // 🔥 VALIDATION ADDED BACK HERE (Send Request) 🔥
+  // Handle Negotiation
   const handleNegotiation = async (offerAmount) => {
     if (!offerAmount || isNaN(offerAmount) || offerAmount <= 0) {
       toast.error("Please enter a valid offer amount");
       return;
-    }
-
-    // ✅ Validation Logic: Offer > Fee * 10
-    if (platformFee && platformFee > 0) {
-        const minRequiredAmount = platformFee * 10;
-        
-        if (Number(offerAmount) <= minRequiredAmount) {
-            toast.error(`Offer amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`);
-            return;
-        }
     }
 
     try {
@@ -302,16 +270,19 @@ export default function Bid() {
     }
   };
 
+  // Handle Bid Success (New Bid)
   const handleBidSuccess = (amount, description, duration, bidId) => {
     setExistingBid({ bid_amount: amount, message: description, duration: duration, _id: bidId });
     setIsBidModal(false);
   };
 
+  // Handle Edit Bid Success
   const handleEditBidSuccess = (newAmount, newDesc, newDuration) => {
     setExistingBid((prev) => ({ ...prev, bid_amount: newAmount, message: newDesc, duration: newDuration }));
     setIsEditBidModal(false);
   };
 
+  // Handle Accept Negotiation
   const handleAcceptNegotiation = async (id, role) => {
     if (!id) {
       toast.error("Negotiation ID is missing");
@@ -343,7 +314,8 @@ export default function Bid() {
   };
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
-  if (error) return <div className="text-center py-6 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-6 text-red-500">{error}</div>;
 
   return (
     <>
@@ -358,12 +330,11 @@ export default function Bid() {
           Back
         </button>
       </div>
-
-      <div className="min-h-screen p-4">
+      <div className="min-h-screen p-4  ">
         <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
           <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
 
-          {/* Work Image with Click Zoom */}
+          {/* Work Image */}
           {worker?.image?.length > 0 ? (
             <Carousel
               showArrows={true}
@@ -371,16 +342,20 @@ export default function Bid() {
               infiniteLoop={true}
               autoPlay={true}
               className="w-full h-[360px]"
-              emulateTouch={true} 
+              emulateTouch={true} // Mobile touch support ke liye
               onClickItem={(index) => setOpenImage(worker.image[index])}
             >
               {worker.image.map((url, index) => (
                 <div key={index} className="cursor-pointer">
+
+                  <div key={index}>
+
                     <img
                       src={url}
                       alt={`Project image ${index + 1}`}
                       className="w-full h-[360px] object-cover"
                     />
+                  </div>
                 </div>
               ))}
             </Carousel>
@@ -393,12 +368,39 @@ export default function Bid() {
               />
             </div>
           )}
+          {/* Lightbox / Image Zoom Modal */}
+          {openImage && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              onClick={() => setOpenImage(null)}
+            >
+              <div className="relative w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                <img
+                  src={openImage}
+                  alt="Preview"
+                  // 🔥 Yahan change kiya hai: 85 ko 98 aur 95 kar diya
+                  className="max-w-[98vw] max-h-[95vh] w-auto h-auto rounded-lg shadow-2xl object-contain"
+                />
+                <button
+                  onClick={() => setOpenImage(null)}
+                  // 🔥 Button ko thoda side mein kiya taaki badi image ke upar na aaye
+                  className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl font-bold cursor-pointer hover:bg-gray-200"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
+          )}
 
           {worker && (
             <div className="py-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-lg font-semibold">{worker.workName}</h2>
+                  {/* <span className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2">
+                    <FaMapMarkerAlt size={18} color="#228B22" />
+                    <span className="truncate">{worker.location || "N/A"}</span>
+                  </span> */}
                   <span
                     onClick={() => setIsMapModalOpen(true)}
                     className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
@@ -430,16 +432,32 @@ export default function Bid() {
                     Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                        ${worker.hire_status === "pending" ? "bg-yellow-500" : ""}
-                        ${worker.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
-                        ${worker.hire_status === "completed" ? "bg-[#228B22]" : ""}
-                        ${worker.hire_status === "cancelledDispute" ? "bg-[#FF8C00]" : ""}
-                        ${worker.hire_status === "accepted" ? "bg-blue-500" : ""}`}
+                        ${worker.hire_status === "pending"
+                          ? "bg-yellow-500"
+                          : ""
+                        }
+                        ${worker.hire_status === "cancelled"
+                          ? "bg-[#FF0000]"
+                          : ""
+                        }
+                        ${worker.hire_status === "completed"
+                          ? "bg-[#228B22]"
+                          : ""
+                        }
+                        ${worker.hire_status === "cancelledDispute"
+                          ? "bg-[#FF8C00]"
+                          : ""
+                        }
+                        ${worker.hire_status === "accepted" ? "bg-blue-500" : ""
+                        }`}
                     >
                       {worker.hire_status
                         ? worker.hire_status
                           .split(" ")
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
                           .join(" ")
                         : "Unknown Status"}
                     </span>
@@ -485,6 +503,7 @@ export default function Bid() {
                 {/* PENDING: Show Bid or Edit Bid */}
                 {worker.hire_status === "pending" && (
                   <>
+                    {/* No bid yet */}
                     {!bidLoading && !existingBid && (
                       <button
                         onClick={() => setIsBidModal(true)}
@@ -494,6 +513,7 @@ export default function Bid() {
                       </button>
                     )}
 
+                    {/* Bid exists */}
                     {!bidLoading && existingBid && (
                       <button
                         onClick={() => setIsEditBidModal(true)}
@@ -503,6 +523,7 @@ export default function Bid() {
                       </button>
                     )}
 
+                    {/* Loading */}
                     {bidLoading && (
                       <div className="text-gray-600">Checking your bid…</div>
                     )}
@@ -649,30 +670,6 @@ export default function Bid() {
       </div>
 
       <Footer />
-      
-      {/* Lightbox / Image Zoom Modal */}
-      {openImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-          onClick={() => setOpenImage(null)}
-        >
-          <div className="relative w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={openImage}
-              alt="Preview"
-              className="max-w-[98vw] max-h-[95vh] w-auto h-auto rounded-lg shadow-2xl object-contain"
-            />
-            <button
-              onClick={() => setOpenImage(null)}
-              className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl font-bold cursor-pointer hover:bg-gray-200"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Map Modal */}
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
@@ -697,6 +694,14 @@ export default function Bid() {
                 )}`}
               ></iframe>
             </div>
+            <div className="mt-5 text-center">
+              {/* <button
+                onClick={() => handleGetDirections(worker?.location)}
+                className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
+              >
+                Get Directions
+              </button> */}
+            </div>
           </div>
         </div>
       )}
@@ -708,7 +713,6 @@ export default function Bid() {
           onClose={() => setIsBidModal(false)}
           orderId={worker?._id}
           onBidSuccess={handleBidSuccess}
-          platformFee={platformFee} // 🔥 Fee passed to Modal
         />
       )}
 
@@ -722,7 +726,6 @@ export default function Bid() {
           initialDescription={existingBid.message}
           bidId={existingBid._id}
           onEditSuccess={handleEditBidSuccess}
-          platformFee={platformFee} // 🔥 Fee passed to Edit Modal too
         />
       )}
     </>

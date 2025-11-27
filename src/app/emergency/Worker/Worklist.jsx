@@ -30,12 +30,12 @@ export default function Worklist() {
   const [expandedAddresses, setExpandedAddresses] = useState({}); // For "See More"
   const [expandedIds, setExpandedIds] = useState({});
 
-const toggleExpand = (id) => {
-  setExpandedIds((prev) => ({
-    ...prev,
-    [id]: !prev[id],
-  }));
-};
+  const toggleExpand = (id) => {
+    setExpandedIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -348,11 +348,10 @@ const toggleExpand = (id) => {
             <button
               key={tab}
               onClick={() => handleTabClick(tab)}
-              className={`px-6 sm:px-9 py-2 rounded-full font-semibold transition-all text-sm sm:text-base ${
-                activeTab === tab
+              className={`px-6 sm:px-9 py-2 rounded-full font-semibold transition-all text-sm sm:text-base ${activeTab === tab
                   ? "bg-[#228B22] text-white"
                   : "text-[#228B22] border border-[#228B22] hover:bg-[#228B22] hover:text-white"
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -440,25 +439,24 @@ const toggleExpand = (id) => {
                   </div>
 
                   {/* Description */}
-                 {task.description && (
-  <div key={task.id} className="mt-2">
-    <p
-      className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
-        transition-all duration-300 break-words ${
-          expandedIds[task.id] ? "line-clamp-none" : "line-clamp-3"
-        }`}
-    >
-      {task.description}
-    </p>
+                  {task.description && (
+                    <div key={task.id} className="mt-2">
+                      <p
+                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
+        transition-all duration-300 break-words ${expandedIds[task.id] ? "line-clamp-none" : "line-clamp-3"
+                          }`}
+                      >
+                        {task.description}
+                      </p>
 
-    <button
-      onClick={() => toggleExpand(task.id)}
-      className="text-green-600 mt-1 text-xs font-medium hover:underline"
-    >
-      {expandedIds[task.id] ? "See Less" : "See More"}
-    </button>
-  </div>
-)}
+                      <button
+                        onClick={() => toggleExpand(task.id)}
+                        className="text-green-600 mt-1 text-xs font-medium hover:underline"
+                      >
+                        {expandedIds[task.id] ? "See Less" : "See More"}
+                      </button>
+                    </div>
+                  )}
 
 
                   {/* Skills + PDF */}
@@ -495,20 +493,19 @@ const toggleExpand = (id) => {
                       Completion: {task.completiondate}
                     </p>
                     <p
-                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${
-                        task.status === "pending"
+                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${task.status === "pending"
                           ? "bg-yellow-100 text-yellow-800"
                           : task.status === "cancelled"
-                          ? "bg-red-100 text-red-800"
-                          : task.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : task.status === "cancelledDispute"
-                          ? "bg-orange-100 text-orange-800"
-                          : task.status === "accepted" ||
-                            task.status === "assigned"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
+                            ? "bg-red-100 text-red-800"
+                            : task.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : task.status === "cancelledDispute"
+                                ? "bg-orange-100 text-orange-800"
+                                : task.status === "accepted" ||
+                                  task.status === "assigned"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-gray-100 text-gray-800"
+                        }`}
                     >
                       Status: {task.status.replace(/([A-Z])/g, " $1").trim()}
                     </p>

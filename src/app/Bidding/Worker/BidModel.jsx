@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
+export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platformFee }) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
 	const [duration, setDuration] = useState("");
@@ -14,6 +14,15 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     if (platformFee && platformFee > 0) {
+      const minRequiredAmount = platformFee * 10;
+
+     
+      if (Number(amount) <= minRequiredAmount) {
+        toast.error(`Bid amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`);
+        return; // Yahan se wapas bhej denge, API call nahi hogi
+      }
+    }
 
     const token = localStorage.getItem("bharat_token");
 

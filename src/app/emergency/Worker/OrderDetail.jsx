@@ -27,7 +27,8 @@ export default function ViewProfile() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
-   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [openImage, setOpenImage] = useState(null);
 
   const fetchBannerImages = async () => {
     try {
@@ -69,7 +70,7 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
-    const handleGetDirections = (destinationAddress) => {
+  const handleGetDirections = (destinationAddress) => {
     if (destinationAddress) {
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
         destinationAddress
@@ -107,14 +108,14 @@ export default function ViewProfile() {
           }),
           orderData?.hire_status === "pending"
             ? axios.get(
-                `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              )
+              `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
             : { data: { providers: [] } }, // Skip provider fetch if not pending
         ]);
         console.log("Order Response:", orderResponse.data);
@@ -180,8 +181,11 @@ export default function ViewProfile() {
               infiniteLoop={true}
               autoPlay={false}
               className="w-full h-[360px]"
+               emulateTouch={true} // Mobile touch support
+              onClickItem={(index) => setOpenImage(orderData.image_urls[index])}
             >
               {orderData.image_urls.map((url, index) => (
+                <div key={index} className="cursor-pointer">
                 <div key={index}>
                   <img
                     src={url}
@@ -189,15 +193,42 @@ export default function ViewProfile() {
                     className="w-full h-[360px] object-cover"
                   />
                 </div>
+                </div>
               ))}
             </Carousel>
           ) : (
+             <div onClick={() => setOpenImage(workImage)} className="cursor-pointer">
             <img
               src={workImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
+            </div>
           )}
+          {/* Full Screen Image Modal */}
+      {openImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setOpenImage(null)}
+        >
+          <div 
+            className="relative w-full h-full flex items-center justify-center" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={openImage}
+              alt="Preview"
+              className="max-w-[98vw] max-h-[95vh] w-auto h-auto rounded-lg shadow-2xl object-contain"
+            />
+            <button
+              onClick={() => setOpenImage(null)}
+              className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl font-bold cursor-pointer hover:bg-gray-200"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
 
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
@@ -224,20 +255,20 @@ export default function ViewProfile() {
                     </span>
                     {orderData?.google_address || "Unknown Location"}
                   </div> */}
-                  <div 
-  onClick={() => setIsMapModalOpen(true)}
-  className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
->
-    {" "}
-    <span>
-      <FaMapMarkerAlt
-        size={25}
-        color="#228B22"
-        className="mr-2"
-      />
-    </span>
-    {orderData?.google_address || "Unknown Location"}
-</div>
+                  <div
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="text-gray-600 flex justify-center items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                  >
+                    {" "}
+                    <span>
+                      <FaMapMarkerAlt
+                        size={25}
+                        color="#228B22"
+                        className="mr-2"
+                      />
+                    </span>
+                    {orderData?.google_address || "Unknown Location"}
+                  </div>
                   <span className="text-gray-600 text-sm font-semibold block">
                     Deadline Date&Time:{" "}
                     {orderData?.deadline
@@ -269,12 +300,12 @@ export default function ViewProfile() {
                     {orderData?.hire_status === "cancelledDispute"
                       ? `Cancelled ${" "} Dispute`
                       : orderData.hire_status
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ") || "Unknown Status"}
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ") || "Unknown Status"}
                   </span>
                 </span>
               </div>
@@ -298,19 +329,19 @@ export default function ViewProfile() {
             {(orderData?.hire_status === "assigned" ||
               orderData?.hire_status === "completed" ||
               orderData?.hire_status === "cancelledDispute") && (
-              <>
-                <Accepted
-                  serviceProvider={orderData?.user_id}
-                  user_id={orderData?.service_provider_id?._id}
-                  assignedWorker={assignedWorker}
-                  paymentHistory={orderData?.service_payment?.payment_history}
-                  fullPaymentHistory={orderData?.service_payment}
-                  orderId={id}
-                  hireStatus={orderData?.hire_status}
-                />
-                <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                  {/* Yellow warning box */}
-                  {/*<div className="relative max-w-2xl mx-auto">
+                <>
+                  <Accepted
+                    serviceProvider={orderData?.user_id}
+                    user_id={orderData?.service_provider_id?._id}
+                    assignedWorker={assignedWorker}
+                    paymentHistory={orderData?.service_payment?.payment_history}
+                    fullPaymentHistory={orderData?.service_payment}
+                    orderId={id}
+                    hireStatus={orderData?.hire_status}
+                  />
+                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                    {/* Yellow warning box */}
+                    {/*<div className="relative max-w-2xl mx-auto">
                     
                     <div className="relative z-10">
                       <img
@@ -337,24 +368,24 @@ export default function ViewProfile() {
                     </div>
                   </div>*/}
 
-                  {/* Cancel button */}
-                  {(orderData?.hire_status === "assigned" ||
-                    orderData?.hire_status === "pending" ||
-                    orderData?.hire_status === "completed") && (
-                    <div className="flex space-x-4">
-                      {/* Red button (Cancel Task) */}
-                      <Link to={`/dispute/${id}/emergency`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          {orderData?.hire_status === "completed"
-                            ? "Create Dispute"
-                            : "Cancel Task and Create Dispute"}
-                        </button>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+                    {/* Cancel button */}
+                    {(orderData?.hire_status === "assigned" ||
+                      orderData?.hire_status === "pending" ||
+                      orderData?.hire_status === "completed") && (
+                        <div className="flex space-x-4">
+                          {/* Red button (Cancel Task) */}
+                          <Link to={`/dispute/${id}/emergency`}>
+                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                              {orderData?.hire_status === "completed"
+                                ? "Create Dispute"
+                                : "Cancel Task and Create Dispute"}
+                            </button>
+                          </Link>
+                        </div>
+                      )}
+                  </div>
+                </>
+              )}
           </div>
         </div>
       </div>
@@ -391,7 +422,7 @@ export default function ViewProfile() {
       </div>
 
       <Footer />
-       {isMapModalOpen && (
+      {isMapModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white p-5 rounded-lg shadow-xl w-full max-w-2xl mx-4">
             <div className="flex justify-between items-center mb-4">
