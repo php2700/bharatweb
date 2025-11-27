@@ -437,9 +437,11 @@ export default function ViewProfile() {
                 interval={3000}
                 emulateTouch={true}
                 showStatus={false}
-                onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+                onClickItem={(index) => setOpenImage(images[index])}
+                 // 🔥 FIX
               >
                 {images.map((url, index) => (
+                   <div key={index} className="h-[360px] cursor-pointer">
                   <div key={index} className="h-[360px]">
                     <img
                       src={url}
@@ -447,15 +449,18 @@ export default function ViewProfile() {
                       alt={`Project image ${index + 1}`}
                     />
                   </div>
+                  </div>
                 ))}
               </Carousel>
             </div>
           ) : (
+             <div onClick={() => setOpenImage(defaultWorkImage)} className="cursor-pointer">
             <img
               src={defaultWorkImage}
               alt="No project images available"
               className="w-full h-[360px] object-cover mt-5"
             />
+            </div>
           )}
 
           {openImage && (
@@ -467,7 +472,7 @@ export default function ViewProfile() {
                 <img
                   src={openImage}
                   alt="Preview"
-                  className="max-w-[85vw] max-h-[85vh] rounded-xl shadow-2xl"
+                  className="max-w-[98vw] max-h-[95vh] rounded-xl shadow-2xl"
                 />
 
                 <button

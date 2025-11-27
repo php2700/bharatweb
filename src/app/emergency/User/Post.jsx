@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 import axios from "axios";
 import Swal from "sweetalert2";
-import EmergencyTask from "../../../assets/EmergencyTask.png";
+import EmergencyTask from "../../../assets/emergTask.png";
 import Logo from "../../../assets/logo.svg";
 import {
   useJsApiLoader,
@@ -978,6 +978,8 @@ const Post = () => {
                 value={formData.deadline}
                 onChange={handleInputChange}
                 min={new Date().toISOString().slice(0, 16)}
+                onClick={(e) => e.target.showPicker()}
+                onFocus={(e) => e.target.showPicker()}
                 className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.deadline ? "border-red-500" : "border-green-500"
                   }`}
               />

@@ -168,13 +168,13 @@ export default function WokerAcceptReject() {
                   Category: {orderData?.category_id?.name || "Unknown Category"}
                 </div>
                 <div>
-                  <div className="flex items-start gap-2 text-gray-700 mt-2">
+                  <div className="flex items-start gap-2 text-gray-700 mt-2 cursor-pointer">
                     <FaMapMarkerAlt
                       size={16}
                       color="#228B22"
                       className="mt-1"
                     />
-                    <span className="bg-gray-100 px-3 py-1 rounded-lg text-sm break-words">
+                    <span className="bg-gray-100 px-3 py-1 rounded-lg text-sm break-words cursor-pointer">
                       {orderData?.google_address || "Unknown Location"}
                     </span>
                   </div>
@@ -245,13 +245,13 @@ export default function WokerAcceptReject() {
             {orderData?.hire_status === "pending" && (
               <div className="flex justify-evenly items-center mb-6">
                 <button
-                  className="px-8 py-3 bg-green-600 min-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-green-700"
+                  className="px-8 py-3 bg-green-600 min-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-green-700 cursor-pointer"
                   onClick={() => handleAcceptOrder(orderData?._id)}
                 >
                   Accept
                 </button>
                 <button
-                  className="px-8 py-3 bg-red-600 min-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-red-700"
+                  className="px-8 py-3 bg-red-600 min-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-red-700 cursor-pointer"
                   onClick={handleReject}
                 >
                   Reject

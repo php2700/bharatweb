@@ -217,6 +217,24 @@ export default function ViewProfile() {
       setIsSubmitting(false);
     }
   };
+  // --- Yeh naya function add karein ---
+  const handleHireConfirmation = (providerId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to hire this service provider?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#228B22",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Hire",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleHire(providerId);
+      }
+    });
+  };
+  // ------------------------------------
 
   const handlePayment = async () => {
     setIsSubmitting(true);
@@ -932,7 +950,8 @@ export default function ViewProfile() {
                     </div>
                     <button
                       className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
-                      onClick={() => handleHire(provider._id)}
+                      // onClick={() => handleHire(provider._id)}
+                      onClick={() => handleHireConfirmation(provider._id)}
                     >
                       Hire
                     </button>
