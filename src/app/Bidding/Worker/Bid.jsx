@@ -31,7 +31,7 @@ export default function Bid() {
   const [isEditBidModal, setIsEditBidModal] = useState(false);
   const [data, setData] = useState(null);
   const [worker, setWorker] = useState(null);
-  const [existingBid, setExistingBid] = useState(null); 
+  const [existingBid, setExistingBid] = useState(null);
   const [bidLoading, setBidLoading] = useState(false);
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
@@ -42,10 +42,10 @@ export default function Bid() {
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-  
+
   // ✅ Platform Fee State
   const [platformFee, setPlatformFee] = useState(0);
-  
+
   // ✅ Image Zoom State
   const [openImage, setOpenImage] = useState(null);
 
@@ -73,11 +73,11 @@ export default function Bid() {
             "Content-Type": "application/json",
           },
         });
-        
+
         if (response.data?.data?.fee) {
-            setPlatformFee(response.data.data.fee);
+          setPlatformFee(response.data.data.fee);
         } else if (response.data?.fee) {
-            setPlatformFee(response.data.fee);
+          setPlatformFee(response.data.fee);
         }
       } catch (err) {
         console.error("Failed to fetch platform fee:", err);
@@ -140,7 +140,7 @@ export default function Bid() {
           throw new Error("Failed to fetch work details");
 
         const result = response.data.data;
-        
+
         setWorker({
           _id: result._id,
           order_id: result._id,
@@ -261,12 +261,14 @@ export default function Bid() {
 
     // ✅ Validation Logic: Offer > Fee * 10
     if (platformFee && platformFee > 0) {
-        const minRequiredAmount = platformFee * 10;
-        
-        if (Number(offerAmount) <= minRequiredAmount) {
-            toast.error(`Offer amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`);
-            return;
-        }
+      const minRequiredAmount = platformFee * 10;
+
+      if (Number(offerAmount) <= minRequiredAmount) {
+        toast.error(
+          `Offer amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`
+        );
+        return;
+      }
     }
 
     try {
@@ -303,12 +305,22 @@ export default function Bid() {
   };
 
   const handleBidSuccess = (amount, description, duration, bidId) => {
-    setExistingBid({ bid_amount: amount, message: description, duration: duration, _id: bidId });
+    setExistingBid({
+      bid_amount: amount,
+      message: description,
+      duration: duration,
+      _id: bidId,
+    });
     setIsBidModal(false);
   };
 
   const handleEditBidSuccess = (newAmount, newDesc, newDuration) => {
-    setExistingBid((prev) => ({ ...prev, bid_amount: newAmount, message: newDesc, duration: newDuration }));
+    setExistingBid((prev) => ({
+      ...prev,
+      bid_amount: newAmount,
+      message: newDesc,
+      duration: newDuration,
+    }));
     setIsEditBidModal(false);
   };
 
@@ -343,7 +355,8 @@ export default function Bid() {
   };
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
-  if (error) return <div className="text-center py-6 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-6 text-red-500">{error}</div>;
 
   return (
     <>
@@ -371,21 +384,24 @@ export default function Bid() {
               infiniteLoop={true}
               autoPlay={true}
               className="w-full h-[360px]"
-              emulateTouch={true} 
+              emulateTouch={true}
               onClickItem={(index) => setOpenImage(worker.image[index])}
             >
               {worker.image.map((url, index) => (
                 <div key={index} className="cursor-pointer">
-                    <img
-                      src={url}
-                      alt={`Project image ${index + 1}`}
-                      className="w-full h-[360px] object-cover"
-                    />
+                  <img
+                    src={url}
+                    alt={`Project image ${index + 1}`}
+                    className="w-full h-[360px] object-cover"
+                  />
                 </div>
               ))}
             </Carousel>
           ) : (
-            <div onClick={() => setOpenImage(hisWorkImg)} className="cursor-pointer">
+            <div
+              onClick={() => setOpenImage(hisWorkImg)}
+              className="cursor-pointer"
+            >
               <img
                 src={hisWorkImg}
                 alt="No project images available"
@@ -430,17 +446,38 @@ export default function Bid() {
                     Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                        ${worker.hire_status === "pending" ? "bg-yellow-500" : ""}
-                        ${worker.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
-                        ${worker.hire_status === "completed" ? "bg-[#228B22]" : ""}
-                        ${worker.hire_status === "cancelledDispute" ? "bg-[#FF8C00]" : ""}
-                        ${worker.hire_status === "accepted" ? "bg-blue-500" : ""}`}
+                        ${
+                          worker.hire_status === "pending"
+                            ? "bg-yellow-500"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "cancelled"
+                            ? "bg-[#FF0000]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "completed"
+                            ? "bg-[#228B22]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "cancelledDispute"
+                            ? "bg-[#FF8C00]"
+                            : ""
+                        }
+                        ${
+                          worker.hire_status === "accepted" ? "bg-blue-500" : ""
+                        }`}
                     >
                       {worker.hire_status
                         ? worker.hire_status
-                          .split(" ")
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(" ")
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
                         : "Unknown Status"}
                     </span>
                   </span>
@@ -451,7 +488,8 @@ export default function Bid() {
                 Category: {worker?.category_id?.name}
               </p>
               <p className="font-semibold">
-                SubCategory: {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
+                SubCategory:{" "}
+                {worker?.sub_category_ids?.map((sub) => sub.name).join(", ")}
               </p>
 
               <h3 className="text-lg font-semibold">Task Details</h3>
@@ -518,19 +556,21 @@ export default function Bid() {
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
                 <button
                   onClick={() => setIsOfferActive(true)}
-                  className={`px-16 py-2 rounded-full font-medium cursor-pointer shadow-sm ${isOfferActive
+                  className={`px-16 py-2 rounded-full font-medium cursor-pointer shadow-sm ${
+                    isOfferActive
                       ? "bg-[#228B22] text-white border border-green-600"
                       : "border border-green-600 text-green-600"
-                    }`}
+                  }`}
                 >
                   Offer Price ({data?.offer_amount || 0})
                 </button>
                 <button
                   onClick={() => setIsOfferActive(false)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-md cursor-pointer ${!isOfferActive
+                  className={`px-16 py-2 rounded-full font-medium shadow-md cursor-pointer ${
+                    !isOfferActive
                       ? "bg-[#228B22] text-white hover:bg-[#228B22]"
                       : "border border-green-600 text-green-600"
-                    }`}
+                  }`}
                 >
                   Negotiate
                 </button>
@@ -607,12 +647,19 @@ export default function Bid() {
           <div className="flex space-x-4">
             <Link to={`/dispute/${id}/bidding`}>
               <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                {worker?.hire_status === "completed"
-                  ? "Create Dispute"
-                  : "Cancel Task and Create Dispute"}
+                Cancel Task and Create Dispute
               </button>
             </Link>
           </div>
+        </div>
+      )}
+      {worker?.hire_status === "completed" && (
+        <div className="flex justify-center mt-4">
+          <Link to={`/dispute/${id}/bidding`}>
+            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+              Create Dispute
+            </button>
+          </Link>
         </div>
       )}
 
@@ -649,14 +696,17 @@ export default function Bid() {
       </div>
 
       <Footer />
-      
+
       {/* Lightbox / Image Zoom Modal */}
       {openImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
           onClick={() => setOpenImage(null)}
         >
-          <div className="relative w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={openImage}
               alt="Preview"
