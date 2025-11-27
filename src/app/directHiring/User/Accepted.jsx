@@ -551,10 +551,53 @@ export default function Accepted({
          
              {/* Add Payment Form (unchanged) */}
              {showForm && (
-               <>
-                 {/* Your existing form code here */}
-               </>
-             )}
+            <>
+              <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
+                <span className="font-semibold">
+                  {paymentHistory.length + 1}
+                </span>
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter payment description"
+                  className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                />
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                />
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                >
+                  <option value="" disabled>
+                    Select payment method
+                  </option>
+                  <option value="online">Online</option>
+                  <option value="cod">Cash on Delivery</option>
+                </select>
+              </div>
+              <div className="flex justify-end space-x-4 mt-4">
+                <button
+                  onClick={handlePaymentSubmit}
+                  className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
          
            </div>
          )}
