@@ -76,6 +76,7 @@ export default function ServiceProviderList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { category_id, subcategory_ids } = location.state || {};
+  
 
   /* ---------- state ---------- */
   const [workers, setWorkers] = useState([]);
@@ -186,13 +187,39 @@ export default function ServiceProviderList() {
   };
 
   /** Unique sub‑category list */
-  const allSubcategories = useMemo(() => {
-    const set = new Set();
-    workers.forEach((w) =>
-      (w.subcategory_names || []).forEach((s) => set.add(s))
-    );
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [workers]);
+  // const allSubcategories = useMemo(() => {
+  //   const set = new Set();
+  //   workers.forEach((w) =>
+  //     (w.subcategory_names || []).forEach((s) => set.add(s))
+  //   );
+  //   return Array.from(set).sort((a, b) => a.localeCompare(b));
+  // }, [workers]);
+
+  // 1️⃣ First create map
+const subcategoryMap = useMemo(() => {
+  const map = {};
+
+  workers.forEach(w => {
+    (w.subcategory_ids || []).forEach((id, index) => {
+      const name = w.subcategory_names?.[index];
+      if (id && name) map[id] = name;
+    });
+  });
+
+  return map;
+}, [workers]);
+
+// 2️⃣ Now safely use map to convert ID → Name
+const allSubcategories = useMemo(() => {
+  if (!Array.isArray(subcategory_ids)) return [];
+
+  return subcategory_ids
+    .map(id => subcategoryMap[id])   // Now it works ✔
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b));
+}, [subcategory_ids, subcategoryMap]);
+
+
 
   /** Filtered & sorted list */
   const filteredWorkers = useMemo(() => {
