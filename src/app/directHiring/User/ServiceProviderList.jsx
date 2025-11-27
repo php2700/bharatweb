@@ -14,7 +14,7 @@ import {
   FaSortAlphaUpAlt,
 } from "react-icons/fa";
 import Header from "../../../component/Header";
-
+import defaultImage from "../../../assets/default-image.jpg";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /* --------------------------------------------------------------
@@ -56,11 +56,11 @@ const BannerSlider = ({ images, loading, error }) => {
       {images.map((src, i) => (
         <div key={i}>
           <img
-            src={src || "/src/assets/profile/default.png"}
+            src={src || defaultImage}
             alt={`Banner ${i + 1}`}
             className="w-full h-[400px] object-cover"
             onError={(e) =>
-              (e.currentTarget.src = "/src/assets/profile/default.png")
+              (e.currentTarget.src = defaultImage)
             }
           />
         </div>
