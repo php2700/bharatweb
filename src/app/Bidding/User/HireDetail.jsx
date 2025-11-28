@@ -8,6 +8,7 @@ import locationIcon from "../../../assets/directHiring/location-icon.png";
 import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
+import defaultPic from "../../../assets/default-image.jpg";
 import { useLocation, useParams } from "react-router-dom";
 
 import { useEffect, useState } from "react";
@@ -35,6 +36,8 @@ export default function HireDetail() {
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [bannerError, setBannerError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const dispatch = useDispatch();
 
   const { profile } = useSelector((state) => state.user);
@@ -184,6 +187,20 @@ export default function HireDetail() {
       clearInterval(interval);
     };
   }, [imagsArray.length]);
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
+  const handleDocumentClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  // Determine isHired similar to ViewProfileDetails behavior
+  const isHired =
+    location.state?.isHired !== undefined
+      ? !!location.state?.isHired
+      : hire_status === "accepted" && !!platFormFee;
 
   if (loading) {
     return <div className="text-center py-10">Loading...</div>;
@@ -615,6 +632,20 @@ const handlePayment = async (order_id, serviceProviderId) => {
           </div>
         </div>
 
+        {/* Document Preview Modal */}
+        {selectedImage && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-4 rounded-lg max-w-3xl">
+              <div className="flex justify-end">
+                <button onClick={closeModal} className="text-gray-600 hover:text-gray-800 font-semibold">
+                  Close
+                </button>
+              </div>
+              <img src={selectedImage} alt="Document Preview" className="w-full h-auto max-h-[80vh] object-contain" onError={(e) => { e.target.src = defaultPic; }} />
+            </div>
+          </div>
+        )}
+
         {/* Image Slider */}
         <div className="bg-[#D3FFD3] h-90 flex items-center relative">
           <img
@@ -637,42 +668,133 @@ const handlePayment = async (order_id, serviceProviderId) => {
         {/* Documents */}
         <div className="container max-w-2xl mx-auto my-10 space-y-6">
           <div className="shadow-2xl rounded-lg py-4 px-10">
-            <h2 className="font-semibold text-lg mb-2">Document</h2>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <span className="bg-green-100 p-2 rounded">📄</span>
-                <span className="font-medium">Aadhar card</span>
-              </div>
-              <div className="bg-[#A9FFB3] h-24 w-40 flex justify-center">
-                <img
-                  src={providerDetail.documents || aadharImg}
-                  alt="Document"
-                  className="h-23 rounded-md border w-[127px]"
-                />
-              </div>
+            <h2 className="font-semibold text-lg mb-2">Documents</h2>
+            <div className="mt-4">
+              {(() => {
+                // Normalize providerDetail.documents into array format similar to ViewProfileDetails
+                const docs = Array.isArray(providerDetail.documents)
+                  ? providerDetail.documents
+                  : providerDetail.documents
+                  ? [
+                      {
+                        documentName: "Aadhar card",
+                        images: Array.isArray(providerDetail.documents)
+                          ? providerDetail.documents
+                          : [providerDetail.documents],
+                      },
+                    ]
+                  : [];
+
+                if (docs.length === 0) {
+                  return (
+                    <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+                      <p className="text-xl font-medium text-gray-600">
+                        No Documents Uploaded Yet
+                      </p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Documents will appear here once the service provider uploads them.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return docs.map((doc, index) => (
+                  <div key={index} className="mb-6 border-b border-gray-200 pb-6 last:border-b-0">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
+                        <span>📄</span>
+                      </div>
+                      <p className="text-lg font-semibold text-gray-800">{doc.documentName || `Document ${index + 1}`}</p>
+                    </div>
+
+                    {doc.images?.length > 0 ? (
+                      <div className="relative">
+                        <div className={`flex flex-wrap gap-6 ${!isHired ? 'blur-md pointer-events-none' : ''}`}>
+                          {doc.images.map((img, imgIndex) => (
+                            <div key={imgIndex} className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${isHired ? 'cursor-pointer hover:shadow-xl' : 'cursor-default'}`} onClick={isHired ? () => handleDocumentClick(img) : undefined}>
+                              <img src={img} alt={`${doc.documentName} image ${imgIndex + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onError={(e) => { e.target.src = defaultPic; }} />
+                              {isHired && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
+                                  <span className="text-white font-medium text-sm">Click to view</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {!isHired && (
+                          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+                            <div className="text-center bg-white p-5 rounded-2xl shadow-2xl border border-gray-200">
+                              <p className="text-xl font-bold text-[#228B22]">Hire to Unlock</p>
+                              <p className="text-sm text-gray-600 mt-1">View clear document images after hiring</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic pl-1">No images uploaded for this document.</p>
+                    )}
+                  </div>
+                ));
+              })()}
             </div>
           </div>
 
           {/* Reviews */}
           <div>
-            <h2 className="font-semibold text-lg mb-3">Rate & Reviews</h2>
-            {providerDetail.rateAndReviews?.length > 0 ? (
-              providerDetail.rateAndReviews.map((review, idx) => (
-                <div
-                  key={idx}
-                  className="shadow-2xl rounded-lg p-4 mb-4 bg-white"
-                >
-                  <div className="flex text-yellow-500 mb-1">{"★★★★☆"}</div>
-                  <div className="font-medium">{review.title}</div>
-                  <p className="text-sm text-gray-600 mb-2">{review.comment}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span>{new Date(review.date).toDateString()}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500">No reviews available.</p>
-            )}
+            
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-lead-600">Rate & Reviews</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-lead-600">Ratings</span>
+                <span className="text-2xl font-bold text-[#228B22]">{providerDetail.rating ?? providerDetail.avgRating ?? '0.0'}</span>
+                <span className="text-sm text-gray-600">({providerDetail.totalReview ?? providerDetail.totalReviews ?? 0} reviews)</span>
+              </div>
+            </div>
+
+            {/* Determine reviews to display */}
+            {(() => {
+              const reviews = providerDetail.rateAndReviews || [];
+              const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 2);
+
+              if (displayedReviews.length > 0) {
+                return (
+                  <>
+                    {displayedReviews.map((item, idx) => (
+                      <div key={item._id ?? idx} className="bg-white rounded-xl shadow-md p-6 mb-4">
+                        <div className="flex gap-1 mb-2">
+                          {[1, 2, 3, 4, 5].map((star, i) => (
+                            <span key={i} className={i < (item.rating ?? 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <img src={item.user?.profilePic || defaultPic} alt="Reviewer" className="w-8 h-8 rounded-full" onError={(e) => { e.target.src = defaultPic; }} />
+                          <h3 className="font-semibold">{item.user?.name || item.user?.full_name || 'Unknown'}</h3>
+                        </div>
+                        <p className="text-gray-600 text-sm mb-2">{item.review ?? item.comment}</p>
+                        <p className="text-xs text-gray-400 mb-2">{new Date(item.createdAt ?? item.date ?? Date.now()).toLocaleDateString()} • {item.order_type ?? item.orderType ?? ''}</p>
+                        {item.images?.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {item.images.map((img, i) => (
+                              <img key={i} src={img} alt={`Review image ${i + 1}`} className="w-16 h-16 object-cover rounded-md" onError={(e) => { e.target.src = defaultPic; }} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* See All Reviews toggle */}
+                    {reviews.length > 2 && !showAllReviews && (
+                      <div className="text-center mt-4">
+                        <button onClick={() => setShowAllReviews(true)} className="text-[#228B22] font-semibold hover:underline">See All Reviews</button>
+                      </div>
+                    )}
+                  </>
+                );
+              }
+
+              return <p className="text-gray-500 text-center">No Ratings Available</p>;
+            })()}
           </div>
 
           {/* Offer/Negotiate Section */}

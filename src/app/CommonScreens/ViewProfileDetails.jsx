@@ -910,6 +910,7 @@ export default function ViewProfileDetails() {
               )}
             </>
           )}
+          
 
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="flex justify-between items-center mb-4">
