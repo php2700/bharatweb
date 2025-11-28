@@ -815,7 +815,11 @@ export default function Header() {
     acc[section].push(notif);
     return acc;
   }, {});
+  
+  //Total Notification count
   const totalNotifications = notifications.length;
+
+
   const notificationSections = Object.keys(groupedNotifications).map(
     (section) => ({
       section,
