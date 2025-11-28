@@ -509,6 +509,9 @@ export default function ViewProfile() {
   }
 };
 
+const capitalize = (text = "") =>
+  text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+
   const handleCancelOffer = async () => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -1052,14 +1055,18 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                
+                <span>
+  Title :- {capitalize(orderData?.title || "Unknown Title")}
+</span>
+
                 {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
                 <div>
                   <div
                     onClick={() => {
                       openMap(orderData?.address);
                     }}
-                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6"
+                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6 relative right-[9px]"
                   >
                     <FaMapMarkerAlt
                       size={25}
@@ -1167,7 +1174,7 @@ export default function ViewProfile() {
               </div>
             </div>
 
-            <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
+            <div className="border border-green-600 rounded-lg p-2 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
                 {orderData?.description}
               </p>

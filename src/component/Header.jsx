@@ -21,6 +21,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
+  const capitalize = (str = "") =>
+  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -1194,19 +1197,21 @@ export default function Header() {
               </div>
 
               {/* Profile Dropdown */}
-              <div className="relative lg:flex hidden " ref={dropdownRef}>
-                {fullName ? (
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
-                  >
-                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                      {fullName}
-                    </span>
-                    <img
-                      src={Dropdown}
-                      alt="Dropdown"
-                      className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
+                <div className="relative lg:flex hidden " ref={dropdownRef}>
+                  {fullName ? (
+                    <button
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
+                    >
+                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                       <span>{capitalize(fullName)}</span>
+
+                      </span>
+                      <img
+                        src={Dropdown}
+                        alt="Dropdown"
+                        className={`w-5 h-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : "rotate-0"
                         }`}
                     />
                   </button>

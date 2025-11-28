@@ -195,7 +195,7 @@ export default function RejectedWorkDetails() {
                       ).toLocaleDateString("en-GB")
                     : "N/A"}
                 </span>
-               <div className="flex items-center gap-2">
+               {/* <div className="flex items-center gap-2">
   <span className="text-gray-700 font-semibold">Order_Status:</span>
 
   <div
@@ -223,7 +223,7 @@ export default function RejectedWorkDetails() {
   </div>
 
 
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -257,7 +257,7 @@ export default function RejectedWorkDetails() {
                     {task?.offer_history && task.offer_history.length > 0
                       ? task.offer_history[0].isRejectedByUser
                         ? "Rejected by me"
-                        : "Rejected by user"
+                        : "Rejected by Worker"
                       : "No offer history"}
                   </div>
                 
