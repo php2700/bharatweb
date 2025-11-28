@@ -155,10 +155,10 @@ export default function WokerAcceptReject() {
             />
           )}
 
-          <div className="p-6">
+          {/* <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-							<div>
+                <div>
                   Title: {orderData?.title || "Unknown title"}
                 </div>
                 <div>
@@ -194,40 +194,35 @@ export default function WokerAcceptReject() {
                   Status:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${
-                        orderData?.hire_status === "pending"
-                          ? "bg-yellow-500"
-                          : ""
+                      ${orderData?.hire_status === "pending"
+                        ? "bg-yellow-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "cancelled"
-                          ? "bg-red-500"
-                          : ""
+                      ${orderData?.hire_status === "cancelled"
+                        ? "bg-red-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "completed"
-                          ? "bg-green-500"
-                          : ""
+                      ${orderData?.hire_status === "completed"
+                        ? "bg-green-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "cancelldispute"
-                          ? "bg-orange-500"
-                          : ""
+                      ${orderData?.hire_status === "cancelldispute"
+                        ? "bg-orange-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "assigned"
-                          ? "bg-green-500"
-                          : ""
+                      ${orderData?.hire_status === "assigned"
+                        ? "bg-green-500"
+                        : ""
                       }`}
                   >
                     {orderData?.hire_status
                       ? orderData.hire_status
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
                       : "Unknown Status"}
                   </span>
                 </span>
@@ -259,6 +254,115 @@ export default function WokerAcceptReject() {
               </div>
             )}
 
+            {orderData?.hire_status === "assigned" && (
+              <Accepted
+                serviceProvider={orderData?.service_provider_id}
+                assignedWorker={assignedWorker}
+                paymentHistory={orderData?.service_payment?.payment_history}
+              />
+            )}
+          </div> */}
+          <div className="p-6">
+            {/* 1. Title aur Right Side Info (ID, Date, Status) */}
+            <div className="flex flex-col md:flex-row justify-between items-start mb-2">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2 md:mb-0">
+                {orderData?.title || "Untitled Task"}
+              </h1>
+
+              <div className="text-right space-y-1 w-full md:w-auto flex flex-col items-end">
+                <span className="bg-black text-white px-4 py-1 rounded-full text-sm block w-fit">
+                  {orderData?.project_id || "#N/A"}
+                </span>
+                <span className="text-gray-600 font-semibold text-sm">
+                  Posted Date:{" "}
+                  {orderData?.createdAt
+                    ? new Date(orderData.createdAt).toLocaleDateString("en-GB")
+                    : "N/A"}
+                </span>
+                <span className="text-gray-600 font-semibold text-sm">
+                  Status:{" "}
+                  <span
+                    className={`px-2 py-0.5 rounded text-white text-xs font-medium ml-1
+                      ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
+                      ${orderData?.hire_status === "cancelled" ? "bg-red-500" : ""}
+                      ${orderData?.hire_status === "completed" ? "bg-green-500" : ""}
+                      ${orderData?.hire_status === "cancelldispute" ? "bg-orange-500" : ""}
+                      ${orderData?.hire_status === "assigned" ? "bg-green-500" : ""}`}
+                  >
+                    {orderData?.hire_status
+                      ? orderData.hire_status.charAt(0).toUpperCase() + orderData.hire_status.slice(1)
+                      : "Unknown"}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            {/* 2. Address Location */}
+            <div className="flex items-start gap-2 text-gray-700 mb-4">
+              <FaMapMarkerAlt size={18} color="#228B22" className="mt-1 shrink-0" />
+              <span className="text-sm md:text-base">
+                {orderData?.google_address || "Unknown Location"}
+              </span>
+            </div>
+
+            {/* 3. Cost aur Date */}
+            <div className="mb-4">
+              <p className="text-green-600 font-bold text-lg">
+                Cost :- ₹{orderData?.platform_fee ? orderData.platform_fee : "0"}/-
+              </p>
+              <p className="text-black font-medium text-sm mt-1">
+                Completion Date:{" "}
+                {orderData?.deadline
+                  ? new Date(orderData.deadline).toLocaleString("en-GB")
+                  : "N/A"}
+              </p>
+            </div>
+
+            {/* 4. Category aur SubCategory (Text format) */}
+            <div className="mb-6 space-y-1 text-black font-semibold text-sm md:text-base">
+              <p>
+                Category:{" "}
+                <span className="font-normal text-gray-800">
+                  {orderData?.category_id?.name || "N/A"}
+                </span>
+              </p>
+              <p>
+                SubCategory:{" "}
+                <span className="font-normal text-gray-800">
+                  {orderData?.sub_category_ids?.map((sub) => sub.name).join(", ") || "N/A"}
+                </span>
+              </p>
+            </div>
+
+            {/* 5. Task Details (Description in Green Box) */}
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Task Details</h3>
+              <div className="border border-green-600 rounded-lg p-4 bg-white min-h-[80px]">
+                <p className="text-gray-700 whitespace-pre-wrap">
+                  {orderData?.description || "No description provided."}
+                </p>
+              </div>
+            </div>
+
+            {/* 6. Action Buttons (Accept/Reject) */}
+            {orderData?.hire_status === "pending" && (
+              <div className="flex justify-evenly items-center mb-6 gap-4 flex-wrap">
+                <button
+                  className="px-8 py-3 bg-green-600 flex-1 min-w-[150px] max-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-green-700 transition cursor-pointer"
+                  onClick={() => handleAcceptOrder(orderData?._id)}
+                >
+                  Accept
+                </button>
+                <button
+                  className="px-8 py-3 bg-red-600 flex-1 min-w-[150px] max-w-[250px] text-white rounded-[8px] text-lg font-semibold hover:bg-red-700 transition cursor-pointer"
+                  onClick={handleReject}
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+
+            {/* 7. Assigned Status Component */}
             {orderData?.hire_status === "assigned" && (
               <Accepted
                 serviceProvider={orderData?.service_provider_id}

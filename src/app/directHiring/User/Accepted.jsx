@@ -602,26 +602,40 @@ export default function Accepted({
            </div>
          )}
       </div>
-      <div className="p-4 bg-white shadow-md rounded-lg">
+      <div className="p-4 bg-white shadow-md rounded-lg mt-10">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>
             <tr>
-              <th className="border p-2 text-left">Amount</th>
-              <th className="border p-2 text-left">Total Paid</th>
-              <th className="border p-2 text-left">Total Tax</th>
-              <th className="border p-2 text-left">Paid to Provider</th>
+              <th className="border p-2 text-left">Description</th>
+              <th className="border p-2 text-left">Amount (₹)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
+              <td className="border p-2">Total Amount Paid</td>
               <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+            </tr>
+            <tr>
+              <td className="border p-2">Pending with App</td>
               <td className="border p-2">
-                ₹{fullPaymentHistory.total_expected}
+                ₹{paymentHistory
+                  .filter((p) =>
+                    ["pending"].includes(p.release_status)
+                  )
+                  .reduce((sum, p) => sum + p.amount, 0)}
               </td>
-              <td className="border p-2">₹{fullPaymentHistory.total_tax}</td>
+            </tr>
+            <tr>
+              <td className="border p-2">Paid to Worker</td>
               <td className="border p-2">
-                ₹{fullPaymentHistory.remaining_amount}
+                ₹
+                {paymentHistory
+                  .filter((p) =>
+                    ["release_requested", "released"].includes(p.release_status)
+                  )
+                  .reduce((sum, p) => sum + p.amount, 0)}
               </td>
+              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
             </tr>
           </tbody>
         </table>

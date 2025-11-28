@@ -1440,14 +1440,21 @@ export default function BiddinggetWorkDetail() {
                   />
                   <Link to={`/dispute/${id}/bidding`}>
                     <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                      {orderDetail?.hire_status === "completed"
-                        ? "Create Dispute"
-                        : "Cancel Task and Create Dispute"}
+                      Cancel Task and Create Dispute
                     </button>
                   </Link>
                 </div>
               </div>
             )}
+          {orderDetail?.hire_status === "completed" && (
+            <div className="flex justify-center mt-4">
+              <Link to={`/dispute/${id}/bidding`}>
+                <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                  Create Dispute
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
         <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
           {bannerLoading ? (
