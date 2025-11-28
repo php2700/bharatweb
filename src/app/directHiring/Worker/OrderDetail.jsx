@@ -295,6 +295,9 @@ export default function ViewProfile() {
     }
   };
 
+
+  const capitalize = (text = "") =>
+  text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   const handleRejectOffer = async () => {
     const confirmResult = await Swal.fire({
       title: "Are you sure?",
@@ -488,7 +491,9 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                         <span>
+  Title :- {capitalize(orderData?.title || "Unknown Title")}
+</span>
                 {/* <div>Description :- {orderData?.description || "Unknown description"}</div> */}
                 <div>
                   {/* <div className=" text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit">
@@ -502,7 +507,7 @@ export default function ViewProfile() {
                   </div> */}
                   <div
                     onClick={() => setIsMapModalOpen(true)}
-                    className="text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                    className="text-gray-800 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer relative right-[5px]"
                   >
                     <FaMapMarkerAlt
                       size={25}
@@ -579,7 +584,7 @@ export default function ViewProfile() {
                 </span>
               </div>
             </div>
-            <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
+            <div className="border border-green-600 rounded-lg p-2 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
                 {orderData?.description}
               </p>
