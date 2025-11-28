@@ -21,6 +21,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
+  const capitalize = (str = "") =>
+  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -1191,7 +1194,8 @@ export default function Header() {
                       className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
                     >
                       <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                        {fullName}
+                       <span>{capitalize(fullName)}</span>
+
                       </span>
                       <img
                         src={Dropdown}
