@@ -697,10 +697,10 @@ export default function Header() {
               full_address: updatedAddresses,
               location: newLocation
                 ? {
-                    latitude: newLocation.latitude,
-                    longitude: newLocation.longitude,
-                    address: newLocation.address,
-                  }
+                  latitude: newLocation.latitude,
+                  longitude: newLocation.longitude,
+                  address: newLocation.address,
+                }
                 : null,
             }),
           }
@@ -815,7 +815,7 @@ export default function Header() {
     acc[section].push(notif);
     return acc;
   }, {});
-
+  const totalNotifications = notifications.length;
   const notificationSections = Object.keys(groupedNotifications).map(
     (section) => ({
       section,
@@ -1131,41 +1131,47 @@ export default function Header() {
                       </div>
                     ) : (
                       <>
-                        {notificationSections.map((section, i) => (
-                          <div key={i}>
-                            <div className="p-3 text-sm font-medium text-gray-700 border-b">
-                              {section.section}
-                            </div>
-                            {section.items.map((notif, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
-                                onClick={() =>
-                                  handleRedirectNotification(notif)
-                                }
-                              >
-                                <div className="flex items-center gap-3">
-                                  <img
-                                    src={Logo}
-                                    alt="coin"
-                                    className="w-10 h-10"
-                                  />
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-800">
-                                      {notif.title}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {notif.message}
-                                    </p>
-                                  </div>
-                                </div>
-                                <span className="text-gray-400 text-xs font-medium">
-                                  {section.section}
-                                </span>
+                        <div className="p-3 text-sm font-medium text-gray-700 border-b">
+                          {notificationSections.map((section, i) => (
+                            <div key={i}>
+                              {/* 👉 Header Row */}
+                              <div className="p-3 text-sm font-medium text-gray-700 border-b flex justify-between items-center">
+                                <p>{section.section}</p>
+                                {section.section === "Today" && (
+                                  <h3 className="font-semibold">Total Notifications :- {totalNotifications}</h3>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                        ))}
+                              {section.items.map((notif, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                  onClick={() =>
+                                    handleRedirectNotification(notif)
+                                  }
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <img
+                                      src={Logo}
+                                      alt="coin"
+                                      className="w-10 h-10"
+                                    />
+                                    <div>
+                                      <p className="text-sm font-medium text-gray-800">
+                                        {notif.title}
+                                      </p>
+                                      <p className="text-xs text-gray-500">
+                                        {notif.message}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <span className="text-gray-400 text-xs font-medium">
+                                    {section.section}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
                         {/*<div className="border-t p-3 flex justify-center">
                           <button
                             onClick={() => {
@@ -1184,141 +1190,132 @@ export default function Header() {
               </div>
 
               {/* Profile Dropdown */}
-                <div className="relative lg:flex hidden " ref={dropdownRef}>
-                  {fullName ? (
-                    <button
-                      onClick={() => setIsOpen(!isOpen)}
-                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
-                    >
-                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                        {fullName}
-                      </span>
-                      <img
-                        src={Dropdown}
-                        alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : "rotate-0"
+              <div className="relative lg:flex hidden " ref={dropdownRef}>
+                {fullName ? (
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
+                  >
+                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                      {fullName}
+                    </span>
+                    <img
+                      src={Dropdown}
+                      alt="Dropdown"
+                      className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
                         }`}
-                      />
-                    </button>
-                  ) : (
+                    />
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                  >
+                    Login / Signup
+                    <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+                  </Link>
+                )}
+                {isOpen && fullName && (
+                  <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
                     <Link
-                      to="/login"
-                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2"
+                      to="/account"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/account"
+                        ? " bg-green-600 text-white  "
+                        : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                      onClick={() => setIsOpen(false)}
                     >
-                      Login / Signup
-                      <img src={Dropdown} alt="Dropdown" className="w-5 h-5" />
+                      <img src={Account} alt="Account" className={`w-5 h-5 ${location.pathname === "/account" ? "filter brightness-0 invert" : ""}`} />{" "}
+                      Account
                     </Link>
-                  )}
-                  {isOpen && fullName && (
-                    <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                      <Link
-                        to="/account"
-                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/account"
-                            ? " bg-green-600 text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
+                    <Link
+                      to="/details"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/details"
+                        ? "bg-[#228B22] text-white"
+                        : "  text-black font-semibold hover:bg-gray-100"
                         }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <img src={Account} alt="Account" className={`w-5 h-5 ${location.pathname === "/account" ? "filter brightness-0 invert" : ""}`} />{" "}
-                        Account
-                      </Link>
-                      <Link
-                        to="/details"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/details"
-                            ? "bg-[#228B22] text-white"
-                            : "  text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <img src={Profile} alt="Profile" className={`w-6 h-6 ${location.pathname === "/details" ? "filter brightness-0 invert" : ""}`} />{" "}
+                      Profile
+                    </Link>
+                    <Link
+                      to="/user/work-list/My Hire"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname.startsWith("/user/work-list")
+                        ? " bg-[#228B22] text-white  "
+                        : "text-black font-semibold hover:bg-gray-100"
                         }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <img src={Profile} alt="Profile" className={`w-6 h-6 ${location.pathname === "/details" ? "filter brightness-0 invert" : ""}`} />{" "}
-                        Profile
-                      </Link>
-                        <Link
-                          to="/user/work-list/My Hire"
-                          className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname.startsWith("/user/work-list")
-                              ? " bg-[#228B22] text-white  "
-                              : "text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaUserTie className="w-5 h-5" /> My Hire
+                    </Link>
+                    <Link
+                      to="/worker/work-list/My Hire"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname.startsWith("/worker/work-list")
+                        ? " bg-[#228B22] text-white  "
+                        : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaBriefcase className="w-5 h-5" /> My Work
+                    </Link>
+
+                    {(role === "service_provider" || role === "both") && (
+                      <Link
+                        to="/worker/rejected-work"
+                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/worker/rejected-work"
+                          ? " bg-green-600 text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
                           }`}
                         onClick={() => setIsOpen(false)}
                       >
-                        <FaUserTie className="w-5 h-5" /> My Hire
+                        <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
                       </Link>
+                    )}
+
+                    {(role === "service_provider" || role === "both") && (
                       <Link
-                        to="/worker/work-list/My Hire"
-                    className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname.startsWith("/worker/work-list")
-                            ? " bg-[#228B22] text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                        to="/worker/emergency/rejected-work"
+                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/worker/emergency/rejected-work"
+                          ? " bg-green-600 text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
+                          }`}
                         onClick={() => setIsOpen(false)}
                       >
-                        <FaBriefcase className="w-5 h-5" /> My Work
+                        <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
                       </Link>
+                    )}
 
-                      {(role === "service_provider" || role === "both") && (
-                        <Link
-                          to="/worker/rejected-work"
-                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/worker/rejected-work"
-                            ? " bg-green-600 text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
+                    <Link
+                      to="/disputes"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/disputes"
+                        ? " bg-green-600 text-white  "
+                        : "  text-black font-semibold hover:bg-gray-100"
                         }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
-                        </Link>
-                      )}
-
-                      {(role === "service_provider" || role === "both") && (
-                        <Link
-                          to="/worker/emergency/rejected-work"
-                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/worker/emergency/rejected-work"
-                            ? " bg-green-600 text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaGavel className="w-5 h-5" /> Disputes
+                    </Link>
+                    <Link
+                      to="/promotion"
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/promotion"
+                        ? " bg-green-600 text-white  "
+                        : "  text-black font-semibold hover:bg-gray-100"
                         }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
-                        </Link>
-                      )}
-
-                      <Link
-                        to="/disputes"
-                            className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/disputes"
-                            ? " bg-green-600 text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaGavel className="w-5 h-5" /> Disputes
-                      </Link>
-                      <Link
-                        to="/promotion"
-                          className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
-                          location.pathname ==="/promotion"
-                            ? " bg-green-600 text-white  "
-                            : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaTrophy className="w-5 h-5" /> Promotion
-                      </Link>
-                      <button
-                        onClick={logoutdestroy}
-                        className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      >
-                        <img src={Logout} alt="Logout" className="w-5 h-5" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FaTrophy className="w-5 h-5" /> Promotion
+                    </Link>
+                    <button
+                      onClick={logoutdestroy}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                    >
+                      <img src={Logout} alt="Logout" className="w-5 h-5" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           )}
           {/*<button
@@ -1339,26 +1336,26 @@ export default function Header() {
           {!(
             location.pathname === "/service-provider-list" && isLargeScreen
           ) && (
-            <button
-              className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6 text-white"
+              <button
+                className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-            </button>
-          )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 text-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                  />
+                </svg>
+              </button>
+            )}
         </div>
       </div>
 
@@ -1411,11 +1408,11 @@ export default function Header() {
                       className="flex items-center font-bold gap-2 px-4 py-3 hover:bg-gray-50 transition-all rounded-lg"
                       onClick={() => setPostATaskDropdown(false)}
                     >
-                     <img
-                      src={DirectHiring}
-                      alt=""
-                      className="w-6 h-6 font-bold text-gray-700"
-                    />
+                      <img
+                        src={DirectHiring}
+                        alt=""
+                        className="w-6 h-6 font-bold text-gray-700"
+                      />
 
                       <span>Direct Hiring</span>
                     </Link>
@@ -1559,9 +1556,8 @@ export default function Header() {
                       <img
                         src={Dropdown}
                         alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : "rotate-0"
-                        }`}
+                        className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
+                          }`}
                       />
                     </button>
                   ) : (

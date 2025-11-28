@@ -498,14 +498,14 @@ export default function ViewProfile() {
     <>
       <Header />
       <div className="container mx-auto mt-20 px-4 py-4">
-                    <button
-                  className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-                  onClick={() => navigate(-1)}
-                >
-                  <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
-                  Back
-                </button>
-                  </div>
+        <button
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+          onClick={() => navigate(-1)}
+        >
+          <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+          Back
+        </button>
+      </div>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -539,7 +539,11 @@ export default function ViewProfile() {
             {/* Order Details */}
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <p>Title :- {orderData?.title || "Unknown Title"}</p>
+                <p>
+                  Title :- {orderData?.title
+                    ? orderData.title.charAt(0).toUpperCase() + orderData.title.slice(1)
+                    : "Unknown Title"}
+                </p>
                 <span className="text-green-600">
                   Category :-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}
@@ -579,8 +583,8 @@ export default function ViewProfile() {
                   Status:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
-                        ? "bg-yellow-500"
-                        : ""
+                      ? "bg-yellow-500"
+                      : ""
                       } ${orderData?.hire_status === "cancelled" ||
                         orderData?.hire_status === "cancelledDispute"
                         ? "bg-[#FF0000]"
@@ -604,8 +608,8 @@ export default function ViewProfile() {
                     Refund:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
-                          ? "bg-yellow-500"
-                          : "bg-blue-500"
+                        ? "bg-yellow-500"
+                        : "bg-blue-500"
                         }`}
                     >
                       {orderData?.refundStatus?.charAt(0).toUpperCase() +
@@ -960,29 +964,29 @@ export default function ViewProfile() {
               </div>
             ) : (
               <div className="text-center text-gray-600 py-8">
-  {searchQuery
-    ? (
-      <>
-        <p>No providers found for "{searchQuery}"</p>
-        <img
-          src={noWorkImage}
-          alt="No providers"
-          className="mx-auto mt-4 w-74 opacity-80"
-        />
-      </>
-    )
-    : (
-      <>
-        <p>No service providers available.</p>
-        <img
-          src={noWorkImage}
-          alt="No service providers"
-          className="mx-auto mt-4 w-74 opacity-80"
-        />
-      </>
-    )
-  }
-</div>
+                {searchQuery
+                  ? (
+                    <>
+                      <p>No providers found for "{searchQuery}"</p>
+                      <img
+                        src={noWorkImage}
+                        alt="No providers"
+                        className="mx-auto mt-4 w-74 opacity-80"
+                      />
+                    </>
+                  )
+                  : (
+                    <>
+                      <p>No service providers available.</p>
+                      <img
+                        src={noWorkImage}
+                        alt="No service providers"
+                        className="mx-auto mt-4 w-74 opacity-80"
+                      />
+                    </>
+                  )
+                }
+              </div>
 
             )}
           </div>
