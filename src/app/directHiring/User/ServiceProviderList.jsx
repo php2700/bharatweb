@@ -222,43 +222,34 @@ export default function ServiceProviderList() {
   }, [workers]);
 
   // -------------------------------------------------------------------
-  // 3️⃣ Convert incoming subcategory_ids → names 
+  // 3️⃣ Convert incoming subcategory_ids → names  
   // -------------------------------------------------------------------
 useEffect(() => {
-  if (!subcategory_ids) return;
+  // ignore if no subcategory_ids
+  if (!subcategory_ids || selectedSubcats.length > 0) return;
 
-  // Already names → no loop
+  // If already names
   if (
     Array.isArray(subcategory_ids) &&
     subcategory_ids.every(
       (x) => typeof x === "string" && allSubcategories.includes(x)
     )
   ) {
-    // Prevent unnecessary re-render
-    if (JSON.stringify(selectedSubcats) !== JSON.stringify(subcategory_ids)) {
-      setSelectedSubcats(subcategory_ids);
-    }
+    setSelectedSubcats(subcategory_ids);
     return;
   }
 
-  // IDs → convert to names
+  // IDs → names
   if (Array.isArray(subcategory_ids)) {
     const names = subcategory_ids
-      .map((id) => subcategoryIdToName[id])
-      .filter(Boolean);
+  .map((id) => subcategoryIdToName[id])
+  .filter(Boolean);
 
-    // Prevent infinite loop
-    if (names.length && JSON.stringify(selectedSubcats) !== JSON.stringify(names)) {
-      setSelectedSubcats(names);
-    }
+setSelectedSubcats(names);
+
   }
-}, [
-  subcategory_ids,
-  subcategoryIdToName,
-  allSubcategories,
-  selectedSubcats
-]);
-;
+}, [subcategory_ids, allSubcategories, subcategoryIdToName]);
+
 
   
 
