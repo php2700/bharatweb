@@ -82,6 +82,7 @@ export default function ServiceProviderList() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc"); // asc / desc
+  
   const [selectedSubcats, setSelectedSubcats] = useState([]); // multi‑select
   const [minRating, setMinRating] = useState(""); // NEW: rating filter
 
@@ -152,7 +153,7 @@ export default function ServiceProviderList() {
     };
 
     fetchWorkers();
-  }, [category_id, subcategory_ids]);
+  }, [category_id, subcategory_ids,location.key]);
 
   /* collapse expandables when any filter changes */
   useEffect(() => {
@@ -186,13 +187,81 @@ export default function ServiceProviderList() {
   };
 
   /** Unique sub‑category list */
-  const allSubcategories = useMemo(() => {
-    const set = new Set();
-    workers.forEach((w) =>
-      (w.subcategory_names || []).forEach((s) => set.add(s))
-    );
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  // const allSubcategories = useMemo(() => {
+  //   const set = new Set();
+  //   workers.forEach((w) =>
+  //     (w.subcategory_names || []).forEach((s) => set.add(s))
+  //   );
+  //   return Array.from(set).sort((a, b) => a.localeCompare(b));
+  // }, [workers]);
+
+    const allSubcategories = useMemo(() => {
+    const subs = [];
+    workers.forEach((w) => {
+      if (w.subcategory_names) {
+        w.subcategory_names.forEach((name) => {
+          if (name && !subs.includes(name)) subs.push(name);
+        });
+      }
+    });
+    return subs;
   }, [workers]);
+
+  // --------------------------------------------------
+  // 2️⃣ Create ID → NAME mapping (from worker data)
+  // --------------------------------------------------
+  const subcategoryIdToName = useMemo(() => {
+    const map = {};
+    workers.forEach((w) => {
+      (w.subcategory_ids || []).forEach((id, index) => {
+        const name = w.subcategory_names?.[index];
+        if (id && name) map[id] = name;
+      });
+    });
+    return map;
+  }, [workers]);
+
+  // -------------------------------------------------------------------
+  // 3️⃣ Convert incoming subcategory_ids → names 
+  // -------------------------------------------------------------------
+useEffect(() => {
+  if (!subcategory_ids) return;
+
+  // Already names → no loop
+  if (
+    Array.isArray(subcategory_ids) &&
+    subcategory_ids.every(
+      (x) => typeof x === "string" && allSubcategories.includes(x)
+    )
+  ) {
+    // Prevent unnecessary re-render
+    if (JSON.stringify(selectedSubcats) !== JSON.stringify(subcategory_ids)) {
+      setSelectedSubcats(subcategory_ids);
+    }
+    return;
+  }
+
+  // IDs → convert to names
+  if (Array.isArray(subcategory_ids)) {
+    const names = subcategory_ids
+      .map((id) => subcategoryIdToName[id])
+      .filter(Boolean);
+
+    // Prevent infinite loop
+    if (names.length && JSON.stringify(selectedSubcats) !== JSON.stringify(names)) {
+      setSelectedSubcats(names);
+    }
+  }
+}, [
+  subcategory_ids,
+  subcategoryIdToName,
+  allSubcategories,
+  selectedSubcats
+]);
+;
+
+  
+
 
   /** Filtered & sorted list */
   const filteredWorkers = useMemo(() => {
@@ -377,6 +446,8 @@ export default function ServiceProviderList() {
                       value={sc}
                       className="py-2 pl-4 pr-10 rounded hover:bg-green-50 cursor-pointer"
                     >
+                      {/* Add visual check for currently selected items without changing logic */}
+                      {selectedSubcats.includes(sc) ? "✓ " : ""}
                       {sc}
                     </option>
                   ))}
