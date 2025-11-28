@@ -335,7 +335,7 @@ export default function RejectedWorklist() {
               {/* Content */}
               <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
                 <div className="flex justify-between">
-                  <h2 className="font-semibold text-lg">{task.name}</h2>
+                  <h2 className="font-semibold text-lg">Title :- {task.name}</h2>
                   <p className="text-sm">Posted: {task.date}</p>
                 </div>
 

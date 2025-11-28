@@ -68,7 +68,7 @@ export default function WokerAcceptReject() {
         }
       );
       console.log("Accept response:", response.data);
-      navigate("/worker/work-list/Emergency task");
+      navigate("/worker/emergency/rejected-work");
     } catch (err) {
       console.error("Accept error:", err);
       setError(err.message);

@@ -162,8 +162,11 @@ export default function RejectedWorkDetails() {
             <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-6">
               <div className="space-y-4">
                 <h1 className="text-xl md:text-3xl font-bold text-gray-800">
-                  {task.title}
+                  Title :- {task.title
+                    ? task.title.charAt(0).toUpperCase() + task.title.slice(1)
+                    : ""}
                 </h1>
+
                 <div
                   onClick={() => setIsMapModalOpen(true)}
                   className="flex items-center text-gray-700 cursor-pointer hover:text-green-700"
@@ -176,8 +179,8 @@ export default function RejectedWorkDetails() {
                     <strong>Deadline:</strong>{" "}
                     {task.deadline
                       ? new Date(
-                          task.deadline.split("/").reverse().join("-")
-                        ).toLocaleDateString("en-GB")
+                        task.deadline.split("/").reverse().join("-")
+                      ).toLocaleDateString("en-GB")
                       : "N/A"}
                   </p>
                 </div>
@@ -191,8 +194,8 @@ export default function RejectedWorkDetails() {
                   Posted Date:{" "}
                   {task.createdAt
                     ? new Date(
-                        task.createdAt.split("/").reverse().join("-")
-                      ).toLocaleDateString("en-GB")
+                      task.createdAt.split("/").reverse().join("-")
+                    ).toLocaleDateString("en-GB")
                     : "N/A"}
                 </span>
                 <div className="flex items-center gap-2">
@@ -202,25 +205,24 @@ export default function RejectedWorkDetails() {
 
                   <div
                     className={`px-4 py-1 rounded-full text-sm text-white flex items-center gap-2
-      ${
-        task?.hire_status === "pending"
-          ? "bg-yellow-500"
-          : task?.hire_status === "cancelled"
-          ? "bg-red-500"
-          : task?.hire_status === "completed"
-          ? "bg-[#228B22]"
-          : task?.hire_status === "cancelledDispute"
-          ? "bg-[#FF0000]"
-          : task?.hire_status === "accepted"
-          ? "bg-[#228B22]"
-          : "bg-gray-500"
-      }
+      ${task?.hire_status === "pending"
+                        ? "bg-yellow-500"
+                        : task?.hire_status === "cancelled"
+                          ? "bg-red-500"
+                          : task?.hire_status === "completed"
+                            ? "bg-[#228B22]"
+                            : task?.hire_status === "cancelledDispute"
+                              ? "bg-[#FF0000]"
+                              : task?.hire_status === "accepted"
+                                ? "bg-[#228B22]"
+                                : "bg-gray-500"
+                      }
     `}
                   >
                     <p className="text-white text-sm">
                       {task?.hire_status
                         ? task.hire_status.charAt(0).toUpperCase() +
-                          task.hire_status.slice(1)
+                        task.hire_status.slice(1)
                         : ""}
                     </p>
                   </div>
@@ -258,12 +260,12 @@ export default function RejectedWorkDetails() {
                     {task?.hire_status === "pending"
                       ? "Waiting for user response"
                       : task?.hire_status === "assigned"
-                      ? "You are not selected for this task "
-                      : task?.hire_status === "completed"
-                      ? "You are selected for this task"
-                      : task?.hire_status === "cancelledDispute"
-                      ? "User cancelled Dispute"
-                      : ""}
+                        ? "You are not selected for this task "
+                        : task?.hire_status === "completed"
+                          ? "You are selected for this task"
+                          : task?.hire_status === "cancelledDispute"
+                            ? "User cancelled Dispute"
+                            : ""}
                   </div>
                 </div>
               </div>
