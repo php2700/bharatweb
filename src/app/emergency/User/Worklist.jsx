@@ -28,12 +28,12 @@ export default function Worklist() {
   const [bannerError, setBannerError] = useState(null);
   const [downloadingIds, setDownloadingIds] = useState([]);
   const [expandedAddresses, setExpandedAddresses] = useState({});
-		const [expandedIds, setExpandedIds] = useState({});
-	
-		const toggleExpand = (id) => {
-			setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
-		};
-	
+  const [expandedIds, setExpandedIds] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -333,7 +333,9 @@ export default function Worklist() {
       </div>
 
       {/* Top banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
             Loading banners...
@@ -345,11 +347,11 @@ export default function Worklist() {
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
             {bannerImages.map((banner, i) => (
-              <div key={i}>
+              <div key={i} className="w-full h-[220px] sm:h-[400px]">
                 <img
                   src={banner}
                   alt={`Banner ${i + 1}`}
-                  className="w-full h-[400px] object-cover"
+                  className="w-full h-full object-cover"
                   onError={(e) => (e.target.src = Work)}
                 />
               </div>
@@ -369,16 +371,15 @@ export default function Worklist() {
         </h1>
 
         {/* Tabs */}
-        <div className="flex justify-center gap-8 sm:gap-[200px] bg-gray-100 p-2 mb-6 flex-wrap">
+        <div className="flex justify-center gap-8 sm:gap-12 bg-gray-100 p-2 mb-6 flex-wrap">
           {["My Bidding", "My Hire", "Emergency Tasks"].map((tab) => (
             <button
               key={tab}
               onClick={() => handleTabClick(tab)}
-              className={`px-6 sm:px-9 py-2 rounded-full font-semibold text-sm sm:text-base transition-all cursor-pointer ${
-                activeTab === tab
-                  ? "bg-[#228B22] text-white"
-                  : "text-[#228B22] border border-[#228B22] hover:bg-[#228B22] hover:text-white"
-              }`}
+              className={`px-6 sm:px-9 py-2 rounded-full font-semibold text-sm sm:text-base transition-all cursor-pointer ${activeTab === tab
+                ? "bg-[#228B22] text-white"
+                : "text-[#228B22] border border-[#228B22] hover:bg-[#228B22] hover:text-white"
+                }`}
             >
               {tab}
             </button>
@@ -444,7 +445,9 @@ export default function Worklist() {
                   {/* Title + Date */}
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                     <h2 className="text-lg font-semibold text-gray-800">
-                      {task.name || "Untitled Task"}
+                      {task.name
+                        ? task.name.charAt(0).toUpperCase() + task.name.slice(1)
+                        : "Untitled Task"}
                     </h2>
                     <p className="text-sm text-[#334247] font-medium">
                       Posted: {task.date}
@@ -469,13 +472,13 @@ export default function Worklist() {
                   {task.description && (
                     <div className="mt-2">
                       <p
-                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded 
-      transition-all duration-300 break-words ${
-        expandedIds[task._id] ? "line-clamp-none" : "line-clamp-3"
-      }`}
+                        className={`text-sm text-[#334247] italic bg-gray-50 p-2 rounded transition-all duration-300 break-words${expandedIds[task._id] ? "line-clamp-none" : "line-clamp-3"}`}
                       >
-                        {task.description}
+                        {task.description
+                          ? task.description.charAt(0).toUpperCase() + task.description.slice(1)
+                          : ""}
                       </p>
+
 
                       <button
                         onClick={() => toggleExpand(task._id)}
@@ -519,20 +522,19 @@ export default function Worklist() {
                       Completion: {task.completiondate}
                     </p>
                     <p
-                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${
-                        task.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : task.status === "cancelled"
+                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${task.status === "pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : task.status === "cancelled"
                           ? "bg-red-100 text-red-800"
                           : task.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : task.status === "cancelledDispute"
-                          ? "bg-orange-100 text-orange-800"
-                          : task.status === "accepted" ||
-                            task.status === "assigned"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
+                            ? "bg-green-100 text-green-800"
+                            : task.status === "cancelledDispute"
+                              ? "bg-orange-100 text-orange-800"
+                              : task.status === "accepted" ||
+                                task.status === "assigned"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-gray-100 text-gray-800"
+                        }`}
                     >
                       Status: {task.status.replace(/([A-Z])/g, " $1").trim()}
                     </p>
@@ -555,7 +557,7 @@ export default function Worklist() {
                       }}
                       class="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
                     >
-                      View Details 
+                      View Details
                     </button>
                   </div>
                 </div>

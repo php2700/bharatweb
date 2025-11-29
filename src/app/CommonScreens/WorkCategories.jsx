@@ -311,7 +311,7 @@ const handleBankUpdate = () => {
 {showBankWarning && (
   <div
     className="
-      w-full bg-gradient-to-r from-yellow-50 to-yellow-100
+      max-w-[90%] mx-auto bg-gradient-to-r from-yellow-50 to-yellow-100
       border-l-[6px] border-yellow-600
       text-yellow-900 p-4 px-6 text-sm font-medium
       flex justify-between items-center shadow-lg

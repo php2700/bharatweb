@@ -109,13 +109,21 @@ export default function LoginPage() {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen flex items-center justify-center bg-white mt-[50px]">
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
-          <div className="md:block md:w-1/2">
-            <img
-              src={image}
-              alt="Plumber working"
-              className="w-full h-auto object-contain"
-            />
-          </div>
+     <div className="w-full md:w-1/2 flex justify-center">
+  <img
+    src={image}
+    alt="Plumber working"
+    className="
+      w-full 
+      h-auto 
+      object-contain 
+      max-h-[220px]      /* Small mobile screens */
+      sm:max-h-[280px]   /* >640px */
+      md:max-h-none      /* Desktop normal size */
+    "
+  />
+</div>
+
 
           <div className="w-full md:w-1/2 flex flex-col justify-center p-6 sm:p-8 md:p-12 lg:p-16">
             <div className="flex flex-col items-center space-y-6 w-full">

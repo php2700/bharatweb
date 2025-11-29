@@ -133,36 +133,36 @@ export default function Account() {
         </div>
 
         {/* Banner Slider */}
-        <div className="w-full max-w-[75rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              Error: {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, index) => (
-                <div key={index}>
-                  <img
-                    src={banner || "/src/assets/banner.png"} // Fallback image
-                    alt={`Banner ${index + 1}`}
-                    className="w-full h-[400px] object-cover"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/banner.png"; // Fallback on image load error
-                    }}
-                  />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
+       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
+  {bannerLoading ? (
+    <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+      Loading banners...
+    </p>
+  ) : bannerError ? (
+    <p className="absolute inset-0 flex items-center justify-center text-red-500">
+      {bannerError}
+    </p>
+  ) : bannerImages.length > 0 ? (
+    <Slider {...sliderSettings}>
+      {bannerImages.map((banner, i) => (
+        <div key={i} className="w-full h-[220px] sm:h-[400px]">
+          <img
+            src={banner}
+            alt={`Banner ${i + 1}`}
+            className="w-full h-full object-cover"
+            onError={(e) => (e.target.src = Work)}
+          />
         </div>
+      ))}
+    </Slider>
+  ) : (
+    <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+      No banners available
+    </p>
+  )}
+</div>
       </div>
 
       <Footer />

@@ -636,26 +636,27 @@ export default function Details() {
           Back
         </Link>
       </div>
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+      {/* Top banner */}
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
             Loading banners...
           </p>
         ) : bannerError ? (
           <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
+            {bannerError}
           </p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i} className="w-full h-[220px] sm:h-[400px]">
                 <img
-                  src={banner || "/src/assets/profile/default.png"}
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png";
-                  }}
+                  src={banner}
+                  alt={`Banner ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.target.src = Work)}
                 />
               </div>
             ))}
@@ -670,22 +671,20 @@ export default function Details() {
         <div className="flex justify-center gap-10 mt-6">
           <button
             onClick={() => handleTabSwitch("user")}
-            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
-              activeTab === "user"
+            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${activeTab === "user"
                 ? "bg-[#228B22] text-white"
                 : "bg-white text-[#228B22]"
-            }`}
+              }`}
             aria-label="View User Profile"
           >
             User Profile
           </button>
           <button
             onClick={() => handleTabSwitch("Worker")}
-            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
-              activeTab === "Worker"
+            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${activeTab === "Worker"
                 ? "bg-[#228B22] text-white"
                 : "bg-white text-[#228B22]"
-            }`}
+              }`}
             aria-label="View Worker Profile"
           >
             Worker Profile
@@ -848,11 +847,10 @@ export default function Details() {
                     setWorkerTab("work");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
-                    WorkerTab === "work"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "work"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                  } transition-colors duration-300`}
+                    } transition-colors duration-300`}
                   aria-label="View Work"
                 >
                   His Work
@@ -862,11 +860,10 @@ export default function Details() {
                     setWorkerTab("review");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
-                    WorkerTab === "review"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "review"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                  } transition-colors duration-300`}
+                    } transition-colors duration-300`}
                   aria-label="View Customer Reviews"
                 >
                   Customer Review
@@ -876,11 +873,10 @@ export default function Details() {
                     setWorkerTab("business");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
-                    WorkerTab === "business"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "business"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                  } transition-colors duration-300`}
+                    } transition-colors duration-300`}
                   aria-label="View Business Details"
                 >
                   Business Details
@@ -1088,13 +1084,12 @@ export default function Details() {
                   <button
                     onClick={handleToggleEmergency}
                     disabled={isToggling}
-                    className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${
-                      isToggling
+                    className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${isToggling
                         ? "bg-gray-400 cursor-not-allowed"
                         : isEmergencyOn
-                        ? "bg-[#228B22] justify-end"
-                        : "bg-[#DF1414] justify-start"
-                    }`}
+                          ? "bg-[#228B22] justify-end"
+                          : "bg-[#DF1414] justify-start"
+                      }`}
                     style={{
                       width: "40px",
                       height: "25px",
@@ -1148,9 +1143,8 @@ export default function Details() {
                               <img
                                 key={imgIndex}
                                 src={img}
-                                alt={`${doc.documentName} image ${
-                                  imgIndex + 1
-                                }`}
+                                alt={`${doc.documentName} image ${imgIndex + 1
+                                  }`}
                                 className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-md shadow"
                                 onError={(e) => {
                                   e.target.src =
@@ -1194,11 +1188,10 @@ export default function Details() {
                         {[1, 2, 3, 4, 5].map((star, i) => (
                           <span
                             key={i}
-                            className={`text-lg sm:text-xl ${
-                              i < item.rating
+                            className={`text-lg sm:text-xl ${i < item.rating
                                 ? "text-yellow-400"
                                 : "text-gray-300"
-                            }`}
+                              }`}
                           >
                             ★
                           </span>

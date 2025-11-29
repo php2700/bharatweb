@@ -830,7 +830,7 @@ export default function BiddinggetWorkDetail() {
                 <h2 className="text-lg font-semibold">
                   {orderDetail?.title || "N/A"}
                 </h2>
-                <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
+                
                 <span
                   onClick={() => setShowMap(true)}
                   className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
