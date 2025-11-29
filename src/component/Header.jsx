@@ -16,6 +16,8 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import Biding from "../assets/Homepage/bidding.svg";
 import Emergency from "../assets/Homepage/emergency.png";
 import DirectHiring from "../assets/Homepage/deirecthiring.png";
+import Swal from "sweetalert2";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -731,6 +733,21 @@ export default function Header() {
     }
     setIsAddressDropdownOpen(false);
   };
+const handleDeleteConfirm = (index, addressId) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you really want to delete this address?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      handleDeleteAddress(index, addressId); // 👉 Yahi original function chalega
+    }
+  });
+};
+
 
   const handleEditAddress = (index, addressId) => {
     setEditingAddress(index);
@@ -965,13 +982,12 @@ export default function Header() {
                             Edit
                           </button>
                           <button
-                            onClick={() =>
-                              handleDeleteAddress(index, address._id)
-                            }
-                            className="text-sm text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
+  onClick={() => handleDeleteConfirm(index, address._id)}
+  className="text-sm text-red-600 hover:underline"
+>
+  Delete
+</button>
+
                         </div>
                       </div>
                     ))

@@ -63,6 +63,7 @@ export default function ViewProfile() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
+  const [setServiceProvidersids,setServiceProvidersidsD]=useState("");
 
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 28.6139,
@@ -123,25 +124,7 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
- useEffect(() => {
-    fetchData();
-    fetchBannerImages();
-  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
 
-  if (!hasSeenModal) {
-    Swal.fire({
-      title: "Important!",
-      text: " For your safety kindly match the worker id proof phycically with id prrof in the App",
-      icon: "warning",
-      confirmButtonText: "OK",
-    }).then(() => {
-      window.scrollTo(0, 0);
-
-      // Mark modal as seen for this login session
-      sessionStorage.setItem("hasSeenIDModal", "true");
-    });
-  }
-}, [id]);
 
 
 
@@ -227,6 +210,8 @@ export default function ViewProfile() {
       //   "sssss------------------------"
       // );
       setOrderData(orderResponse.data.data.order);
+      setServiceProvidersidsD(orderResponse.data.data.offer_history?.[0]?.provider_id?._id)
+      // localStorage.setItem('service_provider_ids',orderResponse.data.data.offer_history[0])
       setAssignedWorker(orderResponse.data.data.assignedWorker || null);
       setServiceProviders(orderResponse.data.data.order.offer_history || []);
       setIsHired(orderResponse.data.data.order.hire_status !== "pending");
@@ -236,6 +221,7 @@ export default function ViewProfile() {
       const providerIds = [];
       orderResponse.data.data.order.offer_history?.forEach((provider) => {
         initialStatuses[provider.provider_id._id] =
+        localStorage.setItem('testnow',provider.provider_id._id);
           provider.status[0] || "sent";
         providerIds.push(provider.provider_id._id);
       });
@@ -271,6 +257,27 @@ export default function ViewProfile() {
   useEffect(() => {
     fetchData();
   }, [id]);
+   useEffect(() => {
+    fetchData();
+    fetchBannerImages();
+  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
+
+if (!hasSeenModal) {
+  Swal.fire({
+    title: "Important!",
+    html: `For your safety kindly match the worker id proof phycically with id proof in the App  
+           <a href="/profile-details/${localStorage.getItem('testnow')}/direct" style="font-weight:bold; margin-left:5px; text-decoration:none;">
+             View Profile &raquo;&raquo;
+           </a>`,
+    icon: "warning",
+    confirmButtonText: "OK",
+  }).then(() => {
+    window.scrollTo(0, 0);
+    sessionStorage.setItem("hasSeenIDModal", "true");
+  });
+}
+
+}, [id]);
 
   // Trigger related workers fetch when category/subcategory changes
   useEffect(() => {
@@ -1212,6 +1219,9 @@ const capitalize = (text = "") =>
                   </h2>
                   <div className="space-y-4">
                     {filteredProviders.reverse().map((provider) => (
+                    
+  
+                      
                       <div
                         key={provider.provider_id._id}
                         className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"

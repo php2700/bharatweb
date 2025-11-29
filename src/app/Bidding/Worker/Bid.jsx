@@ -353,6 +353,11 @@ export default function Bid() {
       toast.error("Failed to accept negotiation");
     }
   };
+useEffect(() => {
+  if (worker?.service_provider_id?._id) {
+    console.log("Provider ID:", worker.service_provider_id._id);
+  }
+}, [worker]);
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
   if (error)
