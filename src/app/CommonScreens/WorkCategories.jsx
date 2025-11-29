@@ -9,7 +9,7 @@ import hire1 from "../../assets/workcategory/hire1.jpg";
 import hire2 from "../../assets/workcategory/hire2.jpg";
 import hire3 from "../../assets/workcategory/hire3.jpeg";
 import banner1 from "../../assets/workcategory/biddingTask.jpg";
-import banner2 from "../../assets/workcategory/emergencytask.png";
+import banner2 from "../../assets/workcategory/emergencyTask.png";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
