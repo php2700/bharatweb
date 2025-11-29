@@ -46,7 +46,14 @@ export default function Header() {
     pincode: "",
     _id: null,
   });
-  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [savedAddresses, setSavedAddresses] = useState(() => {
+    try {
+      const stored = localStorage.getItem("savedAddresses");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [selectedAddressId, setSelectedAddressId] = useState(
     localStorage.getItem("selectedAddressId") || null
   );
@@ -355,6 +362,7 @@ export default function Header() {
           // 1. Save all addresses
           if (data?.full_address) {
             setSavedAddresses(data.full_address);
+            localStorage.setItem("savedAddresses", JSON.stringify(data.full_address));
           }
 
           // 2. If location exists → match the correct addressId
@@ -404,17 +412,16 @@ export default function Header() {
       if (matchedAddress) {
         setSelectedAddress(matchedAddress.address);
         setSelectedAddressId(matchedAddress._id);
-
         localStorage.setItem("selectedAddressTitle", matchedAddress.address);
         localStorage.setItem("selectedAddressId", matchedAddress._id);
+        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
       } else if (profile.full_address?.length > 0) {
         const firstAddress = profile.full_address[0];
-
         setSelectedAddress(firstAddress.address);
         setSelectedAddressId(firstAddress._id);
-
         localStorage.setItem("selectedAddressTitle", firstAddress.address);
         localStorage.setItem("selectedAddressId", firstAddress._id);
+        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
       }
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
@@ -620,6 +627,7 @@ export default function Header() {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
+        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
         const newIndex =
           editingAddress !== null
             ? editingAddress
@@ -679,6 +687,7 @@ export default function Header() {
           (_, idx) => idx !== index
         );
         setSavedAddresses(updatedAddresses);
+        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
         let newLocation = profile.location;
         if (selectedAddressId === addressId) {
           newLocation = updatedAddresses[0] || null;

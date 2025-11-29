@@ -988,13 +988,6 @@ export default function BiddinggetWorkDetail() {
                     !orderDetail?.platform_fee_paid) ? (
                   // 🟢 Edit + Cancel Buttons (only if not cancelled)
                   <div className="flex justify-center gap-6">
-                    <Link
-                      to={`/bidding/edittask/${id}`}
-                      className="flex items-center gap-2 text-[#228B22] px-6 py-3 rounded-lg font-medium border-2 border-[#228B22]"
-                    >
-                      <img src={editIcon} alt="Edit" className="w-5 h-5" />
-                      Edit
-                    </Link>
                     <button
                       onClick={cancelTask}
                       className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium cursor-pointer"
