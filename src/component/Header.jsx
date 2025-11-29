@@ -16,11 +16,16 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import Biding from "../assets/Homepage/bidding.svg";
 import Emergency from "../assets/Homepage/emergency.png";
 import DirectHiring from "../assets/Homepage/deirecthiring.png";
+import Swal from "sweetalert2";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
+  const capitalize = (str = "") =>
+  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -728,6 +733,21 @@ export default function Header() {
     }
     setIsAddressDropdownOpen(false);
   };
+const handleDeleteConfirm = (index, addressId) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you really want to delete this address?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      handleDeleteAddress(index, addressId); // 👉 Yahi original function chalega
+    }
+  });
+};
+
 
   const handleEditAddress = (index, addressId) => {
     setEditingAddress(index);
@@ -962,13 +982,12 @@ export default function Header() {
                             Edit
                           </button>
                           <button
-                            onClick={() =>
-                              handleDeleteAddress(index, address._id)
-                            }
-                            className="text-sm text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
+  onClick={() => handleDeleteConfirm(index, address._id)}
+  className="text-sm text-red-600 hover:underline"
+>
+  Delete
+</button>
+
                         </div>
                       </div>
                     ))
@@ -1194,19 +1213,21 @@ export default function Header() {
               </div>
 
               {/* Profile Dropdown */}
-              <div className="relative lg:flex hidden " ref={dropdownRef}>
-                {fullName ? (
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
-                  >
-                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                      {fullName}
-                    </span>
-                    <img
-                      src={Dropdown}
-                      alt="Dropdown"
-                      className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
+                <div className="relative lg:flex hidden " ref={dropdownRef}>
+                  {fullName ? (
+                    <button
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
+                    >
+                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                       <span>{capitalize(fullName)}</span>
+
+                      </span>
+                      <img
+                        src={Dropdown}
+                        alt="Dropdown"
+                        className={`w-5 h-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : "rotate-0"
                         }`}
                     />
                   </button>

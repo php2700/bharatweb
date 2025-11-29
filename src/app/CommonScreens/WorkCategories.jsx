@@ -9,7 +9,7 @@ import hire1 from "../../assets/workcategory/hire1.jpg";
 import hire2 from "../../assets/workcategory/hire2.jpg";
 import hire3 from "../../assets/workcategory/hire3.jpeg";
 import banner1 from "../../assets/workcategory/biddingTask.jpg";
-import banner2 from "../../assets/workcategory/emergencytask.png";
+import banner2 from "../../assets/workcategory/emergencyTask.png";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -315,8 +315,8 @@ const handleBankUpdate = () => {
       border-l-[6px] border-yellow-600
       text-yellow-900 p-4 px-6 text-sm font-medium
       flex justify-between items-center shadow-lg
-      rounded-md
-      animate-slideDownFade
+     rounded-[17px]
+      animate-slideDownFade 
     "
   >
     <span className="flex items-center gap-2 font-semibold">
@@ -342,6 +342,7 @@ const handleBankUpdate = () => {
 
         {/* Hero Section with Slider */}
         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-2 md:mt-5">
+          
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
               Loading banners...

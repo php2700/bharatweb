@@ -63,6 +63,7 @@ export default function ViewProfile() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
+  const [setServiceProvidersids,setServiceProvidersidsD]=useState("");
 
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 28.6139,
@@ -123,25 +124,7 @@ export default function ViewProfile() {
       setBannerLoading(false);
     }
   };
- useEffect(() => {
-    fetchData();
-    fetchBannerImages();
-  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
 
-  if (!hasSeenModal) {
-    Swal.fire({
-      title: "Important!",
-      text: " For your safety kindly match the worker id proof phycically with id prrof in the App",
-      icon: "warning",
-      confirmButtonText: "OK",
-    }).then(() => {
-      window.scrollTo(0, 0);
-
-      // Mark modal as seen for this login session
-      sessionStorage.setItem("hasSeenIDModal", "true");
-    });
-  }
-}, [id]);
 
 
 
@@ -227,6 +210,8 @@ export default function ViewProfile() {
       //   "sssss------------------------"
       // );
       setOrderData(orderResponse.data.data.order);
+      setServiceProvidersidsD(orderResponse.data.data.offer_history?.[0]?.provider_id?._id)
+      // localStorage.setItem('service_provider_ids',orderResponse.data.data.offer_history[0])
       setAssignedWorker(orderResponse.data.data.assignedWorker || null);
       setServiceProviders(orderResponse.data.data.order.offer_history || []);
       setIsHired(orderResponse.data.data.order.hire_status !== "pending");
@@ -236,6 +221,7 @@ export default function ViewProfile() {
       const providerIds = [];
       orderResponse.data.data.order.offer_history?.forEach((provider) => {
         initialStatuses[provider.provider_id._id] =
+        localStorage.setItem('testnow',provider.provider_id._id);
           provider.status[0] || "sent";
         providerIds.push(provider.provider_id._id);
       });
@@ -271,6 +257,27 @@ export default function ViewProfile() {
   useEffect(() => {
     fetchData();
   }, [id]);
+   useEffect(() => {
+    fetchData();
+    fetchBannerImages();
+  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
+
+if (!hasSeenModal) {
+  Swal.fire({
+    title: "Important!",
+    html: `For your safety kindly match the worker id proof phycically with id proof in the App  
+           <a href="/profile-details/${localStorage.getItem('testnow')}/direct" style="font-weight:bold; margin-left:5px; text-decoration:none;">
+             View Profile &raquo;&raquo;
+           </a>`,
+    icon: "warning",
+    confirmButtonText: "OK",
+  }).then(() => {
+    window.scrollTo(0, 0);
+    sessionStorage.setItem("hasSeenIDModal", "true");
+  });
+}
+
+}, [id]);
 
   // Trigger related workers fetch when category/subcategory changes
   useEffect(() => {
@@ -508,6 +515,9 @@ export default function ViewProfile() {
     alert("Destination address not found!");
   }
 };
+
+const capitalize = (text = "") =>
+  text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
   const handleCancelOffer = async () => {
     const result = await Swal.fire({
@@ -1052,14 +1062,18 @@ export default function ViewProfile() {
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <span>Title :- {orderData?.title || "Unknown Title"}</span>
+                
+                <span>
+  Title :- {capitalize(orderData?.title || "Unknown Title")}
+</span>
+
                 {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
                 <div>
                   <div
                     onClick={() => {
                       openMap(orderData?.address);
                     }}
-                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6"
+                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6 relative right-[9px]"
                   >
                     <FaMapMarkerAlt
                       size={25}
@@ -1167,7 +1181,7 @@ export default function ViewProfile() {
               </div>
             </div>
 
-            <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
+            <div className="border border-green-600 rounded-lg p-2 mb-4 bg-gray-50">
               <p className="text-gray-700 tracking-tight">
                 {orderData?.description}
               </p>
@@ -1205,6 +1219,9 @@ export default function ViewProfile() {
                   </h2>
                   <div className="space-y-4">
                     {filteredProviders.reverse().map((provider) => (
+                    
+  
+                      
                       <div
                         key={provider.provider_id._id}
                         className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
