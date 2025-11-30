@@ -954,7 +954,7 @@ const Chat = () => {
   {otherUser?.full_name || "User"}
 </h3>
                       {/* Placeholder for time - add timestamps to data if available */}
-                      <span className="text-xs text-gray-400">Now</span> 
+                      {/* <span className="text-xs text-gray-400">Now</span>  */}
                     </div>
                     <div className="flex justify-between items-center mt-1">
                       <p className={`text-sm truncate w-4/5 ${conv.unreadCount > 0 ? "font-semibold text-gray-800" : "text-gray-500"}`}>
@@ -989,7 +989,9 @@ const Chat = () => {
                   />
                   <div>
                     <h3 className="font-bold text-gray-800">
-                      {currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat"}
+                      {(currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat")
+  .replace(/^\w/, (c) => c.toUpperCase())}
+
                     </h3>
                      {/* Check online status */}
                     {/* <p className="text-xs text-[#228B22] font-medium">

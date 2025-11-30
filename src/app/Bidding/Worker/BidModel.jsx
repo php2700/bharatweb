@@ -78,20 +78,21 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platfo
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-left">
             <label className="block font-medium mb-1">Enter Amount</label>
-            <input
+       <input
   type="text"
   value={amount}
   onChange={(e) => {
     const value = e.target.value;
 
-    // Only digits allowed (0-9)
-    if (/^\d*$/.test(value)) {
+    // Only digits allowed and max length 10
+    if (/^\d*$/.test(value) && value.length <= 10) {
       setAmount(value);
     }
   }}
   className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
   required
 />
+
           </div>
 
           <div className="text-left">
