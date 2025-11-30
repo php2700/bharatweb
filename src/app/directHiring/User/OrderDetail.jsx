@@ -265,7 +265,7 @@ export default function ViewProfile() {
 if (!hasSeenModal) {
   Swal.fire({
     title: "Important!",
-    html: `For your safety kindly match the worker id proof phycically with id proof in the App  
+    html: `For your safety kindly match the worker id proof physically with id proof in the App  
            <a href="/profile-details/${localStorage.getItem('testnow')}/direct" style="font-weight:bold; margin-left:5px; text-decoration:none;">
              View Profile &raquo;&raquo;
            </a>`,

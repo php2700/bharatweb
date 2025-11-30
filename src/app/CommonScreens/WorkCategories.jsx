@@ -316,7 +316,7 @@ const handleBankUpdate = () => {
       text-yellow-900 p-4 px-6 text-sm font-medium
       flex justify-between items-center shadow-lg
      rounded-[17px]
-      animate-slideDownFade 
+      animate-slideDownFade relative lg:-top-[42px]
     "
   >
     <span className="flex items-center gap-2 font-semibold">

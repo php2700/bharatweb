@@ -219,7 +219,7 @@ export default function BiddinggetWorkDetail() {
   };
   const handleGetDirections = (destinationAddress) => {
     if (destinationAddress) {
-      // origin (शुरुआत) खाली छोड़ने पर गूगल मैप्स यूज़र की current location ले लेता है।
+      
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
         destinationAddress
       )}`;
@@ -828,8 +828,11 @@ export default function BiddinggetWorkDetail() {
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-lg font-semibold">
-                  {orderDetail?.title || "N/A"}
-                </h2>
+  {orderDetail?.title
+    ? orderDetail.title.charAt(0).toUpperCase() + orderDetail.title.slice(1)
+    : "N/A"}
+</h2>
+
                 
                 <span
                   onClick={() => setShowMap(true)}

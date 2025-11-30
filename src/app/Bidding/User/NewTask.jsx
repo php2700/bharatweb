@@ -823,16 +823,24 @@ export default function BiddingNewTask() {
 
             {/* Cost */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
-              <input
-                type="number"
-                name="cost"
-                placeholder="Enter cost in INR"
-                value={formData.cost}
-                onChange={handleChange}
-                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
+  <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
+  <input
+    type="text"
+    name="cost"
+    placeholder="Enter cost in INR"
+    value={formData.cost}
+    onChange={(e) => {
+      const value = e.target.value;
+
+      // Only allow digits and max 7 characters
+      if (/^\d{0,7}$/.test(value)) {
+        handleChange(e); // Your existing handler
+      }
+    }}
+    className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
+  />
+</div>
+
 
             {/* Deadline */}
             <div>
