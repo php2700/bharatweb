@@ -1216,7 +1216,7 @@ const [searchText, setSearchText] = useState("");
                             {console.log("PROVIDER DATA →", provider)}
 
                             <img
-                              src={provider.image || workImage}
+                              src={provider.profile_pic || workImage}
                               alt={provider.full_name}
                               className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                             />
@@ -1333,7 +1333,7 @@ const [searchText, setSearchText] = useState("");
                           className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
                         >
                           <img
-                            src={offer.provider_id?.image || workImage}
+                            src={offer.provider_id?.profile_pic || workImage}
                             alt={offer.provider_id?.full_name || "Worker"}
                             className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                           />

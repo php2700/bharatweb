@@ -250,7 +250,7 @@ export default function Subscription() {
         >
           {selectedPlan ? "Purchase Plan" : "Select a Plan"}
         </button>
-        <p className="mt-3 text-gray-500 text-sm cursor-pointer">Not Now</p>
+        
       </div>
     </>
   );
