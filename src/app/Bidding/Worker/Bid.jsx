@@ -419,7 +419,12 @@ useEffect(() => {
             <div className="py-6 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-lg font-semibold">{worker.workName}</h2>
+                  <h2 className="text-lg font-semibold">
+  {worker?.workName
+    ? worker.workName.charAt(0).toUpperCase() + worker.workName.slice(1)
+    : ""}
+</h2>
+
                   <span
                     onClick={() => setIsMapModalOpen(true)}
                     className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"

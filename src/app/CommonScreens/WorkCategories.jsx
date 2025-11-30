@@ -319,7 +319,7 @@ const handleBankUpdate = () => {
       animate-slideDownFade relative lg:-top-[42px]
     "
   >
-    <span className="flex items-center gap-2 font-semibold">
+    <span className="flex items-center gap-2 font-semibold" style={{fontWeight:'650'}}>
       ⚠️ Your bank details are incomplete.
     </span>
 

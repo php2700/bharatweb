@@ -1053,7 +1053,7 @@ export default function ServiceProviderHome() {
         fetchEmergency();
      } catch (e) { console.error(e) }
   };
-  const handlePlan = () => navigate("/subscription");
+  const handlePlan = () => navigate("/account");
 
   const sliderSettings = { dots: true, infinite: true, speed: 500, slidesToShow: 1, slidesToScroll: 1, autoplay: true, autoplaySpeed: 3000, arrows: true };
   const visibleDirectHiring = directHiring.slice(0, 4);

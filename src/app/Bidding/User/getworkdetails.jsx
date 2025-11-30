@@ -991,6 +991,13 @@ export default function BiddinggetWorkDetail() {
                     !orderDetail?.platform_fee_paid) ? (
                   // 🟢 Edit + Cancel Buttons (only if not cancelled)
                   <div className="flex justify-center gap-6">
+                    {/* <Link
+                      to={`/bidding/edittask/${id}`}
+                      className="flex items-center gap-2 text-[#228B22] px-6 py-3 rounded-lg font-medium border-2 border-[#228B22]"
+                    >
+                      <img src={editIcon} alt="Edit" className="w-5 h-5" />
+                      Edit
+                    </Link> */}
                     <button
                       onClick={cancelTask}
                       className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium cursor-pointer"
@@ -1224,20 +1231,20 @@ export default function BiddinggetWorkDetail() {
                             </div>
                             <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
                               <div className="flex items-center gap-4 sm:gap-7">
-                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
                                   <img
                                     src={callIcon}
                                     alt="Call"
                                     className="w-[18px] sm:w-[23px]"
                                   />
-                                </span>
-                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                </span> */}
+                                {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
                                   <img
                                     src={msgIcon}
                                     alt="Message"
                                     className="w-[18px] sm:w-[23px]"
                                   />
-                                </span>
+                                </span> */}
                                 <button
                                   onClick={() => InviteSendWorker(provider._id)}
                                   className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
