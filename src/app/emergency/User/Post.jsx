@@ -952,24 +952,31 @@ const Post = () => {
             )}
 
             {/* Contact */}
-            <div>
-              <label className="block text-xs mb-1 font-bold">Contact</label>
-              <input
-                type="text"
-                name="contact"
-                value={formData.contact}
-                onChange={(e) => {
-                  const onlyNums = e.target.value.replace(/\D/g, "");
-                  handleInputChange({ target: { name: "contact", value: onlyNums } });
-                }}
-                placeholder="Enter Contact Number"
-                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.contact ? "border-red-500" : "border-green-500"
-                  }`}
-              />
-              {validationErrors.contact && (
-                <p className="text-red-500 text-xs">{validationErrors.contact}</p>
-              )}
-            </div>
+           <div>
+  <label className="block text-xs mb-1 font-bold">Contact</label>
+  <input
+    type="text"
+    name="contact"
+    value={formData.contact}
+    onChange={(e) => {
+      // Sirf digits nikal lo
+      let onlyNums = e.target.value.replace(/\D/g, "");
+      // Max 10 digits tak
+      if (onlyNums.length > 10) {
+        onlyNums = onlyNums.slice(0, 10);
+      }
+      handleInputChange({ target: { name: "contact", value: onlyNums } });
+    }}
+    placeholder="Enter Contact Number"
+    className={`w-full border rounded-md px-3 py-2 text-sm ${
+      validationErrors.contact ? "border-red-500" : "border-green-500"
+    }`}
+  />
+  {validationErrors.contact && (
+    <p className="text-red-500 text-xs">{validationErrors.contact}</p>
+  )}
+</div>
+
 
             {/* Deadline */}
             {/* <div>

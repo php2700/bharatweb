@@ -734,7 +734,12 @@ export default function Details() {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg sm:text-xl font-bold">{full_name}</h2>
+                  <h2 className="text-lg sm:text-xl font-bold">
+  {full_name
+    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+    : ""}
+</h2>
+
                 </div>
                 <div className="flex flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
@@ -789,7 +794,11 @@ export default function Details() {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg sm:text-xl font-bold">{full_name}</h2>
+                                <h2 className="text-lg sm:text-xl font-bold">
+  {full_name
+    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+    : ""}
+</h2>
                   {profile?.verificationStatus === "verified" && (
                     <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
                       Verified

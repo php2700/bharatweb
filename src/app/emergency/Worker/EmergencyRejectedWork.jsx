@@ -278,8 +278,8 @@ export default function RejectedWorklist() {
             onClick={() => setActiveTab(tab)}
             className={`px-6 py-2 rounded-full font-semibold ${
               activeTab === tab
-                ? "bg-green-600 text-white"
-                : "border border-green-600 text-green-600"
+                ? "bg-[#228B22] text-white"
+                : "border border-[#228B22] text-[#228B22]"
             }`}
           >
             {tab}
@@ -335,7 +335,10 @@ export default function RejectedWorklist() {
               {/* Content */}
               <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
                 <div className="flex justify-between">
-                  <h2 className="font-semibold text-lg">Title :- {task.name}</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">
+  {task.name.charAt(0).toUpperCase() + task.name.slice(1)}
+</h2>
+
                   <p className="text-sm">Posted: {task.date}</p>
                 </div>
 

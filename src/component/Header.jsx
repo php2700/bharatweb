@@ -1169,9 +1169,9 @@ const handleDeleteConfirm = (index, addressId) => {
                               {/* 👉 Header Row */}
                               <div className="p-3 text-sm font-medium text-gray-700 border-b flex justify-between items-center">
                                 <p>{section.section}</p>
-                                {section.section === "Today" && (
+                                {/* {section.section === "Today" && (
                                   <h3 className="font-semibold">Total Notifications :- {totalNotifications}</h3>
-                                )}
+                                )} */}
                               </div>
                               {section.items.map((notif, idx) => (
                                 <div
