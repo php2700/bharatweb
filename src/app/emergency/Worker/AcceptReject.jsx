@@ -9,6 +9,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Accepted from "./Accepted";
 import workImage from "../../../assets/directHiring/Work.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -58,6 +59,16 @@ export default function WokerAcceptReject() {
     fetchData();
   }, [id]);
 
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.openAcceptedSection) {
+    // Yaha aap jo bhi section open karna chahte ho wo karwa do
+    console.log("Accepted section open trigger received");
+  }
+}, [location.state]);
+
+
   const handleAcceptOrder = async (orderId) => {
     try {
       const response = await axios.post(
@@ -68,7 +79,14 @@ export default function WokerAcceptReject() {
         }
       );
       console.log("Accept response:", response.data);
-      navigate("/worker/emergency/rejected-work");
+ navigate("/worker/emergency-details/accepted-worker", {
+  state: {
+    openAcceptedSection: true,
+    task: orderData     // <<=== THIS WAS MISSING
+  }
+});
+
+
     } catch (err) {
       console.error("Accept error:", err);
       setError(err.message);
@@ -113,6 +131,9 @@ export default function WokerAcceptReject() {
       </div>
     );
   }
+if (!orderData) {
+  return <div className="p-6 text-center">Loading data...</div>;
+}
 
   return (
     <>
@@ -290,7 +311,7 @@ export default function WokerAcceptReject() {
                       ${orderData?.hire_status === "assigned" ? "bg-green-500" : ""}`}
                   >
                     {orderData?.hire_status
-                      ? orderData.hire_status.charAt(0).toUpperCase() + orderData.hire_status.slice(1)
+                      ? orderData?.hire_status.charAt(0).toUpperCase() + orderData?.hire_status.slice(1)
                       : "Unknown"}
                   </span>
                 </span>

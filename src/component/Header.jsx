@@ -481,7 +481,22 @@ export default function Header() {
             ...reduxNotifications,
             ...(data.notifications || []),
           ];
-          setNotifications(combinedNotifications);
+   const currentUrl = window.location.pathname;
+
+if (currentUrl === "/chats") {
+  // Chats page par chat notifications HIDE
+  setNotifications(
+    combinedNotifications.filter(
+      (n) => n.userType !== "chat" && n.isRead === true
+    )
+  );
+} else {
+  // Baaki pages par bhi sirf read + non-chat
+  setNotifications(combinedNotifications)
+}
+
+
+          console.log(combinedNotifications);
 
           const count = combinedNotifications.filter((notif) => !notif.isRead);
           setNotificationCount(count.length);
@@ -881,7 +896,12 @@ const handleDeleteConfirm = (index, addressId) => {
       } else {
         window.location.href = `/emergency/worker/order-detail/${orderId}`;
       }
-    } else {
+    }
+    else if(notif.userType=="chat"){
+      localStorage.setItem('lastSelectedConvId',notif.orderId);
+      window.location.href = `/chats`;
+    }
+    else {
       window.location.href = `/disputes`;
     }
   };
