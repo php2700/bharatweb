@@ -16,6 +16,8 @@ import PostNewTask3 from "../../../assets/bidTask.png";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../../../redux/userSlice";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function BiddingNewTask() {
   const dispatch = useDispatch();
