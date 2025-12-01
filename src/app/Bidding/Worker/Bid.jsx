@@ -551,7 +551,7 @@ export default function Bid() {
           )}
 
           {/* Offer / Negotiate Section */}
-          {worker?.hire_status === "pending" && (
+          {worker?.hire_status === "pending" && !bidLoading && existingBid &&  (
             <div className="flex flex-col items-center p-6">
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
                 <button
@@ -589,7 +589,7 @@ export default function Bid() {
             </div>
           )}
 
-          {worker?.hire_status === "pending" && (
+          {worker?.hire_status === "pending" && !bidLoading && existingBid && (
             <div className="text-center">
               <button
                 className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold cursor-pointer"

@@ -13,6 +13,7 @@ export default function Accepted({
   orderId,
   hireStatus,
   user_id,
+  amount,
 }) {
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
@@ -187,19 +188,34 @@ export default function Accepted({
               <th className="border p-2 text-left">Amount (₹)</th>
             </tr>
           </thead>
+
           <tbody>
             <tr>
               <td className="border p-2">Total Project Value</td>
-              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.total_expected}
+              </td>
             </tr>
+
             <tr>
-              <td className="border p-2">Pending for User Approval</td>
+              <td className="border p-2">Total Remaining Value</td>
               <td className="border p-2">
                 ₹{fullPaymentHistory.remaining_amount}
               </td>
             </tr>
+
             <tr>
-              <td className="border p-2">Paid to You</td>
+              <td className="border p-2">Pending with App</td>
+              <td className="border p-2">
+                ₹
+                {paymentHistory
+                  .filter((p) => ["pending"].includes(p.release_status))
+                  .reduce((sum, p) => sum + p.amount, 0)}
+              </td>
+            </tr>
+
+            <tr>
+              <td className="border p-2">Paid to Worker</td>
               <td className="border p-2">
                 ₹
                 {paymentHistory
@@ -208,7 +224,6 @@ export default function Accepted({
                   )
                   .reduce((sum, p) => sum + p.amount, 0)}
               </td>
-              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
             </tr>
           </tbody>
         </table>

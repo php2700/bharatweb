@@ -2,6 +2,7 @@ import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditBidModal({
@@ -9,7 +10,7 @@ export default function EditBidModal({
   onClose,
   orderId,
   initialAmount,
-	initialDuration,
+  initialDuration,
   initialDescription,
   onEditSuccess,
 }) {
@@ -17,8 +18,8 @@ export default function EditBidModal({
   const [duration, setDuration] = useState(initialDuration || "");
   const [description, setDescription] = useState(initialDescription || "");
   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     setAmount(initialAmount || "");
     setDescription(initialDescription || "");
@@ -32,11 +33,11 @@ export default function EditBidModal({
     const token = localStorage.getItem("bharat_token");
 
     const payload = {
-  order_id: orderId,
-  message: description,
-  bid_amount: amount,
-	duration: duration,
-};
+      order_id: orderId,
+      message: description,
+      bid_amount: amount,
+      duration: duration,
+    };
 
     // console.log("Payload being sent:", payload);
 
@@ -56,7 +57,11 @@ export default function EditBidModal({
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Bid updated successfully ✅");
+        Swal.fire({
+          title: "Bid updated successfully ✅",
+          icon: "success",
+        });
+
         onEditSuccess(amount, description, duration);
         onClose();
       } else {
@@ -104,7 +109,7 @@ export default function EditBidModal({
             />
           </div>
 
-					<div className="text-left">
+          <div className="text-left">
             <label className="block font-medium mb-1">Duration</label>
             <input
               type="number"

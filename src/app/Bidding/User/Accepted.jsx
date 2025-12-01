@@ -22,6 +22,7 @@ export default function Accepted({
   if (!serviceProvider && !assignedWorker) {
     return null; // Don't render if no data is available
   }
+
   if (!fullPaymentHistory) return null;
   const navigate = useNavigate();
   const [description, setDescription] = useState("");
@@ -64,10 +65,10 @@ export default function Accepted({
           },
         }
       );
-      console.log("razor", response);
-      console.log("razor", response.status);
+      // console.log("razor", response);
+      // console.log("razor", response.status);
       if (response.status === 200) {
-        console.log("razor", response.data.razorOrder);
+        // console.log("razor", response.data.razorOrder);
         return response.data.razorOrder; // Assuming backend returns Razorpay order details
       } else {
         throw new Error("Failed to create order");
@@ -401,7 +402,6 @@ export default function Accepted({
         {/* Payment History */}
         {paymentHistory && Array.isArray(paymentHistory) && (
           <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
-
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
               <h3 className="text-lg font-semibold">Payment Summary</h3>
@@ -435,24 +435,24 @@ export default function Accepted({
 
                 {/* MIDDLE SECTION — Status + Buttons */}
                 <div className="md:col-span-4 flex flex-col md:flex-row md:items-center md:justify-center gap-2">
-
                   {/* Waiting for Approval */}
-                  {payment.status === "success" && payment.release_status === "pending" && (
-                    <>
-                      <span className="text-[#228B22] font-semibold text-sm text-left md:text-center">
-                        Waiting for Approval
-                      </span>
+                  {payment.status === "success" &&
+                    payment.release_status === "pending" && (
+                      <>
+                        <span className="text-[#228B22] font-semibold text-sm text-left md:text-center">
+                          Waiting for Approval
+                        </span>
 
-                      {hireStatus === "accepted" && (
-                        <button
-                          onClick={() => handlePay(payment._id)}
-                          className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700 w-fit"
-                        >
-                          Pay
-                        </button>
-                      )}
-                    </>
-                  )}
+                        {hireStatus === "accepted" && (
+                          <button
+                            onClick={() => handlePay(payment._id)}
+                            className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700 w-fit"
+                          >
+                            Pay
+                          </button>
+                        )}
+                      </>
+                    )}
 
                   {/* INFO BUTTON */}
                   <button
@@ -470,18 +470,22 @@ export default function Accepted({
                     </thead>
                     <tbody>
                       ${paymentHistory
-                            .map(
-                              (p) => `
+                        .map(
+                          (p) => `
                             <tr>
-                              <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
-                              <td style="padding:8px; border:1px solid #ddd;">${p.amount}</td>
+                              <td style="padding:8px; border:1px solid #ddd;">${
+                                p.payment_id || "N/A"
+                              }</td>
+                              <td style="padding:8px; border:1px solid #ddd;">${
+                                p.amount
+                              }</td>
                               <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
                                 ${p.method || "N/A"}
                               </td>
                             </tr>
                           `
-                            )
-                            .join("")}
+                        )
+                        .join("")}
                     </tbody>
                   </table>
                 `,
@@ -499,15 +503,21 @@ export default function Accepted({
 
                   {/* PAID LABELS */}
                   {payment.release_status === "release_requested" && (
-                    <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                    <span className="text-[#228B22] font-semibold text-sm">
+                      Paid
+                    </span>
                   )}
 
                   {payment.release_status === "released" && (
-                    <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                    <span className="text-[#228B22] font-semibold text-sm">
+                      Paid
+                    </span>
                   )}
 
                   {payment.release_status === "rejected" && (
-                    <span className="text-red-600 font-semibold text-sm">Admin Rejected</span>
+                    <span className="text-red-600 font-semibold text-sm">
+                      Admin Rejected
+                    </span>
                   )}
                 </div>
 
@@ -567,13 +577,10 @@ export default function Accepted({
                 </div>
               </>
             )}
-
           </div>
         )}
-
-
-      </div> 
-			      <div className="p-4 bg-white shadow-md rounded-lg mt-10">
+      </div>
+      <div className="p-4 bg-white shadow-md rounded-lg mt-10">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>
             <tr>
@@ -581,21 +588,32 @@ export default function Accepted({
               <th className="border p-2 text-left">Amount (₹)</th>
             </tr>
           </thead>
+
           <tbody>
             <tr>
-              <td className="border p-2">Total Amount Paid</td>
-              <td className="border p-2">₹{fullPaymentHistory.amount}</td>
+              <td className="border p-2">Total Project Value</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.total_expected}
+              </td>
             </tr>
+
+            <tr>
+              <td className="border p-2">Total Remaining Value</td>
+              <td className="border p-2">
+                ₹{fullPaymentHistory.remaining_amount}
+              </td>
+            </tr>
+
             <tr>
               <td className="border p-2">Pending with App</td>
               <td className="border p-2">
-                ₹{paymentHistory
-                  .filter((p) =>
-                    ["pending"].includes(p.release_status)
-                  )
+                ₹
+                {paymentHistory
+                  .filter((p) => ["pending"].includes(p.release_status))
                   .reduce((sum, p) => sum + p.amount, 0)}
               </td>
             </tr>
+
             <tr>
               <td className="border p-2">Paid to Worker</td>
               <td className="border p-2">
@@ -606,7 +624,6 @@ export default function Accepted({
                   )
                   .reduce((sum, p) => sum + p.amount, 0)}
               </td>
-              {/* <td className="border p-2">₹{fullPaymentHistory.platform_fee}</td> */}
             </tr>
           </tbody>
         </table>

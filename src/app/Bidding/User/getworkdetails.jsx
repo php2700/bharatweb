@@ -1342,7 +1342,7 @@ export default function BiddinggetWorkDetail() {
                                 }
                                 className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer"
                               >
-                                Accept
+                                Hire
                               </button>
                             )}
                             {orderDetail?.hire_status === "accepted" &&
@@ -1374,6 +1374,7 @@ export default function BiddinggetWorkDetail() {
               </div>
             </div>
           )}
+
           {(orderDetail?.hire_status === "accepted" ||
             orderDetail?.hire_status === "cancelled" ||
             orderDetail?.hire_status === "completed" ||

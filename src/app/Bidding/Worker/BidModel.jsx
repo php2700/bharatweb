@@ -1,25 +1,33 @@
 import bidModelImg from "../../../assets/directHiring/biddModel.png";
 import { useState } from "react";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platformFee }) {
+export default function BidModal({
+  isOpen,
+  onClose,
+  orderId,
+  onBidSuccess,
+  platformFee,
+}) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-	const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState("");
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     if (platformFee && platformFee > 0) {
+    if (platformFee && platformFee > 0) {
       const minRequiredAmount = platformFee * 10;
 
-     
       if (Number(amount) <= minRequiredAmount) {
-        toast.error(`Bid amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`);
+        toast.error(
+          `Bid amount must be greater than ₹${minRequiredAmount} because platform fee is ₹${platformFee}.`
+        );
         return; // Yahan se wapas bhej denge, API call nahi hogi
       }
     }
@@ -34,22 +42,22 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platfo
     };
 
     try {
-      const response = await fetch(
-        `${BASE_URL}/bidding-order/placeBid`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/bidding-order/placeBid`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       const data = await response.json();
       if (response.ok) {
-        toast.success("Bid placed successfully ✅");
-				localStorage.setItem("bidding_offer_id", data?.data?._id);
+        Swal.fire({
+          title: "Bid placed successfully ✅",
+          icon: "success",
+        });
+        localStorage.setItem("bidding_offer_id", data?.data?._id);
         onBidSuccess(amount, description, duration);
         onClose();
       } else {
@@ -61,8 +69,8 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platfo
     }
   };
   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[2px] z-50">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -97,7 +105,7 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platfo
               required
             />
           </div>
-					<div className="text-left">
+          <div className="text-left">
             <label className="block font-medium mb-1">Duration</label>
             <input
               type="number"
@@ -107,7 +115,7 @@ export default function BidModal({ isOpen, onClose, orderId, onBidSuccess,platfo
               required
             />
           </div>
-         
+
           <div className="flex w-1/2 mx-auto justify-center gap-4 mt-6">
             <button
               type="submit"
