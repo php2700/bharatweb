@@ -7,8 +7,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Calender from "../../../assets/bidding/calender.png";
 import Select from "react-select";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useSelector } from "react-redux";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -529,6 +527,17 @@ export default function BiddingNewTask() {
     autoplaySpeed: 3000,
   };
 
+  const formatDeadlineForInput = (value) => {
+    if (!value) return "";
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
+      return value;
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  };
+
   return (
     <>
       <Header />
@@ -841,17 +850,15 @@ export default function BiddingNewTask() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <img src={Calender} alt="" className="w-4 h-4" />
                 </div>
-                <ReactDatePicker
-                  selected={
-                    formData.deadline ? new Date(formData.deadline) : null
+                <input
+                  type="datetime-local"
+                  value={formatDeadlineForInput(formData.deadline)}
+                  onChange={(e) =>
+                    setFormData({ ...formData, deadline: e.target.value })
                   }
-                  onChange={(date) =>
-                    setFormData({ ...formData, deadline: date.toISOString() })
-                  }
-                  showTimeSelect
-                  dateFormat="dd MMM yyyy, hh:mm aa"
-                  placeholderText="Select deadline"
-                  minDate={new Date()}
+                  min={new Date().toISOString().slice(0, 16)}
+                  onClick={(e) => e.target.showPicker?.()}
+                  onFocus={(e) => e.target.showPicker?.()}
                   className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
