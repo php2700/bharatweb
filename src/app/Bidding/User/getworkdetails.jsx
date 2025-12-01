@@ -486,14 +486,14 @@ const [searchText, setSearchText] = useState("");
             );
 
             const verifyResult = await verifyResponse.json();
-            console.log("Verify Response:", verifyResult);
+            console.log("Verify Response123:", verifyResult);
             if (verifyResponse.ok && verifyResult.status) {
               toast.success("Payment verified successfully ✅");
               await fetchOrder(); // refresh order after verification
             } else {
-              toast.error(
-                verifyResult.message || "Payment verification failed ❌"
-              );
+              // toast.info(
+              //   verifyResult.message || "Payment verification failed ❌"
+              // );
             }
           } catch (err) {
             console.error("Verify API error:", err);
@@ -652,13 +652,13 @@ const [searchText, setSearchText] = useState("");
             );
 
             const verifyResult = await verifyResponse.json();
-            console.log("Verify Response:", verifyResult);
+            console.log("Verify Responsedsds:", verifyResult);
             if (verifyResponse.ok && verifyResult.status) {
               toast.success("Payment verified successfully ✅");
-              console.log("Verify Response:", verifyResult);
+              console.log("Verify Response123:", verifyResult);
               // Optionally refresh UI or update state
             } else {
-              toast.error(
+              toast.info(
                 verifyResult.message || "Payment verification failed ❌"
               );
             }
