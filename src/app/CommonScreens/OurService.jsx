@@ -154,27 +154,27 @@ export default function OurServices() {
         </div>
       </div>
 
-      {/* Banner Slider */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+     {/* Top banner */}
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
             Loading banners...
           </p>
         ) : bannerError ? (
           <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
+            {bannerError}
           </p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i} className="w-full h-[220px] sm:h-[400px]">
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
-                  }}
+                  src={banner}
+                  alt={`Banner ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.target.src = Work)}
                 />
               </div>
             ))}

@@ -7,6 +7,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import EmergencyTask from "../../../assets/emergTask.png";
 import Logo from "../../../assets/logo.svg";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -950,27 +952,34 @@ const Post = () => {
             )}
 
             {/* Contact */}
-            <div>
-              <label className="block text-xs mb-1 font-bold">Contact</label>
-              <input
-                type="text"
-                name="contact"
-                value={formData.contact}
-                onChange={(e) => {
-                  const onlyNums = e.target.value.replace(/\D/g, "");
-                  handleInputChange({ target: { name: "contact", value: onlyNums } });
-                }}
-                placeholder="Enter Contact Number"
-                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.contact ? "border-red-500" : "border-green-500"
-                  }`}
-              />
-              {validationErrors.contact && (
-                <p className="text-red-500 text-xs">{validationErrors.contact}</p>
-              )}
-            </div>
+           <div>
+  <label className="block text-xs mb-1 font-bold">Contact</label>
+  <input
+    type="text"
+    name="contact"
+    value={formData.contact}
+    onChange={(e) => {
+      // Sirf digits nikal lo
+      let onlyNums = e.target.value.replace(/\D/g, "");
+      // Max 10 digits tak
+      if (onlyNums.length > 10) {
+        onlyNums = onlyNums.slice(0, 10);
+      }
+      handleInputChange({ target: { name: "contact", value: onlyNums } });
+    }}
+    placeholder="Enter Contact Number"
+    className={`w-full border rounded-md px-3 py-2 text-sm ${
+      validationErrors.contact ? "border-red-500" : "border-green-500"
+    }`}
+  />
+  {validationErrors.contact && (
+    <p className="text-red-500 text-xs">{validationErrors.contact}</p>
+  )}
+</div>
+
 
             {/* Deadline */}
-            <div>
+            {/* <div>
               <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
               <input
                 type="datetime-local"
@@ -983,6 +992,31 @@ const Post = () => {
                 className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.deadline ? "border-red-500" : "border-green-500"
                   }`}
               />
+              {validationErrors.deadline && (
+                <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
+              )}
+            </div> */}
+            {/* Deadline / Completion Time */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
+              <div className="relative w-full">
+                <DatePicker
+                  selected={formData.deadline ? new Date(formData.deadline) : null}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, deadline: date.toISOString() }))
+                  }
+                  showTimeSelect
+                  timeFormat="h:mm aa"
+                  timeIntervals={15}
+                  dateFormat="dd MMM yyyy, h:mm aa"  // Isse Date + AM/PM dikhega
+                  placeholderText="Select Date & Time"
+                  minDate={new Date()}
+                  wrapperClassName="w-full"
+                  className={`w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500 ${
+                    validationErrors.deadline ? "border-red-500" : "border-green-500"
+                  }`}
+                />
+              </div>
               {validationErrors.deadline && (
                 <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
               )}

@@ -16,6 +16,8 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import Biding from "../assets/Homepage/bidding.svg";
 import Emergency from "../assets/Homepage/emergency.png";
 import DirectHiring from "../assets/Homepage/deirecthiring.png";
+import Swal from "sweetalert2";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -44,7 +46,14 @@ export default function Header() {
     pincode: "",
     _id: null,
   });
-  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [savedAddresses, setSavedAddresses] = useState(() => {
+    try {
+      const stored = localStorage.getItem("savedAddresses");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [selectedAddressId, setSelectedAddressId] = useState(
     localStorage.getItem("selectedAddressId") || null
   );
@@ -353,6 +362,7 @@ export default function Header() {
           // 1. Save all addresses
           if (data?.full_address) {
             setSavedAddresses(data.full_address);
+            localStorage.setItem("savedAddresses", JSON.stringify(data.full_address));
           }
 
           // 2. If location exists → match the correct addressId
@@ -402,17 +412,16 @@ export default function Header() {
       if (matchedAddress) {
         setSelectedAddress(matchedAddress.address);
         setSelectedAddressId(matchedAddress._id);
-
         localStorage.setItem("selectedAddressTitle", matchedAddress.address);
         localStorage.setItem("selectedAddressId", matchedAddress._id);
+        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
       } else if (profile.full_address?.length > 0) {
         const firstAddress = profile.full_address[0];
-
         setSelectedAddress(firstAddress.address);
         setSelectedAddressId(firstAddress._id);
-
         localStorage.setItem("selectedAddressTitle", firstAddress.address);
         localStorage.setItem("selectedAddressId", firstAddress._id);
+        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
       }
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
@@ -618,6 +627,7 @@ export default function Header() {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
+        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
         const newIndex =
           editingAddress !== null
             ? editingAddress
@@ -677,6 +687,7 @@ export default function Header() {
           (_, idx) => idx !== index
         );
         setSavedAddresses(updatedAddresses);
+        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
         let newLocation = profile.location;
         if (selectedAddressId === addressId) {
           newLocation = updatedAddresses[0] || null;
@@ -731,6 +742,21 @@ export default function Header() {
     }
     setIsAddressDropdownOpen(false);
   };
+const handleDeleteConfirm = (index, addressId) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you really want to delete this address?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      handleDeleteAddress(index, addressId); // 👉 Yahi original function chalega
+    }
+  });
+};
+
 
   const handleEditAddress = (index, addressId) => {
     setEditingAddress(index);
@@ -965,13 +991,12 @@ export default function Header() {
                             Edit
                           </button>
                           <button
-                            onClick={() =>
-                              handleDeleteAddress(index, address._id)
-                            }
-                            className="text-sm text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
+  onClick={() => handleDeleteConfirm(index, address._id)}
+  className="text-sm text-red-600 hover:underline"
+>
+  Delete
+</button>
+
                         </div>
                       </div>
                     ))
@@ -1144,9 +1169,9 @@ export default function Header() {
                               {/* 👉 Header Row */}
                               <div className="p-3 text-sm font-medium text-gray-700 border-b flex justify-between items-center">
                                 <p>{section.section}</p>
-                                {section.section === "Today" && (
+                                {/* {section.section === "Today" && (
                                   <h3 className="font-semibold">Total Notifications :- {totalNotifications}</h3>
-                                )}
+                                )} */}
                               </div>
                               {section.items.map((notif, idx) => (
                                 <div

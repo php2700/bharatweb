@@ -823,19 +823,27 @@ export default function BiddingNewTask() {
 
             {/* Cost */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
-              <input
-                type="number"
-                name="cost"
-                placeholder="Enter cost in INR"
-                value={formData.cost}
-                onChange={handleChange}
-                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
+  <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
+  <input
+    type="text"
+    name="cost"
+    placeholder="Enter cost in INR"
+    value={formData.cost}
+    onChange={(e) => {
+      const value = e.target.value;
+
+      // Only allow digits and max 7 characters
+      if (/^\d{0,7}$/.test(value)) {
+        handleChange(e); // Your existing handler
+      }
+    }}
+    className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
+  />
+</div>
+
 
             {/* Deadline */}
-            <div>
+            {/* <div>
               <label className="block text-xs mb-1 font-bold">Deadline</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -852,6 +860,29 @@ export default function BiddingNewTask() {
                   dateFormat="dd MMM yyyy, hh:mm aa"
                   placeholderText="Select deadline"
                   minDate={new Date()}
+                  className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div> */}
+            {/* Deadline */}
+            <div>
+              <label className="block text-xs mb-1 font-bold">Deadline</label>
+              <div className="relative w-full">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                  <img src={Calender} alt="" className="w-4 h-4" />
+                </div>
+                <ReactDatePicker
+                  selected={
+                    formData.deadline ? new Date(formData.deadline) : null
+                  }
+                  onChange={(date) =>
+                    setFormData({ ...formData, deadline: date.toISOString() })
+                  }
+                  showTimeSelect
+                  dateFormat="dd MMM yyyy, hh:mm aa"
+                  placeholderText="Select deadline"
+                  minDate={new Date()}
+                  wrapperClassName="w-full" // Ye line jaruri hai width fix karne ke liye
                   className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>

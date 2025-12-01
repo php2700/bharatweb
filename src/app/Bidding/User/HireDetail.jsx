@@ -554,9 +554,13 @@ const handlePayment = async (order_id, serviceProviderId) => {
             <div className="space-y-4">
               {/* Name + Rating */}
               <div className="flex justify-between items-center">
-                <div className="text-lg sm:text-xl font-semibold text-gray-800">
-                  {providerDetail.full_name}
-                </div>
+               <div className="text-lg sm:text-xl font-semibold text-gray-800">
+  {providerDetail.full_name
+    ? providerDetail.full_name.charAt(0).toUpperCase() +
+      providerDetail.full_name.slice(1)
+    : ""}
+</div>
+
                 <div className="flex flex-col gap-1 items-end">
                   <div className="flex items-center text-sm text-gray-700">
                     <span className="font-semibold">

@@ -327,7 +327,11 @@ const filteredWorkers = workers.filter((worker) => {
         <div className="md:col-span-8 p-4 space-y-2">
           <div className="flex flex-col sm:flex-row justify-between gap-2">
             <h2 className="text-base font-semibold text-gray-800">
-              {worker.workName}
+              {worker?.workName
+  ? worker.workName.charAt(0).toUpperCase() + worker.workName.slice(1)
+  : ""
+}
+
             </h2>
             <div className="text-sm font-semibold">
               Posted Date:{" "}

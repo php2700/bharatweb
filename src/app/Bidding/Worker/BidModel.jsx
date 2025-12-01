@@ -86,13 +86,21 @@ export default function BidModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-left">
             <label className="block font-medium mb-1">Enter Amount</label>
-            <input
-              type="text"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
-              required
-            />
+       <input
+  type="text"
+  value={amount}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Only digits allowed and max length 10
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setAmount(value);
+    }
+  }}
+  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
+  required
+/>
+
           </div>
 
           <div className="text-left">
@@ -107,13 +115,21 @@ export default function BidModal({
           </div>
           <div className="text-left">
             <label className="block font-medium mb-1">Duration</label>
-            <input
-              type="number"
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
-              required
-            />
+           <input
+  type="text"
+  value={duration}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // Only digits & max length 3
+    if (/^\d{0,3}$/.test(value)) {
+      setDuration(value);
+    }
+  }}
+  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none"
+  required
+/>
+
           </div>
 
           <div className="flex w-1/2 mx-auto justify-center gap-4 mt-6">

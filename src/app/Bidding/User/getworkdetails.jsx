@@ -55,6 +55,9 @@ export default function BiddinggetWorkDetail() {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const [openImage, setOpenImage] = useState(null);
+  const [localInvited, setLocalInvited] = useState([]);
+const [searchText, setSearchText] = useState("");
+
   useEffect(() => {
     window.scrollTo(0, 0);
     localStorage.setItem("order_id", id);
@@ -219,7 +222,7 @@ export default function BiddinggetWorkDetail() {
   };
   const handleGetDirections = (destinationAddress) => {
     if (destinationAddress) {
-      // origin (शुरुआत) खाली छोड़ने पर गूगल मैप्स यूज़र की current location ले लेता है।
+      
       const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
         destinationAddress
       )}`;
@@ -265,6 +268,19 @@ export default function BiddinggetWorkDetail() {
       toast.error(err.message || "Network error, please try again.");
     }
   };
+  const handleInviteClick = async (workerId) => {
+  // UI instantly update
+  setLocalInvited((prev) => [...prev, workerId]);
+
+  try {
+    await InviteSendWorker(workerId); // <-- Tumhara API function
+
+  } catch (err) {
+    // API fail ho to local state revert
+    setLocalInvited((prev) => prev.filter((x) => x !== workerId));
+  }
+};
+
 
   const handleMarkComplete = async () => {
     try {
@@ -499,6 +515,22 @@ export default function BiddinggetWorkDetail() {
       toast.error(error.message || "Something went wrong ❌");
     }
   };
+  const confirmAccept = (providerId) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Do you want to accept this bid?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#228B22",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Accept",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      handleAcceptBid(providerId); // <-- your original function runs here
+    }
+  });
+};
+
 
   const handleView = (serviceProviderId, biddingOfferId, orderId) => {
     navigate(`/bidding/hiredetail/${serviceProviderId}`, {
@@ -828,9 +860,12 @@ export default function BiddinggetWorkDetail() {
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="text-lg font-semibold">
-                  {orderDetail?.title || "N/A"}
-                </h2>
-                <p className="text-lg font-semibold">Chhawani Usha Ganj</p>
+  {orderDetail?.title
+    ? orderDetail.title.charAt(0).toUpperCase() + orderDetail.title.slice(1)
+    : "N/A"}
+</h2>
+
+                
                 <span
                   onClick={() => setShowMap(true)}
                   className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
@@ -988,13 +1023,13 @@ export default function BiddinggetWorkDetail() {
                     !orderDetail?.platform_fee_paid) ? (
                   // 🟢 Edit + Cancel Buttons (only if not cancelled)
                   <div className="flex justify-center gap-6">
-                    <Link
+                    {/* <Link
                       to={`/bidding/edittask/${id}`}
                       className="flex items-center gap-2 text-[#228B22] px-6 py-3 rounded-lg font-medium border-2 border-[#228B22]"
                     >
                       <img src={editIcon} alt="Edit" className="w-5 h-5" />
                       Edit
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={cancelTask}
                       className="flex items-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium cursor-pointer"
@@ -1120,6 +1155,7 @@ export default function BiddinggetWorkDetail() {
               />
             </div>
           </div>
+          
           {(orderDetail?.hire_status === "pending" ||
             (orderDetail?.hire_status === "accepted" &&
               !orderDetail?.platform_fee_paid)) && (
@@ -1150,23 +1186,29 @@ export default function BiddinggetWorkDetail() {
                 <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
                   <Search className="w-5 h-5 text-gray-400" />
                   <input
-                    type="text"
-                    placeholder="Search for services"
-                    className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-                  />
-                  <SlidersHorizontal className="w-5 h-5 text-gray-500 cursor-pointer" />
+  type="text"
+  placeholder="Search for services"
+  className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+  value={searchText}   // <-- add this
+  onChange={(e) => setSearchText(e.target.value.toLowerCase())}  // <-- add this
+/>
+
+                  
                 </div>
                 {tab === "related" ? (
                   <div className="flex flex-col items-center justify-center text-gray-500 py-10">
                     {Array.isArray(providers) && providers.length > 0 ? (
                       providers
-                        .filter(
-                          (provider) =>
-                            !offers.some(
-                              (offer) => offer.provider_id?._id === provider._id
-                            )
-                        )
+  .filter(
+    (provider) =>
+      provider.full_name?.toLowerCase().includes(searchText) &&  // <-- search filter
+      !offers.some(
+        (offer) => offer.provider_id?._id === provider._id
+      )
+  )
+
                         .map((provider) => (
+                          
                           <div
                             key={provider._id}
                             className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
@@ -1174,7 +1216,7 @@ export default function BiddinggetWorkDetail() {
                             {console.log("PROVIDER DATA →", provider)}
 
                             <img
-                              src={provider.image || workImage}
+                              src={provider.profile_pic || workImage}
                               alt={provider.full_name}
                               className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                             />
@@ -1228,26 +1270,40 @@ export default function BiddinggetWorkDetail() {
                             </div>
                             <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
                               <div className="flex items-center gap-4 sm:gap-7">
-                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
                                   <img
                                     src={callIcon}
                                     alt="Call"
                                     className="w-[18px] sm:w-[23px]"
                                   />
-                                </span>
-                                <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
+                                </span> */}
+                                {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
                                   <img
                                     src={msgIcon}
                                     alt="Message"
                                     className="w-[18px] sm:w-[23px]"
                                   />
-                                </span>
-                                <button
-                                  onClick={() => InviteSendWorker(provider._id)}
-                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                                >
-                                  Invite
-                                </button>
+                                </span> */}
+           <button
+  onClick={() => handleInviteClick(provider._id)}
+  disabled={
+    localInvited.includes(provider._id) ||
+    orderDetail?.invited_providers?.includes(provider._id)
+  }
+  className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white ${
+    localInvited.includes(provider._id) ||
+    orderDetail?.invited_providers?.includes(provider._id)
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-[#228B22] hover:bg-green-700"
+  }`}
+>
+  {localInvited.includes(provider._id) ||
+  orderDetail?.invited_providers?.includes(provider._id)
+    ? "Invite Sent"
+    : "Invite"}
+</button>
+
+
                               </div>
                             </div>
                           </div>
@@ -1266,13 +1322,18 @@ export default function BiddinggetWorkDetail() {
                 ) : (
                   <div className="mt-6 space-y-4">
                     {Array.isArray(offers) && offers.length > 0 ? (
-                      offers.map((offer) => (
+                      offers
+  .filter((offer) =>
+    offer.provider_id?.full_name?.toLowerCase().includes(searchText) // <-- search filter
+  )
+  .map((offer) => (
+
                         <div
                           key={offer._id}
                           className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
                         >
                           <img
-                            src={offer.provider_id?.image || workImage}
+                            src={offer.provider_id?.profile_pic || workImage}
                             alt={offer.provider_id?.full_name || "Worker"}
                             className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                           />
@@ -1368,7 +1429,7 @@ export default function BiddinggetWorkDetail() {
                         />
                         <p>No bids available</p>
                       </div>
-                    )}
+                    ) }
                   </div>
                 )}
               </div>

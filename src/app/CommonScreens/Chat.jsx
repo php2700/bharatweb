@@ -947,11 +947,14 @@ const Chat = () => {
 
                   <div className="ml-4 flex-1 min-w-0">
                     <div className="flex justify-between items-baseline">
-                      <h3 className={`text-sm font-semibold truncate ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
+                      {/* <h3 className={`text-sm font-semibold truncate ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
                         {otherUser?.full_name || "User"}
-                      </h3>
+                      </h3> */}
+                      <h3 className={`text-sm font-semibold truncate capitalize ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
+  {otherUser?.full_name || "User"}
+</h3>
                       {/* Placeholder for time - add timestamps to data if available */}
-                      <span className="text-xs text-gray-400">Now</span> 
+                      {/* <span className="text-xs text-gray-400">Now</span>  */}
                     </div>
                     <div className="flex justify-between items-center mt-1">
                       <p className={`text-sm truncate w-4/5 ${conv.unreadCount > 0 ? "font-semibold text-gray-800" : "text-gray-500"}`}>
@@ -986,7 +989,9 @@ const Chat = () => {
                   />
                   <div>
                     <h3 className="font-bold text-gray-800">
-                      {currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat"}
+                      {(currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat")
+  .replace(/^\w/, (c) => c.toUpperCase())}
+
                     </h3>
                      {/* Check online status */}
                     {/* <p className="text-xs text-[#228B22] font-medium">
@@ -996,7 +1001,7 @@ const Chat = () => {
                        {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? (
                          <span className="text-[#228B22]">Online</span>
                        ) : (
-                         <span className="text-gray-500">Last seen 20 Oct at 12:30 PM</span>
+                         <span className="text-gray-500"></span>
                        )}
                     </p>
                   </div>
@@ -1093,7 +1098,7 @@ const Chat = () => {
                         className="hidden"
                         disabled={isLoading || !isChatInitialized}
                       />
-                      <FiImage size={20} />
+                      {/* <FiImage size={20} /> */}
                     </label>
                     <label className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition">
                       <input
@@ -1105,7 +1110,7 @@ const Chat = () => {
                         className="hidden"
                         disabled={isLoading || !isChatInitialized}
                       />
-                      <FiPaperclip size={20} />
+                      {/* <FiPaperclip size={20} /> */}
                     </label>
                   </div>
 
