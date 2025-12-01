@@ -74,16 +74,16 @@ export default function RejectedWorkDetails() {
     autoplaySpeed: 3000,
     arrows: false,
   };
-const destination = task.google_address || task.location;
+  const destination = task.google_address || task.location;
   const handleGetDirections = () => {
-if (destination) {
-  window.open(
-    `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-      destination
-    )}`,
-    "_blank"
-  );
-}
+    if (destination) {
+      window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+          destination
+        )}`,
+        "_blank"
+      );
+    }
 
   };
 
@@ -95,6 +95,9 @@ if (destination) {
     );
     navigate("/chats");
   };
+
+
+
 
   return (
     <>
@@ -175,9 +178,9 @@ if (destination) {
                   className="flex items-center text-gray-700 cursor-pointer hover:text-green-700"
                 >
                   <FaMapMarkerAlt size={28} color="#228B22" className="mr-3" />
-    <span className="text-lg">
-  {task.google_address || task.location || "Location not available"}
-</span>
+                  <span className="text-lg">
+                    {task.google_address || task.location || "Location not available"}
+                  </span>
 
 
                 </div>
@@ -259,7 +262,8 @@ if (destination) {
                     />
                     <div>
                       <h3 className="text-2xl font-bold text-gray-800">
-                        {task.user_name || "Unknown User"}
+                       {task.user_id?.full_name || "User"}
+
                       </h3>
                     </div>
                   </div>
@@ -326,8 +330,8 @@ if (destination) {
                 loading="lazy"
                 allowFullScreen
                 src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
-  task.google_address || task.location
-)}`}
+                  task.google_address || task.location
+                )}`}
 
               />
             </div>
