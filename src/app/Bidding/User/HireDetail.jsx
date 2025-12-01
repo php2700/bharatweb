@@ -209,6 +209,46 @@ export default function HireDetail() {
   if (!providerDetail) {
     return <div className="text-center py-10">No Provider Found</div>;
   }
+
+  // Destructure fields similar to ViewProfileDetails for reuse in UI
+  const {
+    full_name = providerDetail.full_name || "N/A",
+    unique_id = providerDetail.unique_id || "N/A",
+    location: providerLocation = providerDetail.location || {
+      address: "Not Available",
+    },
+    businessAddress = providerDetail.businessAddress || {
+      address: "Not Available",
+    },
+    isShop = providerDetail.isShop || false,
+    profilePic = providerDetail.profilePic || null,
+    skill = providerDetail.skill || "No Skill Available",
+    category = providerDetail.category || { name: providerDetail.category_name || "Not Available" },
+    subcategory_names = providerDetail.subcategory_names || [],
+    emergencySubcategory_names = providerDetail.emergencySubcategory_names || [],
+    documents = providerDetail.documents || [],
+    rateAndReviews = providerDetail.rateAndReviews || [],
+    verificationStatus = providerDetail.verificationStatus || "pending",
+    hiswork = providerDetail.hiswork || [],
+    customerReview = providerDetail.customerReview || [],
+    businessImage = providerDetail.businessImage || [],
+    avgRating = providerDetail.avgRating || (providerDetail.rating?.toString?.() ?? "0.0"),
+    totalReviews = providerDetail.totalReviews || providerDetail.totalReview || 0,
+  } = providerDetail;
+
+  const verifiedStatus =
+    verificationStatus === "verified"
+      ? "Verified by Admin"
+      : verificationStatus === "rejected"
+      ? "Rejected"
+      : "Pending";
+  const statusClass =
+    verificationStatus === "verified"
+      ? "bg-green-100 text-green-600"
+      : verificationStatus === "rejected"
+      ? "bg-red-100 text-red-600"
+      : "bg-yellow-100 text-yellow-600";
+
   const handleNagotiation = async (offer) => {
     const userId = localStorage.getItem("user_id"); // user id from localStorage
     const token = localStorage.getItem("bharat_token"); // bearer token from localStorage
@@ -635,166 +675,233 @@ const handlePayment = async (order_id, serviceProviderId) => {
         {/* Document Preview Modal */}
         {selectedImage && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-4 rounded-lg max-w-3xl">
-              <div className="flex justify-end">
-                <button onClick={closeModal} className="text-gray-600 hover:text-gray-800 font-semibold">
-                  Close
-                </button>
-              </div>
-              <img src={selectedImage} alt="Document Preview" className="w-full h-auto max-h-[80vh] object-contain" onError={(e) => { e.target.src = defaultPic; }} />
+            <div className="bg-white p-4 rounded-lg max-w-3xl w-[92vw] md:w-auto relative">
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 bg-white text-gray-700 hover:text-gray-900 shadow-lg w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold"
+                aria-label="Close image preview"
+              >
+                ×
+              </button>
+              <img
+                src={selectedImage}
+                alt="Document Preview"
+                className="w-full h-auto max-h-[78vh] max-w-[85vw] object-contain"
+                onError={(e) => {
+                  e.target.src = defaultPic;
+                }}
+              />
             </div>
           </div>
         )}
 
         {/* Image Slider */}
-        <div className="bg-[#D3FFD3] h-90 flex items-center relative">
-          <img
-            className="h-80 w-1/2 mx-auto"
-            src={imagsArray[imageIndex]}
-            alt="His Work"
-          />
+       <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
 
-          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-            {imagsArray?.map((_, idx) => (
-              <div
-                key={idx}
-                className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300
-                ${idx === imageIndex ? "bg-green-600" : "bg-gray-300"}`}
-              />
-            ))}
-          </div>
-        </div>
+  {/* Main Preview Image — same styling as first code */}
+  <div className="relative w-[700px] h-[400px]">
+    <img
+      className="w-full h-full object-cover rounded-md shadow-md"
+      src={imagsArray[imageIndex]}
+      alt="His Work"
+      onError={(e) => {
+        e.target.src = defaultPic;
+      }}
+    />
+  </div>
+</div>
+
 
         {/* Documents */}
         <div className="container max-w-2xl mx-auto my-10 space-y-6">
-          <div className="shadow-2xl rounded-lg py-4 px-10">
-            <h2 className="font-semibold text-lg mb-2">Documents</h2>
-            <div className="mt-4">
-              {(() => {
-                // Normalize providerDetail.documents into array format similar to ViewProfileDetails
-                const docs = Array.isArray(providerDetail.documents)
-                  ? providerDetail.documents
-                  : providerDetail.documents
-                  ? [
-                      {
-                        documentName: "Aadhar card",
-                        images: Array.isArray(providerDetail.documents)
-                          ? providerDetail.documents
-                          : [providerDetail.documents],
-                      },
-                    ]
-                  : [];
 
-                if (docs.length === 0) {
-                  return (
+
+
+          
+            <div>
+            {/* Reviews */}
+
+              {/* Documents Section – copied structure from ViewProfileDetails */}
+              <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+                <div className="flex justify-between items-start">
+                  <h2 className="text-xl font-bold">Documents</h2>
+                  <span
+                    className={`${statusClass} text-xs font-semibold px-3 py-1 rounded-full`}
+                  >
+                    {verifiedStatus}
+                  </span>
+                </div>
+                <div className="mt-4">
+                  {documents.length > 0 ? (
+                    documents.map((doc, index) => (
+                      <div
+                        key={index}
+                        className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
+                      >
+                        {/* Document header */}
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
+                            <img
+                              src={aadharImg}
+                              alt="Document Icon"
+                              className="w-8 h-8"
+                            />
+                          </div>
+                          <p className="text-lg font-semibold text-gray-800">
+                            {doc.documentName}
+                          </p>
+                        </div>
+
+                        {/* Images grid */}
+                        {doc.images?.length > 0 ? (
+                          <div className="relative">
+                            <div className="flex flex-wrap gap-6">
+                              {doc.images.map((img, imgIndex) => (
+                                <div
+                                  key={imgIndex}
+                                  className="group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow cursor-pointer hover:shadow-xl"
+                                  onClick={() => handleDocumentClick(img)}
+                                >
+                                  <img
+                                    src={img}
+                                    alt={`${doc.documentName} image ${
+                                      imgIndex + 1
+                                    }`}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                    onError={(e) => {
+                                      e.target.src = defaultPic;
+                                    }}
+                                  />
+
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
+                                    <span className="text-white font-medium text-sm">
+                                      Click to view
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic pl-1">
+                            No images uploaded for this document.
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    /* No documents at all – always fully visible */
                     <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
                       <p className="text-xl font-medium text-gray-600">
                         No Documents Uploaded Yet
                       </p>
                       <p className="text-sm text-gray-500 mt-2">
-                        Documents will appear here once the service provider uploads them.
+                        Documents will appear here once the worker uploads them.
                       </p>
                     </div>
-                  );
-                }
-
-                return docs.map((doc, index) => (
-                  <div key={index} className="mb-6 border-b border-gray-200 pb-6 last:border-b-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
-                        <span>📄</span>
-                      </div>
-                      <p className="text-lg font-semibold text-gray-800">{doc.documentName || `Document ${index + 1}`}</p>
-                    </div>
-
-                    {doc.images?.length > 0 ? (
-                      <div className="relative">
-                        <div className={`flex flex-wrap gap-6 ${!isHired ? 'blur-md pointer-events-none' : ''}`}>
-                          {doc.images.map((img, imgIndex) => (
-                            <div key={imgIndex} className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${isHired ? 'cursor-pointer hover:shadow-xl' : 'cursor-default'}`} onClick={isHired ? () => handleDocumentClick(img) : undefined}>
-                              <img src={img} alt={`${doc.documentName} image ${imgIndex + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" onError={(e) => { e.target.src = defaultPic; }} />
-                              {isHired && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
-                                  <span className="text-white font-medium text-sm">Click to view</span>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-
-                        {!isHired && (
-                          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-                            <div className="text-center bg-white p-5 rounded-2xl shadow-2xl border border-gray-200">
-                              <p className="text-xl font-bold text-[#228B22]">Hire to Unlock</p>
-                              <p className="text-sm text-gray-600 mt-1">View clear document images after hiring</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 italic pl-1">No images uploaded for this document.</p>
-                    )}
-                  </div>
-                ));
-              })()}
-            </div>
-          </div>
-
-          {/* Reviews */}
-          <div>
-            
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-lead-600">Rate & Reviews</h2>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-lead-600">Ratings</span>
-                <span className="text-2xl font-bold text-[#228B22]">{providerDetail.rating ?? providerDetail.avgRating ?? '0.0'}</span>
-                <span className="text-sm text-gray-600">({providerDetail.totalReview ?? providerDetail.totalReviews ?? 0} reviews)</span>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Determine reviews to display */}
-            {(() => {
-              const reviews = providerDetail.rateAndReviews || [];
-              const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 2);
+              {/* Rate & Reviews Section – copied from ViewProfileDetails */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Rate & Reviews</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold text-lead-600">
+                      Ratings
+                    </span>
+                    <span className="text-2xl font-bold text-[#228B22]">
+                      {avgRating}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      ({totalReviews} reviews)
+                    </span>
+                  </div>
+                </div>
+                {(() => {
+                  const displayedReviews = showAllReviews
+                    ? rateAndReviews
+                    : rateAndReviews.slice(0, 2);
 
-              if (displayedReviews.length > 0) {
-                return (
-                  <>
-                    {displayedReviews.map((item, idx) => (
-                      <div key={item._id ?? idx} className="bg-white rounded-xl shadow-md p-6 mb-4">
-                        <div className="flex gap-1 mb-2">
-                          {[1, 2, 3, 4, 5].map((star, i) => (
-                            <span key={i} className={i < (item.rating ?? 0) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <img src={item.user?.profilePic || defaultPic} alt="Reviewer" className="w-8 h-8 rounded-full" onError={(e) => { e.target.src = defaultPic; }} />
-                          <h3 className="font-semibold">{item.user?.name || item.user?.full_name || 'Unknown'}</h3>
-                        </div>
-                        <p className="text-gray-600 text-sm mb-2">{item.review ?? item.comment}</p>
-                        <p className="text-xs text-gray-400 mb-2">{new Date(item.createdAt ?? item.date ?? Date.now()).toLocaleDateString()} • {item.order_type ?? item.orderType ?? ''}</p>
-                        {item.images?.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {item.images.map((img, i) => (
-                              <img key={i} src={img} alt={`Review image ${i + 1}`} className="w-16 h-16 object-cover rounded-md" onError={(e) => { e.target.src = defaultPic; }} />
-                            ))}
+                  if (displayedReviews.length > 0) {
+                    return (
+                      <>
+                        {displayedReviews.map((item) => (
+                          <div
+                            key={item._id}
+                            className="bg-white rounded-xl shadow-md p-6 mb-4"
+                          >
+                            <div className="flex gap-1 mb-2">
+                              {[1, 2, 3, 4, 5].map((star, i) => (
+                                <span
+                                  key={i}
+                                  className={
+                                    i < item.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <img
+                                src={item.user.profilePic || defaultPic}
+                                alt="Reviewer"
+                                className="w-8 h-8 rounded-full"
+                                onError={(e) => {
+                                  e.target.src = defaultPic;
+                                }}
+                              />
+                              <h3 className="font-semibold">{item.user.name}</h3>
+                            </div>
+                            <p className="text-gray-600 text-sm mb-2">
+                              {item.review}
+                            </p>
+                            <p className="text-xs text-gray-400 mb-2">
+                              {new Date(item.createdAt).toLocaleDateString()} •{" "}
+                              {item.order_type}
+                            </p>
+                            {item.images?.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {item.images.map((img, i) => (
+                                  <img
+                                    key={i}
+                                    src={img}
+                                    alt={`Review image ${i + 1}`}
+                                    className="w-16 h-16 object-cover rounded-md"
+                                    onError={(e) => {
+                                      e.target.src = defaultPic;
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                        ))}
+                      </>
+                    );
+                  }
 
-                    {/* See All Reviews toggle */}
-                    {reviews.length > 2 && !showAllReviews && (
-                      <div className="text-center mt-4">
-                        <button onClick={() => setShowAllReviews(true)} className="text-[#228B22] font-semibold hover:underline">See All Reviews</button>
-                      </div>
-                    )}
-                  </>
-                );
-              }
-
-              return <p className="text-gray-500 text-center">No Ratings Available</p>;
-            })()}
+                  return (
+                    <p className="text-gray-500 text-center">
+                      No Ratings Available
+                    </p>
+                  );
+                })()}
+                {rateAndReviews.length > 2 && !showAllReviews && (
+                  <div className="text-center mt-4">
+                    <button
+                      onClick={() => setShowAllReviews(true)}
+                      className="text-[#228B22] font-semibold hover:underline"
+                    >
+                      See All Reviews
+                    </button>
+                  </div>
+                )}
+              </div>
           </div>
 
           {/* Offer/Negotiate Section */}
