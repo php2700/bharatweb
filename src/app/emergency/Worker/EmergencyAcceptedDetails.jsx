@@ -24,11 +24,13 @@ export default function RejectedWorkDetails() {
   const navigate = useNavigate();
   const task = state?.task;
   console.log(task);
-  console.log(task.hire_status);
+  console.log(task?.hire_status);
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
   const [openImage, setOpenImage] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+
+
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -72,16 +74,17 @@ export default function RejectedWorkDetails() {
     autoplaySpeed: 3000,
     arrows: false,
   };
-
+const destination = task.google_address || task.location;
   const handleGetDirections = () => {
-    if (task.location) {
-      window.open(
-        `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-          task.location
-        )}`,
-        "_blank"
-      );
-    }
+if (destination) {
+  window.open(
+    `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+      destination
+    )}`,
+    "_blank"
+  );
+}
+
   };
 
   const handleChatOpen = (receiverId) => {
@@ -172,7 +175,11 @@ export default function RejectedWorkDetails() {
                   className="flex items-center text-gray-700 cursor-pointer hover:text-green-700"
                 >
                   <FaMapMarkerAlt size={28} color="#228B22" className="mr-3" />
-                  <span className="text-lg">{task.location}</span>
+    <span className="text-lg">
+  {task.google_address || task.location || "Location not available"}
+</span>
+
+
                 </div>
                 <div className="text-gray-600">
                   <p className="text-lg">
@@ -319,8 +326,9 @@ export default function RejectedWorkDetails() {
                 loading="lazy"
                 allowFullScreen
                 src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(
-                  task.location
-                )}`}
+  task.google_address || task.location
+)}`}
+
               />
             </div>
             <div className="mt-6 text-center">
