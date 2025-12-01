@@ -1,11 +1,9 @@
 import Header from "../../../component/Header";
 import banner from "../../../assets/banner.png";
 import Footer from "../../../component/footer";
-import serviceProviderImg from "../../../assets/directHiring/service-provider.png";
 import NoPicAvailable from "../../../assets/bidding/No_Image_Available.jpg";
 
 import locationIcon from "../../../assets/directHiring/location-icon.png";
-import hisWorkImg from "../../../assets/directHiring/his-work.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
 import defaultPic from "../../../assets/default-image.jpg";
@@ -38,7 +36,21 @@ export default function HireDetail() {
   const [bannerError, setBannerError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [documentsUnlocked, setDocumentsUnlocked] = useState(false);
+  const [WorkerTab, setWorkerTab] = useState("work");
+  const [workIndex, setWorkIndex] = useState(0);
+  const [reviewIndex, setReviewIndex] = useState(0);
   const dispatch = useDispatch();
+
+  // Persistent key so once documents are unlocked for this user/provider,
+  // they remain unlocked across refreshes, re-renders, or route-state loss.
+  // We intentionally avoid depending on order_id because location.state
+  // (where order_id comes from) is cleared on hard refresh.
+  const currentUserId = localStorage.getItem("user_id");
+  const docUnlockKey =
+    currentUserId && id
+      ? `bidding_docs_unlocked_${currentUserId}_${id}`
+      : null;
 
   const { profile } = useSelector((state) => state.user);
   // console.log("User Profile from Redux:", profile); // Debugging line
@@ -168,25 +180,31 @@ export default function HireDetail() {
     }
   }, [id]);
 
-  const imagsArray = [
-    hisWorkImg,
-    serviceProviderImg,
-    hisWorkImg,
-    serviceProviderImg,
-    hisWorkImg,
-    serviceProviderImg,
-  ];
-
-  const [imageIndex, setImageIndex] = useState(0);
-
+  // Auto-slide for work images
   useEffect(() => {
+    const workImages = providerDetail?.hiswork || [];
+    if (WorkerTab !== "work" || workImages.length === 0) return;
+
     const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % imagsArray.length);
+      setWorkIndex((prevIndex) => (prevIndex + 1) % workImages.length);
     }, 2000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [imagsArray.length]);
+
+    return () => clearInterval(interval);
+  }, [WorkerTab, providerDetail?.hiswork?.length]);
+
+  // Auto-slide for customer review images
+  useEffect(() => {
+    const reviewImages = providerDetail?.customerReview || [];
+    if (WorkerTab !== "review" || reviewImages.length === 0) return;
+
+    const interval = setInterval(() => {
+      setReviewIndex(
+        (prevIndex) => (prevIndex + 1) % reviewImages.length
+      );
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [WorkerTab, providerDetail?.customerReview?.length]);
 
   const closeModal = () => {
     setSelectedImage(null);
@@ -197,10 +215,37 @@ export default function HireDetail() {
   };
 
   // Determine isHired similar to ViewProfileDetails behavior
+  // Unlock when:
+  // - hire_status === "accepted"
+  // - OR explicit isHired flag is passed from navigation state
+  // - OR platform fee is already marked as paid
   const isHired =
     location.state?.isHired !== undefined
       ? !!location.state?.isHired
-      : hire_status === "accepted" && !!platFormFee;
+      : hire_status === "accepted" || !!platFormFee;
+
+  // Central helper to unlock documents
+  const unlockDocuments = () => {
+    setDocumentsUnlocked(true);
+  };
+
+  // On initial load, if we ever unlocked documents before for this
+  // order/provider, keep them permanently unlocked.
+  useEffect(() => {
+    if (docUnlockKey && localStorage.getItem(docUnlockKey) === "true") {
+      setDocumentsUnlocked(true);
+    }
+  }, [docUnlockKey]);
+
+  // On initial load (and when isHired changes), auto-unlock documents
+  useEffect(() => {
+    if (isHired) {
+      unlockDocuments();
+      if (docUnlockKey) {
+        localStorage.setItem(docUnlockKey, "true");
+      }
+    }
+  }, [isHired, docUnlockKey]);
 
   if (loading) {
     return <div className="text-center py-10">Loading...</div>;
@@ -355,6 +400,11 @@ const handleAcceptNegotiation = async (
       return;
     }
     toast.success("Negotiation accepted ✅");
+    // Unlock documents as soon as negotiation is accepted
+    unlockDocuments();
+    if (docUnlockKey) {
+      localStorage.setItem(docUnlockKey, "true");
+    }
 
     // 2️⃣ Create Platform Fee Order
     const orderResponse = await fetch(`${BASE_URL}/bidding-order/createPlatformFeeOrder/${orderId}`, {
@@ -412,6 +462,11 @@ const handleAcceptNegotiation = async (
           if (verifyResponse.ok && verifyResult.status) {
             toast.success("Payment verified successfully ✅");
             console.log("Verify Response:", verifyResult);
+            // Unlock documents after successful payment verification
+            unlockDocuments();
+            if (docUnlockKey) {
+              localStorage.setItem(docUnlockKey, "true");
+            }
           } else {
             toast.error(verifyResult.message || "Payment verification failed ❌");
           }
@@ -509,6 +564,8 @@ const handlePayment = async (order_id, serviceProviderId) => {
           if (verifyResponse.ok && verifyResult.status) {
             toast.success("Payment verified successfully ✅");
             console.log("Verify Response:", verifyResult);
+            // Unlock documents after successful payment verification
+            unlockDocuments();
             // Optionally refresh UI or update state
           } else {
             toast.error(
@@ -665,12 +722,32 @@ const handlePayment = async (order_id, serviceProviderId) => {
             </div>
           </div>
 
-          {/* His Work + Review Tabs */}
-          <div className="flex justify-center gap-4 my-10">
-            <button className="py-1 px-10 bg-[#D3FFD3] rounded-lg border text-[#008000] cursor-pointer">
+          {/* His Work + Customer Review Tabs (image galleries) */}
+          <div className="flex justify-center gap-6 p-4 mt-6">
+            <button
+              onClick={() => {
+                setWorkerTab("work");
+                setWorkIndex(0);
+              }}
+              className={`py-1 px-10 rounded-lg border font-semibold ${
+                WorkerTab === "work"
+                  ? "bg-[#228B22] text-white"
+                  : "bg-[#D3FFD3] text-[#008000]"
+              }`}
+            >
               His Work
             </button>
-            <button className="py-1 px-6 rounded-lg border text-[#008000] cursor-pointer">
+            <button
+              onClick={() => {
+                setWorkerTab("review");
+                setReviewIndex(0);
+              }}
+              className={`py-1 px-6 rounded-lg border font-semibold ${
+                WorkerTab === "review"
+                  ? "bg-[#228B22] text-white"
+                  : "bg-[#D3FFD3] text-[#008000]"
+              }`}
+            >
               Customer Review
             </button>
           </div>
@@ -699,21 +776,95 @@ const handlePayment = async (order_id, serviceProviderId) => {
           </div>
         )}
 
-        {/* Image Slider */}
-       <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
+        {/* Work / Customer Review Image Sections */}
+        {WorkerTab === "work" && (
+          <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
+            <div className="relative w-[700px] h-[400px]">
+              {hiswork.length > 0 ? (
+                <img
+                  src={hiswork[workIndex]}
+                  alt={`Work sample ${workIndex + 1}`}
+                  className="w-full h-full object-cover rounded-md shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                  No work available.
+                </div>
+              )}
+            </div>
+            {hiswork.length > 0 && (
+              <div className="mt-6 flex flex-col items-center gap-4">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {hiswork.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                      onClick={() => setWorkIndex(index)}
+                    >
+                      <img
+                        src={img}
+                        alt={`Work sample ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md shadow-md"
+                        onError={(e) => {
+                          e.target.src = defaultPic;
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-  {/* Main Preview Image — same styling as first code */}
-  <div className="relative w-[700px] h-[400px]">
-    <img
-      className="w-full h-full object-cover rounded-md shadow-md"
-      src={imagsArray[imageIndex]}
-      alt="His Work"
-      onError={(e) => {
-        e.target.src = defaultPic;
-      }}
-    />
-  </div>
-</div>
+        {WorkerTab === "review" && (
+          <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
+            <div className="relative w-[700px] h-[400px]">
+              {customerReview.length > 0 ? (
+                <img
+                  src={customerReview[reviewIndex]}
+                  alt={`Customer review ${reviewIndex + 1}`}
+                  className="w-full h-full object-cover rounded-md shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+                  No customer reviews available.
+                </div>
+              )}
+            </div>
+            {customerReview.length > 0 && (
+              <div className="mt-6 flex flex-col items-center gap-4">
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {customerReview.map((img, index) => (
+                    <div
+                      key={index}
+                      className="relative w-24 h-24 overflow-hidden cursor-pointer"
+                      onClick={() => setReviewIndex(index)}
+                    >
+                      <img
+                        src={img}
+                        alt={`Customer review ${index + 1}`}
+                        className="w-full h-full object-cover rounded-md shadow-md"
+                        onError={(e) => {
+                          e.target.src = defaultPic;
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-gray-700 text-base font-semibold">
+                  Customer review images
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
 
         {/* Documents */}
@@ -742,7 +893,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
                         key={index}
                         className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
                       >
-                        {/* Document header */}
+                        {/* Document header – always sharp */}
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
                             <img
@@ -755,16 +906,30 @@ const handlePayment = async (order_id, serviceProviderId) => {
                             {doc.documentName}
                           </p>
                         </div>
-
                         {/* Images grid */}
                         {doc.images?.length > 0 ? (
                           <div className="relative">
-                            <div className="flex flex-wrap gap-6">
+                            {/* Images – blurred + no interaction when not hired */}
+                            <div
+                              className={`flex flex-wrap gap-6 ${
+                                !documentsUnlocked
+                                  ? "blur-md pointer-events-none"
+                                  : ""
+                              }`}
+                            >
                               {doc.images.map((img, imgIndex) => (
                                 <div
                                   key={imgIndex}
-                                  className="group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow cursor-pointer hover:shadow-xl"
-                                  onClick={() => handleDocumentClick(img)}
+                                  className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${
+                                    documentsUnlocked
+                                      ? "cursor-pointer hover:shadow-xl"
+                                      : "cursor-default"
+                                  }`}
+                                  onClick={
+                                    documentsUnlocked
+                                      ? () => handleDocumentClick(img)
+                                      : undefined
+                                  }
                                 >
                                   <img
                                     src={img}
@@ -777,14 +942,31 @@ const handlePayment = async (order_id, serviceProviderId) => {
                                     }}
                                   />
 
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
-                                    <span className="text-white font-medium text-sm">
-                                      Click to view
-                                    </span>
-                                  </div>
+                                  {/* Hover overlay – only when hired */}
+                                  {documentsUnlocked && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
+                                      <span className="text-white font-medium text-sm">
+                                        Click to view
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
+
+                            {/* Blur overlay + CTA – only when not hired */}
+                            {!documentsUnlocked && (
+                              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+                                <div className="text-center bg-white p-5 rounded-2xl shadow-2xl border border-gray-200">
+                                  <p className="text-xl font-bold text-[#228B22]">
+                                    Hire to Unlock
+                                  </p>
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    View clear document images after hiring
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <p className="text-sm text-gray-500 italic pl-1">
