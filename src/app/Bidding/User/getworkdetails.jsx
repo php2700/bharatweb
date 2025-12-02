@@ -57,8 +57,6 @@ export default function BiddinggetWorkDetail() {
   const [openImage, setOpenImage] = useState(null);
   const [localInvited, setLocalInvited] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [sortType, setSortType] = useState("");
-
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -92,51 +90,6 @@ export default function BiddinggetWorkDetail() {
     autoplaySpeed: 3000,
     arrows: true,
   };
-  const applySort = (data) => {
-    if (!sortType) return data;
-
-    let sorted = [...data];
-
-    switch (sortType) {
-      case "name-asc":
-        sorted.sort((a, b) =>
-          (a.full_name || a.provider_id?.full_name).localeCompare(
-            b.full_name || b.provider_id?.full_name
-          )
-        );
-        break;
-
-      case "name-desc":
-        sorted.sort((a, b) =>
-          (b.full_name || b.provider_id?.full_name).localeCompare(
-            a.full_name || a.provider_id?.full_name
-          )
-        );
-        break;
-
-      case "amount-low":
-        sorted.sort((a, b) => (a.bid_amount || 0) - (b.bid_amount || 0));
-        break;
-
-      case "amount-high":
-        sorted.sort((a, b) => (b.bid_amount || 0) - (a.bid_amount || 0));
-        break;
-
-      case "duration-low":
-        sorted.sort((a, b) => (a.duration || 0) - (b.duration || 0));
-        break;
-
-      case "duration-high":
-        sorted.sort((a, b) => (b.duration || 0) - (a.duration || 0));
-        break;
-
-      default:
-        return data;
-    }
-
-    return sorted;
-  };
-
 
   const fetchBannerImages = async () => {
     try {
@@ -1210,8 +1163,8 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("bidder")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${tab === "bidder"
-                        ? "bg-[#228B22] text-white border-3"
-                        : "bg-gray-100 text-[#228B22]"
+                          ? "bg-[#228B22] text-white border-3"
+                          : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Bidder
@@ -1219,69 +1172,36 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("related")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${tab === "related"
-                        ? "bg-[#228B22] text-white border-3"
-                        : "bg-gray-100 text-[#228B22]"
+                          ? "bg-[#228B22] text-white border-3"
+                          : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Related Worker
                     </button>
                   </div>
-
-                 <div className="w-full flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
-
-  {/* Search Box */}
-  <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm w-[60%]">
-    <Search className="w-5 h-5 text-gray-400" />
-    <input
-      type="text"
-      placeholder="Search for services"
-      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value.toLowerCase())}
-    />
-  </div>
-
-  {/* Filter Box */}
-  <div className="w-[35%]">
-    <select
-      className="w-full px-4 py-2 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium shadow-sm hover:bg-gray-200 transition-all cursor-pointer"
-      value={sortType}
-      onChange={(e) => setSortType(e.target.value)}
-    >
-      <option value="">Filter</option>
-
-      {/* Common Filters */}
-      <option value="name-asc">Name A → Z</option>
-      <option value="name-desc">Name Z → A</option>
-
-      {/* Bidder only filters */}
-      {String(tab).toLowerCase().includes("bid") && (
-        <>
-          <option value="amount-low">Amount Low → High</option>
-          <option value="amount-high">Amount High → Low</option>
-          <option value="duration-low">Duration Low → High</option>
-          <option value="duration-high">Duration High → Low</option>
-        </>
-      )}
-    </select>
-  </div>
-
-</div>
+                  <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+                    <Search className="w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search for services"
+                      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+                      value={searchText}   // <-- add this
+                      onChange={(e) => setSearchText(e.target.value.toLowerCase())}  // <-- add this
+                    />
 
 
-
+                  </div>
                   {tab === "related" ? (
                     <div className="flex flex-col items-center justify-center text-gray-500 py-10">
                       {Array.isArray(providers) && providers.length > 0 ? (
-
-                        applySort(
-                          providers.filter(
+                        providers
+                          .filter(
                             (provider) =>
-                              provider.full_name?.toLowerCase().includes(searchText) &&
-                              !offers.some((offer) => offer.provider_id?._id === provider._id)
+                              provider.full_name?.toLowerCase().includes(searchText) &&  // <-- search filter
+                              !offers.some(
+                                (offer) => offer.provider_id?._id === provider._id
+                              )
                           )
-                        )
-
 
                           .map((provider) => (
 
@@ -1367,9 +1287,9 @@ export default function BiddinggetWorkDetail() {
                                       orderDetail?.invited_providers?.includes(provider._id)
                                     }
                                     className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white ${localInvited.includes(provider._id) ||
-                                      orderDetail?.invited_providers?.includes(provider._id)
-                                      ? "bg-gray-400 cursor-not-allowed"
-                                      : "bg-[#228B22] hover:bg-green-700"
+                                        orderDetail?.invited_providers?.includes(provider._id)
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-[#228B22] hover:bg-green-700"
                                       }`}
                                   >
                                     {localInvited.includes(provider._id) ||
@@ -1397,12 +1317,10 @@ export default function BiddinggetWorkDetail() {
                   ) : (
                     <div className="mt-6 space-y-4">
                       {Array.isArray(offers) && offers.length > 0 ? (
-
-                        applySort(
-                          offers.filter((offer) =>
-                            offer.provider_id?.full_name?.toLowerCase().includes(searchText)
+                        offers
+                          .filter((offer) =>
+                            offer.provider_id?.full_name?.toLowerCase().includes(searchText) // <-- search filter
                           )
-                        )
                           .map((offer) => (
 
                             <div

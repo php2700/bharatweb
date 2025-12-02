@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import Profile from "../../../assets/ViewProfile/Worker.png";
+import Profile from "../../../assets/default-image.jpg";
 import Warning from "../../../assets/ViewProfile/warning.svg";
 import CallIcon from "../../../assets/call.png";
 import ChatIcon from "../../../assets/chat.png";
