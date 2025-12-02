@@ -7,7 +7,7 @@ import locationIcon from "../../../assets/directHiring/location-icon.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
 import defaultPic from "../../../assets/default-image.jpg";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { fetchUserProfile } from "../../../redux/userSlice";
@@ -22,6 +22,7 @@ import "slick-carousel/slick/slick-theme.css";
 export default function HireDetail() {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { bidding_offer_id, order_id, hire_status, platFormFee } = location.state || {};
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -214,6 +215,19 @@ export default function HireDetail() {
     setSelectedImage(image);
   };
 
+  const handleRouteHire = (providerId, isHiredFlag) => {
+    if (!providerId) return;
+    navigate(`/profile-details/${providerId}/bidding`, {
+      state: {
+        bidding_offer_id,
+        order_id,
+        hire_status,
+        isHired: !!isHiredFlag,
+        platFormFee,
+      },
+    });
+  };
+
   // Determine isHired similar to ViewProfileDetails behavior
   // Unlock when:
   // - hire_status === "accepted"
@@ -232,7 +246,7 @@ export default function HireDetail() {
   // On initial load, if we ever unlocked documents before for this
   // order/provider, keep them permanently unlocked.
   useEffect(() => {
-    if (docUnlockKey && localStorage.getItem(docUnlockKey) === "true") {
+    if (docUnlockKey && localStorage.getItem(docUnlockKey) === "false") {
       setDocumentsUnlocked(true);
     }
   }, [docUnlockKey]);
@@ -242,7 +256,7 @@ export default function HireDetail() {
     if (isHired) {
       unlockDocuments();
       if (docUnlockKey) {
-        localStorage.setItem(docUnlockKey, "true");
+        localStorage.setItem(docUnlockKey, "false");
       }
     }
   }, [isHired, docUnlockKey]);
@@ -711,14 +725,14 @@ const handlePayment = async (order_id, serviceProviderId) => {
               </div>
 
               {/* Buttons */}
-              {/* <div className="flex justify-center gap-4">
-                <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-4 rounded-lg">
-                  💬 Message
+              <div className="flex justify-center">
+                <button
+                  className="border border-[#228B22] text-[#228B22] font-medium py-2 px-10 rounded-lg"
+                  onClick={() => handleRouteHire(id, isHired)}
+                >
+                  View Profile
                 </button>
-                <button className="border border-[#228B22] text-[#228B22] font-medium py-2 px-8 rounded-lg">
-                  📞 Call
-                </button>
-              </div> */}
+              </div>
             </div>
           </div>
 
@@ -867,13 +881,12 @@ const handlePayment = async (order_id, serviceProviderId) => {
         )}
 
 
-        {/* Documents */}
+
         <div className="container max-w-2xl mx-auto my-10 space-y-6">
 
 
 
           
-            <div>
             {/* Reviews */}
 
               {/* Documents Section – copied structure from ViewProfileDetails */}
@@ -890,8 +903,8 @@ const handlePayment = async (order_id, serviceProviderId) => {
                   {documents.length > 0 ? (
                     documents.map((doc, index) => (
                       <div
-                        key={index}
-                        className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
+                      key={index}
+                      className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
                       >
                         {/* Document header – always sharp */}
                         <div className="flex items-center gap-3 mb-3">
@@ -900,7 +913,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
                               src={aadharImg}
                               alt="Document Icon"
                               className="w-8 h-8"
-                            />
+                              />
                           </div>
                           <p className="text-lg font-semibold text-gray-800">
                             {doc.documentName}
@@ -919,9 +932,9 @@ const handlePayment = async (order_id, serviceProviderId) => {
                             >
                               {doc.images.map((img, imgIndex) => (
                                 <div
-                                  key={imgIndex}
-                                  className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${
-                                    documentsUnlocked
+                                key={imgIndex}
+                                className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${
+                                  documentsUnlocked
                                       ? "cursor-pointer hover:shadow-xl"
                                       : "cursor-default"
                                   }`}
@@ -940,7 +953,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
                                     onError={(e) => {
                                       e.target.src = defaultPic;
                                     }}
-                                  />
+                                    />
 
                                   {/* Hover overlay – only when hired */}
                                   {documentsUnlocked && (
@@ -1015,19 +1028,19 @@ const handlePayment = async (order_id, serviceProviderId) => {
                       <>
                         {displayedReviews.map((item) => (
                           <div
-                            key={item._id}
-                            className="bg-white rounded-xl shadow-md p-6 mb-4"
+                          key={item._id}
+                          className="bg-white rounded-xl shadow-md p-6 mb-4"
                           >
                             <div className="flex gap-1 mb-2">
                               {[1, 2, 3, 4, 5].map((star, i) => (
                                 <span
-                                  key={i}
-                                  className={
+                                key={i}
+                                className={
                                     i < item.rating
                                       ? "text-yellow-400"
                                       : "text-gray-300"
                                   }
-                                >
+                                  >
                                   ★
                                 </span>
                               ))}
@@ -1040,7 +1053,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
                                 onError={(e) => {
                                   e.target.src = defaultPic;
                                 }}
-                              />
+                                />
                               <h3 className="font-semibold">{item.user.name}</h3>
                             </div>
                             <p className="text-gray-600 text-sm mb-2">
@@ -1054,14 +1067,14 @@ const handlePayment = async (order_id, serviceProviderId) => {
                               <div className="flex flex-wrap gap-2">
                                 {item.images.map((img, i) => (
                                   <img
-                                    key={i}
-                                    src={img}
-                                    alt={`Review image ${i + 1}`}
-                                    className="w-16 h-16 object-cover rounded-md"
-                                    onError={(e) => {
-                                      e.target.src = defaultPic;
+                                  key={i}
+                                  src={img}
+                                  alt={`Review image ${i + 1}`}
+                                  className="w-16 h-16 object-cover rounded-md"
+                                  onError={(e) => {
+                                    e.target.src = defaultPic;
                                     }}
-                                  />
+                                    />
                                 ))}
                               </div>
                             )}
@@ -1082,13 +1095,14 @@ const handlePayment = async (order_id, serviceProviderId) => {
                     <button
                       onClick={() => setShowAllReviews(true)}
                       className="text-[#228B22] font-semibold hover:underline"
-                    >
+                      >
                       See All Reviews
                     </button>
                   </div>
                 )}
               </div>
-          </div>
+          
+                      <div>
 
           {/* Offer/Negotiate Section */}
           {hire_status === "pending" && (
@@ -1159,6 +1173,7 @@ const handlePayment = async (order_id, serviceProviderId) => {
             </div>
           )}
         </div>
+      </div>
       </div>
       <Footer />
     </>

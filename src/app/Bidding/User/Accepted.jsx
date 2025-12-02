@@ -312,6 +312,16 @@ export default function Accepted({
     // Redirect to chat page
     navigate("/chats");
   };
+    const handleRouteHire = (ProviderId, isHired) => {
+    if (!ProviderId) return;
+    navigate(`/profile-details/${ProviderId}/bidding`, {
+      state: {
+        order_id: orderId,
+        hire_status: hireStatus,
+        isHired,
+      },
+    });
+  };
   return (
     <>
       <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -359,9 +369,7 @@ export default function Accepted({
 
                 <button
                   className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
-                  onClick={() =>
-                    navigate(`/profile-details/${serviceProvider._id}/bidding`)
-                  }
+                  onClick={() => handleRouteHire(serviceProvider._id, true)}
                 >
                   View Profile
                 </button>
