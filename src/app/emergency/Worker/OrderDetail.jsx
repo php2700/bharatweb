@@ -158,7 +158,7 @@ export default function ViewProfile() {
       </div>
     );
   }
-
+console.log('dfdfdf',orderData);
   return (
     <>
       <Header />
@@ -288,26 +288,54 @@ export default function ViewProfile() {
                     : "N/A"}
                 </span>
                 <span className="text-gray-600 font-semibold block">
-                  Status:{" "}
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
-      ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
-      ${orderData?.hire_status === "cancelled" ? "bg-[#FF0000]" : ""}
-      ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
-      ${orderData?.hire_status === "cancelledDispute" ? "bg-red-600" : ""}
-      ${orderData?.hire_status === "assigned" ? "bg-[#228B22]" : ""}`}
-                  >
-                    {orderData?.hire_status === "cancelledDispute"
-                      ? `Cancelled ${" "} Dispute`
-                      : orderData.hire_status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ") || "Unknown Status"}
-                  </span>
-                </span>
+  Status:{" "}
+  <span
+    className={`px-3 py-1 rounded-full text-white text-sm font-medium
+      ${
+        orderData?.hire_status === "pending"
+          ? "bg-yellow-500"
+          : ""
+      }
+      ${
+        orderData?.hire_status === "cancelled"
+          ? "bg-[#FF0000]"
+          : ""
+      }
+      ${
+        orderData?.hire_status === "completed"
+          ? "bg-[#228B22]"
+          : ""
+      }
+      ${
+        orderData?.hire_status === "cancelledDispute"
+          ? "bg-red-600"
+          : ""
+      }
+      
+      /* 🔥 ASSIGNED CASE CHECK */
+      ${
+        orderData?.hire_status === "assigned"
+          ? orderData?.service_provider_id?._id === localStorage.getItem("user_id")
+            ? "bg-[#228B22]" // Assigned (Green)
+            : "bg-gray-500"  // Not Assigned (Gray)
+          : ""
+      }
+    `}
+  >
+    {/* TEXT LOGIC */}
+    {orderData?.hire_status === "assigned"
+      ? orderData?.service_provider_id?._id === localStorage.getItem("user_id")
+        ? "Assigned"
+        : "Not Assigned"
+      : orderData?.hire_status === "cancelledDispute"
+      ? "Cancelled Dispute"
+      : orderData?.hire_status
+          ?.split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ") || "Unknown Status"}
+  </span>
+</span>
+
               </div>
             </div>
 
@@ -326,66 +354,50 @@ export default function ViewProfile() {
             </div>
 
             {/* Render Accepted component when hire_status is assigned */}
+           {orderData?.service_provider_id?._id === localStorage.getItem("user_id") && (
+  <>
+    {(orderData?.hire_status === "assigned" ||
+      orderData?.hire_status === "completed" ||
+      orderData?.hire_status === "cancelledDispute") && (
+        <>
+          <Accepted
+            serviceProvider={orderData?.user_id}
+            user_id={orderData?.service_provider_id?._id}
+            assignedWorker={assignedWorker}
+            paymentHistory={orderData?.service_payment?.payment_history}
+            fullPaymentHistory={orderData?.service_payment}
+            orderId={id}
+            hireStatus={orderData?.hire_status}
+          />
+
+          <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+
             {(orderData?.hire_status === "assigned" ||
-              orderData?.hire_status === "completed" ||
-              orderData?.hire_status === "cancelledDispute") && (
-                <>
-                  <Accepted
-                    serviceProvider={orderData?.user_id}
-                    user_id={orderData?.service_provider_id?._id}
-                    assignedWorker={assignedWorker}
-                    paymentHistory={orderData?.service_payment?.payment_history}
-                    fullPaymentHistory={orderData?.service_payment}
-                    orderId={id}
-                    hireStatus={orderData?.hire_status}
-                  />
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    {/* Yellow warning box */}
-                    {/*<div className="relative max-w-2xl mx-auto">
-                    
-                    <div className="relative z-10">
-                      <img
-                        src={Warning}
-                        alt="Warning"
-                        className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
-                      />
-                    </div>
+              orderData?.hire_status === "pending" ||
+              orderData?.hire_status === "completed") && (
+                <div className="flex space-x-4">
+                  <Link to={`/dispute/${id}/emergency`}>
+                    <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                      {orderData?.hire_status === "completed"
+                        ? "Create Dispute"
+                        : "Cancel Task and Create Dispute"}
+                    </button>
+                  </Link>
+                </div>
+            )}
+          </div>
+        </>
+    )}
+  </>
+)}
+       {orderData?.service_provider_id?._id !== localStorage.getItem("user_id") && (
+  <div className="w-full flex justify-center mt-10">
+    <h1 className="text-red-600 font-bold text-lg text-center">
+      You are not selected for this task
+    </h1>
+  </div>
+)}
 
-                   
-                    <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center mb-">
-                      <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                        Warning Message
-                      </h2>
-                      <p className="text-gray-700 text-sm md:text-base">
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
-                        when an unknown printer took a galley of type and
-                        scrambled it to make a type specimen book. It has
-                        survived not only five centuries, but also the leap into
-                        electronic typesetting.
-                      </p>
-                    </div>
-                  </div>*/}
-
-                    {/* Cancel button */}
-                    {(orderData?.hire_status === "assigned" ||
-                      orderData?.hire_status === "pending" ||
-                      orderData?.hire_status === "completed") && (
-                        <div className="flex space-x-4">
-                          {/* Red button (Cancel Task) */}
-                          <Link to={`/dispute/${id}/emergency`}>
-                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                              {orderData?.hire_status === "completed"
-                                ? "Create Dispute"
-                                : "Cancel Task and Create Dispute"}
-                            </button>
-                          </Link>
-                        </div>
-                      )}
-                  </div>
-                </>
-              )}
           </div>
         </div>
       </div>
