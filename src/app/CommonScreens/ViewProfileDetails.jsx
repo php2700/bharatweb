@@ -249,7 +249,7 @@ export default function ViewProfileDetails() {
             console.log("Verify Response:", verifyRes.data);
           } catch (err) {
             console.error("Error verifying payment:", err);
-             toast.error("Payment verification failed. Please contact support.");
+            toast.error("Payment verification failed. Please contact support.");
           }
         },
         prefill: {
@@ -307,7 +307,7 @@ export default function ViewProfileDetails() {
                 },
               }
             );
-                if (verifyRes.status === 200) {
+            if (verifyRes.status === 200) {
               toast.success("Payment successful! Redirecting to order details...");
               setTimeout(() => {
                 navigate(`/emergency/order-detail/${orderId}`);
@@ -387,14 +387,14 @@ export default function ViewProfileDetails() {
     verificationStatus === "verified"
       ? "Verified by Admin"
       : verificationStatus === "rejected"
-      ? "Rejected"
-      : "Pending";
+        ? "Rejected"
+        : "Pending";
   const statusClass =
     verificationStatus === "verified"
       ? "bg-green-100 text-green-600"
       : verificationStatus === "rejected"
-      ? "bg-red-100 text-red-600"
-      : "bg-yellow-100 text-yellow-600";
+        ? "bg-red-100 text-red-600"
+        : "bg-yellow-100 text-yellow-600";
 
   const testimage = profilePic && profilePic !== "Not Available";
 
@@ -476,29 +476,30 @@ export default function ViewProfileDetails() {
         </h2>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-            <div className="relative">
-              {testimage ? (
-                <img
-                  src={businessImage[0] || defaultPic}
-                  alt="User Profile"
-                  className="w-[85%] h-[400px] object-cover rounded-2xl shadow-md"
-                  onError={(e) => {
-                    e.target.src = defaultPic;
-                  }}
-                />
-              ) : (
-                <div className="w-full h-[550px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-                  No Profile Picture available
-                </div>
-              )}
-            </div>
+           <div className="relative w-full">
+  {testimage ? (
+    <img
+      src={profilePic && profilePic !== 'Not Available' ? profilePic : defaultPic}
+      alt="User Profile"
+      className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
+      onError={(e) => {
+        e.target.src = defaultPic;
+      }}
+    />
+  ) : (
+    <div className="w-full h-[450px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-lg text-gray-700 font-semibold">
+      No Profile Picture available
+    </div>
+  )}
+</div>
+
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold">
-  {full_name
-    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
-    : ""}
-</h2>
+                <h2 className="text-lg font-bold">
+                  {full_name
+                    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+                    : ""}
+                </h2>
 
                 {verificationStatus === "verified" && (
                   <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
@@ -525,13 +526,13 @@ export default function ViewProfileDetails() {
                   Sub-Categories-
                 </span>{" "}
                 {Array.isArray(subcategory_names) &&
-                subcategory_names.length > 0
+                  subcategory_names.length > 0
                   ? subcategory_names.map((name, index) => (
-                      <span key={index}>
-                        {name.trim()}
-                        {index !== subcategory_names.length - 1 ? ", " : ""}
-                      </span>
-                    ))
+                    <span key={index}>
+                      {name.trim()}
+                      {index !== subcategory_names.length - 1 ? ", " : ""}
+                    </span>
+                  ))
                   : "Not Available"}
               </p>
               {emergencySubcategory_names.length > 0 && (
@@ -550,9 +551,8 @@ export default function ViewProfileDetails() {
                 </p>
               )}
               <div
-                className={`p-4 shadow-xl max-w-[600px] ${
-                  skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
-                }`}
+                className={`p-4 shadow-xl max-w-[600px] ${skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg">About My Skill</h3>
@@ -570,11 +570,10 @@ export default function ViewProfileDetails() {
                   setWorkerTab("work");
                   setWorkIndex(0);
                 }}
-                className={`px-6 py-2 rounded-md shadow-md font-semibold ${
-                  WorkerTab === "work"
+                className={`px-6 py-2 rounded-md shadow-md font-semibold ${WorkerTab === "work"
                     ? "bg-[#228B22] text-white"
                     : "bg-green-100 text-[#228B22]"
-                }`}
+                  }`}
                 aria-label="View Work"
               >
                 His Work
@@ -584,11 +583,10 @@ export default function ViewProfileDetails() {
                   setWorkerTab("review");
                   setReviewIndex(0);
                 }}
-                className={`px-6 py-2 rounded-md shadow-md font-semibold ${
-                  WorkerTab === "review"
+                className={`px-6 py-2 rounded-md shadow-md font-semibold ${WorkerTab === "review"
                     ? "bg-[#228B22] text-white"
                     : "bg-green-100 text-[#228B22]"
-                }`}
+                  }`}
                 aria-label="View Customer Reviews"
               >
                 Customer Review
@@ -779,18 +777,16 @@ export default function ViewProfileDetails() {
                         <div className="relative">
                           {/* Images – blurred + no interaction when not hired */}
                           <div
-                            className={`flex flex-wrap gap-6 ${
-                              !isHired ? "blur-md pointer-events-none" : ""
-                            }`}
+                            className={`flex flex-wrap gap-6 ${!isHired ? "blur-md pointer-events-none" : ""
+                              }`}
                           >
                             {doc.images.map((img, imgIndex) => (
                               <div
                                 key={imgIndex}
-                                className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${
-                                  isHired
+                                className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${isHired
                                     ? "cursor-pointer hover:shadow-xl"
                                     : "cursor-default"
-                                }`}
+                                  }`}
                                 onClick={
                                   isHired
                                     ? () => handleDocumentClick(img)
@@ -799,9 +795,8 @@ export default function ViewProfileDetails() {
                               >
                                 <img
                                   src={img}
-                                  alt={`${doc.documentName} image ${
-                                    imgIndex + 1
-                                  }`}
+                                  alt={`${doc.documentName} image ${imgIndex + 1
+                                    }`}
                                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                   onError={(e) => {
                                     e.target.src = defaultPic;
@@ -915,7 +910,7 @@ export default function ViewProfileDetails() {
               )}
             </>
           )}
-          
+
 
           <div className="container mx-auto max-w-[750px] px-6 py-6">
             <div className="flex justify-between items-center mb-4">
