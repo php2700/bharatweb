@@ -792,6 +792,22 @@ export default function BiddinggetWorkDetail() {
     return `${thumbnailUrl}${separator}original=true`;
   };
 
+  // Route to common ViewProfileDetails screen (same behavior shape as emergency OrderDetail)
+  const handleRouteHire = (providerId, isHired) => {
+    if (!providerId) return;
+
+    navigate(`/profile-details/${providerId}/bidding`, {
+      state: {
+        hire_status: orderDetail?.hire_status,
+        isHired,
+        isPlatformFeePaid: orderDetail?.platform_fee_paid,
+        razorPayOrderId: orderDetail?.razorOrderIdPlatform,
+        platform_fee: orderDetail?.platform_fee,
+        orderId: orderDetail?._id,
+      },
+    });
+  };
+
   return (
     <>
       <Header />
@@ -1255,9 +1271,7 @@ export default function BiddinggetWorkDetail() {
                                 </span>
                                 <div>
                                   <button
-                                    onClick={() =>
-                                      handleView(provider._id, null, id)
-                                    }
+                                    onClick={() => handleRouteHire(provider._id, false)}
                                     className="text-green-600 font-medium text-sm mt-1"
                                   >
                                     View Profile
@@ -1375,11 +1389,7 @@ export default function BiddinggetWorkDetail() {
                                 <div>
                                   <button
                                     onClick={() =>
-                                      handleView(
-                                        offer.provider_id?._id,
-                                        offer._id,
-                                        offer.order_id
-                                      )
+                                      handleRouteHire(offer.provider_id?._id, false)
                                     }
                                     className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
                                   >
