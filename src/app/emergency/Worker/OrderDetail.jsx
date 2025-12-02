@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
+import Profile from "../../../assets/default-image.jpg";
 import Gardening from "../../../assets/profile/profile image.png";
 import Warning from "../../../assets/ViewProfile/warning.svg"; // Added Warning image import
 import axios from "axios";
@@ -15,7 +16,6 @@ import Slider from "react-slick";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
 
 export default function ViewProfile() {
   const navigate = useNavigate();
@@ -82,7 +82,6 @@ export default function ViewProfile() {
     }
   };
 
-
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchBannerImages();
@@ -108,14 +107,14 @@ export default function ViewProfile() {
           }),
           orderData?.hire_status === "pending"
             ? axios.get(
-              `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            )
+                `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              )
             : { data: { providers: [] } }, // Skip provider fetch if not pending
         ]);
         console.log("Order Response:", orderResponse.data);
@@ -181,54 +180,57 @@ export default function ViewProfile() {
               infiniteLoop={true}
               autoPlay={false}
               className="w-full h-[360px]"
-               emulateTouch={true} // Mobile touch support
+              emulateTouch={true} // Mobile touch support
               onClickItem={(index) => setOpenImage(orderData.image_urls[index])}
             >
               {orderData.image_urls.map((url, index) => (
                 <div key={index} className="cursor-pointer">
-                <div key={index}>
-                  <img
-                    src={url}
-                    alt={`Project image ${index + 1}`}
-                    className="w-full h-[360px] object-cover"
-                  />
-                </div>
+                  <div key={index}>
+                    <img
+                      src={url}
+                      alt={`Project image ${index + 1}`}
+                      className="w-full h-[360px] object-cover"
+                    />
+                  </div>
                 </div>
               ))}
             </Carousel>
           ) : (
-             <div onClick={() => setOpenImage(workImage)} className="cursor-pointer">
-            <img
-              src={workImage}
-              alt="No project images available"
-              className="w-full h-[360px] object-cover mt-5"
-            />
+            <div
+              onClick={() => setOpenImage(workImage)}
+              className="cursor-pointer"
+            >
+              <img
+                src={workImage}
+                alt="No project images available"
+                className="w-full h-[360px] object-cover mt-5"
+              />
             </div>
           )}
           {/* Full Screen Image Modal */}
-      {openImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-          onClick={() => setOpenImage(null)}
-        >
-          <div 
-            className="relative w-full h-full flex items-center justify-center" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={openImage}
-              alt="Preview"
-              className="max-w-[98vw] max-h-[95vh] w-auto h-auto rounded-lg shadow-2xl object-contain"
-            />
-            <button
+          {openImage && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
               onClick={() => setOpenImage(null)}
-              className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl font-bold cursor-pointer hover:bg-gray-200"
             >
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
+              <div
+                className="relative w-full h-full flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={openImage}
+                  alt="Preview"
+                  className="max-w-[98vw] max-h-[95vh] w-auto h-auto rounded-lg shadow-2xl object-contain"
+                />
+                <button
+                  onClick={() => setOpenImage(null)}
+                  className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl font-bold cursor-pointer hover:bg-gray-200"
+                >
+                  &times;
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
@@ -300,12 +302,12 @@ export default function ViewProfile() {
                     {orderData?.hire_status === "cancelledDispute"
                       ? `Cancelled ${" "} Dispute`
                       : orderData.hire_status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ") || "Unknown Status"}
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ") || "Unknown Status"}
                   </span>
                 </span>
               </div>
@@ -324,24 +326,54 @@ export default function ViewProfile() {
                 </span>
               ) : null}
             </div>
-
+            {orderData?.user_id &&
+              orderData?.hire_status == "cancelled" && (
+                <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={
+                        orderData?.user_id?.profile_pic || Profile
+                      }
+                      alt={`Profile of ${
+                        orderData?.user_id?.full_name || "User"
+                      }`}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div className="flex items-center w-full">
+                      <p className="text-lg font-semibold">
+                        {orderData?.user_id?.full_name
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ") || "Unknown User"}
+                        <span>
+                          {" "}
+                          ({orderData?.service_provider_id?.unique_id})
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             {/* Render Accepted component when hire_status is assigned */}
             {(orderData?.hire_status === "assigned" ||
               orderData?.hire_status === "completed" ||
               orderData?.hire_status === "cancelledDispute") && (
-                <>
-                  <Accepted
-                    serviceProvider={orderData?.user_id}
-                    user_id={orderData?.service_provider_id?._id}
-                    assignedWorker={assignedWorker}
-                    paymentHistory={orderData?.service_payment?.payment_history}
-                    fullPaymentHistory={orderData?.service_payment}
-                    orderId={id}
-                    hireStatus={orderData?.hire_status}
-                  />
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    {/* Yellow warning box */}
-                    {/*<div className="relative max-w-2xl mx-auto">
+              <>
+                <Accepted
+                  serviceProvider={orderData?.user_id}
+                  user_id={orderData?.service_provider_id?._id}
+                  assignedWorker={assignedWorker}
+                  paymentHistory={orderData?.service_payment?.payment_history}
+                  fullPaymentHistory={orderData?.service_payment}
+                  orderId={id}
+                  hireStatus={orderData?.hire_status}
+                />
+                <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                  {/* Yellow warning box */}
+                  {/*<div className="relative max-w-2xl mx-auto">
                     
                     <div className="relative z-10">
                       <img
@@ -368,24 +400,24 @@ export default function ViewProfile() {
                     </div>
                   </div>*/}
 
-                    {/* Cancel button */}
-                    {(orderData?.hire_status === "assigned" ||
-                      orderData?.hire_status === "pending" ||
-                      orderData?.hire_status === "completed") && (
-                        <div className="flex space-x-4">
-                          {/* Red button (Cancel Task) */}
-                          <Link to={`/dispute/${id}/emergency`}>
-                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                              {orderData?.hire_status === "completed"
-                                ? "Create Dispute"
-                                : "Cancel Task and Create Dispute"}
-                            </button>
-                          </Link>
-                        </div>
-                      )}
-                  </div>
-                </>
-              )}
+                  {/* Cancel button */}
+                  {(orderData?.hire_status === "assigned" ||
+                    orderData?.hire_status === "pending" ||
+                    orderData?.hire_status === "completed") && (
+                    <div className="flex space-x-4">
+                      {/* Red button (Cancel Task) */}
+                      <Link to={`/dispute/${id}/emergency`}>
+                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                          {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
