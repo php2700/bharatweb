@@ -1,6 +1,6 @@
 // Accepted.jsx
 import { useEffect } from "react";
-import Profile from "../../../assets/ViewProfile/Worker.png";
+import Profile from "../../../assets/default-image.jpg";
 import Call from "../../../assets/ViewProfile/call.svg";
 import Message from "../../../assets/ViewProfile/msg.svg";
 import { Link, useNavigate } from "react-router-dom";

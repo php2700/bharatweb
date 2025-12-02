@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 import Arrow from "../../../assets/profile/arrow_back.svg";
-import Profile from "../../../assets/ViewProfile/Worker.png";
+import Profile from "../../../assets/default-image.jpg";
 // import Warning from "../../../assets/ViewProfile/warning.svg";
 import Warning1 from "../../../assets/warning1.png";
 import Warning3 from "../../../assets/warning3.png";
