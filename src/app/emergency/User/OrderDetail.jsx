@@ -182,6 +182,7 @@ export default function ViewProfile() {
             const verifyRes = await axios.post(
               `${BASE_URL}/emergency-order/verify-platform-payment`,
               {
+                service_provider_id: providerId,
                 razorpay_order_id: paymentResponse.razorpay_order_id,
                 razorpay_payment_id: paymentResponse.razorpay_payment_id,
               },
