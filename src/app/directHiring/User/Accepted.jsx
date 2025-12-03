@@ -324,7 +324,6 @@ export default function Accepted({
   return (
     <>
       <div className="container mx-auto px-4 py-6 max-w-4xl">
-        {/* Add ToastContainer to render toasts */}
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -339,23 +338,26 @@ export default function Accepted({
         />
 
         <h2 className="text-lg font-semibold mb-4">Hired Worker</h2>
-        {/* Service Provider Details */}
+
         <p className="font-bold mb-3 text-gray-900">
           Note:&nbsp;
           <span className="text-sm text-red-600 font-semibold">
-            Pay securely — no extra charges from the platform. Choose simple and
-            safe transactions.
+            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
           </span>
         </p>
+
         {serviceProvider && (
           <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
+
               <img
                 src={serviceProvider.profile_pic || Profile}
                 alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
                 className="w-16 h-16 rounded-full object-cover"
               />
-              <div className="flex items-center w-full">
+
+              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-3">
+
                 <p className="text-lg font-semibold">
                   {serviceProvider.full_name
                     .split(" ")
@@ -364,27 +366,27 @@ export default function Accepted({
                   <span> ({serviceProvider.unique_id})</span>
                 </p>
 
-                {hireStatus === "cancelled" ||
-                  hireStatus === "cancelledDispute" ? (
+                {(hireStatus === "cancelled" || hireStatus === "cancelledDispute") ? (
                   ""
                 ) : (
-                  <div className="flex ml-auto items-center space-x-3 ml-6">
+                  <div className="flex items-center space-x-3 sm:ml-auto">
+
                     <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
                       <img src={Call} alt="Call" className="w-5 h-5" />
                     </div>
+
                     <div
                       className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                      onClick={() =>
-                        handleChatOpen(serviceProvider._id, user_id)
-                      }
+                      onClick={() => handleChatOpen(serviceProvider._id, user_id)}
                     >
                       <img src={Message} alt="Message" className="w-5 h-5" />
                     </div>
+
                   </div>
                 )}
 
                 <button
-                  className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
+                  className="sm:ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer w-full sm:w-auto"
                   onClick={() => handleRouteHire(serviceProvider._id, true)}
                 >
                   View Profile
@@ -394,12 +396,13 @@ export default function Accepted({
           </div>
         )}
 
-        {/* Assigned Worker Details */}
         {assignedWorker && (
           <div className="mb-4">
             <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
+
             <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
                 <div className="flex items-center space-x-4">
                   <img
                     src={assignedWorker.image || Profile}
@@ -410,198 +413,279 @@ export default function Accepted({
                     <p className="text-lg font-semibold">
                       {assignedWorker.name
                         .split(" ")
-                        .map(
-                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-                        )
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(" ") || "Unknown Worker"}
                     </p>
                   </div>
                 </div>
+
                 <Link
                   to={`/view-worker/${assignedWorker._id}`}
-                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 w-full sm:w-auto text-center"
                 >
                   View Profile
                 </Link>
+
               </div>
             </div>
           </div>
         )}
 
-        {/* Payment History */}
+        {paymentHistory && Array.isArray(paymentHistory) && (
+          <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
 
-           {paymentHistory && Array.isArray(paymentHistory) && (
-           <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
-         
-             {/* Header Section */}
-             <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
-               <h3 className="text-lg font-semibold">Payment Summary</h3>
-         
-               <div className="flex flex-wrap items-center gap-3">
-                 {/* Create Payment Button */}
-                 {hireStatus == "accepted" && (
-                   <button
-                     onClick={() => setShowForm(true)}
-                     className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
-                   >
-                     Create Payment
-                   </button>
-                 )}
-               </div>
-             </div>
-         
-             {/* Payment History List */}
-             {paymentHistory.map((payment, index) => (
-               <div
-                 key={payment._id}
-                 className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center bg-white border-b border-gray-200 py-4 px-3 gap-4"
-               >
-                 {/* LEFT SIDE — Description */}
-                 <div className="md:col-span-5 flex gap-3 items-start md:items-center">
-                   <span className="font-semibold">{index + 1}.</span>
-                   <span className="text-sm md:text-base">
-                     {payment.description || "Starting Payment"}
-                   </span>
-                 </div>
-         
-                 {/* MIDDLE SECTION — Status + Buttons */}
-                 <div className="md:col-span-4 flex flex-col md:flex-row md:items-center md:justify-center gap-2">
-         
-                   {/* Waiting for Approval */}
-                   {payment.status === "success" && payment.release_status === "pending" && (
-                     <>
-                       <span className="text-[#228B22] font-semibold text-sm text-left md:text-center">
-                         Waiting for Approval
-                       </span>
-         
-                       {hireStatus === "accepted" && (
-                         <button
-                           onClick={() => handlePay(payment._id)}
-                           className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700 w-fit"
-                         >
-                           Pay
-                         </button>
-                       )}
-                     </>
-                   )}
-         
-                   {/* INFO BUTTON */}
-                   <button
-                     onClick={() => {
-                       Swal.fire({
-                         title: "Payment Details",
-                         html: `
-                           <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
-                             <thead>
-                               <tr style="background-color:#228B22; color:white;">
-                                 <th style="padding:8px; border:1px solid #ddd; text-align:left;">Payment ID</th>
-                                 <th style="padding:8px; border:1px solid #ddd; text-align:left;">Amount</th>
-                                 <th style="padding:8px; border:1px solid #ddd; text-align:left;">Method</th>
-                               </tr>
-                             </thead>
-                             <tbody>
-                               ${paymentHistory
-                                 .map(
-                                   (p) => `
-                                     <tr>
-                                       <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
-                                       <td style="padding:8px; border:1px solid #ddd;">${p.amount}</td>
-                                       <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
-                                         ${p.method || "N/A"}
-                                       </td>
-                                     </tr>
-                                   `
-                                 )
-                                 .join("")}
-                             </tbody>
-                           </table>
-                         `,
-                         confirmButtonText: "Close",
-                         width: 600,
-                         backdrop: `rgba(0,0,0,0.4) blur(6px)`,
-                         background: "white",
-                       });
-                     }}
-                     className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm
-                       hover:bg-indigo-400 border border-indigo-600 cursor-pointer w-fit flex items-center"
-                   >
-                     info
-                   </button>
-         
-                   {/* PAID LABELS */}
-                   {payment.release_status === "release_requested" && (
-                     <span className="text-[#228B22] font-semibold text-sm">Paid</span>
-                   )}
-         
-                   {payment.release_status === "released" && (
-                     <span className="text-[#228B22] font-semibold text-sm">Paid</span>
-                   )}
-         
-                   {payment.release_status === "rejected" && (
-                     <span className="text-red-600 font-semibold text-sm">Admin Rejected</span>
-                   )}
-                 </div>
-         
-                 {/* RIGHT SIDE — Amount */}
-                 <div className="md:col-span-3 text-right font-semibold text-base">
-                   ₹{payment.amount}
-                 </div>
-               </div>
-             ))}
-         
-             {/* Add Payment Form (unchanged) */}
-             {showForm && (
-            <>
-              <div className="flex items-center space-x-4 border-t border-gray-200 pt-4 mt-4">
-                <span className="font-semibold">
-                  {paymentHistory.length + 1}
-                </span>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter payment description"
-                  className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                />
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
-                >
-                  <option value="" disabled>
-                    Select payment method
-                  </option>
-                  <option value="online">Online</option>
-                  <option value="cod">Cash on Delivery</option>
-                </select>
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
+              <h3 className="text-lg font-semibold">Payment Summary</h3>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {hireStatus == "accepted" && (
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
+                  >
+                    Create Payment
+                  </button>
+                )}
               </div>
-              <div className="flex justify-end space-x-4 mt-4">
-                <button
-                  onClick={handlePaymentSubmit}
-                  className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700"
-                >
-                  Submit
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50"
-                >
-                  Cancel
-                </button>
+            </div>
+
+            {/* PAYMENT LIST */}
+            {paymentHistory.map((payment, index) => (
+              <div
+                key={payment._id}
+                className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center bg-white border-b border-gray-200 py-4 px-3 gap-4"
+              >
+                {/* Mobile: Ek hi line mein sab | Desktop: Pehle jaisa */}
+                <div className="flex flex-col md:hidden gap-3">
+                  {/* Mobile Row - Ek hi line mein sab */}
+                  <div className="flex items-center justify-between overflow-x-auto whitespace-nowrap text-sm">
+                    {/* Left: Number + Description */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="font-semibold">{index + 1}.</span>
+                      <span className="font-medium">
+                        {payment.description || "Starting Payment"}
+                      </span>
+                    </div>
+
+                    {/* Middle: Status + Info Button */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Status Text */}
+                      {payment.status === "success" && payment.release_status === "pending" && (
+                        <>
+                          <span className="text-[#228B22] font-semibold">
+                            Waiting for Approval
+                          </span>
+                          {hireStatus === "accepted" && (
+                            <button
+                              onClick={() => handlePay(payment._id)}
+                              className="bg-[#228B22] text-white px-4 py-1 rounded-md text-xs hover:bg-green-700 whitespace-nowrap"
+                            >
+                              Pay
+                            </button>
+                          )}
+                        </>
+                      )}
+                      {payment.release_status === "release_requested" && (
+                        <span className="text-[#228B22] font-semibold">Paid</span>
+                      )}
+                      {payment.release_status === "released" && (
+                        <span className="text-[#228B22] font-semibold">Paid</span>
+                      )}
+                      {payment.release_status === "rejected" && (
+                        <span className="text-red-600 font-semibold">Admin Rejected</span>
+                      )}
+
+                      {/* Info Button */}
+                      <button
+                        onClick={() => {
+                          Swal.fire({
+                            title: "Payment Details",
+                            html: `
+                  <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                      <tr style="background-color:#228B22; color:white;">
+                        <th style="padding:8px; border:1px solid #ddd; text-align:left;">Payment ID</th>
+                        <th style="padding:8px; border:1px solid #ddd; text-align:left;">Amount</th>
+                        <th style="padding:8px; border:1px solid #ddd; text-align:left;">Method</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${paymentHistory
+                                .map(
+                                  (p) => `
+                            <tr>
+                              <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
+                              <td style="padding:8px; border:1px solid #ddd;">${p.amount}</td>
+                              <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                                ${p.method || "N/A"}
+                              </td>
+                            </tr>
+                          `
+                                )
+                                .join("")}
+                    </tbody>
+                  </table>
+                `,
+                            confirmButtonText: "Close",
+                            width: 600,
+                            backdrop: `rgba(0,0,0,0.4) blur(6px)`,
+                            background: "white",
+                          });
+                        }}
+                        className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-xs hover:bg-indigo-400 border border-indigo-600 whitespace-nowrap"
+                      >
+                        info
+                      </button>
+                    </div>
+
+                    {/* Right: Amount */}
+                    <div className="flex-shrink-0 font-semibold text-base">
+                      ₹{payment.amount}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop View - Bilkul pehle jaisa (unchanged) */}
+                <div className="hidden md:flex md:col-span-5 gap-3 items-center">
+                  <span className="font-semibold">{index + 1}.</span>
+                  <span className="text-sm md:text-base">
+                    {payment.description || "Starting Payment"}
+                  </span>
+                </div>
+
+                <div className="hidden md:flex md:col-span-4 flex-col md:flex-row md:items-center md:justify-center gap-2">
+                  {payment.status === "success" && payment.release_status === "pending" && (
+                    <>
+                      <span className="text-[#228B22] font-semibold text-sm text-left md:text-center">
+                        Waiting for Approval
+                      </span>
+                      {hireStatus === "accepted" && (
+                        <button
+                          onClick={() => handlePay(payment._id)}
+                          className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700 w-fit"
+                        >
+                          Pay
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Payment Details",
+                        html: `
+              <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                  <tr style="background-color:#228B22; color:white;">
+                    <th style="padding:8px; border:1px solid #ddd; text-align:left;">Payment ID</th>
+                    <th style="padding:8px; border:1px solid #ddd; text-align:left;">Amount</th>
+                    <th style="padding:8px; border:1px solid #ddd; text-align:left;">Method</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${paymentHistory
+                            .map(
+                              (p) => `
+                        <tr>
+                          <td style="padding:8px; border:1px solid #ddd;">${p.payment_id || "N/A"}</td>
+                          <td style="padding:8px; border:1px solid #ddd;">${p.amount}</td>
+                          <td style="padding:8px; border:1px solid #ddd; text-transform:capitalize;">
+                            ${p.method || "N/A"}
+                          </td>
+                        </tr>
+                      `
+                            )
+                            .join("")}
+                </tbody>
+              </table>
+            `,
+                        confirmButtonText: "Close",
+                        width: 600,
+                        backdrop: `rgba(0,0,0,0.4) blur(6px)`,
+                        background: "white",
+                      });
+                    }}
+                    className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm hover:bg-indigo-400 border border-indigo-600 cursor-pointer w-fit flex items-center"
+                  >
+                    info
+                  </button>
+
+                  {payment.release_status === "release_requested" && (
+                    <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                  )}
+                  {payment.release_status === "released" && (
+                    <span className="text-[#228B22] font-semibold text-sm">Paid</span>
+                  )}
+                  {payment.release_status === "rejected" && (
+                    <span className="text-red-600 font-semibold text-sm">Admin Rejected</span>
+                  )}
+                </div>
+
+                <div className="hidden md:block md:col-span-3 text-right font-semibold text-base">
+                  ₹{payment.amount}
+                </div>
               </div>
-            </>
-          )}
-         
-           </div>
-         )}
+            ))}
+
+            {/* Add Payment Form */}
+            {showForm && (
+              <>
+                <div className="flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4 border-t border-gray-200 pt-4 mt-4">
+
+                  <span className="font-semibold">{paymentHistory.length + 1}</span>
+
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter payment description"
+                    className="flex-1 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-full md:w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 placeholder:text-gray-500 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  />
+
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full md:w-40 border border-[#228B22] bg-[#228B22]/20 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-[#228B22]"
+                  >
+                    <option value="" disabled>Select payment method</option>
+                    <option value="online">Online</option>
+                    <option value="cod">Cash on Delivery</option>
+                  </select>
+
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
+                  <button
+                    onClick={handlePaymentSubmit}
+                    className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700 w-full sm:w-auto"
+                  >
+                    Submit
+                  </button>
+
+                  <button
+                    onClick={handleCancel}
+                    className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50 w-full sm:w-auto"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+
+          </div>
+        )}
       </div>
+
       <div className="p-4 bg-white shadow-md rounded-lg mt-10">
         <table className="w-full border border-gray-300 rounded-md overflow-hidden">
           <thead style={{ backgroundColor: "#228B22", color: "white" }}>

@@ -211,34 +211,26 @@ export default function Dispute() {
       </div>
 
       {/* Banner Slider */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+    <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
         {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
         ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
-          </p>
+          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"} // Fallback image
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png"; // Fallback on image load error
-                  }}
+                  src={banner}
+                  alt=""
+                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
                 />
               </div>
             ))}
           </Slider>
         ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
         )}
       </div>
 

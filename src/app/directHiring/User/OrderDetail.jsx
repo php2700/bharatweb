@@ -63,7 +63,7 @@ export default function ViewProfile() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyBU6oBwyKGYp3YY-4M_dtgigaVDvbW55f4",
   });
-  const [setServiceProvidersids,setServiceProvidersidsD]=useState("");
+  const [setServiceProvidersids, setServiceProvidersidsD] = useState("");
 
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 28.6139,
@@ -221,8 +221,8 @@ export default function ViewProfile() {
       const providerIds = [];
       orderResponse.data.data.order.offer_history?.forEach((provider) => {
         initialStatuses[provider.provider_id._id] =
-        localStorage.setItem('testnow',provider.provider_id._id);
-          provider.status[0] || "sent";
+          localStorage.setItem('testnow', provider.provider_id._id);
+        provider.status[0] || "sent";
         providerIds.push(provider.provider_id._id);
       });
       setOfferStatuses(initialStatuses);
@@ -257,27 +257,27 @@ export default function ViewProfile() {
   useEffect(() => {
     fetchData();
   }, [id]);
-   useEffect(() => {
+  useEffect(() => {
     fetchData();
     fetchBannerImages();
-  const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
+    const hasSeenModal = sessionStorage.getItem("hasSeenIDModal");
 
-if (!hasSeenModal) {
-  Swal.fire({
-    title: "Important!",
-    html: `For your safety kindly match the worker id proof physically with id proof in the App  
+    if (!hasSeenModal) {
+      Swal.fire({
+        title: "Important!",
+        html: `For your safety kindly match the worker id proof physically with id proof in the App  
            <a href="/profile-details/${localStorage.getItem('testnow')}/direct" style="font-weight:bold; margin-left:5px; text-decoration:none;">
              View Profile &raquo;&raquo;
            </a>`,
-    icon: "warning",
-    confirmButtonText: "OK",
-  }).then(() => {
-    window.scrollTo(0, 0);
-    sessionStorage.setItem("hasSeenIDModal", "true");
-  });
-}
+        icon: "warning",
+        confirmButtonText: "OK",
+      }).then(() => {
+        window.scrollTo(0, 0);
+        sessionStorage.setItem("hasSeenIDModal", "true");
+      });
+    }
 
-}, [id]);
+  }, [id]);
 
   // Trigger related workers fetch when category/subcategory changes
   useEffect(() => {
@@ -506,18 +506,18 @@ if (!hasSeenModal) {
     });
   };
   const handleGetDirections = (destinationAddress) => {
-  if (destinationAddress) {
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-      destinationAddress
-    )}`;
-    window.open(googleMapsUrl, "_blank");
-  } else {
-    alert("Destination address not found!");
-  }
-};
+    if (destinationAddress) {
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+        destinationAddress
+      )}`;
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      alert("Destination address not found!");
+    }
+  };
 
-const capitalize = (text = "") =>
-  text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  const capitalize = (text = "") =>
+    text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 
   const handleCancelOffer = async () => {
     const result = await Swal.fire({
@@ -989,7 +989,7 @@ const capitalize = (text = "") =>
     return address.substring(0, maxLength) + "...";
   };
   const images = Array.isArray(orderData?.image_url) ? orderData.image_url : [];
-   console.log("Final Order Data:", orderData);
+  console.log("Final Order Data:", orderData);
   console.log("Dispute Info:", disputeInfo);
   return (
     <>
@@ -1062,10 +1062,10 @@ const capitalize = (text = "") =>
           <div className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
               <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                
+
                 <span>
-  Title :- {capitalize(orderData?.title || "Unknown Title")}
-</span>
+                  Title :- {capitalize(orderData?.title || "Unknown Title")}
+                </span>
 
                 {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
                 <div>
@@ -1107,41 +1107,36 @@ const capitalize = (text = "") =>
                   Status:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${
-                        orderData?.hire_status === "pending"
-                          ? "bg-yellow-500"
-                          : ""
+                      ${orderData?.hire_status === "pending"
+                        ? "bg-yellow-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "cancelled"
-                          ? "bg-red-500"
-                          : ""
+                      ${orderData?.hire_status === "cancelled"
+                        ? "bg-red-500"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "completed"
-                          ? "bg-[#228B22]"
-                          : ""
+                      ${orderData?.hire_status === "completed"
+                        ? "bg-[#228B22]"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "cancelledDispute"
-                          ? "bg-[#FF0000]"
-                          : ""
+                      ${orderData?.hire_status === "cancelledDispute"
+                        ? "bg-[#FF0000]"
+                        : ""
                       }
-                      ${
-                        orderData?.hire_status === "accepted"
-                          ? "bg-[#228B22]"
-                          : ""
+                      ${orderData?.hire_status === "accepted"
+                        ? "bg-[#228B22]"
+                        : ""
                       }`}
                   >
                     {orderData?.hire_status === "cancelledDispute"
                       ? `Cancelled ${" "} Dispute`
                       : orderData.hire_status
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ") || "Unknown status"}
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ") || "Unknown status"}
                   </span>
                 </span>
                 {orderData?.refundRequest && (
@@ -1149,31 +1144,28 @@ const capitalize = (text = "") =>
                     Refund Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${
-                        orderData?.refundStatus === "pending"
+                      ${orderData?.refundStatus === "pending"
                           ? "bg-yellow-500"
                           : ""
-                      }
-                      ${
-                        orderData?.refundStatus === "processed"
+                        }
+                      ${orderData?.refundStatus === "processed"
                           ? "bg-blue-500"
                           : ""
-                      }
-											${
-                        orderData?.refundStatus === "rejected"
+                        }
+											${orderData?.refundStatus === "rejected"
                           ? "bg-red-500"
                           : ""
-                      }`
-											}
+                        }`
+                      }
                     >
                       {orderData?.refundStatus
                         ? orderData.refundStatus
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ")
+                          .split(" ")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                          )
+                          .join(" ")
                         : "Unknown Status"}
                     </span>
                   </span>
@@ -1182,10 +1174,11 @@ const capitalize = (text = "") =>
             </div>
 
             <div className="border border-green-600 rounded-lg p-2 mb-4 bg-gray-50">
-              <p className="text-gray-700 tracking-tight">
+              <p className="text-gray-700 tracking-tight break-words whitespace-pre-line text-sm sm:text-base leading-relaxed">
                 {orderData?.description}
               </p>
             </div>
+
             <p className="m-3">
               <span className="text-gray-600 font-semibold block">
                 Do you want to visit a shop:{" "}
@@ -1217,56 +1210,49 @@ const capitalize = (text = "") =>
                   <h2 className="text-xl font-semibold text-black mb-4">
                     Offered Service Providers
                   </h2>
+
                   <div className="space-y-4">
                     {filteredProviders.reverse().map((provider) => (
-                    
-  
-                      
                       <div
                         key={provider.provider_id._id}
-                        className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow"
+                        className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white rounded-lg shadow w-full"
                       >
+                        {/* Profile Pic */}
                         <img
                           src={provider.provider_id.profile_pic || Profile}
-                          alt={`Profile of ${
-                            provider.provider_id.full_name || "Provider"
-                          }`}
-                          className="w-16 h-16 rounded-full object-cover"
+                          alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0"
                         />
+
+                        {/* Middle Section */}
                         <div className="flex-1">
-                          <p className="text-lg font-semibold">
+                          {/* Name */}
+                          <p className="text-lg font-semibold break-words">
                             {provider.provider_id.full_name
                               .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
+                              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                               .join(" ") || "Unknown Provider"}{" "}
                             <span className="text-gray-500 text-sm">
                               ({provider.provider_id.unique_id})
                             </span>
                           </p>
-                          {/* <p className="bg-[#F27773] text-white px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                            {provider.provider_id?.location?.address ||
-                              "No Address Provided"}
-                          </p> */}
-                          <div className="flex items-start gap-2 flex-1">
+
+                          {/* Address */}
+                          <div className="flex items-start gap-2 mt-2">
                             <FaMapMarkerAlt
                               className="text-[#F27773] mt-1 flex-shrink-0"
                               color="#228B22"
                               size={20}
                             />
-                            <p className="text-gray-700 text-sm">
+                            <p className="text-gray-700 text-sm break-words leading-snug">
                               {truncateAddress(
                                 provider.provider_id?.location?.address,
                                 provider.provider_id._id
                               )}
-                              {provider.provider_id?.location?.address?.length >
-                                50 && (
+
+                              {provider.provider_id?.location?.address?.length > 50 && (
                                 <button
-                                  onClick={() =>
-                                    toggleAddress(provider.provider_id._id)
-                                  }
+                                  onClick={() => toggleAddress(provider.provider_id._id)}
                                   className="text-[#228B22] font-semibold ml-2 hover:underline"
                                 >
                                   {expandedAddresses[provider.provider_id._id]
@@ -1277,6 +1263,7 @@ const capitalize = (text = "") =>
                             </p>
                           </div>
 
+                          {/* View Profile Button */}
                           <button
                             onClick={() =>
                               handleRouteHire(provider.provider_id._id, true)
@@ -1286,103 +1273,83 @@ const capitalize = (text = "") =>
                             View Profile
                           </button>
                         </div>
+
+                        {/* Contact Section */}
                         {orderData.hire_status === "cancelled" ? (
                           " "
                         ) : (
-                          <div className="flex flex-col items-center justify-center flex-1">
+                          <div className="flex flex-col items-center justify-center w-full sm:w-auto">
                             <p className="text-gray-600 font-medium">Contact</p>
-                            <div className="flex space-x-2 mt-2">
+                            <div className="flex space-x-3 mt-2">
                               <button
                                 className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                                title="Call"
-                                onClick={() => {
-                                  window.open(`tel:${provider.phone}`, "_self");
-                                }}
+                                onClick={() => window.open(`tel:${provider.phone}`, "_self")}
                               >
-                                <img
-                                  src={CallIcon}
-                                  alt="Call"
-                                  className="w-6 h-6"
-                                />
+                                <img src={CallIcon} alt="Call" className="w-6 h-6" />
                               </button>
+
                               <button
                                 className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
-                                title="Chat"
                                 onClick={() =>
-                                  handleChatOpen(
-                                    provider?.provider_id?._id,
-                                    userId
-                                  )
+                                  handleChatOpen(provider?.provider_id?._id, userId)
                                 }
                               >
-                                <img
-                                  src={ChatIcon}
-                                  alt="Chat"
-                                  className="w-6 h-6"
-                                />
+                                <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                               </button>
                             </div>
                           </div>
                         )}
 
-                        <div className="flex flex-col gap-2">
-                          {offerStatuses[provider.provider_id._id] ===
-                          "pending" ? (
-                            <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
+                        {/* Status / Change Provider */}
+                        <div className="flex flex-col gap-2 w-full sm:w-auto">
+                          {offerStatuses[provider.provider_id._id] === "pending" ? (
+                            <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold text-center">
                               Cancelled
                             </span>
                           ) : (
                             <>
                               {/* Status Button */}
                               {!provider.isRejectedByUser && (
-                                <>
-                                  <button
-                                    className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed
-            ${provider.status === "pending" ? "bg-yellow-500" : ""}
-            ${provider.status === "accepted" ? "bg-green-600" : ""}
-            ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                    disabled
-                                  >
-                                    {Array.isArray(provider.status)
-                                      ? provider.status
-                                          .map(
-                                            (word) =>
-                                              word.charAt(0).toUpperCase() +
-                                              word.slice(1)
-                                          )
-                                          .join(" ")
-                                      : provider.status
-                                      ? provider.status
-                                          .charAt(0)
-                                          .toUpperCase() +
-                                        provider.status.slice(1)
+                                <button
+                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed text-center
+                    ${provider.status === "pending" ? "bg-yellow-500" : ""}
+                    ${provider.status === "accepted" ? "bg-green-600" : ""}
+                    ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+                                  disabled
+                                >
+                                  {Array.isArray(provider.status)
+                                    ? provider.status
+                                      .map(
+                                        (word) =>
+                                          word.charAt(0).toUpperCase() + word.slice(1)
+                                      )
+                                      .join(" ")
+                                    : provider.status
+                                      ? provider.status.charAt(0).toUpperCase() +
+                                      provider.status.slice(1)
                                       : ""}
-                                  </button>
-                                </>
+                                </button>
                               )}
 
-                              {/* If user rejected — show 'Rejected by Me' instead */}
+                              {/* Rejected by Me */}
                               {provider.isRejectedByUser && (
                                 <button
-                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed"
+                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed text-center"
                                   disabled
                                 >
                                   Rejected by Me
                                 </button>
                               )}
 
-                              {/* Change Service Provider Button */}
+                              {/* Change Service Provider */}
                               {orderData?.hire_status === "pending" &&
                                 provider.status === "pending" && (
                                   <button
-                                    className={`px-6 py-2 ${
-                                      showChangeProvider ||
-                                      provider.isRejectedByUser
-                                        ? "bg-green-600"
-                                        : "bg-[#FB3523]"
-                                    } text-white font-semibold rounded-lg shadow`}
+                                    className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
+                                      ? "bg-green-600"
+                                      : "bg-[#FB3523]"
+                                      } text-white font-semibold rounded-lg shadow`}
                                     onClick={async () => {
-                                      // If already rejected, just open section
                                       if (provider.isRejectedByUser) {
                                         setShowChangeProvider(true);
                                         return;
@@ -1400,22 +1367,17 @@ const capitalize = (text = "") =>
 
                                       if (result.isConfirmed) {
                                         try {
-                                          const token =
-                                            localStorage.getItem(
-                                              "bharat_token"
-                                            );
+                                          const token = localStorage.getItem("bharat_token");
 
                                           await axios.post(
                                             `${BASE_URL}/direct-order/userRejectOffer`,
                                             {
                                               order_id: orderData._id,
-                                              provider_id:
-                                                provider.provider_id._id,
+                                              provider_id: provider.provider_id._id,
                                             },
                                             {
                                               headers: {
-                                                "Content-Type":
-                                                  "application/json",
+                                                "Content-Type": "application/json",
                                                 Authorization: `Bearer ${token}`,
                                               },
                                             }
@@ -1429,7 +1391,6 @@ const capitalize = (text = "") =>
                                             showConfirmButton: false,
                                           });
 
-                                          // ✅ Automatically open section for new provider hire
                                           setShowChangeProvider(true);
                                           fetchData();
                                         } catch (error) {
@@ -1444,8 +1405,7 @@ const capitalize = (text = "") =>
                                       }
                                     }}
                                   >
-                                    {showChangeProvider ||
-                                    provider.isRejectedByUser
+                                    {showChangeProvider || provider.isRejectedByUser
                                       ? "Rejected by Me"
                                       : "Change Service Provider"}
                                   </button>
@@ -1457,6 +1417,7 @@ const capitalize = (text = "") =>
                     ))}
                   </div>
                 </div>
+
               )}
 
             {/* Task Status / Cancel Button */}
@@ -1502,11 +1463,14 @@ const capitalize = (text = "") =>
                   {/* <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
                     Cancelled ({disputeInfo.unique_id || "No Id"})
                   </span> */}
-                     <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
-      <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-red-700">
-        Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
-      </span>
-    </Link>
+                  <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
+                    <span
+                      className="px-4 sm:px-6 py-1.5 bg-[#FF0000] text-white rounded-md text-sm sm:text-base font-semibold cursor-pointer hover:bg-red-700 whitespace-nowrap leading-tight block w-fit "
+                    >
+                      Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
+                    </span>
+
+                  </Link>
 
                   <p className="text-sm text-gray-700 mt-3">
                     Note:{" "}
@@ -1544,15 +1508,14 @@ const capitalize = (text = "") =>
               )}
               {orderData?.refundRequest && (
                 <button
-                  className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${
-                    orderData?.refundStatus === "pending"
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : orderData?.refundStatus === "processed"
+                  className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : orderData?.refundStatus === "processed"
                       ? "bg-green-600 hover:bg-green-700"
                       : orderData?.refundStatus === "rejected"
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-gray-500"
-                  }`}
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-gray-500"
+                    }`}
                 >
                   {orderData?.refundStatus === "pending" &&
                     "Refund Request Submitted"}
@@ -1562,16 +1525,15 @@ const capitalize = (text = "") =>
               )}
               {(orderData?.refundStatus === "processed" ||
                 orderData?.refundStatus === "rejected") && (
-                <p
-                  className={`mt-2 text-sm font-medium ${
-                    orderData?.refundStatus === "processed"
+                  <p
+                    className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
                       ? "text-green-600"
                       : "text-red-600"
-                  }`}
-                >
-                  Admin Remark: {orderData?.refundReasonDetails}
-                </p>
-              )}
+                      }`}
+                  >
+                    Admin Remark: {orderData?.refundReasonDetails}
+                  </p>
+                )}
               {/* ✅ Refund Modal */}
               {showRefundModal && (
                 <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
@@ -1624,83 +1586,83 @@ const capitalize = (text = "") =>
             {(orderData?.hire_status === "accepted" ||
               orderData?.hire_status === "completed" ||
               orderData?.hire_status === "cancelledDispute") && (
-              <div ref={acceptedSectionRef}>
-                <Accepted
-                  serviceProvider={orderData?.service_provider_id}
-                  user_id={orderData?.user_id._id}
-                  assignedWorker={assignedWorker}
-                  paymentHistory={orderData?.service_payment?.payment_history}
-                  fullPaymentHistory={orderData?.service_payment}
-                  orderId={id}
-                  hireStatus={orderData?.hire_status}
-                />
-                {(orderData?.hire_status === "accepted" ||
-                  orderData?.hire_status === "completed") && (
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    <div className="relative max-w-2xl mx-auto">
-                      {/* Top Images */}
-                      <div className="relative z-10 flex justify-center gap-4">
-                        <img
-                          src={Warning1}
-                          alt="Warning"
-                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                        />
-                        <img
-                          src={Warning3}
-                          alt="Warning2"
-                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                        />
-                      </div>
+                <div ref={acceptedSectionRef}>
+                  <Accepted
+                    serviceProvider={orderData?.service_provider_id}
+                    user_id={orderData?.user_id._id}
+                    assignedWorker={assignedWorker}
+                    paymentHistory={orderData?.service_payment?.payment_history}
+                    fullPaymentHistory={orderData?.service_payment}
+                    orderId={id}
+                    hireStatus={orderData?.hire_status}
+                  />
+                  {(orderData?.hire_status === "accepted" ||
+                    orderData?.hire_status === "completed") && (
+                      <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                        <div className="relative max-w-2xl mx-auto">
+                          {/* Top Images */}
+                          <div className="relative z-10 flex justify-center gap-4">
+                            <img
+                              src={Warning1}
+                              alt="Warning"
+                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                            />
+                            <img
+                              src={Warning3}
+                              alt="Warning2"
+                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                            />
+                          </div>
 
-                      {/* Yellow Box */}
-                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                        <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                          Warning Message
-                        </h2>
-                        <p className="text-gray-700 text-sm md:text-base">
-                          Pay securely — no extra charges from the platform.
-                          Choose simple and safe transactions.
-                        </p>
-                      </div>
-                    </div>
+                          {/* Yellow Box */}
+                          <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
+                            <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                              Warning Message
+                            </h2>
+                            <p className="text-gray-700 text-sm md:text-base">
+                              Pay securely — no extra charges from the platform.
+                              Choose simple and safe transactions.
+                            </p>
+                          </div>
+                        </div>
 
-                    <div className="flex space-x-4">
-                      {orderData?.hire_status === "completed" ? (
-                        ""
-                      ) : (
-                        <>
-                          <button
-                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer"
-                            onClick={handleMarkComplete}
-                          >
-                            Mark as Complete
-                          </button>
-                          <ReviewModal
-                            show={showCompletedModal}
-                            onClose={() => {
-                              setShowCompletedModal(false);
-                              fetchData();
-                            }}
-                            service_provider_id={
-                              orderData?.service_provider_id._id
-                            }
-                            orderId={id}
-                            type="direct"
-                          />{" "}
-                        </>
-                      )}
-                      <Link to={`/dispute/${id}/direct`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
-                          {orderData?.hire_status === "completed"
-                            ? "Create Dispute"
-                            : "Cancel Task and Create Dispute"}
-                        </button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                        <div className="flex space-x-4">
+                          {orderData?.hire_status === "completed" ? (
+                            ""
+                          ) : (
+                            <>
+                              <button
+                                className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer"
+                                onClick={handleMarkComplete}
+                              >
+                                Mark as Complete
+                              </button>
+                              <ReviewModal
+                                show={showCompletedModal}
+                                onClose={() => {
+                                  setShowCompletedModal(false);
+                                  fetchData();
+                                }}
+                                service_provider_id={
+                                  orderData?.service_provider_id._id
+                                }
+                                orderId={id}
+                                type="direct"
+                              />{" "}
+                            </>
+                          )}
+                          <Link to={`/dispute/${id}/direct`}>
+                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
+                              {orderData?.hire_status === "completed"
+                                ? "Create Dispute"
+                                : "Cancel Task and Create Dispute"}
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              )}
           </div>
         </div>
       </div>
@@ -1813,7 +1775,7 @@ const capitalize = (text = "") =>
             </div>
           </div>
         )} */}
-        
+
 
       {showChangeProvider &&
         orderData?.hire_status !== "cancelled" &&
@@ -1826,7 +1788,7 @@ const capitalize = (text = "") =>
             <h2 className="text-lg font-bold text-[#FB3523] mb-4 mx-auto text-center -mt-4">
               (Note: You can hire only one worker on this task.)
             </h2>
-            
+
             {/* Search Bar - यह हमेशा दिखेगा */}
             <div className="relative mb-4">
               <input
@@ -1925,7 +1887,7 @@ const capitalize = (text = "") =>
           </div>
         )}
 
-    
+
 
       {/* Related Workers Section */}
       {/*orderData?.hire_status !== "cancelled" &&
@@ -2004,34 +1966,26 @@ const capitalize = (text = "") =>
         ) */}
 
       {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
         {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
         ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
-          </p>
+          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i}>
                 <img
-                  src={banner || "/src/assets/profile/default.png"}
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png";
-                  }}
+                  src={banner}
+                  alt=""
+                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
                 />
               </div>
             ))}
           </Slider>
         ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
         )}
       </div>
 
@@ -2068,7 +2022,7 @@ const capitalize = (text = "") =>
 
       {isMapOpen && isLoaded && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          
+
           <div className="bg-white p-4 rounded-2xl shadow-lg w-[90%] max-w-lg">
             <div className="flex justify-between mb-2">
               <h1 className="text-black text-[20px] font-semibold">
@@ -2092,14 +2046,14 @@ const capitalize = (text = "") =>
                 <Marker position={markerLocationAddress} />
               )}
             </GoogleMap>
-               <div className="mt-4 text-center">
-        {/* <button
+            <div className="mt-4 text-center">
+              {/* <button
           onClick={() => handleGetDirections(orderData?.address)}
           className="px-6 py-2 bg-[#228B22] text-white font-semibold rounded-lg hover:bg-green-700"
         >
           Get Directions
         </button> */}
-      </div>
+            </div>
           </div>
         </div>
       )}
