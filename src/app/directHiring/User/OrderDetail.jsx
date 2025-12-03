@@ -70,6 +70,7 @@ export default function ViewProfile() {
     lng: 77.209,
   });
   const user = useSelector((state) => state.user.profile);
+
   const userId = user?._id;
 
   useEffect(() => {
@@ -945,7 +946,7 @@ const capitalize = (text = "") =>
 
   const handleChatOpen = (receiverId, senderId) => {
     localStorage.setItem("receiverId", receiverId);
-    localStorage.setItem("senderId", senderId);
+    localStorage.setItem("user_id", localStorage.getItem('user_id'));
     navigate("/chats");
   };
 
