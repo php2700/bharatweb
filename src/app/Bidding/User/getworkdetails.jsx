@@ -1004,7 +1004,7 @@ export default function BiddinggetWorkDetail() {
               SubCategory:{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
-            <h3 className="text-sm font-semibold">Project Description</h3>
+            <h3 className="text-sm font-semibold">Task Details</h3>
             <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div>

@@ -2,7 +2,7 @@ import Header from "../../../component/Header";
 import banner from "../../../assets/banner.png";
 import Footer from "../../../component/footer";
 import NoPicAvailable from "../../../assets/bidding/No_Image_Available.jpg";
-
+import Profile from "../../../assets/default-image.jpg";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
@@ -247,7 +247,7 @@ export default function HireDetail() {
   // order/provider, keep them permanently unlocked.
   useEffect(() => {
     if (docUnlockKey && localStorage.getItem(docUnlockKey) === "false") {
-      setDocumentsUnlocked(true);
+      setDocumentsUnlocked(false);
     }
   }, [docUnlockKey]);
 
@@ -659,7 +659,7 @@ export default function HireDetail() {
               <div className="relative w-full">
                 {providerDetail.profilePic ? (
                   <img
-                    src={providerDetail.profilePic || NoPicAvailable}
+                    src={providerDetail.profilePic || Profile}
                     alt="Service Provider"
                     className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
                     onError={(e) => {
