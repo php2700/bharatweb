@@ -795,18 +795,24 @@ export default function BiddinggetWorkDetail() {
   return (
     <>
       <Header />
+
+  <div className="w-full flex justify-start mt-25">
+  <div className="w-fit ml-50">
+    <button
+      className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+      onClick={() => navigate(-1)}
+    >
+      <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+      Back
+    </button>
+  </div>
+
+
+  </div>
+   
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
-        <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button
-            className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-            onClick={() => navigate(-1)}
-          >
-            <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
-            Back
-          </button>
-        </div>
-        <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
+
+      <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
           <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
           {orderDetail?.image_url?.length > 0 ? (
             <Carousel
@@ -929,110 +935,110 @@ export default function BiddinggetWorkDetail() {
                       </div>
                     </div>
                   </div>
-                  
+
                 )}
-                </div>
-                
-    {/* DESKTOP VIEW (same as before) */}
-<div className="text-left sm:text-right sm:ml-auto mt-4 sm:mt-0 hidden sm:block">
-  <p className="bg-black text-white text-md px-4 rounded-full inline-block sm:ml-auto">
-    {orderDetail?.project_id || "N/A"}
-  </p>
+              </div>
 
-  <p className="text-md mt-2 sm:ml-auto">
-    <span className="font-semibold">
-      Posted Date: {formatDate(orderDetail?.createdAt)}
-    </span>
-  </p>
+              {/* DESKTOP VIEW (same as before) */}
+              <div className="text-left sm:text-right sm:ml-auto mt-4 sm:mt-0 hidden sm:block">
+                <p className="bg-black text-white text-md px-4 rounded-full inline-block sm:ml-auto">
+                  {orderDetail?.project_id || "N/A"}
+                </p>
 
-  {/* Status */}
-  <span className="text-gray-600 font-semibold block mt-1 sm:ml-auto">
-    Status:{" "}
-    <span
-      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
-        orderDetail?.hire_status
-      )}`}
-    >
-      {orderDetail?.hire_status
-        ? orderDetail.hire_status
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-        : "Unknown"}
-    </span>
-  </span>
+                <p className="text-md mt-2 sm:ml-auto">
+                  <span className="font-semibold">
+                    Posted Date: {formatDate(orderDetail?.createdAt)}
+                  </span>
+                </p>
 
-  {/* Refund Status */}
-  {orderDetail?.refundRequest && (
-    <span className="text-gray-600 mt-2 font-semibold block">
-      Refund Status:{" "}
-      <span
-        className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                {/* Status */}
+                <span className="text-gray-600 font-semibold block mt-1 sm:ml-auto">
+                  Status:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
+                      orderDetail?.hire_status
+                    )}`}
+                  >
+                    {orderDetail?.hire_status
+                      ? orderDetail.hire_status
+                        .split(" ")
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ")
+                      : "Unknown"}
+                  </span>
+                </span>
+
+                {/* Refund Status */}
+                {orderDetail?.refundRequest && (
+                  <span className="text-gray-600 mt-2 font-semibold block">
+                    Refund Status:{" "}
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium
           ${orderDetail?.refundStatus === "pending" ? "bg-yellow-500" : ""}
           ${orderDetail?.refundStatus === "processed" ? "bg-blue-500" : ""}`}
-      >
-        {orderDetail?.refundStatus
-          ? orderDetail.refundStatus
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-          : "Unknown Status"}
-      </span>
-    </span>
-  )}
-</div>
-</div>
+                    >
+                      {orderDetail?.refundStatus
+                        ? orderDetail.refundStatus
+                          .split(" ")
+                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(" ")
+                        : "Unknown Status"}
+                    </span>
+                  </span>
+                )}
+              </div>
+            </div>
 
 
-{/* MOBILE VIEW (new div — left aligned) */}
-<div className="block sm:hidden mt-4 text-left">
-  <p className="bg-black text-white text-md px-4 rounded-full inline-block">
-    {orderDetail?.project_id || "N/A"}
-  </p>
+            {/* MOBILE VIEW (new div — left aligned) */}
+            <div className="block sm:hidden mt-4 text-left">
+              <p className="bg-black text-white text-md px-4 rounded-full inline-block">
+                {orderDetail?.project_id || "N/A"}
+              </p>
 
-  <p className="text-md mt-2">
-    <span className="font-semibold">
-      Posted Date: {formatDate(orderDetail?.createdAt)}
-    </span>
-  </p>
+              <p className="text-md mt-2">
+                <span className="font-semibold">
+                  Posted Date: {formatDate(orderDetail?.createdAt)}
+                </span>
+              </p>
 
-  <span className="text-gray-600 font-semibold block mt-1">
-    Status:{" "}
-    <span
-      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
-        orderDetail?.hire_status
-      )}`}
-    >
-      {orderDetail?.hire_status
-        ? orderDetail.hire_status
-            .split(" ")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ")
-        : "Unknown"}
-    </span>
-  </span>
+              <span className="text-gray-600 font-semibold block mt-1">
+                Status:{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
+                    orderDetail?.hire_status
+                  )}`}
+                >
+                  {orderDetail?.hire_status
+                    ? orderDetail.hire_status
+                      .split(" ")
+                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(" ")
+                    : "Unknown"}
+                </span>
+              </span>
 
-  {orderDetail?.refundRequest && (
-    <span className="text-gray-600 mt-2 font-semibold block">
-      Refund Status:{" "}
-      <span
-        className={`px-3 py-1 rounded-full text-white text-sm font-medium
+              {orderDetail?.refundRequest && (
+                <span className="text-gray-600 mt-2 font-semibold block">
+                  Refund Status:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
           ${orderDetail?.refundStatus === "pending" ? "bg-yellow-500" : ""}
           ${orderDetail?.refundStatus === "processed" ? "bg-blue-500" : ""}`}
-      >
-        {orderDetail?.refundStatus
-          ? orderDetail.refundStatus
-              .split(" ")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-          : "Unknown Status"}
-      </span>
-    </span>
-  )}
-</div>
+                  >
+                    {orderDetail?.refundStatus
+                      ? orderDetail.refundStatus
+                        .split(" ")
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ")
+                      : "Unknown Status"}
+                  </span>
+                </span>
+              )}
+            </div>
 
 
-            
+
             <p className="text-sm">
               <span className="font-semibold">
                 Completion Date:{" "}
@@ -1178,9 +1184,20 @@ export default function BiddinggetWorkDetail() {
                 // ) : null}
                 orderDetail?.hire_status === "cancelledDispute" && disputeInfo ? (
                   <Link to={`/disputes/bidding/${disputeInfo._id}`}>
-                    <span className="px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-orange-600">
-                      Cancelled ( {disputeInfo.unique_id || "N/A"})
+                    <span
+                      className="
+    px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold 
+    cursor-pointer hover:bg-orange-600
+
+    flex sm:inline-flex items-center gap-1   /* Mobile = flex (single line), Desktop = inline-flex */
+    whitespace-nowrap                        /* Line break avoid */
+  "
+                    >
+                      Cancelled (
+                      <span className="ml-1">{disputeInfo.unique_id || "N/A"}</span>
+                      )
                     </span>
+
                   </Link>
                 ) : null}
               <ReviewModal
@@ -1239,223 +1256,222 @@ export default function BiddinggetWorkDetail() {
                       onChange={(e) => setSearchText(e.target.value.toLowerCase())}  // <-- add this
                     />
                   </div>
-                 {tab === "related" ? (
-  <div className="flex flex-col items-center justify-center text-gray-500 py-10 w-full">
-    {Array.isArray(providers) && providers.length > 0 ? (
-      providers
-        .filter(
-          (provider) =>
-            provider.full_name?.toLowerCase().includes(searchText) &&
-            !offers.some(
-              (offer) => offer.provider_id?._id === provider._id
-            )
-        )
-        .map((provider) => (
-          <div
-            key={provider._id}
-            className="flex flex-col sm:flex-row items-center sm:items-start 
+                  {tab === "related" ? (
+                    <div className="flex flex-col items-center justify-center text-gray-500 py-10 w-full">
+                      {Array.isArray(providers) && providers.length > 0 ? (
+                        providers
+                          .filter(
+                            (provider) =>
+                              provider.full_name?.toLowerCase().includes(searchText) &&
+                              !offers.some(
+                                (offer) => offer.provider_id?._id === provider._id
+                              )
+                          )
+                          .map((provider) => (
+                            <div
+                              key={provider._id}
+                              className="flex flex-col sm:flex-row items-center sm:items-start 
                      gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow 
                      w-full sm:w-[738px]"
-          >
-            <img
-              src={provider.profile_pic || workImage}
-              alt={provider.full_name}
-              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-            />
+                            >
+                              <img
+                                src={provider.profile_pic || workImage}
+                                alt={provider.full_name}
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                              />
 
-            {/* LEFT INFO */}
-            <div className="flex-1 text-left w-full">
-              <h3 className="text-[17px] font-bold text-[#303030]">
-                {provider.full_name || "Unknown"}
-              </h3>
+                              {/* LEFT INFO */}
+                              <div className="flex-1 text-left w-full">
+                                <h3 className="text-[17px] font-bold text-[#303030]">
+                                  {provider.full_name || "Unknown"}
+                                </h3>
 
-              {/* Rating */}
-              {provider.averageRating !== undefined ? (
-                <p className="text-sm font-medium flex items-center gap-1">
-                  <span className="text-yellow-600">
-                    Rating: {parseFloat(provider.averageRating).toFixed(1)} / 5.0
-                  </span>
-                  {provider.totalReview > 0 ? (
-                    <span className="text-gray-500 text-xs">
-                      ({provider.totalReview} reviews)
-                    </span>
+                                {/* Rating */}
+                                {provider.averageRating !== undefined ? (
+                                  <p className="text-sm font-medium flex items-center gap-1">
+                                    <span className="text-yellow-600">
+                                      Rating: {parseFloat(provider.averageRating).toFixed(1)} / 5.0
+                                    </span>
+                                    {provider.totalReview > 0 ? (
+                                      <span className="text-gray-500 text-xs">
+                                        ({provider.totalReview} reviews)
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-500 text-xs">
+                                        (No reviews yet)
+                                      </span>
+                                    )}
+                                  </p>
+                                ) : (
+                                  <p className="text-sm text-gray-500">No rating yet</p>
+                                )}
+
+                                <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                                  {provider.skill || "No skill listed"}
+                                </p>
+
+                                <div className="flex items-center gap-1 text-gray-700 font-semibold text-xs mt-1">
+                                  <MapPin className="text-green-600 w-4 h-4" />
+                                  {provider.location?.address || "Unknown location"}
+                                </div>
+
+                                <button
+                                  onClick={() => handleView(provider._id, null, id)}
+                                  className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto"
+                                >
+                                  View Profile
+                                </button>
+                              </div>
+
+                              {/* RIGHT SIDE BUTTON */}
+                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                                <button
+                                  onClick={() => handleInviteClick(provider._id)}
+                                  disabled={
+                                    localInvited.includes(provider._id) ||
+                                    orderDetail?.invited_providers?.includes(provider._id)
+                                  }
+                                  className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white w-full sm:w-auto
+                  ${localInvited.includes(provider._id) ||
+                                      orderDetail?.invited_providers?.includes(provider._id)
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-[#228B22] hover:bg-green-700"
+                                    }`}
+                                >
+                                  {localInvited.includes(provider._id) ||
+                                    orderDetail?.invited_providers?.includes(provider._id)
+                                    ? "Invite Sent"
+                                    : "Invite"}
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                          <img
+                            src={noWorkImage}
+                            alt="No worker"
+                            className="w-48 sm:w-72 md:w-96 mb-4"
+                          />
+                          <p>No related workers found</p>
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <span className="text-gray-500 text-xs">
-                      (No reviews yet)
-                    </span>
-                  )}
-                </p>
-              ) : (
-                <p className="text-sm text-gray-500">No rating yet</p>
-              )}
-
-              <p className="text-sm text-gray-500 truncate max-w-[200px]">
-                {provider.skill || "No skill listed"}
-              </p>
-
-              <div className="flex items-center gap-1 text-gray-700 font-semibold text-xs mt-1">
-                <MapPin className="text-green-600 w-4 h-4" />
-                {provider.location?.address || "Unknown location"}
-              </div>
-
-              <button
-                onClick={() => handleView(provider._id, null, id)}
-                className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto"
-              >
-                View Profile
-              </button>
-            </div>
-
-            {/* RIGHT SIDE BUTTON */}
-            <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-              <button
-                onClick={() => handleInviteClick(provider._id)}
-                disabled={
-                  localInvited.includes(provider._id) ||
-                  orderDetail?.invited_providers?.includes(provider._id)
-                }
-                className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white w-full sm:w-auto
-                  ${
-                    localInvited.includes(provider._id) ||
-                    orderDetail?.invited_providers?.includes(provider._id)
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#228B22] hover:bg-green-700"
-                  }`}
-              >
-                {localInvited.includes(provider._id) ||
-                orderDetail?.invited_providers?.includes(provider._id)
-                  ? "Invite Sent"
-                  : "Invite"}
-              </button>
-            </div>
-          </div>
-        ))
-    ) : (
-      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-        <img
-          src={noWorkImage}
-          alt="No worker"
-          className="w-48 sm:w-72 md:w-96 mb-4"
-        />
-        <p>No related workers found</p>
-      </div>
-    )}
-  </div>
-) : (
-  <div className="mt-6 space-y-4 w-full">
-    {Array.isArray(offers) && offers.length > 0 ? (
-      offers
-        .filter((offer) =>
-          offer.provider_id?.full_name?.toLowerCase().includes(searchText)
-        )
-        .map((offer) => (
-          <div
-            key={offer._id}
-            className="flex flex-col sm:flex-row items-center sm:items-start 
+                    <div className="mt-6 space-y-4 w-full">
+                      {Array.isArray(offers) && offers.length > 0 ? (
+                        offers
+                          .filter((offer) =>
+                            offer.provider_id?.full_name?.toLowerCase().includes(searchText)
+                          )
+                          .map((offer) => (
+                            <div
+                              key={offer._id}
+                              className="flex flex-col sm:flex-row items-center sm:items-start 
                        gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-full"
-          >
-            <img
-              src={offer.provider_id?.profile_pic || workImage}
-              alt={offer.provider_id?.full_name || "Worker"}
-              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-            />
+                            >
+                              <img
+                                src={offer.provider_id?.profile_pic || workImage}
+                                alt={offer.provider_id?.full_name || "Worker"}
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                              />
 
-            <div className="flex-1 text-left w-full">
-              <h3 className="text-[17px] font-bold text-[#303030]">
-                {offer.provider_id?.full_name || "Unknown"}
-              </h3>
+                              <div className="flex-1 text-left w-full">
+                                <h3 className="text-[17px] font-bold text-[#303030]">
+                                  {offer.provider_id?.full_name || "Unknown"}
+                                </h3>
 
-              {/* Rating */}
-              {offer.averageRating !== undefined ? (
-                <p className="text-sm font-medium flex items-center gap-1">
-                  <span className="text-yellow-600">
-                    Rating: {parseFloat(offer.averageRating).toFixed(1)} / 5.0
-                  </span>
-                  {offer.totalReview > 0 ? (
-                    <span className="text-gray-500 text-xs">
-                      ({offer.totalReview} reviews)
-                    </span>
-                  ) : (
-                    <span className="text-gray-500 text-xs">
-                      (No reviews yet)
-                    </span>
-                  )}
-                </p>
-              ) : (
-                <p className="text-sm text-gray-500">No rating yet</p>
-              )}
+                                {/* Rating */}
+                                {offer.averageRating !== undefined ? (
+                                  <p className="text-sm font-medium flex items-center gap-1">
+                                    <span className="text-yellow-600">
+                                      Rating: {parseFloat(offer.averageRating).toFixed(1)} / 5.0
+                                    </span>
+                                    {offer.totalReview > 0 ? (
+                                      <span className="text-gray-500 text-xs">
+                                        ({offer.totalReview} reviews)
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-500 text-xs">
+                                        (No reviews yet)
+                                      </span>
+                                    )}
+                                  </p>
+                                ) : (
+                                  <p className="text-sm text-gray-500">No rating yet</p>
+                                )}
 
-              {offer.duration && (
-                <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                  Duration: {offer.duration} {offer.duration == 1 ? "day" : "days"}
-                </span>
-              )}
+                                {offer.duration && (
+                                  <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
+                                    Duration: {offer.duration} {offer.duration == 1 ? "day" : "days"}
+                                  </span>
+                                )}
 
-              <p className="text-sm text-gray-500 mt-2">
-                {offer.message || "No message provided"}
-              </p>
+                                <p className="text-sm text-gray-500 mt-2">
+                                  {offer.message || "No message provided"}
+                                </p>
 
-              <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
-                <FaMapMarkerAlt size={16} color="#228B22" />
-                {offer.provider_id?.location?.address || "Unknown location"}
-              </span>
+                                <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
+                                  <FaMapMarkerAlt size={16} color="#228B22" />
+                                  {offer.provider_id?.location?.address || "Unknown location"}
+                                </span>
 
-              <button
-                onClick={() =>
-                  handleView(
-                    offer.provider_id?._id,
-                    offer._id,
-                    offer.order_id
-                  )
-                }
-                className="text-green-600 font-medium text-base border border-green-600 
+                                <button
+                                  onClick={() =>
+                                    handleView(
+                                      offer.provider_id?._id,
+                                      offer._id,
+                                      offer.order_id
+                                    )
+                                  }
+                                  className="text-green-600 font-medium text-base border border-green-600 
                            px-5 py-1 rounded-lg mt-5 w-full sm:w-auto"
-              >
-                View Profile
-              </button>
-            </div>
+                                >
+                                  View Profile
+                                </button>
+                              </div>
 
-            {/* RIGHT SIDE PRICE + BUTTON */}
-            <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-              <span className="text-lg font-semibold text-gray-800 mb-2">
-                ₹{offer.bid_amount || "N/A"}
-              </span>
+                              {/* RIGHT SIDE PRICE + BUTTON */}
+                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+                                <span className="text-lg font-semibold text-gray-800 mb-2">
+                                  ₹{offer.bid_amount || "N/A"}
+                                </span>
 
-              {orderDetail?.hire_status === "pending" && (
-                <button
-                  onClick={() => handleAcceptBid(offer.provider_id?._id)}
-                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                                {orderDetail?.hire_status === "pending" && (
+                                  <button
+                                    onClick={() => handleAcceptBid(offer.provider_id?._id)}
+                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
                              font-medium hover:bg-green-700 w-full sm:w-auto"
-                >
-                  Hire
-                </button>
-              )}
+                                  >
+                                    Hire
+                                  </button>
+                                )}
 
-              {orderDetail?.hire_status === "accepted" &&
-                !orderDetail?.platform_fee_paid && (
-                  <button
-                    onClick={() => handlePayment(offer.provider_id?._id)}
-                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                                {orderDetail?.hire_status === "accepted" &&
+                                  !orderDetail?.platform_fee_paid && (
+                                    <button
+                                      onClick={() => handlePayment(offer.provider_id?._id)}
+                                      className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
                                font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
-                  >
-                    Pay & Hire
-                  </button>
-                )}
-            </div>
-          </div>
-        ))
-    ) : (
-      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-        <img
-          src={noWorkImage}
-          alt="No bids"
-          className="w-48 sm:w-72 md:w-96 mb-4"
-        />
-        <p>No bids available</p>
-      </div>
-    )}
-  </div>
-)}
+                                    >
+                                      Pay & Hire
+                                    </button>
+                                  )}
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+                          <img
+                            src={noWorkImage}
+                            alt="No bids"
+                            className="w-48 sm:w-72 md:w-96 mb-4"
+                          />
+                          <p>No bids available</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                 </div>
               </div>
@@ -1543,30 +1559,31 @@ export default function BiddinggetWorkDetail() {
             </div>
           )}
         </div>
-          {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
-        ) : bannerError ? (
-          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i}>
-                <img
-                  src={banner}
-                  alt=""
-                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
-                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
-                />
-              </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
-        )}
-      </div>
-      </div>
+        {/* Banner Slider */}
+        <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
+          {bannerLoading ? (
+            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
+          ) : bannerError ? (
+            <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, i) => (
+                <div key={i}>
+                  <img
+                    src={banner}
+                    alt=""
+                    className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                    onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
+          )}
+        </div>
+     
+    
       <Footer />
     </>
   );

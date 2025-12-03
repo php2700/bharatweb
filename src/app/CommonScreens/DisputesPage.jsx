@@ -119,127 +119,144 @@ export default function DisputesPage() {
 
   const renderDisputeCard = (dispute) => (
     <div
-      key={dispute._id}
-      className="border border-gray-200 rounded-xl p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
-    >
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">
-        Dispute ID: {dispute.unique_id}
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <p className="text-gray-700">
-            <span className="font-semibold">Order ID:</span>{" "}
-            {dispute?.order_id?.project_id || "N/A"}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Order Title:</span>{" "}
-            {dispute?.order_id?.title || "N/A"}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Order Description:</span>{" "}
-            {dispute?.order_id?.description || "N/A"}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Flow Type:</span>{" "}
-            {dispute.flow_type.charAt(0).toUpperCase() +
-              dispute.flow_type.slice(1)}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Amount:</span> ₹
-            {dispute.amount.toLocaleString()}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Status:</span>{" "}
-            <span
-              className={`capitalize ${
-                dispute.status === "pending"
-                  ? "text-yellow-600"
-                  : dispute.status === "resolved"
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
-            >
-              {dispute.status}
-            </span>
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Created At:</span>{" "}
-            {new Date(dispute.createdAt).toLocaleString("en-IN", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Updated At:</span>{" "}
-            {new Date(dispute.updatedAt).toLocaleString("en-IN", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })}
-          </p>
-        </div>
-        <div>
-          <p className="text-gray-700">
-            <span className="font-semibold">Raised By:</span>{" "}
-            {dispute.raised_by.full_name} (ID: {dispute.raised_by.unique_id})
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Against:</span>{" "}
-            {dispute.against.full_name} (ID: {dispute.against.unique_id})
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Description:</span>{" "}
-            {dispute.description}
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Requirement:</span>{" "}
-            {dispute.requirement}
-          </p>
-        </div>
-      </div>
-			 {dispute.reason && (
-          <div className="flex justify-center">
-            <p
-              className={`inline-block px-4 py-2 rounded-lg font-medium text-center ${
-                dispute.status === "resolved"
-                  ? "bg-green-100 text-green-800"
-                  : dispute.status === "rejected"
-                  ? "bg-red-100 text-red-800"
-                  : "text-gray-700"
-              }`}
-            >
-              <span className="font-semibold">Admin Reason:</span>{" "}
-              {dispute.reason}
-            </p>
-          </div>
-        )}
-      {dispute.images && dispute.images.length > 0 && (
-        <div className="mt-4">
-          <h4 className="text-lg font-semibold text-gray-800">
-            Dispute Images
-          </h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
-            {dispute.images.map((image, index) => (
-              <div key={index} className="relative w-32 h-32">
-                <img
-                  src={image}
-                  alt={`Dispute Image ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg shadow-md cursor-pointer hover:opacity-90 transition-opacity duration-200"
-                  onClick={() => handleImageClick(image)}
-                  onError={() =>
-                    toast.error(
-                      `Failed to load image ${
-                        index + 1
-                      }. Please check the URL.`,
-                      { toastId: `imageError-${index}` }
-                    )
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+  key={dispute._id}
+  className="border border-gray-200 rounded-xl p-6 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300"
+>
+  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+    Dispute ID: {dispute.unique_id}
+  </h3>
+
+  {/* Content Grid */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    {/* Left Section */}
+    <div className="space-y-2">
+      <p className="text-gray-700">
+        <span className="font-semibold">Order ID:</span>{" "}
+        {dispute?.order_id?.project_id || "N/A"}
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Order Title:</span>{" "}
+        {dispute?.order_id?.title || "N/A"}
+      </p>
+
+      <p className="text-gray-700 break-words">
+        <span className="font-semibold">Order Description:</span>{" "}
+        {dispute?.order_id?.description || "N/A"}
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Flow Type:</span>{" "}
+        {dispute.flow_type.charAt(0).toUpperCase() + dispute.flow_type.slice(1)}
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Amount:</span> ₹
+        {dispute.amount.toLocaleString()}
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Status:</span>{" "}
+        <span
+          className={`capitalize ${
+            dispute.status === "pending"
+              ? "text-yellow-600"
+              : dispute.status === "resolved"
+              ? "text-green-600"
+              : "text-red-600"
+          }`}
+        >
+          {dispute.status}
+        </span>
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Created At:</span>{" "}
+        {new Date(dispute.createdAt).toLocaleString("en-IN", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })}
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-semibold">Updated At:</span>{" "}
+        {new Date(dispute.updatedAt).toLocaleString("en-IN", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })}
+      </p>
     </div>
+
+    {/* Right Section */}
+    <div className="space-y-2">
+      <p className="text-gray-700 break-words">
+        <span className="font-semibold">Raised By:</span>{" "}
+        {dispute.raised_by.full_name} (ID: {dispute.raised_by.unique_id})
+      </p>
+
+      <p className="text-gray-700 break-words">
+        <span className="font-semibold">Against:</span>{" "}
+        {dispute.against.full_name} (ID: {dispute.against.unique_id})
+      </p>
+
+      <p className="text-gray-700 break-words">
+        <span className="font-semibold">Description:</span>{" "}
+        {dispute.description}
+      </p>
+
+      <p className="text-gray-700 break-words">
+        <span className="font-semibold">Requirement:</span>{" "}
+        {dispute.requirement}
+      </p>
+    </div>
+  </div>
+
+  {/* Admin Reason */}
+  {dispute.reason && (
+    <div className="flex justify-center mt-4">
+      <p
+        className={`inline-block px-4 py-2 rounded-lg font-medium text-center break-words ${
+          dispute.status === "resolved"
+            ? "bg-green-100 text-green-800"
+            : dispute.status === "rejected"
+            ? "bg-red-100 text-red-800"
+            : "text-gray-700"
+        }`}
+      >
+        <span className="font-semibold">Admin Reason:</span>{" "}
+        {dispute.reason}
+      </p>
+    </div>
+  )}
+
+  {/* Images Section */}
+  {dispute.images && dispute.images.length > 0 && (
+    <div className="mt-5">
+      <h4 className="text-lg font-semibold text-gray-800">Dispute Images</h4>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3">
+        {dispute.images.map((image, index) => (
+          <div key={index} className="relative w-full h-32 sm:h-36">
+            <img
+              src={image}
+              alt={`Dispute Image ${index + 1}`}
+              className="w-full h-full object-cover rounded-lg shadow-md cursor-pointer hover:opacity-90 transition"
+              onClick={() => handleImageClick(image)}
+              onError={() =>
+                toast.error(
+                  `Failed to load image ${index + 1}. Please check the URL.`,
+                  { toastId: `imageError-${index}` }
+                )
+              }
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
   );
 
   const filteredDisputes = (disputes) =>
