@@ -76,7 +76,7 @@ export default function Accepted({
                 </button>
               ) : (
                 <Link
-                  to={`/assign-work/${orderId}/direct`}
+                  to={`/assign-work/${orderId}/bidding`}
                   className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white text-center"
                 >
                   Assign work

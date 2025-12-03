@@ -349,22 +349,24 @@ export default function Accepted({
             safe transactions.
           </span>
         </p>
-        {serviceProvider && (
+{serviceProvider && (
   <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-    <div className="flex items-center space-x-4 max-sm:space-x-3">
-      
+
+    {/* Outer Wrapper – Mobile = Column / Desktop = Row */}
+    <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
+
       {/* Profile Image */}
       <img
         src={serviceProvider.profile_pic || Profile}
         alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
-        className="w-16 h-16 rounded-full object-cover max-sm:w-12 max-sm:h-12"
+        className="w-20 h-20 sm:w-16 sm:h-16 rounded-full object-cover mx-auto sm:mx-0"
       />
 
       {/* Right Section */}
-      <div className="flex items-center w-full max-sm:flex-col max-sm:items-start max-sm:gap-2">
-        
+      <div className="flex flex-col sm:flex-row sm:items-center w-full gap-3">
+
         {/* Name */}
-        <p className="text-lg font-semibold max-sm:text-base max-sm:leading-tight">
+        <p className="text-lg font-semibold text-center sm:text-left">
           {serviceProvider.full_name
             .split(" ")
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -376,19 +378,20 @@ export default function Accepted({
         {hireStatus === "cancelled" || hireStatus === "cancelledDispute" ? (
           ""
         ) : (
-          <div className="flex ml-auto items-center space-x-3 ml-6 max-sm:ml-0">
-            <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer max-sm:w-8 max-sm:h-8">
-              <img src={Call} alt="Call" className="w-5 h-5 max-sm:w-4 max-sm:h-4" />
+          <div className="flex items-center space-x-3 justify-center sm:justify-start sm:ml-auto">
+
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+              <img src={Call} alt="Call" className="w-5 h-5" />
             </div>
 
             <div
-              className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer max-sm:w-8 max-sm:h-8"
+              className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
               onClick={() => handleChatOpen(serviceProvider._id, user_id)}
             >
               <img
                 src={Message}
                 alt="Message"
-                className="w-5 h-5 max-sm:w-4 max-sm:h-4"
+                className="w-5 h-5"
               />
             </div>
           </div>
@@ -396,15 +399,19 @@ export default function Accepted({
 
         {/* View Profile Button */}
         <button
-          className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer max-sm:px-4 max-sm:py-1.5 max-sm:text-sm max-sm:ml-0"
+          className="w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
+                     text-[#228B22] bg-white rounded-lg font-semibold 
+                     hover:bg-green-50 cursor-pointer text-center"
           onClick={() => handleRouteHire(serviceProvider._id, true)}
         >
           View Profile
         </button>
+
       </div>
     </div>
   </div>
 )}
+
 
 
         {/* Assigned Worker Details */}

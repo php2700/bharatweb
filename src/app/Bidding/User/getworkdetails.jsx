@@ -929,8 +929,63 @@ export default function BiddinggetWorkDetail() {
                       </div>
                     </div>
                   </div>
+                  
                 )}
-            <div className="text-left sm:text-left mt-4 sm:mt-0">
+                </div>
+                
+    {/* DESKTOP VIEW (same as before) */}
+<div className="text-left sm:text-right sm:ml-auto mt-4 sm:mt-0 hidden sm:block">
+  <p className="bg-black text-white text-md px-4 rounded-full inline-block sm:ml-auto">
+    {orderDetail?.project_id || "N/A"}
+  </p>
+
+  <p className="text-md mt-2 sm:ml-auto">
+    <span className="font-semibold">
+      Posted Date: {formatDate(orderDetail?.createdAt)}
+    </span>
+  </p>
+
+  {/* Status */}
+  <span className="text-gray-600 font-semibold block mt-1 sm:ml-auto">
+    Status:{" "}
+    <span
+      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
+        orderDetail?.hire_status
+      )}`}
+    >
+      {orderDetail?.hire_status
+        ? orderDetail.hire_status
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+        : "Unknown"}
+    </span>
+  </span>
+
+  {/* Refund Status */}
+  {orderDetail?.refundRequest && (
+    <span className="text-gray-600 mt-2 font-semibold block">
+      Refund Status:{" "}
+      <span
+        className={`px-3 py-1 rounded-full text-white text-sm font-medium
+          ${orderDetail?.refundStatus === "pending" ? "bg-yellow-500" : ""}
+          ${orderDetail?.refundStatus === "processed" ? "bg-blue-500" : ""}`}
+      >
+        {orderDetail?.refundStatus
+          ? orderDetail.refundStatus
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          : "Unknown Status"}
+      </span>
+    </span>
+  )}
+</div>
+</div>
+
+
+{/* MOBILE VIEW (new div — left aligned) */}
+<div className="block sm:hidden mt-4 text-left">
   <p className="bg-black text-white text-md px-4 rounded-full inline-block">
     {orderDetail?.project_id || "N/A"}
   </p>
@@ -941,49 +996,34 @@ export default function BiddinggetWorkDetail() {
     </span>
   </p>
 
-  {/* Status */}
   <span className="text-gray-600 font-semibold block mt-1">
     Status:{" "}
     <span
       className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
         orderDetail?.hire_status
       )}`}
-      >
+    >
       {orderDetail?.hire_status
         ? orderDetail.hire_status
-        .split(" ")
-        .map(
-          (word) => word.charAt(0).toUpperCase() + word.slice(1)
-        )
-        .join(" ")
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
         : "Unknown"}
     </span>
   </span>
-        </div>
 
-  {/* Refund Status */}
   {orderDetail?.refundRequest && (
     <span className="text-gray-600 mt-2 font-semibold block">
       Refund Status:{" "}
       <span
         className={`px-3 py-1 rounded-full text-white text-sm font-medium
-          ${
-            orderDetail?.refundStatus === "pending"
-              ? "bg-yellow-500"
-              : ""
-          }
-          ${
-            orderDetail?.refundStatus === "processed"
-              ? "bg-blue-500"
-              : ""
-          }`}
+          ${orderDetail?.refundStatus === "pending" ? "bg-yellow-500" : ""}
+          ${orderDetail?.refundStatus === "processed" ? "bg-blue-500" : ""}`}
       >
         {orderDetail?.refundStatus
           ? orderDetail.refundStatus
               .split(" ")
-              .map(
-                (word) => word.charAt(0).toUpperCase() + word.slice(1)
-              )
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")
           : "Unknown Status"}
       </span>
@@ -991,7 +1031,8 @@ export default function BiddinggetWorkDetail() {
   )}
 </div>
 
-            </div>
+
+            
             <p className="text-sm">
               <span className="font-semibold">
                 Completion Date:{" "}
@@ -1502,36 +1543,29 @@ export default function BiddinggetWorkDetail() {
             </div>
           )}
         </div>
-        <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              Error: {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, index) => (
-                <div key={index}>
-                  <img
-                    src={banner || bannerPlaceholder}
-                    alt={`Banner ${index + 1}`}
-                    className="w-full h-[400px] object-cover"
-                    onError={(e) => {
-                      e.target.src = bannerPlaceholder;
-                    }}
-                  />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
-        </div>
+          {/* Banner Slider */}
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
+        {bannerLoading ? (
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
+        ) : bannerError ? (
+          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, i) => (
+              <div key={i}>
+                <img
+                  src={banner}
+                  alt=""
+                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
+        )}
+      </div>
       </div>
       <Footer />
     </>
