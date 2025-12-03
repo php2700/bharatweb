@@ -2,7 +2,7 @@ import Header from "../../../component/Header";
 import banner from "../../../assets/banner.png";
 import Footer from "../../../component/footer";
 import NoPicAvailable from "../../../assets/bidding/No_Image_Available.jpg";
-
+import Profile from "../../../assets/default-image.jpg";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
 import aadharImg from "../../../assets/directHiring/aadhar.png";
@@ -247,7 +247,7 @@ export default function HireDetail() {
   // order/provider, keep them permanently unlocked.
   useEffect(() => {
     if (docUnlockKey && localStorage.getItem(docUnlockKey) === "false") {
-      setDocumentsUnlocked(true);
+      setDocumentsUnlocked(false);
     }
   }, [docUnlockKey]);
 
@@ -647,123 +647,138 @@ export default function HireDetail() {
           )}
         </div>
 
-        <div className="max-w-5xl mx-auto my-10 p-6 bg-white rounded-2xl shadow-md">
-          <div className="text-xl sm:text-2xl font-bold mb-6">
+        <div className="container mx-auto px-6 py-6">
+          <h2 className="text-3xl font-bold text-black mb-3 text-left ml-10 mt-10">
             Bidding Hiring
-          </div>
+          </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
 
-            {/* Profile Pic */}
-            <div className="flex justify-center lg:justify-start">
-              <img
-                src={providerDetail.profilePic || NoPicAvailable}
-                alt="Service Provider"
-                className="w-72 h-72 lg:w-96 lg:h-96 object-cover rounded-2xl shadow-xl border border-gray-200 p-1 bg-white"
-              />
-            </div>
-
-
-            <div className="space-y-4">
-              {/* Name + Rating */}
-              <div className="flex justify-between items-center">
-                <div className="text-lg sm:text-xl font-semibold text-gray-800">
-                  {providerDetail.full_name
-                    ? providerDetail.full_name.charAt(0).toUpperCase() +
-                    providerDetail.full_name.slice(1)
-                    : ""}
-                </div>
-
-                <div className="flex flex-col gap-1 items-end">
-                  <div className="flex items-center text-sm text-gray-700">
-                    <span className="font-semibold">
-                      ({providerDetail.rating || 0}
-                    </span>
-                    <img
-                      className="h-5 w-5 mx-1"
-                      src={ratingImgages}
-                      alt="Rating"
-                    />
-                    <span className="font-semibold">)</span>
+              {/* Profile Pic - Same as first code */}
+              <div className="relative w-full">
+                {providerDetail.profilePic ? (
+                  <img
+                    src={providerDetail.profilePic || Profile}
+                    alt="Service Provider"
+                    className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
+                    onError={(e) => {
+                      e.target.src = NoPicAvailable;
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-[450px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-lg text-gray-700 font-semibold">
+                    No Profile Picture available
                   </div>
-                  <div className="text-[#228B22] underline font-semibold">
-                    {providerDetail.totalReview} Reviews
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Location */}
-              <div className="flex items-center text-gray-600 text-sm sm:text-base">
-                <img
-                  src={locationIcon}
-                  alt="Location"
-                  className="h-5 mr-2 text-green-500"
-                />
-                {providerDetail.location?.address || "Location not available"}
-              </div>
+              {/* Right Side Details */}
+              <div className="flex flex-col gap-4">
 
-              {/* Category + Subcategory */}
-              <div className="text-gray-700">
-                <p>
-                  <span className="font-semibold text-green-600">
-                    Category-{" "}
-                  </span>
+                {/* Name + Rating */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold">
+                      {full_name
+                        ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+                        : ""}
+                    </h2>
+
+                    {verificationStatus === "verified" && (
+                      <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        Verified
+                      </span>
+                    )}
+                    <div className="flex flex-col gap-1 items-end">
+                      <div className="flex items-center text-sm text-gray-700">
+                        <span className="font-semibold">
+                          ({providerDetail.rating || 0}
+                        </span>
+                        <img className="h-5 w-5 mx-1" src={ratingImgages} alt="Rating" />
+                        <span className="font-semibold">)</span>
+                      </div>
+                      <div className="text-[#228B22] underline font-semibold">
+                        {providerDetail.totalReview} Reviews
+                      </div>
+                    </div>
+                  </div>
+
+
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                  <span className="font-semibold text-[#228B22]">Id-</span>{" "}
+                  <span>{unique_id}</span>
+                </div>
+                {/* Location */}
+                <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                  <img src={locationIcon} alt="Location icon" className="w-5 h-5" />
+                  <span>{providerDetail.location?.address || "Location not available"}</span>
+                </div>
+
+                {/* Category */}
+                <p className="text-base font-semibold text-gray-700">
+                  <span className="font-semibold text-[#228B22]">Category-</span>{" "}
                   {providerDetail.category_name}
                 </p>
-                <p>
-                  <span className="font-semibold text-green-600">
-                    Sub-Categories-{" "}
-                  </span>
-                  {providerDetail.subcategory_names?.join(", ")}
+
+                {/* Sub-Categories */}
+                <p className="text-base font-semibold -mt-4 text-gray-700">
+                  <span className="font-semibold text-[#228B22]">Sub-Categories-</span>{" "}
+                  {providerDetail.subcategory_names?.length > 0
+                    ? providerDetail.subcategory_names.map((name, index) => (
+                      <span key={index}>
+                        {name.trim()}
+                        {index !== providerDetail.subcategory_names.length - 1 ? ", " : ""}
+                      </span>
+                    ))
+                    : "Not Available"}
                 </p>
-              </div>
 
-              {/* About */}
-              <div className="bg-gray-50 shadow-2xl rounded-lg p-4 text-sm text-gray-600">
-                <div className="font-semibold text-xl text-gray-800 mb-2">
-                  About My Skill
+                {/* About My Skill */}
+                <div className={`p-4 shadow-xl max-w-[600px] h-[260px]`}>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">About My Skill</h3>
+                  </div>
+                  <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
+                    {providerDetail.skill || "No skill info available."}
+                  </p>
                 </div>
-                <p>{providerDetail.skill || "No skill info available."}</p>
               </div>
+            </div>
 
-              {/* Buttons */}
-              <div className="flex justify-center">
+            {/* Tabs - His Work & Customer Review - Exactly same as first code */}
+            <div className="container mx-auto px-4 py-6">
+              <div className="flex justify-center gap-6 p-4 mt-6">
                 <button
-                  className="border border-[#228B22] text-[#228B22] font-medium py-2 px-10 rounded-lg cursor-pointer"
-                  onClick={() => handleRouteHire(id, isHired)}
+                  onClick={() => {
+                    setWorkerTab("work");
+                    setWorkIndex(0);
+                  }}
+                  className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "work"
+                      ? "bg-[#228B22] text-white"
+                      : "bg-green-100 text-[#228B22]"
+                    }`}
+                  aria-label="View Work"
                 >
-                  View Profile
+                  His Work
+                </button>
+
+                <button
+                  onClick={() => {
+                    setWorkerTab("review");
+                    setReviewIndex(0);
+                  }}
+                  className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "review"
+                      ? "bg-[#228B22] text-white"
+                      : "bg-green-100 text-[#228B22]"
+                    }`}
+                  aria-label="View Customer Reviews"
+                >
+                  Customer Review
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* His Work + Customer Review Tabs (image galleries) */}
-          <div className="flex justify-center gap-6 p-4 mt-6">
-            <button
-              onClick={() => {
-                setWorkerTab("work");
-                setWorkIndex(0);
-              }}
-              className={`py-1 px-10 rounded-lg cursor-pointer border font-semibold ${WorkerTab === "work"
-                  ? "bg-[#228B22] text-white"
-                  : "bg-[#D3FFD3] text-[#008000]"
-                }`}
-            >
-              His Work
-            </button>
-            <button
-              onClick={() => {
-                setWorkerTab("review");
-                setReviewIndex(0);
-              }}
-              className={`py-1 px-6 rounded-lg border cursor-pointer font-semibold ${WorkerTab === "review"
-                  ? "bg-[#228B22] text-white"
-                  : "bg-[#D3FFD3] text-[#008000]"
-                }`}
-            >
-              Customer Review
-            </button>
           </div>
         </div>
 
@@ -925,16 +940,16 @@ export default function HireDetail() {
                         {/* Images – blurred + no interaction when not hired */}
                         <div
                           className={`flex flex-wrap gap-6 ${!documentsUnlocked
-                              ? "blur-md pointer-events-none"
-                              : ""
+                            ? "blur-md pointer-events-none"
+                            : ""
                             }`}
                         >
                           {doc.images.map((img, imgIndex) => (
                             <div
                               key={imgIndex}
                               className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${documentsUnlocked
-                                  ? "cursor-pointer hover:shadow-xl"
-                                  : "cursor-default"
+                                ? "cursor-pointer hover:shadow-xl"
+                                : "cursor-default"
                                 }`}
                               onClick={
                                 documentsUnlocked
@@ -1108,8 +1123,8 @@ export default function HireDetail() {
                   <button
                     onClick={() => setIsOfferActive(true)}
                     className={`px-16 py-2 rounded-full cursor-pointer font-medium shadow-sm ${isOfferActive
-                        ? "bg-[#228B22] text-white border border-green-600"
-                        : "border border-green-600 text-green-600"
+                      ? "bg-[#228B22] text-white border border-green-600"
+                      : "border border-green-600 text-green-600"
                       }`}
                   >
                     Offer Price ({data?.offer_amount || 0})
@@ -1117,8 +1132,8 @@ export default function HireDetail() {
                   <button
                     onClick={() => setIsOfferActive(false)}
                     className={`px-16 py-2 rounded-full cursor-pointer font-medium shadow-md ${!isOfferActive
-                        ? "bg-[#228B22] text-white hover:bg-[#228B22]"
-                        : "border border-green-600 text-green-600"
+                      ? "bg-[#228B22] text-white hover:bg-[#228B22]"
+                      : "border border-green-600 text-green-600"
                       }`}
                   >
                     Negotiate

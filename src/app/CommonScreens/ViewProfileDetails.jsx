@@ -476,21 +476,17 @@ export default function ViewProfileDetails() {
         </h2>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-           <div className="relative w-full">
-  {testimage ? (
-    <img
-      src={profilePic && profilePic !== 'Not Available' ? profilePic : defaultPic}
-      alt="User Profile"
-      className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
-      onError={(e) => {
-        e.target.src = defaultPic;
-      }}
-    />
-  ) : (
-    <div className="w-full h-[450px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-lg text-gray-700 font-semibold">
-      No Profile Picture available
-    </div>
-  )}
+    <div className="relative w-full">
+  <img
+    src={profilePic || defaultPic}
+    alt="User Profile"
+    className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
+    onError={(e) => {
+      if (e.currentTarget.src !== defaultPic) {
+        e.currentTarget.src = defaultPic;
+      }
+    }}
+  />
 </div>
 
             <div className="flex flex-col gap-4">
@@ -570,7 +566,7 @@ export default function ViewProfileDetails() {
                   setWorkerTab("work");
                   setWorkIndex(0);
                 }}
-                className={`px-6 py-2 rounded-md shadow-md font-semibold ${WorkerTab === "work"
+                className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "work"
                     ? "bg-[#228B22] text-white"
                     : "bg-green-100 text-[#228B22]"
                   }`}
@@ -583,7 +579,7 @@ export default function ViewProfileDetails() {
                   setWorkerTab("review");
                   setReviewIndex(0);
                 }}
-                className={`px-6 py-2 rounded-md shadow-md font-semibold ${WorkerTab === "review"
+                className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "review"
                     ? "bg-[#228B22] text-white"
                     : "bg-green-100 text-[#228B22]"
                   }`}
