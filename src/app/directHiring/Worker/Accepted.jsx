@@ -107,17 +107,17 @@ export default function Accepted({
             <h3 className="text-base font-semibold mb-2">Assigned Person</h3>
 
             {/* Gray container only for worker details */}
-            <div className="border border-[#228B22] bg-[#F5F5F5] p-4 rounded-lg">
-              <div className="flex items-center justify-between">
+            <div className="bg-[#F5F5F5] border border-[#228B22] rounded-lg shadow p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 {/* Worker Info */}
-                <div className="flex items-center space-x-4">
+               <div className="flex items-center  gap-3">
                   <img
                     src={assignedWorker.image || Profile}
                     alt={`Profile of ${assignedWorker.name || "Worker"}`}
-                    className="w-16 h-16 rounded-full object-cover"
+                    className="w-14 h-14 min-w-14 rounded-full object-cover"
                   />
                   <div>
-                    <p className="text-lg font-semibold">
+                    <p className="text-lg font-semibold truncate">
                       {assignedWorker.name
                         .split(" ")
                         .map(
@@ -131,7 +131,9 @@ export default function Accepted({
                 {/* View Profile Button aligned right */}
                 <Link
                   to={`/view-worker/${assignedWorker._id}`}
-                  className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                   className="px-3 py-1.5 text-sm border border-[#228B22] 
+                 text-[#228B22] bg-white rounded-lg font-medium 
+                 hover:bg-green-50 ml-2 sm:ml-5 shrink-0 text-center"
                 >
                   View Profile
                 </Link>
@@ -153,19 +155,19 @@ export default function Accepted({
               paymentHistory.map((payment, index) => (
                 <div
                   key={payment._id}
-                  className="grid grid-cols-12 items-center bg-white border-b border-gray-200 py-4 px-3 last:border-b-0"
+                  className="grid grid-cols-12 gap-4 items-center bg-white border-b border-gray-200 py-5 px-4 last:border-b-0 "
                 >
                   {/* Index + Description */}
-                  <div className="col-span-5 flex items-center gap-3">
+                  <div className="col-span-12 sm:col-span-5 flex items-center gap-2 text-sm sm:text-base ">
                     <span className="font-semibold">{index + 1}.</span>
                     <span>{payment.description.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Starting Payment"}</span>
                   </div>
 
                   {/* Status */}
-                  <div className="col-span-4 text-center">
+                  <div className="col-span-12 sm:col-span-4 ">
                     {payment.status === "success" &&
                       payment.release_status === "pending" && (
-                        <span className="text-yellow-600 font-semibold">
+                        <span className="text-yellow-600 text-sm md:text-xl font-semibold">
                           Waiting for User Approval
                         </span>
                       )}
@@ -186,7 +188,7 @@ export default function Accepted({
                   </div>
 
                   {/* Amount */}
-                  <div className="col-span-3 text-right font-semibold pr-3">
+                  <div className="col-span-12 sm:col-span-3  font-semibold">
                     ₹{payment.amount}
                   </div>
                 </div>

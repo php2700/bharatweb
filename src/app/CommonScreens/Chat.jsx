@@ -537,12 +537,14 @@ import Header from "../../component/Header";
 import { FiSend, FiPaperclip, FiImage, FiFileText, FiX } from "react-icons/fi"; // Icons for professional look
 import { BsCheck2All } from "react-icons/bs"; // Read receipts icon
 import { UserX } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const Base_url = import.meta.env.VITE_SOCKET_URL;
-const socket = io("https://api.thebharatworks.com/");
+const socket = io("http://localhost:5001/");
 
 const Chat = () => {
-  const senderId = localStorage.getItem("senderId");
+  const senderId = localStorage.getItem("user_id");
+  const user_id=localStorage.getItem('user_id');
   const receiverId = localStorage.getItem("receiverId");
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
@@ -554,6 +556,8 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isChatInitialized, setIsChatInitialized] = useState(false);
   const scrollRef = useRef();
+  const location = useLocation();
+let { conversationId } = location.state || {};
   const fileInputRef = useRef(null);
 
   // --- Logic Same as before ---
@@ -599,7 +603,7 @@ const Chat = () => {
             },
           }
         );
-
+         
         let conversationsWithUnread = res.data.conversations.map((conv) => ({
           ...conv,
           unreadCount: 0,
@@ -608,6 +612,7 @@ const Chat = () => {
         conversationsWithUnread = await enrichConversations(
           conversationsWithUnread
         );
+
         setConversations(conversationsWithUnread || []);
 
         let selectedChat = null;
@@ -658,14 +663,15 @@ const Chat = () => {
           localStorage.removeItem("receiverId");
         } else {
           const lastSelectedConvId = localStorage.getItem("lastSelectedConvId");
-          if (lastSelectedConvId) {
+          
+
+         
+          if(lastSelectedConvId){
             selectedChat = conversationsWithUnread.find(
               (conv) => conv._id === lastSelectedConvId
             );
           }
-          if (!selectedChat && conversationsWithUnread.length > 0) {
-            selectedChat = conversationsWithUnread[0];
-          }
+          
         }
 
         setCurrentChat(selectedChat);
@@ -862,7 +868,7 @@ const Chat = () => {
       filePreviews.forEach((preview) => URL.revokeObjectURL(preview));
     };
   }, [filePreviews]);
-
+console.log('thisis',conversations);
   // --- Render Helpers ---
   const renderFileMessage = (fileUrl) => {
     const isPdf = fileUrl.toLowerCase().endsWith(".pdf");

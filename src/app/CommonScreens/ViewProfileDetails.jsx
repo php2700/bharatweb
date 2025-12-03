@@ -222,6 +222,7 @@ export default function ViewProfileDetails() {
             const verifyRes = await axios.post(
               `${BASE_URL}/emergency-order/verify-platform-payment`,
               {
+                service_provider_id: providerId,
                 razorpay_order_id: paymentResponse.razorpay_order_id,
                 razorpay_payment_id: paymentResponse.razorpay_payment_id,
               },
@@ -440,34 +441,26 @@ export default function ViewProfileDetails() {
         </button>
       </div>
       {/* Banner Slider */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
         {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
         ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
-          </p>
+          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
-            {bannerImages.map((banner, index) => (
-              <div key={index}>
+            {bannerImages.map((banner, i) => (
+              <div key={i}>
                 <img
-                  src={banner || defaultPic}
-                  alt={`Banner ${index + 1}`}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = defaultPic;
-                  }}
+                  src={banner}
+                  alt=""
+                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
                 />
               </div>
             ))}
           </Slider>
         ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
         )}
       </div>
       <div className="container mx-auto px-6 py-6">
@@ -475,377 +468,394 @@ export default function ViewProfileDetails() {
           {isShop ? "Business Details" : "Working Person Details"}
         </h2>
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[80px] items-start">
-    <div className="relative w-full">
-  <img
-    src={profilePic || defaultPic}
-    alt="User Profile"
-    className="w-full h-[450px] object-cover rounded-2xl shadow-lg"
-    onError={(e) => {
-      if (e.currentTarget.src !== defaultPic) {
-        e.currentTarget.src = defaultPic;
-      }
-    }}
-  />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-[80px] items-start">
+
+  {/* Profile Image */}
+  <div className="relative w-full">
+    <img
+      src={profilePic || defaultPic}
+      alt="User Profile"
+      className="w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-[450px] object-cover rounded-2xl shadow-lg"
+      onError={(e) => {
+        if (e.currentTarget.src !== defaultPic) {
+          e.currentTarget.src = defaultPic;
+        }
+      }}
+    />
+  </div>
+
+  {/* Right Section */}
+  <div className="flex flex-col gap-3 sm:gap-4">
+
+    <div className="flex flex-wrap items-center gap-2">
+      <h2 className="text-base sm:text-lg font-bold">
+        {full_name
+          ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+          : ""}
+      </h2>
+
+      {verificationStatus === "verified" && (
+        <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
+          Verified
+        </span>
+      )}
+    </div>
+
+    <div className="flex flex-wrap items-center gap-2 text-gray-600 font-semibold">
+      <span className="font-semibold text-[#228B22]">Id-</span>
+      <span>{unique_id}</span>
+    </div>
+
+    <div className="flex flex-wrap items-center gap-2 text-gray-600 font-semibold">
+      <img src={Location} alt="Location icon" className="w-4 h-4 sm:w-5 sm:h-5" />
+      <span className="break-words max-w-full">
+        {isShop ? businessAddress.address : location.address}
+      </span>
+    </div>
+
+    <p className="text-sm sm:text-base font-semibold text-gray-700">
+      <span className="font-semibold text-[#228B22]">Category-</span> {category.name}
+    </p>
+
+    <p className="text-sm sm:text-base font-semibold -mt-2 text-gray-700 break-words">
+      <span className="font-semibold text-[#228B22]">Sub-Categories-</span>{" "}
+      {Array.isArray(subcategory_names) && subcategory_names.length > 0
+        ? subcategory_names.map((name, index) => (
+            <span key={index}>
+              {name.trim()}
+              {index !== subcategory_names.length - 1 ? ", " : ""}
+            </span>
+          ))
+        : "Not Available"}
+    </p>
+
+    {emergencySubcategory_names.length > 0 && (
+      <p className="text-sm sm:text-base font-semibold -mt-2 text-gray-700 break-words">
+        <span className="font-semibold text-[#228B22]">Emergency Sub-Categories-</span>{" "}
+        {emergencySubcategory_names.map((name, index) => (
+          <span key={index}>
+            {name.trim()}
+            {index !== emergencySubcategory_names.length - 1 ? ", " : ""}
+          </span>
+        ))}
+      </p>
+    )}
+
+    <div
+      className={`p-3 sm:p-4 shadow-xl w-full max-w-full rounded-xl ${
+        skill === "No Skill Available" ? "min-h-[200px]" : "min-h-[200px]"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-base sm:text-lg">About My Skill</h3>
+      </div>
+      <p className="mt-1 text-gray-700 text-sm sm:text-base leading-relaxed break-words">
+        {skill}
+      </p>
+    </div>
+
+  </div>
 </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">
-                  {full_name
-                    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
-                    : ""}
-                </h2>
 
-                {verificationStatus === "verified" && (
-                  <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Verified
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                <span className="font-semibold text-[#228B22]">Id-</span>{" "}
-                <span>{unique_id}</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 font-semibold">
-                <img src={Location} alt="Location icon" className="w-5 h-5" />
-                <span>
-                  {isShop ? businessAddress.address : location.address}
-                </span>
-              </div>
-              <p className="text-base font-semibold text-gray-700">
-                <span className="font-semibold text-[#228B22]">Category-</span>{" "}
-                {category.name}
-              </p>
-              <p className="text-base font-semibold -mt-4 text-gray-700">
-                <span className="font-semibold text-[#228B22]">
-                  Sub-Categories-
-                </span>{" "}
-                {Array.isArray(subcategory_names) &&
-                  subcategory_names.length > 0
-                  ? subcategory_names.map((name, index) => (
-                    <span key={index}>
-                      {name.trim()}
-                      {index !== subcategory_names.length - 1 ? ", " : ""}
-                    </span>
-                  ))
-                  : "Not Available"}
-              </p>
-              {emergencySubcategory_names.length > 0 && (
-                <p className="text-base font-semibold -mt-4 text-gray-700">
-                  <span className="font-semibold text-[#228B22]">
-                    Emergency Sub-Categories-
-                  </span>{" "}
-                  {emergencySubcategory_names.map((name, index) => (
-                    <span key={index}>
-                      {name.trim()}
-                      {index !== emergencySubcategory_names.length - 1
-                        ? ", "
-                        : ""}
-                    </span>
-                  ))}
-                </p>
-              )}
+
+
+          <div className="container mx-auto px-3 sm:px-4 py-6">
+
+  {/* Tabs */}
+  <div className="flex flex-wrap justify-center gap-3 sm:gap-6 p-3 sm:p-4 mt-4 sm:mt-6">
+    <button
+      onClick={() => {
+        setWorkerTab("work");
+        setWorkIndex(0);
+      }}
+      className={`px-4 sm:px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${
+        WorkerTab === "work"
+          ? "bg-[#228B22] text-white"
+          : "bg-green-100 text-[#228B22]"
+      }`}
+    >
+      His Work
+    </button>
+
+    <button
+      onClick={() => {
+        setWorkerTab("review");
+        setReviewIndex(0);
+      }}
+      className={`px-4 sm:px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${
+        WorkerTab === "review"
+          ? "bg-[#228B22] text-white"
+          : "bg-green-100 text-[#228B22]"
+      }`}
+    >
+      Customer Review
+    </button>
+  </div>
+
+  {/* WORK SECTION */}
+  {WorkerTab === "work" && (
+    <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-6 sm:py-10">
+      
+      {/* Main Image (Responsive Width) */}
+      <div className="relative w-full max-w-[700px] h-[220px] xs:h-[260px] sm:h-[350px] md:h-[400px] px-3 sm:px-0">
+        {hiswork.length > 0 ? (
+          <img
+            src={hiswork[workIndex]}
+            alt={`Work sample ${workIndex + 1}`}
+            className="w-full h-full object-cover rounded-md shadow-md"
+            onError={(e) => {
+              e.target.src = defaultPic;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+            No work available.
+          </div>
+        )}
+      </div>
+
+      {/* Thumbnails */}
+      {hiswork.length > 0 && (
+        <div className="mt-6 flex flex-col items-center gap-3 sm:gap-4">
+          <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 justify-center px-3">
+            {hiswork.map((img, index) => (
               <div
-                className={`p-4 shadow-xl max-w-[600px] ${skill === "No Skill Available" ? "h-[260px]" : "h-[260px]"
-                  }`}
+                key={index}
+                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden cursor-pointer"
+                onClick={() => setWorkIndex(index)}
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-lg">About My Skill</h3>
-                </div>
-                <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
-                  {skill}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex justify-center gap-6 p-4 mt-6">
-              <button
-                onClick={() => {
-                  setWorkerTab("work");
-                  setWorkIndex(0);
-                }}
-                className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "work"
-                    ? "bg-[#228B22] text-white"
-                    : "bg-green-100 text-[#228B22]"
-                  }`}
-                aria-label="View Work"
-              >
-                His Work
-              </button>
-              <button
-                onClick={() => {
-                  setWorkerTab("review");
-                  setReviewIndex(0);
-                }}
-                className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "review"
-                    ? "bg-[#228B22] text-white"
-                    : "bg-green-100 text-[#228B22]"
-                  }`}
-                aria-label="View Customer Reviews"
-              >
-                Customer Review
-              </button>
-              {/*isShop && businessImage?.length > 0 && (
-                <button
-                  onClick={() => {
-                    setWorkerTab("business");
-                    setWorkIndex(0);
+                <img
+                  src={img}
+                  alt={`Work sample ${index + 1}`}
+                  className="w-full h-full object-cover shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
                   }}
-                  className={`px-6 py-2 rounded-md shadow-md font-semibold ${
-                    WorkerTab === "business"
-                      ? "bg-[#228B22] text-white"
-                      : "bg-green-100 text-[#228B22]"
-                  }`}
-                  aria-label="View Business Images"
-                >
-                  Business Images
-                </button>
-              )*/}
-            </div>
-            {WorkerTab === "work" && (
-              <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
-                <div className="relative w-[700px] h-[400px]">
-                  {hiswork.length > 0 ? (
-                    <img
-                      src={hiswork[workIndex]}
-                      alt={`Work sample ${workIndex + 1}`}
-                      className="w-full h-full object-cover rounded-md shadow-md"
-                      onError={(e) => {
-                        e.target.src = defaultPic;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                      No work available.
-                    </div>
-                  )}
-                </div>
-                {hiswork.length > 0 && (
-                  <div className="mt-6 flex flex-col items-center gap-4">
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {hiswork.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
-                          onClick={() => setWorkIndex(index)}
-                        >
-                          <img
-                            src={img}
-                            alt={`Work sample ${index + 1}`}
-                            className="w-full h-full object-cover rounded-md shadow-md"
-                            onError={(e) => {
-                              e.target.src = defaultPic;
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                />
               </div>
-            )}
-            {WorkerTab === "review" && (
-              <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
-                <div className="relative w-[700px] h-[400px]">
-                  {customerReview.length > 0 ? (
-                    <img
-                      src={customerReview[reviewIndex]}
-                      alt={`Customer review ${reviewIndex + 1}`}
-                      className="w-full h-full object-cover rounded-md shadow-md"
-                      onError={(e) => {
-                        e.target.src = defaultPic;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                      No customer reviews available.
-                    </div>
-                  )}
-                </div>
-                {customerReview.length > 0 && (
-                  <div className="mt-6 flex flex-col items-center gap-4">
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {customerReview.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
-                          onClick={() => setReviewIndex(index)}
-                        >
-                          <img
-                            src={img}
-                            alt={`Customer review ${index + 1}`}
-                            className="w-full h-full object-cover rounded-md shadow-md"
-                            onError={(e) => {
-                              e.target.src = defaultPic;
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-gray-700 text-base font-semibold">
-                      Customer review images
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-            {WorkerTab === "business" && isShop && (
-              <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-10">
-                <div className="relative w-[700px] h-[400px]">
-                  {businessImage.length > 0 ? (
-                    <img
-                      src={businessImage[workIndex]}
-                      alt={`Business image ${workIndex + 1}`}
-                      className="w-full h-full object-cover rounded-md shadow-md"
-                      onError={(e) => {
-                        e.target.src = defaultPic;
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
-                      No business images available.
-                    </div>
-                  )}
-                </div>
-                {businessImage.length > 0 && (
-                  <div className="mt-6 flex flex-col items-center gap-4">
-                    <div className="flex flex-wrap gap-4 justify-center">
-                      {businessImage.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative w-24 h-24 overflow-hidden cursor-pointer"
-                          onClick={() => setWorkIndex(index)}
-                        >
-                          <img
-                            src={img}
-                            alt={`Business image ${index + 1}`}
-                            className="w-full h-full object-cover rounded-md shadow-md"
-                            onError={(e) => {
-                              e.target.src = defaultPic;
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-gray-700 text-base font-semibold">
-                      Business images
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
+            ))}
           </div>
-          <div className="container mx-auto max-w-[750px] px-6 py-6">
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="flex justify-between items-start">
-                <h2 className="text-xl font-bold">Documents</h2>
-                <span
-                  className={`${statusClass} text-xs font-semibold px-3 py-1 rounded-full`}
-                >
-                  {verifiedStatus}
-                </span>
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* REVIEW SECTION */}
+  {WorkerTab === "review" && (
+    <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-6 sm:py-10">
+      <div className="relative w-full max-w-[700px] h-[220px] xs:h-[260px] sm:h-[350px] md:h-[400px] px-3 sm:px-0">
+        {customerReview.length > 0 ? (
+          <img
+            src={customerReview[reviewIndex]}
+            alt={`Customer review ${reviewIndex + 1}`}
+            className="w-full h-full object-cover rounded-md shadow-md"
+            onError={(e) => {
+              e.target.src = defaultPic;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+            No customer reviews available.
+          </div>
+        )}
+      </div>
+
+      {customerReview.length > 0 && (
+        <div className="mt-6 flex flex-col items-center gap-3 sm:gap-4">
+          <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 justify-center px-3">
+            {customerReview.map((img, index) => (
+              <div
+                key={index}
+                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden cursor-pointer"
+                onClick={() => setReviewIndex(index)}
+              >
+                <img
+                  src={img}
+                  alt={`Customer review ${index + 1}`}
+                  className="w-full h-full object-cover shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
+                />
               </div>
-              <div className="mt-4">
-                {documents.length > 0 ? (
-                  documents.map((doc, index) => (
+            ))}
+          </div>
+          <p className="text-gray-700 text-sm sm:text-base font-semibold">
+            Customer review images
+          </p>
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* BUSINESS SECTION */}
+  {WorkerTab === "business" && isShop && (
+    <div className="mt-6 w-full bg-[#D3FFD3] flex flex-col items-center py-6 sm:py-10">
+
+      <div className="relative w-full max-w-[700px] h-[220px] xs:h-[260px] sm:h-[350px] md:h-[400px] px-3 sm:px-0">
+        {businessImage.length > 0 ? (
+          <img
+            src={businessImage[workIndex]}
+            alt={`Business image ${workIndex + 1}`}
+            className="w-full h-full object-cover rounded-md shadow-md"
+            onError={(e) => {
+              e.target.src = defaultPic;
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-center bg-gray-200 rounded-md text-gray-600 font-semibold">
+            No business images available.
+          </div>
+        )}
+      </div>
+
+      {businessImage.length > 0 && (
+        <div className="mt-6 flex flex-col items-center gap-3 sm:gap-4">
+          <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 justify-center px-3">
+            {businessImage.map((img, index) => (
+              <div
+                key={index}
+                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden cursor-pointer"
+                onClick={() => setWorkIndex(index)}
+              >
+                <img
+                  src={img}
+                  alt={`Business image ${index + 1}`}
+                  className="w-full h-full object-cover shadow-md"
+                  onError={(e) => {
+                    e.target.src = defaultPic;
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          <p className="text-gray-700 text-sm sm:text-base font-semibold">
+            Business images
+          </p>
+        </div>
+      )}
+    </div>
+  )}
+
+</div>
+
+
+
+          <div className="container mx-auto max-w-[750px] px-3 sm:px-6 py-6">
+
+  <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3">
+      <h2 className="text-xl font-bold">Documents</h2>
+
+      <span
+        className={`${statusClass} text-xs font-semibold px-3 py-1 rounded-full self-start sm:self-auto`}
+      >
+        {verifiedStatus}
+      </span>
+    </div>
+
+    <div className="mt-4">
+
+      {documents.length > 0 ? (
+        documents.map((doc, index) => (
+          <div
+            key={index}
+            className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
+          >
+
+            {/* Document Header */}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
+                <img
+                  src={Aadhar}
+                  alt="Document Icon"
+                  className="w-7 h-7 sm:w-8 sm:h-8"
+                />
+              </div>
+
+              <p className="text-base sm:text-lg font-semibold text-gray-800">
+                {doc.documentName}
+              </p>
+            </div>
+
+            {/* Images Grid */}
+            {doc.images?.length > 0 ? (
+              <div className="relative">
+
+                {/* All Images (blur if not hired) */}
+                <div
+                  className={`grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-6 ${
+                    !isHired ? "blur-md pointer-events-none" : ""
+                  }`}
+                >
+                  {doc.images.map((img, imgIndex) => (
                     <div
-                      key={index}
-                      className="mb-8 border-b border-gray-200 pb-8 last:border-b-0 last:mb-0 last:pb-0"
+                      key={imgIndex}
+                      className={`group relative w-full xs:w-32 xs:h-32 h-36 sm:w-32 sm:h-32 overflow-hidden rounded-lg shadow-lg transition-shadow 
+                      ${isHired ? "cursor-pointer hover:shadow-xl" : "cursor-default"}`}
+                      onClick={
+                        isHired ? () => handleDocumentClick(img) : undefined
+                      }
                     >
-                      {/* Document header – always sharp */}
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shadow-sm">
-                          <img
-                            src={Aadhar}
-                            alt="Document Icon"
-                            className="w-8 h-8"
-                          />
+                      <img
+                        src={img}
+                        alt={`${doc.documentName} image ${imgIndex + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        onError={(e) => { e.target.src = defaultPic; }}
+                      />
+
+                      {/* Hover overlay (only if hired) */}
+                      {isHired && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-opacity opacity-0 group-hover:opacity-100">
+                          <span className="text-white font-medium text-xs sm:text-sm">
+                            Click to view
+                          </span>
                         </div>
-                        <p className="text-lg font-semibold text-gray-800">
-                          {doc.documentName}
-                        </p>
-                      </div>
-
-                      {/* Images grid */}
-                      {doc.images?.length > 0 ? (
-                        <div className="relative">
-                          {/* Images – blurred + no interaction when not hired */}
-                          <div
-                            className={`flex flex-wrap gap-6 ${!isHired ? "blur-md pointer-events-none" : ""
-                              }`}
-                          >
-                            {doc.images.map((img, imgIndex) => (
-                              <div
-                                key={imgIndex}
-                                className={`group relative w-32 h-32 overflow-hidden rounded-lg shadow-lg transition-shadow ${isHired
-                                    ? "cursor-pointer hover:shadow-xl"
-                                    : "cursor-default"
-                                  }`}
-                                onClick={
-                                  isHired
-                                    ? () => handleDocumentClick(img)
-                                    : undefined
-                                }
-                              >
-                                <img
-                                  src={img}
-                                  alt={`${doc.documentName} image ${imgIndex + 1
-                                    }`}
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                  onError={(e) => {
-                                    e.target.src = defaultPic;
-                                  }}
-                                />
-
-                                {/* Hover overlay – only when hired */}
-                                {isHired && (
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity opacity-0 group-hover:opacity-100">
-                                    <span className="text-white font-medium text-sm">
-                                      Click to view
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Blur overlay + CTA – only when not hired */}
-                          {!isHired && (
-                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
-                              <div className="text-center bg-white p-5 rounded-2xl shadow-2xl border border-gray-200">
-                                <p className="text-xl font-bold text-[#228B22]">
-                                  Hire to Unlock
-                                </p>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  View clear document images after hiring
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500 italic pl-1">
-                          No images uploaded for this document.
-                        </p>
                       )}
                     </div>
-                  ))
-                ) : (
-                  /* No documents at all – always fully visible */
-                  <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                    <p className="text-xl font-medium text-gray-600">
-                      No Documents Uploaded Yet
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Documents will appear here once the worker uploads them.
-                    </p>
+                  ))}
+                </div>
+
+                {/* Locked Overlay (only if not hired) */}
+                {!isHired && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70">
+                    <div className="text-center bg-white p-4 sm:p-5 rounded-2xl shadow-2xl border border-gray-200 w-[80%] sm:w-auto">
+                      <p className="text-lg sm:text-xl font-bold text-[#228B22]">
+                        Hire to Unlock
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                        View clear document images after hiring
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic pl-1">
+                No images uploaded for this document.
+              </p>
+            )}
           </div>
+        ))
+      ) : (
+        // No documents at all
+        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+          <p className="text-xl font-medium text-gray-600">No Documents Uploaded Yet</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Documents will appear here once the worker uploads them.
+          </p>
+        </div>
+      )}
+
+    </div>
+  </div>
+</div>
+
+
+
           {/* Document Preview Modal */}
           {selectedImage && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

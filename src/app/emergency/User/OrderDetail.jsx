@@ -552,7 +552,7 @@ export default function ViewProfile() {
                   {orderData?.category_id?.name || "Unknown Category"}
                 </span>
                 <div className="text-[13px]">
-                  Sub Category :-{" "}
+                  <span className="font-semibold text-base text-green-600">Sub-Categories-</span>{" "}
                   {orderData?.sub_category_ids?.map((s) => s.name).join(", ") ||
                     "N/A"}
                   {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
@@ -663,11 +663,12 @@ export default function ViewProfile() {
                 One Time Project fee :- ₹{orderData?.platform_fee || "0"}
               </span>
             )}
-            <div className="border border-green-600 rounded-lg p-4 mb-4 bg-gray-50">
-              <p className="text-gray-700 tracking-tight">
-                {orderData?.description || "No details available."}
-              </p>
-            </div>
+            <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+  <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
+    {orderData?.description || "No details available."}
+  </p>
+</div>
+
 
             {/* Action Buttons */}
             <div className="text-center mb-6">
@@ -713,8 +714,10 @@ export default function ViewProfile() {
                 disputeInfo ? (
                 <>
                   <Link to={`/disputes/emergency/${disputeInfo._id}`}>
-                    <span className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold cursor-pointer hover:bg-red-700">
-                      Cancelled ({disputeInfo.unique_id || "No Id"})
+                      <span
+                      className="md:mx-auto px-4 sm:px-6 py-1.5 bg-[#FF0000] text-white rounded-md text-sm sm:text-base font-semibold cursor-pointer hover:bg-red-700 whitespace-nowrap leading-tight block w-fit "
+                    >
+                      Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
                     </span>
                   </Link>
                   <p className="text-sm text-gray-700 mt-3">
@@ -1073,15 +1076,11 @@ export default function ViewProfile() {
         )}
 
       {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
         {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
         ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            Error: {bannerError}
-          </p>
+          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
         ) : bannerImages.length > 0 ? (
           <Slider {...sliderSettings}>
             {bannerImages.map((banner, i) => (
@@ -1089,18 +1088,14 @@ export default function ViewProfile() {
                 <img
                   src={banner}
                   alt=""
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.target.src = "/src/assets/profile/default.png";
-                  }}
+                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
                 />
               </div>
             ))}
           </Slider>
         ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
+          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
         )}
       </div>
 

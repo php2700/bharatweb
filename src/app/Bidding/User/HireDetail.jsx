@@ -717,10 +717,10 @@ export default function HireDetail() {
                 </div>
 
                 {/* Category */}
-                <p className="text-base font-semibold text-gray-700">
-                  <span className="font-semibold text-[#228B22]">Category-</span>{" "}
-                  {providerDetail.category_name}
-                </p>
+               <p className="text-base font-semibold text-gray-700">
+  <span className="font-semibold text-[#228B22]">Category-</span>{" "}
+  {providerDetail.category?.name || providerDetail.category_name || "Not Available"}
+</p>
 
                 {/* Sub-Categories */}
                 <p className="text-base font-semibold -mt-4 text-gray-700">

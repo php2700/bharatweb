@@ -34,7 +34,7 @@ export default function Worklist() {
     setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-const MAX_LENGTH = 30;
+  const MAX_LENGTH = 30;
 
   const navigate = useNavigate();
   const token = localStorage.getItem("bharat_token");
@@ -406,168 +406,163 @@ const MAX_LENGTH = 30;
         </div>
 
         {/* Task list */}
-        <div className="space-y-6 max-w-5xl mx-auto">
-          {loading ? (
-            <p className="text-center">Loading tasks...</p>
-          ) : error ? (
-            <p className="text-center text-red-500">{error}</p>
-          ) : filteredTasks.length === 0 ? (
-            <p className="text-center">
-              {searchQuery
-                ? `No results found for "${searchQuery}" in ${activeTab.toLowerCase()}.`
-                : `No ${activeTab.toLowerCase()} available.`}
-            </p>
-          ) : (
-            filteredTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md overflow-hidden"
-              >
-                {/* Image */}
-                <div className="relative w-full sm:w-[300px] aspect-video bg-gray-100 overflow-hidden rounded-lg">
-                  <img
-                    src={task?.image}
-                    alt={task?.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.currentTarget.src = Work)}
-                  />
-
-                  <span
-                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
-                   bg-black/80 backdrop-blur text-white text-xs 
-                   px-4 py-1 rounded-full shadow-md"
-                  >
-                    {task?.project_id}
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
-                  {/* Title + Date */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      {task.name
-                        ? task.name.charAt(0).toUpperCase() + task.name.slice(1)
-                        : "Untitled Task"}
-                    </h2>
-                    <p className="text-sm text-[#334247] font-medium">
-                      Posted: {task.date}
-                    </p>
-                  </div>
-
-                  {/* Category / Subcategory – ONLY SHOW IF NOT "N/A" */}
-                  <div className="flex flex-wrap  gap-4 text-sm text-gray-700 mt-1 ">
-                    {task.category_name !== "N/A" && (
-                      <span className="text-green-600">
-                        <strong >Category: </strong > {task.category_name}
-                      </span>
-                    )}
-                    {task.subcategory_name !== "N/A" && (
-                      <span className="text-xs">
-                        <strong>Subcategory:</strong> {task.subcategory_name}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                 {task.description && (
-  <div key={task.id} className="mt-2">
-    <p className="text-sm text-[#334247] italic bg-gray-50 p-2 rounded transition-all duration-300 break-words">
-      {expandedIds[task.id]
-        ? task.description
-        : task.description.length > MAX_LENGTH
-        ? task.description.substring(0, MAX_LENGTH) + "..."
-        : task.description}
+       <div className="space-y-6 max-w-5xl mx-auto px-4 sm:px-0">
+  {loading ? (
+    <p className="text-center">Loading tasks...</p>
+  ) : error ? (
+    <p className="text-center text-red-500">{error}</p>
+  ) : filteredTasks.length === 0 ? (
+    <p className="text-center">
+      {searchQuery
+        ? `No results found for "${searchQuery}" in ${activeTab.toLowerCase()}.`
+        : `No ${activeTab.toLowerCase()} available.`}
     </p>
-
-    {task.description.length > MAX_LENGTH && (
-      <button
-        onClick={() => toggleExpand(task.id)}
-        className="text-green-600 mt-1 text-xs font-medium hover:underline"
+  ) : (
+    filteredTasks.map((task) => (
+      <div
+        key={task.id}
+        className="block sm:flex bg-white rounded-xl shadow-md overflow-hidden 
+                   mx-auto 
+                   max-w-full sm:max-w-none
+                   w-full sm:w-auto
+                   border border-gray-200"
+        style={{
+          maxWidth: "100%",
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
       >
-        {expandedIds[task.id] ? "See Less" : "See More"}
-      </button>
-    )}
-  </div>
-)}
+        {/* Image - Mobile par full width but smaller height */}
+        <div className="relative w-full sm:w-[300px] aspect-video sm:aspect-auto sm:h-full bg-gray-100 overflow-hidden">
+          <img
+            src={task?.image}
+            alt={task?.name}
+            className="w-full h-full object-cover"
+            onError={(e) => (e.currentTarget.src = Work)}
+          />
 
-
-                  {/* Skills + PDF */}
-                  <div className="flex justify-between items-start mt-2">
-                    {/*<p className="text-sm text-[#334247]  line-clamp-2 flex-1 pr-2">
-                      {task.skills}
-                    </p> */}
-                    <p className="text-green-600 font-bold mt-2">
-                      ₹{activeTab === "My Bidding" ? task.cost : task.price}
-                    </p>
-                    {task.milestone.length > 0 && (
-                      <button
-                        onClick={() =>
-                          handledownload(
-                            task.id,
-                            downloadTypeFromTab(activeTab)
-                          )
-                        }
-                        disabled={downloadingIds.includes(task.id)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs flex-shrink-0"
-                        title="Download Invoice"
-                      >
-                        <img src={pdf} alt="PDF" className="w-5 h-5" />
-                        {downloadingIds.includes(task.id)
-                          ? "Downloading..."
-                          : "Download PDF"}
-                      </button>
-                    )}
-                  </div>
-                  {/* Completion + Status */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
-                    <p className="text-sm text-[#334247] font-medium">
-                      Completion: {task.completiondate}
-                    </p>
-                    <p
-                      className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${task.status === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : task.status === "cancelled"
-                          ? "bg-red-100 text-red-800"
-                          : task.status === "completed"
-                            ? "bg-green-100 text-green-800"
-                            : task.status === "cancelledDispute"
-                              ? "bg-orange-100 text-orange-800"
-                              : task.status === "accepted" ||
-                                task.status === "assigned"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
-                        }`}
-                    >
-                      Status: {task.status.replace(/([A-Z])/g, " $1").trim()}
-                    </p>
-                  </div>
-
-                  {/* Address + View Details */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 gap-3">
-                    <div className="flex-1 min-w-0">{renderAddress(task)}</div>
-
-                    <button
-                      onClick={() => {
-                        const routes = {
-                          "My Bidding": "bidding",
-                          "My Hire": "my-hire",
-                          "Emergency Tasks": "emergency",
-                        };
-                        navigate(
-                          `/${routes[activeTab]}/order-detail/${task.id}`
-                        );
-                      }}
-                      class="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur text-white text-xs px-4 py-1 rounded-full shadow-md">
+            {task?.project_id}
+          </span>
         </div>
+
+        {/* Content - Mobile par compact */}
+        <div className="w-full p-4 sm:p-6 flex flex-col justify-between text-sm">
+          {/* Title + Date */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 leading-tight">
+              {task.name
+                ? task.name.charAt(0).toUpperCase() + task.name.slice(1)
+                : "Untitled Task"}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#334247] font-medium">
+              Posted: {task.date}
+            </p>
+          </div>
+
+          {/* Category / Subcategory */}
+          <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-gray-700 mb-2">
+            {task.category_name !== "N/A" && (
+              <span className="text-green-600">
+                <strong>Category:</strong> {task.category_name}
+              </span>
+            )}
+            {task.subcategory_name !== "N/A" && (
+              <span className="text-gray-600">
+                <strong>Sub:</strong> {task.subcategory_name}
+              </span>
+            )}
+          </div>
+
+          {/* Description */}
+          {task.description && (
+            <div className="mb-3 text-xs sm:text-sm">
+              <p className="text-[#334247] italic bg-gray-50 p-2 rounded text-xs leading-relaxed break-words">
+                {expandedIds[task.id]
+                  ? task.description
+                  : task.description.length > MAX_LENGTH
+                  ? task.description.substring(0, MAX_LENGTH) + "..."
+                  : task.description}
+              </p>
+
+              {task.description.length > MAX_LENGTH && (
+                <button
+                  onClick={() => toggleExpand(task.id)}
+                  className="text-green-600 text-xs font-medium hover:underline mt-1"
+                >
+                  {expandedIds[task.id] ? "See Less" : "See More"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Price + PDF */}
+          <div className="flex justify-between items-center mb-3">
+            <p className="text-green-600 font-bold text-sm sm:text-base">
+              ₹{activeTab === "My Bidding" ? task.cost : task.price}
+            </p>
+            {task.milestone.length > 0 && (
+              <button
+                onClick={() =>
+                  handledownload(task.id, downloadTypeFromTab(activeTab))
+                }
+                disabled={downloadingIds.includes(task.id)}
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800 disabled:opacity-50 text-xs"
+                title="Download Invoice"
+              >
+                <img src={pdf} alt="PDF" className="w-4 h-4" />
+                {downloadingIds.includes(task.id) ? "Downloading..." : "PDF"}
+              </button>
+            )}
+          </div>
+
+          {/* Completion + Status */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3 text-xs sm:text-sm">
+            <p className="text-[#334247] font-medium">
+              Completion: {task.completiondate}
+            </p>
+            <p
+              className={`text-xs font-semibold px-2 py-1 rounded capitalize ${
+                task.status === "pending"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : task.status === "cancelled"
+                  ? "bg-red-100 text-red-800"
+                  : task.status === "completed"
+                  ? "bg-green-100 text-green-800"
+                  : task.status === "cancelledDispute"
+                  ? "bg-orange-100 text-orange-800"
+                  : task.status === "accepted" || task.status === "assigned"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              Status: {task.status.replace(/([A-Z])/g, " $1").trim()}
+            </p>
+          </div>
+
+          {/* Address + View Details */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex-1 min-w-0 text-xs sm:text-sm">{renderAddress(task)}</div>
+
+            <button
+              onClick={() => {
+                const routes = {
+                  "My Bidding": "bidding",
+                  "My Hire": "my-hire",
+                  "Emergency Tasks": "emergency",
+                };
+                navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
+              }}
+              className="px-4 sm:px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer text-sm whitespace-nowrap"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>  
+    ))
+  )}
+</div>
 
         {/* See All */}
         {/*filteredTasks.length > 0 && (
@@ -579,10 +574,12 @@ const MAX_LENGTH = 30;
         ) */}
 
         {/* Bottom banner */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-10">
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading...
+              Loading banners...
             </p>
           ) : bannerError ? (
             <p className="absolute inset-0 flex items-center justify-center text-red-500">
@@ -591,11 +588,11 @@ const MAX_LENGTH = 30;
           ) : bannerImages.length > 0 ? (
             <Slider {...sliderSettings}>
               {bannerImages.map((banner, i) => (
-                <div key={i}>
+                <div key={i} className="w-full h-[220px] sm:h-[400px]">
                   <img
                     src={banner}
                     alt={`Banner ${i + 1}`}
-                    className="w-full h-[400px] object-cover"
+                    className="w-full h-full object-cover"
                     onError={(e) => (e.target.src = Work)}
                   />
                 </div>
@@ -603,7 +600,7 @@ const MAX_LENGTH = 30;
             </Slider>
           ) : (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners
+              No banners available
             </p>
           )}
         </div>

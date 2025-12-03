@@ -858,14 +858,12 @@ export default function BiddinggetWorkDetail() {
 
           <div className="py-6 space-y-4">
             <div className="flex justify-between items-start">
-              <div>
-                <h2 className="text-lg font-semibold">
+              <div className="w-full md:w-auto">
+                <h2 className="text-lg font-semibold break-words">
                   {orderDetail?.title
                     ? orderDetail.title.charAt(0).toUpperCase() + orderDetail.title.slice(1)
                     : "N/A"}
                 </h2>
-
-
                 <span
                   onClick={() => setShowMap(true)}
                   className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
@@ -932,61 +930,67 @@ export default function BiddinggetWorkDetail() {
                     </div>
                   </div>
                 )}
-              </div>
-              <div className="text-right">
-                <p className="bg-black text-white text-md px-4 rounded-full inline-block">
-                  {orderDetail?.project_id || "N/A"}
-                </p>
-                <p className="text-md mt-2">
-                  <span className="font-semibold">
-                    Posted Date: {formatDate(orderDetail?.createdAt)}
-                  </span>
-                </p>
-                <span className="text-gray-600 font-semibold block">
-                  Status:{" "}
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
-                      orderDetail?.hire_status
-                    )}`}
-                  >
-                    {orderDetail?.hire_status
-                      ? orderDetail.hire_status
-                        .split(" ")
-                        .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
-                        )
-                        .join(" ")
-                      : "Unknown"}
-                  </span>
-                </span>
-                {orderDetail?.refundRequest && (
-                  <span className="text-gray-600 mt-2 font-semibold block">
-                    Refund Status:{" "}
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderDetail?.refundStatus === "pending"
-                          ? "bg-yellow-500"
-                          : ""
-                        }
-                      ${orderDetail?.refundStatus === "processed"
-                          ? "bg-blue-500"
-                          : ""
-                        }`}
-                    >
-                      {orderDetail?.refundStatus
-                        ? orderDetail.refundStatus
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
-                        : "Unknown Status"}
-                    </span>
-                  </span>
-                )}
-              </div>
+            <div className="text-left sm:text-left mt-4 sm:mt-0">
+  <p className="bg-black text-white text-md px-4 rounded-full inline-block">
+    {orderDetail?.project_id || "N/A"}
+  </p>
+
+  <p className="text-md mt-2">
+    <span className="font-semibold">
+      Posted Date: {formatDate(orderDetail?.createdAt)}
+    </span>
+  </p>
+
+  {/* Status */}
+  <span className="text-gray-600 font-semibold block mt-1">
+    Status:{" "}
+    <span
+      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getStatusStyles(
+        orderDetail?.hire_status
+      )}`}
+      >
+      {orderDetail?.hire_status
+        ? orderDetail.hire_status
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join(" ")
+        : "Unknown"}
+    </span>
+  </span>
+        </div>
+
+  {/* Refund Status */}
+  {orderDetail?.refundRequest && (
+    <span className="text-gray-600 mt-2 font-semibold block">
+      Refund Status:{" "}
+      <span
+        className={`px-3 py-1 rounded-full text-white text-sm font-medium
+          ${
+            orderDetail?.refundStatus === "pending"
+              ? "bg-yellow-500"
+              : ""
+          }
+          ${
+            orderDetail?.refundStatus === "processed"
+              ? "bg-blue-500"
+              : ""
+          }`}
+      >
+        {orderDetail?.refundStatus
+          ? orderDetail.refundStatus
+              .split(" ")
+              .map(
+                (word) => word.charAt(0).toUpperCase() + word.slice(1)
+              )
+              .join(" ")
+          : "Unknown Status"}
+      </span>
+    </span>
+  )}
+</div>
+
             </div>
             <p className="text-sm">
               <span className="font-semibold">
@@ -996,17 +1000,22 @@ export default function BiddinggetWorkDetail() {
                   : "N/A"}
               </span>
             </p>
-            <p className="text-green-600 text-lg font-semibold">
-              Category: {orderDetail?.category_id?.name}
+            <p className=" text-lg font-semibold text-gray-700">
+              <span className="font-semibold text-[#228B22]">Category-</span>{" "} {orderDetail?.category_id?.name}
             </p>
 
             <p className="font-semibold text-sm">
-              SubCategory:{" "}
+              <span className="font-semibold text-[#228B22]">Sub-Categories-</span>{" "}
               {orderDetail?.sub_category_ids?.map((sub) => sub.name).join(", ")}
             </p>
             <h3 className="text-sm font-semibold">Task Details</h3>
-            <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
+            {/* <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
+            </div> */}
+            <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+              <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
+                {orderDetail?.description || "No details available."}
+              </p>
             </div>
             <div className="space-y-6">
               <div className="flex justify-center gap-6">
@@ -1163,8 +1172,8 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("bidder")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 rounded-full cursor-pointer font-medium text-sm ${tab === "bidder"
-                          ? "bg-[#228B22] text-white border-3"
-                          : "bg-gray-100 text-[#228B22]"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Bidder
@@ -1172,8 +1181,8 @@ export default function BiddinggetWorkDetail() {
                     <button
                       onClick={() => setTab("related")}
                       className={`px-4 py-2 lg:px-17 lg:py-3 cursor-pointer rounded-full font-medium text-sm ${tab === "related"
-                          ? "bg-[#228B22] text-white border-3"
-                          : "bg-gray-100 text-[#228B22]"
+                        ? "bg-[#228B22] text-white border-3"
+                        : "bg-gray-100 text-[#228B22]"
                         }`}
                     >
                       Related Worker
@@ -1188,245 +1197,225 @@ export default function BiddinggetWorkDetail() {
                       value={searchText}   // <-- add this
                       onChange={(e) => setSearchText(e.target.value.toLowerCase())}  // <-- add this
                     />
-
-
                   </div>
-                  {tab === "related" ? (
-                    <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                      {Array.isArray(providers) && providers.length > 0 ? (
-                        providers
-                          .filter(
-                            (provider) =>
-                              provider.full_name?.toLowerCase().includes(searchText) &&  // <-- search filter
-                              !offers.some(
-                                (offer) => offer.provider_id?._id === provider._id
-                              )
-                          )
+                 {tab === "related" ? (
+  <div className="flex flex-col items-center justify-center text-gray-500 py-10 w-full">
+    {Array.isArray(providers) && providers.length > 0 ? (
+      providers
+        .filter(
+          (provider) =>
+            provider.full_name?.toLowerCase().includes(searchText) &&
+            !offers.some(
+              (offer) => offer.provider_id?._id === provider._id
+            )
+        )
+        .map((provider) => (
+          <div
+            key={provider._id}
+            className="flex flex-col sm:flex-row items-center sm:items-start 
+                     gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow 
+                     w-full sm:w-[738px]"
+          >
+            <img
+              src={provider.profile_pic || workImage}
+              alt={provider.full_name}
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+            />
 
-                          .map((provider) => (
+            {/* LEFT INFO */}
+            <div className="flex-1 text-left w-full">
+              <h3 className="text-[17px] font-bold text-[#303030]">
+                {provider.full_name || "Unknown"}
+              </h3>
 
-                            <div
-                              key={provider._id}
-                              className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-[738px]"
-                            >
-                              {console.log("PROVIDER DATA →", provider)}
-
-                              <img
-                                src={provider.profile_pic || workImage}
-                                alt={provider.full_name}
-                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                              />
-
-                              <div className="flex-1 text-center sm:text-left">
-                                <h3 className="text-[17px] font-bold text-[#303030]">
-                                  {provider.full_name || "Unknown"}
-                                </h3>
-                                {provider.averageRating !== undefined ? (
-                                  <p className="text-sm font-medium flex items-center gap-1">
-                                    <span className="text-yellow-600">
-                                      Rating:{" "}
-                                      {parseFloat(provider.averageRating).toFixed(
-                                        1
-                                      )}{" "}
-                                      / 5.0
-                                    </span>
-                                    {provider.totalReview > 0 ? (
-                                      <span className="text-gray-500 text-xs">
-                                        ({provider.totalReview} reviews)
-                                      </span>
-                                    ) : (
-                                      <span className="text-gray-500 text-xs">
-                                        (No reviews yet)
-                                      </span>
-                                    )}
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    No rating yet
-                                  </p>
-                                )}
-                                <p className="text-sm text-gray-500 truncate max-w-[200px]">
-                                  {provider.skill || "No skill listed"}
-                                </p>
-                                <MapPin className="text-green-600 w-4 h-4 inline-block mr-1" />
-                                <span className="text-gray-700 font-[600] text-xs">
-                                  {provider.location?.address ||
-                                    "Unknown location"}
-                                </span>
-                                <div>
-                                  <button
-                                    onClick={() =>
-                                      handleView(provider._id, null, id)
-                                    }
-                                    className="text-green-600 font-medium text-sm mt-1"
-                                  >
-                                    View Profile
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                                <div className="flex items-center gap-4 sm:gap-7">
-                                  {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                  <img
-                                    src={callIcon}
-                                    alt="Call"
-                                    className="w-[18px] sm:w-[23px]"
-                                  />
-                                </span> */}
-                                  {/* <span className="w-8 h-8 rounded-full bg-[#e1e1e1] flex items-center justify-center">
-                                  <img
-                                    src={msgIcon}
-                                    alt="Message"
-                                    className="w-[18px] sm:w-[23px]"
-                                  />
-                                </span> */}
-                                  <button
-                                    onClick={() => handleInviteClick(provider._id)}
-                                    disabled={
-                                      localInvited.includes(provider._id) ||
-                                      orderDetail?.invited_providers?.includes(provider._id)
-                                    }
-                                    className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white ${localInvited.includes(provider._id) ||
-                                        orderDetail?.invited_providers?.includes(provider._id)
-                                        ? "bg-gray-400 cursor-not-allowed"
-                                        : "bg-[#228B22] hover:bg-green-700"
-                                      }`}
-                                  >
-                                    {localInvited.includes(provider._id) ||
-                                      orderDetail?.invited_providers?.includes(provider._id)
-                                      ? "Invite Sent"
-                                      : "Invite"}
-                                  </button>
-
-
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                          <img
-                            src={noWorkImage}
-                            alt="No worker"
-                            className="w-48 sm:w-72 md:w-96 mb-4"
-                          />
-                          <p>No related workers found</p>
-                        </div>
-                      )}
-                    </div>
+              {/* Rating */}
+              {provider.averageRating !== undefined ? (
+                <p className="text-sm font-medium flex items-center gap-1">
+                  <span className="text-yellow-600">
+                    Rating: {parseFloat(provider.averageRating).toFixed(1)} / 5.0
+                  </span>
+                  {provider.totalReview > 0 ? (
+                    <span className="text-gray-500 text-xs">
+                      ({provider.totalReview} reviews)
+                    </span>
                   ) : (
-                    <div className="mt-6 space-y-4">
-                      {Array.isArray(offers) && offers.length > 0 ? (
-                        offers
-                          .filter((offer) =>
-                            offer.provider_id?.full_name?.toLowerCase().includes(searchText) // <-- search filter
-                          )
-                          .map((offer) => (
-
-                            <div
-                              key={offer._id}
-                              className="flex flex-col sm:flex-row items-center sm:items-start gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow"
-                            >
-                              <img
-                                src={offer.provider_id?.profile_pic || workImage}
-                                alt={offer.provider_id?.full_name || "Worker"}
-                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                              />
-                              <div className="flex-1 text-center sm:text-left">
-                                <h3 className="text-[17px] font-bold text-[#303030]">
-                                  {offer.provider_id?.full_name || "Unknown"}
-                                </h3>
-                                {offer.averageRating !== undefined ? (
-                                  <p className="text-sm font-medium flex items-center gap-1">
-                                    <span className="text-yellow-600">
-                                      Rating:{" "}
-                                      {parseFloat(offer.averageRating).toFixed(1)} /
-                                      5.0
-                                    </span>
-                                    {offer.totalReview > 0 ? (
-                                      <span className="text-gray-500 text-xs">
-                                        ({offer.totalReview} reviews)
-                                      </span>
-                                    ) : (
-                                      <span className="text-gray-500 text-xs">
-                                        (No reviews yet)
-                                      </span>
-                                    )}
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    No rating yet
-                                  </p>
-                                )}
-                                {offer.duration && (
-                                  <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                                    Duration: {offer.duration}{" "}
-                                    {offer.duration == 1 ? "day" : "days"}
-                                  </span>
-                                )}
-                                <p className="text-sm text-gray-500">
-                                  {offer.message || "No message provided"}
-                                </p>
-                                <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
-                                  <FaMapMarkerAlt size={16} color="#228B22" />
-                                  {offer.provider_id?.location?.address ||
-                                    "Unknown location"}
-                                </span>
-                                <div>
-                                  <button
-                                    onClick={() =>
-                                      handleView(
-                                        offer.provider_id?._id,
-                                        offer._id,
-                                        offer.order_id
-                                      )
-                                    }
-                                    className="text-green-600 font-medium text-base border border-green-600 px-5 py-1 rounded-lg mt-5"
-                                  >
-                                    View Profile
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
-                                <span className="text-lg font-semibold text-gray-800 mb-2">
-                                  ₹{offer.bid_amount || "N/A"}
-                                </span>
-                                {orderDetail?.hire_status === "pending" && (
-                                  <button
-                                    onClick={() =>
-                                      handleAcceptBid(offer.provider_id?._id)
-                                    }
-                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer"
-                                  >
-                                    Hire
-                                  </button>
-                                )}
-                                {orderDetail?.hire_status === "accepted" &&
-                                  !orderDetail?.platform_fee_paid && (
-                                    <button
-                                      onClick={() =>
-                                        handlePayment(offer.provider_id?._id)
-                                      }
-                                      className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700"
-                                    >
-                                      Pay & Hire
-                                    </button>
-                                  )}
-                              </div>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-500 py-10">
-                          <img
-                            src={noWorkImage}
-                            alt="No bids"
-                            className="w-48 sm:w-72 md:w-96 mb-4"
-                          />
-                          <p>No bids available</p>
-                        </div>
-                      )}
-                    </div>
+                    <span className="text-gray-500 text-xs">
+                      (No reviews yet)
+                    </span>
                   )}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500">No rating yet</p>
+              )}
+
+              <p className="text-sm text-gray-500 truncate max-w-[200px]">
+                {provider.skill || "No skill listed"}
+              </p>
+
+              <div className="flex items-center gap-1 text-gray-700 font-semibold text-xs mt-1">
+                <MapPin className="text-green-600 w-4 h-4" />
+                {provider.location?.address || "Unknown location"}
+              </div>
+
+              <button
+                onClick={() => handleView(provider._id, null, id)}
+                className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto"
+              >
+                View Profile
+              </button>
+            </div>
+
+            {/* RIGHT SIDE BUTTON */}
+            <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+              <button
+                onClick={() => handleInviteClick(provider._id)}
+                disabled={
+                  localInvited.includes(provider._id) ||
+                  orderDetail?.invited_providers?.includes(provider._id)
+                }
+                className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white w-full sm:w-auto
+                  ${
+                    localInvited.includes(provider._id) ||
+                    orderDetail?.invited_providers?.includes(provider._id)
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-[#228B22] hover:bg-green-700"
+                  }`}
+              >
+                {localInvited.includes(provider._id) ||
+                orderDetail?.invited_providers?.includes(provider._id)
+                  ? "Invite Sent"
+                  : "Invite"}
+              </button>
+            </div>
+          </div>
+        ))
+    ) : (
+      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+        <img
+          src={noWorkImage}
+          alt="No worker"
+          className="w-48 sm:w-72 md:w-96 mb-4"
+        />
+        <p>No related workers found</p>
+      </div>
+    )}
+  </div>
+) : (
+  <div className="mt-6 space-y-4 w-full">
+    {Array.isArray(offers) && offers.length > 0 ? (
+      offers
+        .filter((offer) =>
+          offer.provider_id?.full_name?.toLowerCase().includes(searchText)
+        )
+        .map((offer) => (
+          <div
+            key={offer._id}
+            className="flex flex-col sm:flex-row items-center sm:items-start 
+                       gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-full"
+          >
+            <img
+              src={offer.provider_id?.profile_pic || workImage}
+              alt={offer.provider_id?.full_name || "Worker"}
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+            />
+
+            <div className="flex-1 text-left w-full">
+              <h3 className="text-[17px] font-bold text-[#303030]">
+                {offer.provider_id?.full_name || "Unknown"}
+              </h3>
+
+              {/* Rating */}
+              {offer.averageRating !== undefined ? (
+                <p className="text-sm font-medium flex items-center gap-1">
+                  <span className="text-yellow-600">
+                    Rating: {parseFloat(offer.averageRating).toFixed(1)} / 5.0
+                  </span>
+                  {offer.totalReview > 0 ? (
+                    <span className="text-gray-500 text-xs">
+                      ({offer.totalReview} reviews)
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 text-xs">
+                      (No reviews yet)
+                    </span>
+                  )}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500">No rating yet</p>
+              )}
+
+              {offer.duration && (
+                <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
+                  Duration: {offer.duration} {offer.duration == 1 ? "day" : "days"}
+                </span>
+              )}
+
+              <p className="text-sm text-gray-500 mt-2">
+                {offer.message || "No message provided"}
+              </p>
+
+              <span className="flex items-center gap-2 text-gray-600 font-semibold text-sm mt-1">
+                <FaMapMarkerAlt size={16} color="#228B22" />
+                {offer.provider_id?.location?.address || "Unknown location"}
+              </span>
+
+              <button
+                onClick={() =>
+                  handleView(
+                    offer.provider_id?._id,
+                    offer._id,
+                    offer.order_id
+                  )
+                }
+                className="text-green-600 font-medium text-base border border-green-600 
+                           px-5 py-1 rounded-lg mt-5 w-full sm:w-auto"
+              >
+                View Profile
+              </button>
+            </div>
+
+            {/* RIGHT SIDE PRICE + BUTTON */}
+            <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
+              <span className="text-lg font-semibold text-gray-800 mb-2">
+                ₹{offer.bid_amount || "N/A"}
+              </span>
+
+              {orderDetail?.hire_status === "pending" && (
+                <button
+                  onClick={() => handleAcceptBid(offer.provider_id?._id)}
+                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                             font-medium hover:bg-green-700 w-full sm:w-auto"
+                >
+                  Hire
+                </button>
+              )}
+
+              {orderDetail?.hire_status === "accepted" &&
+                !orderDetail?.platform_fee_paid && (
+                  <button
+                    onClick={() => handlePayment(offer.provider_id?._id)}
+                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                               font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
+                  >
+                    Pay & Hire
+                  </button>
+                )}
+            </div>
+          </div>
+        ))
+    ) : (
+      <div className="flex flex-col items-center justify-center text-gray-500 py-10">
+        <img
+          src={noWorkImage}
+          alt="No bids"
+          className="w-48 sm:w-72 md:w-96 mb-4"
+        />
+        <p>No bids available</p>
+      </div>
+    )}
+  </div>
+)}
+
                 </div>
               </div>
             )}
