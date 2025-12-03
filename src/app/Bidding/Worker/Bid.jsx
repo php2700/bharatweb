@@ -353,11 +353,11 @@ export default function Bid() {
       toast.error("Failed to accept negotiation");
     }
   };
-useEffect(() => {
-  if (worker?.service_provider_id?._id) {
-    console.log("Provider ID:", worker.service_provider_id._id);
-  }
-}, [worker]);
+  useEffect(() => {
+    if (worker?.service_provider_id?._id) {
+      console.log("Provider ID:", worker.service_provider_id._id);
+    }
+  }, [worker]);
 
   if (loading) return <div className="text-center py-6">Loading...</div>;
   if (error)
@@ -416,22 +416,33 @@ useEffect(() => {
           )}
 
           {worker && (
-            <div className="py-6 space-y-4">
-              <div className="flex justify-between items-start">
+            <div className="py-6 px-4 sm:px-0 space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between gap-6">
                 <div>
                   <h2 className="text-lg font-semibold">
-  {worker?.workName
-    ? worker.workName.charAt(0).toUpperCase() + worker.workName.slice(1)
-    : ""}
-</h2>
+                    {worker?.workName
+                      ? worker.workName.charAt(0).toUpperCase() +
+                        worker.workName.slice(1)
+                      : ""}
+                  </h2>
 
-                  <span
-                    onClick={() => setIsMapModalOpen(true)}
-                    className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
-                  >
-                    <FaMapMarkerAlt size={18} color="#228B22" />
-                    <span className="truncate">{worker.location || "N/A"}</span>
-                  </span>
+                  <div className="mt-2">
+                    <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full max-w-full">
+                      {/* Map icon – click to open map */}
+                      <button onClick={() => setIsMapModalOpen(true)}>
+                        <FaMapMarkerAlt size={18} color="#228B22" />
+                      </button>
+
+                      {/* Address with See More / See Less */}
+                      {worker.location && worker.location.length > 35 ? (
+                        <ExpandableAddress location={worker.location} />
+                      ) : (
+                        <span className="text-gray-700 text-sm font-medium">
+                          {worker.location || "N/A"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <p className="font-semibold text-lg my-2 text-[#008000]">
                     Cost :- ₹{worker.amount}/-
                   </p>
@@ -442,7 +453,7 @@ useEffect(() => {
                     </span>
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="md:text-right ">
                   <p className="bg-black text-white text-md px-4 rounded-full inline-block">
                     {worker.project_id}
                   </p>
@@ -561,7 +572,7 @@ useEffect(() => {
           )}
 
           {/* Offer / Negotiate Section */}
-          {worker?.hire_status === "pending" && !bidLoading && existingBid &&  (
+          {worker?.hire_status === "pending" && !bidLoading && existingBid && (
             <div className="flex flex-col items-center p-6">
               <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
                 <button
@@ -788,3 +799,33 @@ useEffect(() => {
     </>
   );
 }
+// ← ADD THIS AT THE END OF THE FILE (outside the main function)
+const ExpandableAddress = ({ location }) => {
+  const [showFull, setShowFull] = useState(false);
+
+  return (
+    <div className="text-gray-700 text-sm font-medium">
+      {showFull ? (
+        <>
+          {location}
+          <button
+            onClick={() => setShowFull(false)}
+            className="text-blue-600 font-bold text-xs  underline"
+          >
+            See Less
+          </button>
+        </>
+      ) : (
+        <>
+          {location.slice(0, 35)}...
+          <button
+            onClick={() => setShowFull(true)}
+            className="text-blue-600 font-bold text-xs ml-2 underline"
+          >
+            See More
+          </button>
+        </>
+      )}
+    </div>
+  );
+};

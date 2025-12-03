@@ -214,7 +214,7 @@ export default function ViewWorker() {
               {/* Address */}
               <div>
                 <p className="text-base font-medium text-gray-700">Address</p>
-                <p className="h-[55px] text-base border border-gray-300 rounded-[19px] px-3 w-full flex items-center">
+                <p className="min-h-[55px] text-base border border-gray-300 rounded-[19px] px-3 w-full flexitems-start break-words">
                   {workerData.address}
                 </p>
               </div>

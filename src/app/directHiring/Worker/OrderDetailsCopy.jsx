@@ -608,24 +608,26 @@ export default function ViewProfile() {
                 </h2>
 
                 {orderData?.user_id ? (
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-md p-6">
-                    {/* User Profile Section */}
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6">
-                      <img
-                        src={orderData.user_id.profile_pic || Profile}
-                        alt={orderData.user_id.full_name || "User"}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg flex-shrink-0"
-                      />
-                      <p className="text-lg font-semibold text-center sm:text-left break-words flex-1">
-                        {orderData?.user_id?.full_name
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ") || "Unknown User"}
-                      </p>
-                      {/* <button
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-md">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="pt-10 pb-6 text-center">
+                        <img
+                          src={orderData.user_id.profile_pic || Profile}
+                          alt={orderData.user_id.full_name || "User"}
+                          className="w-16 h-16 rounded-full object-cover bg-yellow-200"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold">
+                          {orderData?.user_id?.full_name
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ") || "Unknown User"}
+                        </p>
+                        {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
                             navigate(
@@ -635,47 +637,45 @@ export default function ViewProfile() {
                         >
                           View Profile
                         </button> */}
+                      </div>
                     </div>
 
                     {orderData?.hire_status === "cancelled" ||
                     orderData?.hire_status === "cancelledDispute" ? (
                       " "
                     ) : (
-                      <div className="mt-10 sm:mt-8 pb-8 ">
-                    <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-8">
+                      <div className="px-8 py-6 border-t border-gray-100 ">
+                        <p className="text-gray-600 font-medium mb-2 text-center ">
                           Contact
                         </p>
-
-                        {/* Perfectly Responsive Icons – Side by side on all phones */}
-                      <div className="flex justify-center items-center gap-8 sm:gap-12">
+                        <div className="flex gap-6  sm:gap-8 justify-center mt-1">
                           <button
+                            className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                            title="Call"
                             onClick={() =>
                               window.open(
                                 `tel:${orderData.user_id.phone}`,
                                 "_self"
                               )
                             }
-                            className="p-6 bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
-                            title="Call"
                           >
                             <img
                               src={CallIcon}
                               alt="Call"
-                              className="w-12 h-12 object-contain"
+                           className="w-9 h-9"
                             />
                           </button>
-
                           <button
+                            className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                            title="Chat"
                             onClick={() =>
                               handleChatOpen(orderData.user_id._id, userId)
                             }
-                            className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-blue-200"
-                            title="Chat"
                           >
                             <img
                               src={ChatIcon}
                               alt="Chat"
-                              className="w-12 h-12 object-contain"
+                          className="w-9 h-9"
                             />
                           </button>
                         </div>
@@ -683,19 +683,19 @@ export default function ViewProfile() {
                     )}
 
                     {orderData?.hire_status === "cancelled" ? (
-                      <div className=" mt-10 sm:mt-12  text-center ">
-                        <span className="inline-block px-6 sm:px-10 py-3 sm:py-4 bg-red-600 text-white font-bold text-lg sm:text-xl rounded-full shadow-lg">
-                          Project Cancelled by User
-                        </span>
+                      <div className="px-3 py-1 rounded-full text-white text-sm font-medium bg-red-500">
+                      <span className="inline-block px-8 py-4 bg-red-600 text-white font-bold rounded-full text-lg">
+              Project Cancelled by User
+            </span>
                       </div>
                     ) : offerStatus === "accepted" ? (
                       <>
-                        <div className="space-y-5 text-center">
-                          <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
-                            Accepted
-                          </span>
-                        </div>
-                        <div className="px-0 sm:px-4">
+                          <div className="space-y-5 text-center">
+                            <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
+                          Accepted
+                        </span>
+                          </div>
+                        <div className="px-4 pb-6">
                           <button
                             type="button"
                             className="mx-auto block w-full max-w-md px-10 py-3.5 bg-[#228B22] hover:bg-green-700 text-white font-semibold text-lg rounded-2xl shadow-lg transition-all duration-200"
