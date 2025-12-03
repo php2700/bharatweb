@@ -1135,7 +1135,7 @@ export default function ServiceProviderHome() {
             </div>
 
             {/* --- Bidding Section --- */}
-            <div className="max-w-[90%] mx-auto mt-[100px]">
+            <div className="max-w-[90%] mx-auto mt-[50px]">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-black max-md:text-lg">Bidding</h2>
                 {bidding.length > 4 && (
@@ -1172,7 +1172,7 @@ export default function ServiceProviderHome() {
 
             {/* --- Emergency Section --- */}
             {isEmergencyOn ? (
-              <div className="max-w-[90%] mx-auto mt-[100px] mb-10">
+              <div className="max-w-[90%] mx-auto mt-[50px] mb-10">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-black max-md:text-lg">Emergency</h2>
 									{console.log("lele", emergency.length)}

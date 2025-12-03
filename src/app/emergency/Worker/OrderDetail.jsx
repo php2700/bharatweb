@@ -232,10 +232,10 @@ console.log('dfdfdf',orderData);
             </div>
           )}
 
-          <div className="p-6">
+          <div className="space-y-6 text-left">
             <div className="flex flex-col md:flex-row justify-between items-start mb-4">
-              <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <p>Title :- {orderData?.title || "No Title"}</p>
+              <div className="space-y-1 ">
+                <p className="text-gray-800 text-lg font-semibold">Title :- {orderData?.title || "No Title"}</p>
                 <span>
                   Category:-{" "}
                   {orderData?.category_id?.name || "Unknown Category"}

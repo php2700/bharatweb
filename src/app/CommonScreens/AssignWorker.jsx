@@ -26,16 +26,16 @@ export default function WorkerList() {
       const data = await res.json();
       // console.log("data", data)
       if (data.success) {
-  // ✅ Sirf approved workers ko rakho
+        // ✅ Sirf approved workers ko rakho
 
-  const approvedWorkers = data.workers.filter(
-    (worker) => worker.verifyStatus?.toLowerCase() === "approved"
-  );
-  // console.log("apppr", approvedWorkers);
-  setWorkers(approvedWorkers);
-} else {
-  setWorkers([]);
-}
+        const approvedWorkers = data.workers.filter(
+          (worker) => worker.verifyStatus?.toLowerCase() === "approved"
+        );
+        // console.log("apppr", approvedWorkers);
+        setWorkers(approvedWorkers);
+      } else {
+        setWorkers([]);
+      }
       // if (data.success) setWorkers(data.workers);
       // else setWorkers([]);
     } catch (err) {
@@ -45,7 +45,7 @@ export default function WorkerList() {
     }
   };
 
-	// console.log("workder", workers)
+  // console.log("workder", workers)
   useEffect(() => {
     fetchWorkers();
   }, []);
@@ -65,7 +65,11 @@ export default function WorkerList() {
     }
 
     try {
-      console.log("Sending request with:", { worker_id: workerId, order_id: orderId, type });
+      console.log("Sending request with:", {
+        worker_id: workerId,
+        order_id: orderId,
+        type,
+      });
       const response = await axios.post(
         `${BASE_URL}/worker/assign-order`,
         {
@@ -83,18 +87,24 @@ export default function WorkerList() {
 
       // console.log("API Response:", response.data); // Log the full response
 
-      if (response.data.success) { // Changed from response.data.status to response.data.success
+      if (response.data.success) {
+        // Changed from response.data.status to response.data.success
         Swal.fire({
           icon: "success",
           title: "Order Assigned!",
-          text: response.data.message || "The worker has been assigned successfully.", // Use API message
+          text:
+            response.data.message ||
+            "The worker has been assigned successfully.", // Use API message
           timer: 2000,
           showConfirmButton: false,
           toast: true,
           position: "top-end",
         });
         setTimeout(() => {
-          console.log("Navigating to:", `/emergency/worker/order-detail/${orderId}`);
+          console.log(
+            "Navigating to:",
+            `/emergency/worker/order-detail/${orderId}`
+          );
           // navigate(`/emergency/worker/order-detail/${orderId}`);
           navigate(-1);
         }, 2000); // Navigate after toast duration
@@ -135,7 +145,7 @@ export default function WorkerList() {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-4 mt-30">
+      <div className="container mx-auto px-4 py-4 mt-20">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-[#008000] hover:text-green-800 font-semibold text-xl"
@@ -154,7 +164,7 @@ export default function WorkerList() {
         </div>
 
         {/* Worker Cards */}
-        <div className="w-full max-w-5xl mt-4 mx-auto">
+        <div className="w-full max-w-5xl gap-10 mt-4 mx-auto">
           {workers.length === 0 ? (
             <p className="text-center text-gray-600">No workers found</p>
           ) : (
@@ -164,7 +174,7 @@ export default function WorkerList() {
                 className="flex flex-col sm:flex-row items-center justify-between bg-white rounded-lg shadow-md p-4 gap-4"
               >
                 {/* Left Section */}
-                <div className="flex items-center space-x-4 w-full sm:w-auto">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
                   {/* Image with Badge */}
                   <div className="relative">
                     <img
@@ -172,8 +182,19 @@ export default function WorkerList() {
                       alt={worker.name}
                       className="w-36 h-36 sm:w-60 sm:h-45 rounded-lg object-cover"
                     />
-                    <span className="absolute bottom-9 left-1/2 -translate-x-1/2 translate-y-1/2 bg-[#6DEA6D] text-[#FFFFFF] font-[500] text-xs px-3 py-1 rounded-full shadow w-[125px] sm:w-[131px] sm:h-[25px] lg:w-[184px] lg:p-[0px] lg:text-center lg:text-[15px]">
-                      {worker.verifyStatus.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") || "Pending"}
+                    <span
+                      className="absolute bottom-9 left-1/2 -translate-x-1/2 translate-y-1/2 
+    bg-[#6DEA6D] text-white font-medium text-xs 
+    px-2 sm:px-3 py-1 rounded-full shadow 
+    max-w-[85%] sm:max-w-[90%] text-center 
+    whitespace-nowrap overflow-hidden text-ellipsis "
+                    >
+                      {worker.verifyStatus
+                        .split(" ")
+                        .map(
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ") || "Pending"}
                     </span>
                   </div>
                   <div className="lg:mb-[123px]">
@@ -210,7 +231,6 @@ export default function WorkerList() {
                   >
                     Assign
                   </button>
-
                 </div>
               </div>
             ))

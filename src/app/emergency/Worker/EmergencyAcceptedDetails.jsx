@@ -19,7 +19,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-export default function RejectedWorkDetails() {
+export default function AcceptedWorkDetails() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const task = state?.task;
@@ -250,24 +250,24 @@ export default function RejectedWorkDetails() {
               <h2 className="text-xl font-semibold text-black mb-4">
                 User Details
               </h2>
-              <div className="bg-white rounded-2xl shadow-2xl h-[150px]   overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border border-gray-100">
                 <div className="p-4 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-                  <div className="flex items-center space-x-6">
+                  <div className="flex items-center gap-5">
                     <img
                       src={
                         task.user_profile || task.user?.profile_pic || Profile
                       }
                       alt="Customer"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-red-100 shadow-xl"
+                      className=" w-24 h-24 rounded-full object-cover border-4 border-red-100 shadow-xl flex-shrink-0"
                     />
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-800">
+                      <h3 className="text-2xl font-bold text-gray-800 text-center md:text-left">
                        {task.user_id?.full_name || "User"}
 
                       </h3>
                     </div>
                   </div>
-                  <div className="px-6 py-2 rounded-full text-white text-sm font-medium bg-red-500">
+                  <div className="px-6 py-2 rounded-full mb-10 text-white text-center text-sm font-medium bg-red-500">
                     {task?.hire_status === "pending"
                       ? "Waiting for user response"
                       : task?.hire_status === "assigned"
