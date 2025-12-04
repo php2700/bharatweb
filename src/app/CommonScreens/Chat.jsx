@@ -540,7 +540,7 @@ import { UserX } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const Base_url = import.meta.env.VITE_SOCKET_URL;
-const socket = io("http://localhost:5001/");
+const socket = io(`${Base_url}`);
 
 const Chat = () => {
   const senderId = localStorage.getItem("user_id");
