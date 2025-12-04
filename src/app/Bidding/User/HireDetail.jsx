@@ -612,6 +612,7 @@ export default function HireDetail() {
   return (
     <>
       <Header />
+      
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen bg-gray-50 mt-35">
         {/* Banner */}

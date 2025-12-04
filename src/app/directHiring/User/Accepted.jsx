@@ -346,55 +346,65 @@ export default function Accepted({
           </span>
         </p>
 
-        {serviceProvider && (
-          <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
+      {serviceProvider && (
+  <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
 
-              <img
-                src={serviceProvider.profile_pic || Profile}
-                alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
-                className="w-16 h-16 rounded-full object-cover"
-              />
+    {/* Outer Wrapper – Mobile = Column / Desktop = Row */}
+    <div className="flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
 
-              <div className="flex flex-col sm:flex-row sm:items-center w-full gap-3">
+      {/* Profile Image */}
+      <img
+        src={serviceProvider.profile_pic || Profile}
+        alt={`Profile of ${serviceProvider.full_name || "Worker"}`}
+        className="w-20 h-20 sm:w-16 sm:h-16 rounded-full object-cover mx-auto sm:mx-0"
+      />
 
-                <p className="text-lg font-semibold">
-                  {serviceProvider.full_name
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ") || "Unknown Worker"}
-                  <span> ({serviceProvider.unique_id})</span>
-                </p>
+      {/* Right Side Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center w-full gap-3">
 
-                {(hireStatus === "cancelled" || hireStatus === "cancelledDispute") ? (
-                  ""
-                ) : (
-                  <div className="flex items-center space-x-3 sm:ml-auto">
+        {/* Name + ID (aligned center on mobile) */}
+        <p className="text-lg font-semibold text-center sm:text-left">
+          {serviceProvider.full_name
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ") || "Unknown Worker"}
+          <span> ({serviceProvider.unique_id})</span>
+        </p>
 
-                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                      <img src={Call} alt="Call" className="w-5 h-5" />
-                    </div>
+        {/* Icons — Hide if cancelled */}
+        {(hireStatus === "cancelled" || hireStatus === "cancelledDispute") ? (
+          ""
+        ) : (
+          <div className="flex items-center space-x-3 justify-center sm:justify-start sm:ml-auto">
 
-                    <div
-                      className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                      onClick={() => handleChatOpen(serviceProvider._id, user_id)}
-                    >
-                      <img src={Message} alt="Message" className="w-5 h-5" />
-                    </div>
-
-                  </div>
-                )}
-
-                <button
-                  className="sm:ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 cursor-pointer w-full sm:w-auto"
-                  onClick={() => handleRouteHire(serviceProvider._id, true)}
-                >
-                  View Profile
-                </button>
-              </div>
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+              <img src={Call} alt="Call" className="w-5 h-5" />
             </div>
+
+            <div
+              className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+              onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+            >
+              <img src={Message} alt="Message" className="w-5 h-5" />
+            </div>
+
           </div>
         )}
+
+        {/* View Profile Button */}
+        <button
+          className="w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
+                     text-[#228B22] bg-white rounded-lg font-semibold 
+                     hover:bg-green-50 cursor-pointer text-center"
+          onClick={() => handleRouteHire(serviceProvider._id, true)}
+        >
+          View Profile
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
         {assignedWorker && (
           <div className="mb-4">
