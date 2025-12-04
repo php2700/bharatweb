@@ -1175,7 +1175,6 @@ export default function ServiceProviderHome() {
               <div className="max-w-[90%] mx-auto mt-[50px] mb-10">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-black max-md:text-lg">Emergency</h2>
-									{console.log("lele", emergency.length)}
                   {emergency.length > 4 && (
                     <button onClick={() => handleSeeAll("/emergency/tasks")} className="text-black font-medium hover:text-[#228B22]">See All</button>
                   )}

@@ -496,7 +496,7 @@ if (currentUrl === "/chats") {
 }
 
 
-          console.log(combinedNotifications);
+          // console.log("chat",combinedNotifications);
 
           const count = combinedNotifications.filter((notif) => !notif.isRead);
           setNotificationCount(count.length);
@@ -832,7 +832,7 @@ const handleDeleteConfirm = (index, addressId) => {
   const logoutdestroy = () => {
     handleUnauthorized();
   };
-
+  //  console.log("notification", notifications)
   const groupedNotifications = notifications.reduce((acc, notif) => {
     const date = new Date(notif.createdAt).toLocaleDateString("en-US", {
       day: "numeric",
@@ -877,7 +877,7 @@ const handleDeleteConfirm = (index, addressId) => {
 
   // FIXED: Notification click handler
   const handleRedirectNotification = (notif) => {
-    console.log("Notification clicked:", notif);
+    // console.log("Notification clicked:", notif);
     let orderId = notif.orderId;
     // let userId = notif.userId
     if (notif.userType === "user") {
