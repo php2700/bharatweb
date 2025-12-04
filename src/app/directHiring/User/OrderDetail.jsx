@@ -997,19 +997,19 @@ export default function ViewProfile() {
       <Header />
       <div className="container mx-auto mt-20 px-4 py-4">
         <button
-          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
         >
-          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back to work list" />
+          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
           Back
         </button>
       </div>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          {images.length > 0 ? (
-            // give the carousel a fixed height wrapper so images show reliably
-            <div className="w-full" style={{ maxWidth: "100%", height: 360 }}>
+        <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
+
+        {/* TOP IMAGE / CAROUSEL (same style as getworkdetails.jsx) */}
+      {images.length > 0 ? (
               <Carousel
                 showArrows={true}
                 showThumbs={false}
@@ -1019,269 +1019,343 @@ export default function ViewProfile() {
                 emulateTouch={true}
                 showStatus={false}
                 onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+                  className="w-full 
+               h-[180px]        /* mobile */
+               sm:h-[250px] 
+               md:h-[360px]"   /* desktop unchanged */
               >
                 {images.map((url, index) => (
-                  <div key={index} className="h-[360px]">
+                  <div key={index} className="cursor-pointer pointer-events-auto">
                     <img
                       src={url}
-                      className="h-[360px] w-full object-cover"
                       alt={`Project image ${index + 1}`}
+                        className="
+            w-full 
+            h-[180px]        /* mobile size updated */
+            sm:h-[250px] 
+            md:h-[360px]     /* desktop same */
+            object-cover 
+            rounded-lg
+          "
                     />
                   </div>
                 ))}
               </Carousel>
-            </div>
+            
           ) : (
             <img
               src={defaultWorkImage}
               alt="No project images available"
-              className="w-full h-[360px] object-cover mt-5"
+               className="
+      w-full 
+      h-[180px]        /* mobile */
+      sm:h-[250px] 
+      md:h-[360px]     /* desktop same */
+      object-cover 
+      mt-5
+      rounded-lg
+    "
             />
           )}
 
-          {openImage && (
+
+        {/* Fullscreen modal (copied layout from getworkdetails.jsx) */}
+        {openImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setOpenImage(null)}
+          >
             <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-              onClick={() => setOpenImage(null)}
+              className="relative"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <img
-                  src={openImage}
-                  alt="Preview"
-                  className="max-w-[85vw] max-h-[85vh] rounded-xl shadow-2xl"
-                />
+              <img
+                src={openImage}
+                alt="Preview"
+                className="
+                  max-w-[90vw] 
+                  max-h-[90vh] 
+                  rounded-xl 
+                  shadow-2xl
+                "
+              />
 
-                <button
-                  onClick={() => setOpenImage(null)}
-                  className="absolute -top-4 -right-4 h-10 w-10 flex items-center justify-center bg-white text-black rounded-full shadow-lg text-2xl"
-                >
-                  ×
-                </button>
-              </div>
+              <button
+                onClick={() => setOpenImage(null)}
+                className="
+                  absolute -top-4 -right-4 
+                  h-10 w-10 
+                  flex items-center justify-center 
+                  bg-white 
+                  text-black 
+                  rounded-full 
+                  shadow-lg 
+                  text-2xl
+                "
+              >
+                ×
+              </button>
             </div>
-          )}
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row justify-between items-start mb-4">
-              <div className="space-y-2 text-gray-800 text-lg font-semibold">
+          </div>
+        )}
 
-                <span>
-                  Title :- {capitalize(orderData?.title || "Unknown Title")}
-                </span>
+        <div className="py-6 space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="w-full md:w-auto">
+              <h2 className="text-lg font-semibold break-words">
+                {orderData?.title
+                  ? capitalize(orderData.title)
+                  : "N/A"}
+              </h2>
 
-                {/* <div>Description :- {orderData?.description || "Unknown Description"}</div> */}
-                <div>
-                  <div
-                    onClick={() => {
-                      openMap(orderData?.address);
-                    }}
-                    className=" text-gray-800 flex items-center px-1 py-1 rounded-full text-sm mt-2 w-fit mr-6 relative right-[9px]"
-                  >
-                    <FaMapMarkerAlt
-                      size={25}
-                      color="#228B22"
-                      className="mr-2"
-                    />{" "}
-                    {orderData?.address || "Unknown Location"}
-                  </div>
-                </div>
-                <span className="text-gray-600 text-sm font-semibold block">
-                  One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+              <span
+                onClick={() => openMap(orderData?.address)}
+                className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold py-1 rounded-full mt-2"
+              >
+                <FaMapMarkerAlt size={18} color="#228B22" />
+                <span className="truncate">
+                  {orderData?.address || "Unknown Location"}
                 </span>
-                <span className="text-gray-600 text-sm font-semibold block">
-                  Deadline Date&Time:{" "}
-                  {orderData?.deadline
-                    ? new Date(orderData.deadline).toLocaleString()
-                    : "N/A"}
-                </span>
-              </div>
-              <div className="text-right space-y-2 tracking-tight">
-                <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
-                  {orderData?.project_id || "#N/A"}
-                </span>
-                <span className="text-gray-600 font-semibold block">
+              </span>
+
+              <span className="text-gray-600 text-sm font-semibold block">
+                One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+              </span>
+            </div>
+
+            {/* Desktop right side: id, posted, status, refund */}
+            <div className="text-left sm:text-right sm:ml-auto mt-4 sm:mt-0 hidden sm:block">
+              <p className="bg-black text-white text-md px-4 rounded-full inline-block sm:ml-auto">
+                {orderData?.project_id || "#N/A"}
+              </p>
+
+              <p className="text-md mt-2 sm:ml-auto">
+                <span className="font-semibold">
                   Posted Date:{" "}
                   {orderData?.createdAt
                     ? new Date(orderData.createdAt).toLocaleDateString()
                     : "N/A"}
                 </span>
-                <span className="text-gray-600 font-semibold block">
-                  Status:{" "}
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderData?.hire_status === "pending"
-                        ? "bg-yellow-500"
-                        : ""
-                      }
-                      ${orderData?.hire_status === "cancelled"
-                        ? "bg-red-500"
-                        : ""
-                      }
-                      ${orderData?.hire_status === "completed"
-                        ? "bg-[#228B22]"
-                        : ""
-                      }
-                      ${orderData?.hire_status === "cancelledDispute"
-                        ? "bg-[#FF0000]"
-                        : ""
-                      }
-                      ${orderData?.hire_status === "accepted"
-                        ? "bg-[#228B22]"
-                        : ""
-                      }`}
-                  >
-                    {orderData?.hire_status === "cancelledDispute"
-                      ? `Cancelled ${" "} Dispute`
-                      : orderData.hire_status
+              </p>
+
+              <span className="text-gray-600 font-semibold block mt-1 sm:ml-auto">
+                Status:{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                    ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
+                    ${orderData?.hire_status === "cancelled" ? "bg-red-500" : ""}
+                    ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
+                    ${orderData?.hire_status === "cancelledDispute" ? "bg-[#FF0000]" : ""}
+                    ${orderData?.hire_status === "accepted" ? "bg-[#228B22]" : ""}
+                  `}
+                >
+                  {orderData?.hire_status === "cancelledDispute"
+                    ? "Cancelled Dispute"
+                    : orderData?.hire_status
+                      ? orderData.hire_status
                         .split(" ")
                         .map(
                           (word) =>
                             word.charAt(0).toUpperCase() + word.slice(1)
                         )
-                        .join(" ") || "Unknown status"}
-                  </span>
-                </span>
-                {orderData?.refundRequest && (
-                  <span className="text-gray-600 font-semibold block">
-                    Refund Status:{" "}
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium
-                      ${orderData?.refundStatus === "pending"
-                          ? "bg-yellow-500"
-                          : ""
-                        }
-                      ${orderData?.refundStatus === "processed"
-                          ? "bg-blue-500"
-                          : ""
-                        }
-											${orderData?.refundStatus === "rejected"
-                          ? "bg-red-500"
-                          : ""
-                        }`
-                      }
-                    >
-                      {orderData?.refundStatus
-                        ? orderData.refundStatus
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")
-                        : "Unknown Status"}
-                    </span>
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="border border-green-600 rounded-lg p-2 mb-4 bg-gray-50">
-              <p className="text-gray-700 tracking-tight break-words whitespace-pre-line text-sm sm:text-base leading-relaxed">
-                {orderData?.description}
-              </p>
-            </div>
-
-            <p className="m-3">
-              <span className="text-gray-600 font-semibold block">
-                Do you want to visit a shop:{" "}
-                <span
-                  className={
-                    orderData?.isShopVisited ? "text-green-600" : "text-red-600"
-                  }
-                >
-                  {orderData?.isShopVisited ? "Yes" : "No"}
+                        .join(" ")
+                      : "Unknown"}
                 </span>
               </span>
+
+              {orderData?.refundRequest && (
+                <span className="text-gray-600 font-semibold block mt-2">
+                  Refund Status:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                      ${orderData?.refundStatus === "pending" ? "bg-yellow-500" : ""}
+                      ${orderData?.refundStatus === "processed" ? "bg-blue-500" : ""}
+                      ${orderData?.refundStatus === "rejected" ? "bg-red-500" : ""}
+                    `}
+                  >
+                    {orderData?.refundStatus
+                      ? orderData.refundStatus
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
+                      : "Unknown Status"}
+                  </span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile right side */}
+          <div className="block sm:hidden mt-4 text-left">
+            <p className="bg-black text-white text-md px-4 rounded-full inline-block">
+              {orderData?.project_id || "#N/A"}
             </p>
-            {/*orderData?.hire_status == "pending" && (
-              <div className="flex justify-center mt-4">
-                <button
-                  className="px-4 py-2 bg-[#FF0000] text-white rounded hover:bg-red-700 font-semibold"
-                  onClick={handleCancelOffer} // remove extra arrow function wrapping
+
+            <p className="text-md mt-2">
+              <span className="font-semibold">
+                Posted Date:{" "}
+                {orderData?.createdAt
+                  ? new Date(orderData.createdAt).toLocaleDateString()
+                  : "N/A"}
+              </span>
+            </p>
+
+            <span className="text-gray-600 font-semibold block mt-1">
+              Status:{" "}
+              <span
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                  ${orderData?.hire_status === "pending" ? "bg-yellow-500" : ""}
+                  ${orderData?.hire_status === "cancelled" ? "bg-red-500" : ""}
+                  ${orderData?.hire_status === "completed" ? "bg-[#228B22]" : ""}
+                  ${orderData?.hire_status === "cancelledDispute" ? "bg-[#FF0000]" : ""}
+                  ${orderData?.hire_status === "accepted" ? "bg-[#228B22]" : ""}
+                `}
+              >
+                {orderData?.hire_status === "cancelledDispute"
+                  ? "Cancelled Dispute"
+                  : orderData?.hire_status
+                    ? orderData.hire_status
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")
+                    : "Unknown"}
+              </span>
+            </span>
+
+            {orderData?.refundRequest && (
+              <span className="text-gray-600 font-semibold block mt-2">
+                Refund Status:{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium
+                    ${orderData?.refundStatus === "pending" ? "bg-yellow-500" : ""}
+                    ${orderData?.refundStatus === "processed" ? "bg-blue-500" : ""}
+                    ${orderData?.refundStatus === "rejected" ? "bg-red-500" : ""}
+                  `}
                 >
-                  Cancel Project
-                </button>
-              </div>
-            )*/}
+                  {orderData?.refundStatus
+                    ? orderData.refundStatus
+                      .split(" ")
+                      .map(
+                        (word) =>
+                          word.charAt(0).toUpperCase() + word.slice(1)
+                      )
+                      .join(" ")
+                    : "Unknown Status"}
+                </span>
+              </span>
+            )}
+          </div>
 
-            {/* Service Providers from Offer History */}
-            {(orderData?.hire_status === "pending" ||
-              orderData?.hire_status === "cancelled") &&
-              filteredProviders.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-black mb-4">
-                    Offered Service Providers
-                  </h2>
+          {/* Completion date */}
+          <p className="text-sm">
+            <span className="font-semibold">
+              Completion Date:{" "}
+              {orderData?.deadline
+                ? new Date(orderData.deadline).toLocaleString()
+                : "N/A"}
+            </span>
+          </p>
 
-                  <div className="space-y-4">
-                    {filteredProviders.reverse().map((provider) => (
-                      <div
-                        key={provider.provider_id._id}
-                        className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white rounded-lg shadow w-full"
-                      >
-                        {/* Profile Pic */}
-                        <img
-                          src={provider.provider_id.profile_pic || Profile}
-                          alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
-                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0"
-                        />
+          <p className="m-3">
+            <span className="text-gray-600 font-semibold block">
+              Do you want to visit a shop:{" "}
+              <span
+                className={
+                  orderData?.isShopVisited ? "text-green-600" : "text-red-600"
+                }
+              >
+                {orderData?.isShopVisited ? "Yes" : "No"}
+              </span>
+            </span>
+          </p>
 
-                        {/* Middle Section */}
-                        <div className="flex-1">
-                          {/* Name */}
-                          <p className="text-lg font-semibold break-words">
-                            {provider.provider_id.full_name
-                              .split(" ")
-                              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                              .join(" ") || "Unknown Provider"}{" "}
-                            <span className="text-gray-500 text-sm">
-                              ({provider.provider_id.unique_id})
-                            </span>
+          {/* Description styled like bidding */}
+          <div className="w-full max-w-4xl mx-auto px-0">
+            <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+              <p className="text-gray-700 tracking-tight break-words whitespace-pre-line text-sm sm:text-base leading-relaxed">
+                {orderData?.description || "No details available."}
+              </p>
+            </div>
+          </div>
+
+          {/* Service Providers from Offer History */}
+          {(orderData?.hire_status === "pending" ||
+            orderData?.hire_status === "cancelled") &&
+            filteredProviders.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-black mb-4">
+                  Offered Service Providers
+                </h2>
+
+                <div className="space-y-4">
+                  {filteredProviders.reverse().map((provider) => (
+                    <div
+                      key={provider.provider_id._id}
+                      className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-[#F9F9F9] rounded-xl shadow-md w-full"
+                    >
+                      <img
+                        src={provider.provider_id.profile_pic || Profile}
+                        alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                      />
+
+                      <div className="flex-1 text-left w-full">
+                        <p className="text-[17px] font-bold text-[#303030] break-words">
+                          {provider.provider_id.full_name
+                            .split(" ")
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(" ") || "Unknown Provider"}{" "}
+                          <span className="text-gray-500 text-sm">
+                            ({provider.provider_id.unique_id})
+                          </span>
+                        </p>
+
+                        <div className="flex items-start gap-2 mt-2 text-sm">
+                          <FaMapMarkerAlt
+                            className="text-[#F27773] mt-1 flex-shrink-0"
+                            color="#228B22"
+                            size={18}
+                          />
+                          <p className="text-gray-700 leading-snug break-words">
+                            {truncateAddress(
+                              provider.provider_id?.location?.address,
+                              provider.provider_id._id
+                            )}
+
+                            {provider.provider_id?.location?.address?.length > 50 && (
+                              <button
+                                onClick={() => toggleAddress(provider.provider_id._id)}
+                                className="text-[#228B22] font-semibold ml-2 hover:underline"
+                              >
+                                {expandedAddresses[provider.provider_id._id]
+                                  ? "See Less"
+                                  : "See More"}
+                              </button>
+                            )}
                           </p>
-
-                          {/* Address */}
-                          <div className="flex items-start gap-2 mt-2">
-                            <FaMapMarkerAlt
-                              className="text-[#F27773] mt-1 flex-shrink-0"
-                              color="#228B22"
-                              size={20}
-                            />
-                            <p className="text-gray-700 text-sm break-words leading-snug">
-                              {truncateAddress(
-                                provider.provider_id?.location?.address,
-                                provider.provider_id._id
-                              )}
-
-                              {provider.provider_id?.location?.address?.length > 50 && (
-                                <button
-                                  onClick={() => toggleAddress(provider.provider_id._id)}
-                                  className="text-[#228B22] font-semibold ml-2 hover:underline"
-                                >
-                                  {expandedAddresses[provider.provider_id._id]
-                                    ? "See Less"
-                                    : "See More"}
-                                </button>
-                              )}
-                            </p>
-                          </div>
-
-                          {/* View Profile Button */}
-                          <button
-                            onClick={() =>
-                              handleRouteHire(provider.provider_id._id, true)
-                            }
-                            className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
-                          >
-                            View Profile
-                          </button>
                         </div>
 
-                        {/* Contact Section */}
-                        {orderData.hire_status === "cancelled" ? (
-                          " "
-                        ) : (
-                          <div className="flex flex-col items-center justify-center w-full sm:w-auto">
+                        <button
+                          onClick={() =>
+                            handleRouteHire(provider.provider_id._id, true)
+                          }
+                          className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto border border-green-600 px-5 py-1 rounded-lg"
+                        >
+                          View Profile
+                        </button>
+                      </div>
+
+                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0 gap-2">
+                        {orderData.hire_status !== "cancelled" && (
+                          <>
                             <p className="text-gray-600 font-medium">Contact</p>
-                            <div className="flex space-x-3 mt-2">
+                            <div className="flex space-x-3 mt-1">
                               <button
                                 className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
                                 onClick={() => window.open(`tel:${provider.phone}`, "_self")}
@@ -1298,373 +1372,376 @@ export default function ViewProfile() {
                                 <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                               </button>
                             </div>
-                          </div>
+                          </>
                         )}
 
-                        {/* Status / Change Provider */}
-                        <div className="flex flex-col gap-2 w-full sm:w-auto">
-                          {offerStatuses[provider.provider_id._id] === "pending" ? (
-                            <span className="text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold text-center">
-                              Cancelled
-                            </span>
-                          ) : (
-                            <>
-                              {/* Status Button */}
-                              {!provider.isRejectedByUser && (
-                                <button
-                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed text-center
-                    ${provider.status === "pending" ? "bg-yellow-500" : ""}
-                    ${provider.status === "accepted" ? "bg-green-600" : ""}
-                    ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                  disabled
-                                >
-                                  {Array.isArray(provider.status)
-                                    ? provider.status
-                                      .map(
-                                        (word) =>
-                                          word.charAt(0).toUpperCase() + word.slice(1)
-                                      )
-                                      .join(" ")
-                                    : provider.status
-                                      ? provider.status.charAt(0).toUpperCase() +
-                                      provider.status.slice(1)
-                                      : ""}
-                                </button>
-                              )}
+                        {offerStatuses[provider.provider_id._id] === "pending" ? (
+                          <span className="mt-2 text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold text-center">
+                            Cancelled
+                          </span>
+                        ) : (
+                          <div className="flex flex-col gap-2 w-full sm:w-auto mt-2">
+                            {!provider.isRejectedByUser && (
+                              <button
+                                className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed text-center
+                                  ${provider.status === "pending" ? "bg-yellow-500" : ""}
+                                  ${provider.status === "accepted" ? "bg-green-600" : ""}
+                                  ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+                                disabled
+                              >
+                                {Array.isArray(provider.status)
+                                  ? provider.status
+                                    .map(
+                                      (word) =>
+                                        word.charAt(0).toUpperCase() + word.slice(1)
+                                    )
+                                    .join(" ")
+                                  : provider.status
+                                    ? provider.status.charAt(0).toUpperCase() +
+                                    provider.status.slice(1)
+                                    : ""}
+                              </button>
+                            )}
 
-                              {/* Rejected by Me */}
-                              {provider.isRejectedByUser && (
-                                <button
-                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed text-center"
-                                  disabled
-                                >
-                                  Rejected by Me
-                                </button>
-                              )}
+                            {provider.isRejectedByUser && (
+                              <button
+                                className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed text-center"
+                                disabled
+                              >
+                                Rejected by Me
+                              </button>
+                            )}
 
-                              {/* Change Service Provider */}
-                              {orderData?.hire_status === "pending" &&
-                                provider.status === "pending" && (
-                                  <button
-                                    className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
+                            {orderData?.hire_status === "pending" &&
+                              provider.status === "pending" && (
+                                <button
+                                  className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
                                       ? "bg-green-600"
                                       : "bg-[#FB3523]"
-                                      } text-white font-semibold rounded-lg shadow`}
-                                    onClick={async () => {
-                                      if (provider.isRejectedByUser) {
-                                        setShowChangeProvider(true);
-                                        return;
-                                      }
+                                    } text-white font-semibold rounded-lg shadow`}
+                                  onClick={async () => {
+                                    if (provider.isRejectedByUser) {
+                                      setShowChangeProvider(true);
+                                      return;
+                                    }
 
-                                      const result = await Swal.fire({
-                                        title: "Are you sure?",
-                                        text: "Do you really want to change the service provider?",
-                                        icon: "warning",
-                                        showCancelButton: true,
-                                        confirmButtonColor: "#3085d6",
-                                        cancelButtonColor: "#d33",
-                                        confirmButtonText: "Yes, change it!",
-                                      });
+                                    const result = await Swal.fire({
+                                      title: "Are you sure?",
+                                      text: "Do you really want to change the service provider?",
+                                      icon: "warning",
+                                      showCancelButton: true,
+                                      confirmButtonColor: "#3085d6",
+                                      cancelButtonColor: "#d33",
+                                      confirmButtonText: "Yes, change it!",
+                                    });
 
-                                      if (result.isConfirmed) {
-                                        try {
-                                          const token = localStorage.getItem("bharat_token");
+                                    if (result.isConfirmed) {
+                                      try {
+                                        const token = localStorage.getItem("bharat_token");
 
-                                          await axios.post(
-                                            `${BASE_URL}/direct-order/userRejectOffer`,
-                                            {
-                                              order_id: orderData._id,
-                                              provider_id: provider.provider_id._id,
+                                        await axios.post(
+                                          `${BASE_URL}/direct-order/userRejectOffer`,
+                                          {
+                                            order_id: orderData._id,
+                                            provider_id: provider.provider_id._id,
+                                          },
+                                          {
+                                            headers: {
+                                              "Content-Type": "application/json",
+                                              Authorization: `Bearer ${token}`,
                                             },
-                                            {
-                                              headers: {
-                                                "Content-Type": "application/json",
-                                                Authorization: `Bearer ${token}`,
-                                              },
-                                            }
-                                          );
+                                          }
+                                        );
 
-                                          Swal.fire({
-                                            title: "Offer Rejected!",
-                                            text: "You have rejected this offer successfully.",
-                                            icon: "success",
-                                            timer: 1500,
-                                            showConfirmButton: false,
-                                          });
+                                        Swal.fire({
+                                          title: "Offer Rejected!",
+                                          text: "You have rejected this offer successfully.",
+                                          icon: "success",
+                                          timer: 1500,
+                                          showConfirmButton: false,
+                                        });
 
-                                          setShowChangeProvider(true);
-                                          fetchData();
-                                        } catch (error) {
-                                          Swal.fire({
-                                            title: "Error",
-                                            text:
-                                              error.response?.data?.message ||
-                                              "Failed to reject the offer.",
-                                            icon: "error",
-                                          });
-                                        }
+                                        setShowChangeProvider(true);
+                                        fetchData();
+                                      } catch (error) {
+                                        Swal.fire({
+                                          title: "Error",
+                                          text:
+                                            error.response?.data?.message ||
+                                            "Failed to reject the offer.",
+                                          icon: "error",
+                                        });
                                       }
-                                    }}
-                                  >
-                                    {showChangeProvider || provider.isRejectedByUser
-                                      ? "Rejected by Me"
-                                      : "Change Service Provider"}
-                                  </button>
-                                )}
-                            </>
-                          )}
-                        </div>
+                                    }
+                                  }}
+                                >
+                                  {showChangeProvider || provider.isRejectedByUser
+                                    ? "Rejected by Me"
+                                    : "Change Service Provider"}
+                                </button>
+                              )}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
+              </div>
+            )}
 
-              )}
-
-            {/* Task Status / Cancel Button */}
-            <div className="text-center mb-6">
-              {/* Show buttons depending on hire_status */}
-              {orderData?.hire_status === "cancelled" ? (
-                <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled Task
+          {/* Task Status / Cancel Button (aligned with bidding layout) */}
+          <div className="text-center mb-6">
+            {orderData?.hire_status === "cancelled" ? (
+              <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                Cancelled Task
+              </span>
+            ) : orderData?.hire_status === "completed" ? (
+              <div className="flex justify-center gap-4 flex-wrap">
+                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                  Task Completed
                 </span>
-              ) : orderData?.hire_status === "completed" ? (
-                <div className="flex justify-center gap-4 flex-wrap">
-                  {/* ✅ Task Completed */}
-                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
-                    Task Completed
+
+                {orderData?.isReviewedByUser ? (
+                  <span
+                    className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                    onClick={() => setShowOrderReviewModal(true)}
+                  >
+                    See Review
                   </span>
+                ) : (
+                  <span
+                    className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                    onClick={() => setShowCompletedModal(true)}
+                  >
+                    Add Review
+                  </span>
+                )}
+              </div>
+            ) : orderData?.hire_status === "pending" ? (
+              <button
+                className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                onClick={handleCancelOffer}
+              >
+                Cancel Task
+              </button>
+            ) : orderData?.hire_status === "cancelledDispute" ? (
+              <>
+                <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
+                  <span
+  className="
+    px-4 sm:px-6 
+    py-1.5 
+    bg-[#FF0000] 
+    text-white 
+    rounded-md 
+    text-sm sm:text-base 
+    font-semibold 
+    cursor-pointer 
+    hover:bg-red-700 
+    whitespace-nowrap 
+    leading-tight 
+    block 
+    w-fit 
+    mx-auto          /* Center horizontally */
+  "
+>
+  Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
+</span>
 
-                  {/* ✅ Review Buttons */}
-                  {orderData?.isReviewedByUser ? (
-                    <span
-                      className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
-                      onClick={() => setShowOrderReviewModal(true)}
-                    >
-                      See Review
-                    </span>
-                  ) : (
-                    <span
-                      className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
-                      onClick={() => setShowCompletedModal(true)}
-                    >
-                      Add Review
-                    </span>
-                  )}
-                </div>
-              ) : orderData?.hire_status === "pending" ? (
-                <button
-                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
-                  onClick={handleCancelOffer}
-                >
-                  Cancel Task
-                </button>
-              ) : orderData?.hire_status === "cancelledDispute" ? (
-                <>
-                  {/* <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                    Cancelled ({disputeInfo.unique_id || "No Id"})
-                  </span> */}
-                  <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
-                    <span
-                      className="px-4 sm:px-6 py-1.5 bg-[#FF0000] text-white rounded-md text-sm sm:text-base font-semibold cursor-pointer hover:bg-red-700 whitespace-nowrap leading-tight block w-fit "
-                    >
-                      Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
-                    </span>
+                </Link>
 
-                  </Link>
+                <p className="text-sm text-gray-700 mt-3">
+                  Note:{" "}
+                  <span className="text-red-600 font-semibold">
+                    Freezed by Platform
+                  </span>
+                </p>
+              </>
+            ) : null}
 
-                  <p className="text-sm text-gray-700 mt-3">
-                    Note:{" "}
-                    <span className="text-red-600 font-semibold">
-                      Freezed by Platform
-                    </span>
-                  </p>
-                </>
-              ) : null}
-              <ReviewModal
-                show={showCompletedModal}
-                onClose={() => {
-                  setShowCompletedModal(false);
-                  fetchData(); // refresh data after closing
-                }}
-                service_provider_id={orderData?.service_provider_id?._id}
-                orderId={id}
-                type="direct"
-              />
-              <OrderReviewModal
-                show={showOrderReviewModal}
-                onClose={() => setShowOrderReviewModal(false)}
-                orderId={id}
-                type="direct"
-              />
+            <ReviewModal
+              show={showCompletedModal}
+              onClose={() => {
+                setShowCompletedModal(false);
+                fetchData();
+              }}
+              service_provider_id={orderData?.service_provider_id?._id}
+              orderId={id}
+              type="direct"
+            />
+            <OrderReviewModal
+              show={showOrderReviewModal}
+              onClose={() => setShowOrderReviewModal(false)}
+              orderId={id}
+              type="direct"
+            />
 
-              {/* ✅ Show Refund Button */}
-              {showRefundButton && (
-                <button
-                  onClick={() => setShowRefundModal(true)}
-                  className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
-                >
-                  Get Refund
-                </button>
-              )}
-              {orderData?.refundRequest && (
-                <button
-                  className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
+            {showRefundButton && (
+              <button
+                onClick={() => setShowRefundModal(true)}
+                className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+              >
+                Get Refund
+              </button>
+            )}
+
+            {orderData?.refundRequest && (
+              <button
+                className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
                     ? "bg-blue-600 hover:bg-blue-700"
                     : orderData?.refundStatus === "processed"
                       ? "bg-green-600 hover:bg-green-700"
                       : orderData?.refundStatus === "rejected"
                         ? "bg-red-600 hover:bg-red-700"
                         : "bg-gray-500"
-                    }`}
-                >
-                  {orderData?.refundStatus === "pending" &&
-                    "Refund Request Submitted"}
-                  {orderData?.refundStatus === "processed" && "Processed"}
-                  {orderData?.refundStatus === "rejected" && "Rejected"}
-                </button>
-              )}
-              {(orderData?.refundStatus === "processed" ||
-                orderData?.refundStatus === "rejected") && (
-                  <p
-                    className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
+                  }`}
+              >
+                {orderData?.refundStatus === "pending" &&
+                  "Refund Request Submitted"}
+                {orderData?.refundStatus === "processed" && "Processed"}
+                {orderData?.refundStatus === "rejected" && "Rejected"}
+              </button>
+            )}
+
+            {(orderData?.refundStatus === "processed" ||
+              orderData?.refundStatus === "rejected") && (
+                <p
+                  className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
                       ? "text-green-600"
                       : "text-red-600"
-                      }`}
+                    }`}
+                >
+                  Admin Remark: {orderData?.refundReasonDetails}
+                </p>
+              )}
+
+            {showRefundModal && (
+              <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                  Request Refund
+                </h2>
+                <p className="flex items-center text-black-600 font-bold mt-2 mb-2">
+                  &#9888;{" "}
+                  <span className="ml-2">
+                    Note: 60% amount will be refundable.
+                  </span>
+                </p>
+                <textarea
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Enter your refund reason..."
+                  className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                />
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowRefundModal(false)}
+                    className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
                   >
-                    Admin Remark: {orderData?.refundReasonDetails}
-                  </p>
-                )}
-              {/* ✅ Refund Modal */}
-              {showRefundModal && (
-                <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                    Request Refund
-                  </h2>
-                  <p className="flex items-center text-black-600 font-bold mt-2 mb-2">
-                    &#9888;{" "}
-                    <span className="ml-2">
-                      Note: 60% amount will be refundable.
-                    </span>
-                  </p>
-                  <textarea
-                    value={refundReason}
-                    onChange={(e) => setRefundReason(e.target.value)}
-                    placeholder="Enter your refund reason..."
-                    className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={4}
-                  />
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={() => setShowRefundModal(false)}
-                      className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleRefundRequest}
-                      className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Submit
-                    </button>
-                  </div>
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleRefundRequest}
+                    className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Submit
+                  </button>
                 </div>
-              )}
-            </div>
-
-            {orderData.hire_status === "cancelled" &&
-              !orderData?.refundRequest && (
-                <div className="flex justify-center mt-3">
-                  <p className="text-gray-800 text-sm font-medium text-center">
-                    Note:&nbsp;
-                    <span className="text-red-600 font-semibold">
-                      You can ask for a refund by tapping on the refund button.
-                    </span>
-                  </p>
-                </div>
-              )}
-
-            {(orderData?.hire_status === "accepted" ||
-              orderData?.hire_status === "completed" ||
-              orderData?.hire_status === "cancelledDispute") && (
-                <div ref={acceptedSectionRef}>
-                  <Accepted
-                    serviceProvider={orderData?.service_provider_id}
-                    user_id={orderData?.user_id._id}
-                    assignedWorker={assignedWorker}
-                    paymentHistory={orderData?.service_payment?.payment_history}
-                    fullPaymentHistory={orderData?.service_payment}
-                    orderId={id}
-                    hireStatus={orderData?.hire_status}
-                  />
-                  {(orderData?.hire_status === "accepted" ||
-                    orderData?.hire_status === "completed") && (
-                      <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                        <div className="relative max-w-2xl mx-auto">
-                          {/* Top Images */}
-                          <div className="relative z-10 flex justify-center gap-4">
-                            <img
-                              src={Warning1}
-                              alt="Warning"
-                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                            />
-                            <img
-                              src={Warning3}
-                              alt="Warning2"
-                              className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                            />
-                          </div>
-
-                          {/* Yellow Box */}
-                          <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                            <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                              Warning Message
-                            </h2>
-                            <p className="text-gray-700 text-sm md:text-base">
-                              Pay securely — no extra charges from the platform.
-                              Choose simple and safe transactions.
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex space-x-4">
-                          {orderData?.hire_status === "completed" ? (
-                            ""
-                          ) : (
-                            <>
-                              <button
-                                className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer"
-                                onClick={handleMarkComplete}
-                              >
-                                Mark as Complete
-                              </button>
-                              <ReviewModal
-                                show={showCompletedModal}
-                                onClose={() => {
-                                  setShowCompletedModal(false);
-                                  fetchData();
-                                }}
-                                service_provider_id={
-                                  orderData?.service_provider_id._id
-                                }
-                                orderId={id}
-                                type="direct"
-                              />{" "}
-                            </>
-                          )}
-                          <Link to={`/dispute/${id}/direct`}>
-                            <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer">
-                              {orderData?.hire_status === "completed"
-                                ? "Create Dispute"
-                                : "Cancel Task and Create Dispute"}
-                            </button>
-                          </Link>
-                        </div>
-                      </div>
-                    )}
-                </div>
-              )}
+              </div>
+            )}
           </div>
+
+          {orderData.hire_status === "cancelled" &&
+            !orderData?.refundRequest && (
+              <div className="flex justify-center mt-3">
+                <p className="text-gray-800 text-sm font-medium text-center">
+                  Note:&nbsp;
+                  <span className="text-red-600 font-semibold">
+                    You can ask for a refund by tapping on the refund button.
+                  </span>
+                </p>
+              </div>
+            )}
+
+          {(orderData?.hire_status === "accepted" ||
+            orderData?.hire_status === "completed" ||
+            orderData?.hire_status === "cancelledDispute") && (
+              <div ref={acceptedSectionRef}>
+                <Accepted
+                  serviceProvider={orderData?.service_provider_id}
+                  user_id={orderData?.user_id._id}
+                  assignedWorker={assignedWorker}
+                  paymentHistory={orderData?.service_payment?.payment_history}
+                  fullPaymentHistory={orderData?.service_payment}
+                  orderId={id}
+                  hireStatus={orderData?.hire_status}
+                />
+                {(orderData?.hire_status === "accepted" ||
+                  orderData?.hire_status === "completed") && (
+                    <div className="flex flex-col items-center justify-center space-y-6 mt-6 w-full px-4">
+                      <div className="relative max-w-2xl mx-auto w-full">
+                        {/* Top Images - responsive sizes and wrap on small screens */}
+                        <div className="relative z-10 flex justify-center gap-4 flex-wrap">
+                          <img
+                            src={Warning1}
+                            alt="Warning"
+                            className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                          />
+                          <img
+                            src={Warning3}
+                            alt="Warning2"
+                            className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                          />
+                        </div>
+
+                        {/* Yellow Box - spacing & text size responsive */}
+                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
+                    Warning Message
+                  </h2>
+                  <p className="text-gray-700 text-sm sm:text-base">
+                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                  </p>
+                </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
+                        {orderData?.hire_status === "completed" ? (
+                          ""
+                        ) : (
+                          <>
+                            <button
+                              className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md cursor-pointer"
+                              onClick={handleMarkComplete}
+                            >
+                              Mark as Complete
+                            </button>
+                            <ReviewModal
+                              show={showCompletedModal}
+                              onClose={() => {
+                                setShowCompletedModal(false);
+                                fetchData();
+                              }}
+                              service_provider_id={
+                                orderData?.service_provider_id._id
+                              }
+                              orderId={id}
+                              type="direct"
+                            />
+                          </>
+                        )}
+                        <Link to={`/dispute/${id}/direct`}>
+                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                            {orderData?.hire_status === "completed"
+                              ? "Create Dispute"
+                              : "Cancel Task and Create Dispute"}
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+              </div>
+            )}
         </div>
       </div>
 
