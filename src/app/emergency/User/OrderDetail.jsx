@@ -49,6 +49,7 @@ export default function ViewProfile() {
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [mapAddress, setMapAddress] = useState("");
   const token = localStorage.getItem("bharat_token");
+   const [openImage, setOpenImage] = useState(null);
 
   // Sort state
   const [sortBy, setSortBy] = useState("name-asc");
@@ -618,14 +619,39 @@ export default function ViewProfile() {
         {error}
       </div>
     );
+ const handleOpenImage = (url) => {
+    const full = getFullSizeImage(url);
+    console.log("Opening image:", full); // debug: ensure URL is correct
+    setOpenImage(full);
+  };
+  const getFullSizeImage = (thumbnailUrl) => {
+    if (!thumbnailUrl) return thumbnailUrl;
 
+    // Case 1: Firebase Storage (99% of apps in India)
+    if (thumbnailUrl.includes("firebasestorage.googleapis.com")) {
+      // Removes =s400-c, =s600-c, =s800-c etc. → gives original full size
+      return thumbnailUrl.replace(/=s\d+-c.*/i, "");
+    }
+
+    // Case 2: Cloudinary
+    if (thumbnailUrl.includes("res.cloudinary.com")) {
+      return thumbnailUrl.replace(
+        /\/upload\/.*/,
+        "/upload/q_auto:good,f_auto,w_2000,h_2000,c_limit/"
+      );
+    }
+
+    // Case 3: Any other CDN – force high quality
+    const separator = thumbnailUrl.includes("?") ? "&" : "?";
+    return `${thumbnailUrl}${separator}original=true`;
+  };
   return (
     <>
       <Header />
       <div className="container mx-auto mt-20 px-4 py-4">
         <button
-          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
         >
           <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
           Back
@@ -633,301 +659,446 @@ export default function ViewProfile() {
       </div>
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          {orderData?.image_urls?.length > 0 ? (
-            <Carousel
-              showArrows={true}
-              showThumbs={false}
-              infiniteLoop={true}
-              autoPlay={false}
-              className="w-full h-[360px]"
-            >
-              {orderData.image_urls.map((url, i) => (
-                <div key={i}>
-                  <img
-                    src={url}
-                    alt=""
-                    className="w-full h-[360px] object-cover"
-                  />
-                </div>
-              ))}
-            </Carousel>
-          ) : (
-            <img
-              src={workImage}
-              alt="No images"
-              className="w-full h-[360px] object-cover mt-5"
-            />
-          )}
+        <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
 
-          <div className="p-6">
+        {/* TOP IMAGE / CAROUSEL styled like getworkdetails.jsx */}
+      {orderData?.image_urls?.length > 0 ? (
+  <Carousel
+    showArrows
+    showThumbs={false}
+    infiniteLoop
+    emulateTouch
+    swipeable
+    interval={3000}
+    showStatus={false}
+    autoPlay={false}
+    // use correct plural name and optional chaining
+    onClickItem={(index) => handleOpenImage(orderData?.image_urls?.[index])}
+     className="w-full 
+               h-[180px]        /* mobile */
+               sm:h-[250px] 
+               md:h-[360px]"   /* desktop unchanged */
+  >
+    {orderData.image_urls.map((url, i) => (
+      <div
+        key={i}
+        
+        className="cursor-pointer pointer-events-auto"
+        
+        >
+        <img
+          src={url}
+          alt={`Project image ${i + 1}`}
+            className="
+            w-full 
+            h-[180px]        /* mobile size updated */
+            sm:h-[250px] 
+            md:h-[360px]     /* desktop same */
+            object-cover 
+            rounded-lg
+          "
+          />
+      </div>
+    ))}
+  </Carousel>
+) : (
+  <img
+  src={workImage}
+  alt="No images"
+  className="
+      w-full 
+      h-[180px]        /* mobile */
+      sm:h-[250px] 
+      md:h-[360px]     /* desktop same */
+      object-cover 
+      mt-5
+      rounded-lg
+    "
+  />
+)}
+
+      {openImage && (
+        <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        onClick={() => setOpenImage(null)}
+        >
+    <div
+      className="relative"
+      onClick={(e) => e.stopPropagation()}
+      >
+      <img
+        src={openImage}
+        alt="Preview"
+        className="
+        max-w-[90vw] 
+        max-h-[90vh] 
+        rounded-xl 
+        shadow-2xl
+        "
+        />
+
+      <button
+        onClick={() => setOpenImage(null)}
+        className="
+        absolute -top-4 -right-4 
+        h-10 w-10 
+        flex items-center justify-center 
+        bg-white 
+        text-black 
+        rounded-full 
+          shadow-lg 
+          text-2xl
+        "
+      >
+        ×
+      </button>
+    </div>
+  </div>
+)}
+        <div className="py-6 space-y-4">
             {/* Order Details */}
-            <div className="flex flex-col md:flex-row justify-between items-start mb-4">
-              <div className="space-y-2 text-gray-800 text-lg font-semibold">
-                <p>
-                  Title :-{" "}
-                  {orderData?.title
-                    ? orderData.title.charAt(0).toUpperCase() +
-                      orderData.title.slice(1)
-                    : "Unknown Title"}
-                </p>
-                <span className="text-green-600">
-                  Category :-{" "}
-                  {orderData?.category_id?.name || "Unknown Category"}
-                </span>
-                <div className="text-[13px]">
-                  <span className="font-semibold text-base text-green-600">Sub-Categories-</span>{" "}
-                  {orderData?.sub_category_ids?.map((s) => s.name).join(", ") ||
-                    "N/A"}
-                  {/* <div className="text-gray-600 flex items-center px-3 py-1 rounded-full text-sm mt-2 w-fit">
-                    <FaMapMarkerAlt size={25} color="#228B22" className="mr-2" />
-                    {orderData?.google_address || "Unknown Location"}
-                  </div> */}
-                  <div
-                    onClick={() => openMapModal(orderData?.google_address)}
-                    className="text-gray-600 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
-                  >
-                    <FaMapMarkerAlt
-                      size={25}
-                      color="#228B22"
-                      className="mr-2"
-                    />
-                    {orderData?.google_address || "Unknown Location"}
-                  </div>
+          <div className="flex justify-between items-start">
+            <div className="w-full md:w-auto space-y-1 text-gray-800">
+              <p className="text-lg font-semibold">
+                Title :-{" "}
+                {orderData?.title
+                  ? orderData.title.charAt(0).toUpperCase() +
+                    orderData.title.slice(1)
+                  : "Unknown Title"}
+              </p>
+              <p className="text-sm text-green-600 font-semibold">
+                Category :- {orderData?.category_id?.name || "Unknown Category"}
+              </p>
+              <div className="text-[13px]">
+                <span className="font-semibold text-base text-[#228B22]">
+                  Sub-Categories-
+                </span>{" "}
+                {orderData?.sub_category_ids?.map((s) => s.name).join(", ") ||
+                  "N/A"}
+                <div
+                  onClick={() => openMapModal(orderData?.google_address)}
+                  className="text-gray-600 flex items-center px-0 py-1 rounded-full text-sm mt-2 w-fit cursor-pointer"
+                >
+                  <FaMapMarkerAlt
+                    size={20}
+                    color="#228B22"
+                    className="mr-2"
+                  />
+                  {orderData?.google_address || "Unknown Location"}
                 </div>
-              </div>
-              <div className="text-right space-y-2 tracking-tight">
-                <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm block text-center">
-                  {orderData?.project_id || "#N/A"}
-                </span>
-                <span className="text-gray-600 font-semibold block">
-                  Posted:{" "}
-                  {orderData?.createdAt
-                    ? (() => {
-                        const date = new Date(orderData.createdAt);
-                        const day = String(date.getDate()).padStart(2, "0");
-                        const month = String(date.getMonth() + 1).padStart(
-                          2,
-                          "0"
-                        ); // Month is 0-indexed
-                        const year = date.getFullYear();
-                        return `${day}/${month}/${year}`;
-                      })()
-                    : "N/A"}
-                </span>
-
-                <span className="text-gray-600 font-semibold block">
-                  Status:{" "}
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                      orderData?.hire_status === "pending"
-                        ? "bg-yellow-500"
-                        : ""
-                    } ${
-                      orderData?.hire_status === "cancelled" ||
-                      orderData?.hire_status === "cancelledDispute"
-                        ? "bg-[#FF0000]"
-                        : ""
-                    } ${
-                      orderData?.hire_status === "completed" ||
-                      orderData?.hire_status === "assigned"
-                        ? "bg-[#228B22]"
-                        : ""
-                    }`}
-                  >
-                    {orderData?.hire_status === "cancelledDispute"
-                      ? "Cancelled Dispute"
-                      : orderData?.hire_status
-                          ?.split(" ")
-                          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                          .join(" ") || "Unknown"}
-                  </span>
-                </span>
-                {orderData?.refundRequest && (
-                  <span className="text-gray-600 font-semibold block">
-                    Refund:{" "}
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                        orderData?.refundStatus === "pending"
-                          ? "bg-yellow-500"
-                          : "bg-blue-500"
-                      }`}
-                    >
-                      {orderData?.refundStatus?.charAt(0).toUpperCase() +
-                        orderData?.refundStatus?.slice(1) || "Unknown"}
-                    </span>
-                  </span>
-                )}
               </div>
             </div>
 
-            <span className="text-gray-600 text-sm font-semibold block">
-              Deadline:{" "}
-              {orderData?.deadline
+            {/* Desktop side: project id, posted, status, refund */}
+            <div className="text-left sm:text-right sm:ml-auto mt-4 sm:mt-0 hidden sm:block space-y-2 tracking-tight">
+              <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm inline-block text-center">
+                {orderData?.project_id || "#N/A"}
+              </span>
+              <span className="text-gray-600 font-semibold block">
+                Posted:{" "}
+                {orderData?.createdAt
+                  ? (() => {
+                      const date = new Date(orderData.createdAt);
+                      const day = String(date.getDate()).padStart(2, "0");
+                      const month = String(date.getMonth() + 1).padStart(2, "0");
+                      const year = date.getFullYear();
+                      return `${day}/${month}/${year}`;
+                    })()
+                  : "N/A"}
+              </span>
+
+              <span className="text-gray-600 font-semibold block">
+                Status:{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                    orderData?.hire_status === "pending"
+                      ? "bg-yellow-500"
+                      : ""
+                  } ${
+                    orderData?.hire_status === "cancelled" ||
+                    orderData?.hire_status === "cancelledDispute"
+                      ? "bg-[#FF0000]"
+                      : ""
+                  } ${
+                    orderData?.hire_status === "completed" ||
+                    orderData?.hire_status === "assigned"
+                      ? "bg-[#228B22]"
+                      : ""
+                  }`}
+                >
+                  {orderData?.hire_status === "cancelledDispute"
+                    ? "Cancelled Dispute"
+                    : orderData?.hire_status
+                        ?.split(" ")
+                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(" ") || "Unknown"}
+                </span>
+              </span>
+              {orderData?.refundRequest && (
+                <span className="text-gray-600 font-semibold block">
+                  Refund:{" "}
+                  <span
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                      orderData?.refundStatus === "pending"
+                        ? "bg-yellow-500"
+                        : "bg-blue-500"
+                    }`}
+                  >
+                    {orderData?.refundStatus?.charAt(0).toUpperCase() +
+                      orderData?.refundStatus?.slice(1) || "Unknown"}
+                  </span>
+                </span>
+              )}
+              </div>
+            </div>
+          {/* Mobile mirror of right side */}
+          <div className="block sm:hidden mt-4 text-left">
+            <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm inline-block text-center">
+              {orderData?.project_id || "#N/A"}
+            </span>
+            <span className="text-gray-600 font-semibold block mt-2">
+              Posted:{" "}
+              {orderData?.createdAt
                 ? (() => {
-                    const date = new Date(orderData.deadline); // local time
+                    const date = new Date(orderData.createdAt);
                     const day = String(date.getDate()).padStart(2, "0");
                     const month = String(date.getMonth() + 1).padStart(2, "0");
                     const year = date.getFullYear();
-
-                    let hours = date.getHours();
-                    const minutes = String(date.getMinutes()).padStart(2, "0");
-                    const ampm = hours >= 12 ? "PM" : "AM";
-
-                    hours = hours % 12 || 12; // convert to 12-hour format
-                    hours = String(hours).padStart(2, "0");
-
-                    return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+                    return `${day}/${month}/${year}`;
                   })()
                 : "N/A"}
             </span>
-
-            {orderData?.platform_fee_paid && (
-              <span className="text-gray-600 text-sm font-semibold block mt-1">
-                One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+            <span className="text-gray-600 font-semibold block mt-1">
+              Status:{" "}
+              <span
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                  orderData?.hire_status === "pending"
+                    ? "bg-yellow-500"
+                    : ""
+                } ${
+                  orderData?.hire_status === "cancelled" ||
+                  orderData?.hire_status === "cancelledDispute"
+                    ? "bg-[#FF0000]"
+                    : ""
+                } ${
+                  orderData?.hire_status === "completed" ||
+                  orderData?.hire_status === "assigned"
+                    ? "bg-[#228B22]"
+                    : ""
+                }`}
+              >
+                {orderData?.hire_status === "cancelledDispute"
+                  ? "Cancelled Dispute"
+                  : orderData?.hire_status
+                      ?.split(" ")
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(" ") || "Unknown"}
               </span>
-            )}
-            <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
-  <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
-    {orderData?.description || "No details available."}
-  </p>
-</div>
-
-
-            {/* Action Buttons */}
-            <div className="text-center mb-6">
-              {orderData?.hire_status === "cancelled" ? (
-                <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
-                  Cancelled by User
-                </span>
-              ) : orderData?.hire_status === "completed" ? (
-                <div className="flex justify-center gap-4 flex-wrap">
-                  <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
-                    Task Completed
-                  </span>
-                  {orderData?.isReviewedByUser ? (
-                    <span
-                      className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
-                      onClick={() => setShowOrderReviewModal(true)}
-                    >
-                      See Review
-                    </span>
-                  ) : (
-                    <span
-                      className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
-                      onClick={() => setShowCompletedModal(true)}
-                    >
-                      Add Review
-                    </span>
-                  )}
-                  <ReviewModal
-                    show={showCompletedModal}
-                    onClose={() => setShowCompletedModal(false)}
-                    service_provider_id={orderData?.service_provider_id._id}
-                    orderId={id}
-                    type="emergency"
-                  />
-                  <OrderReviewModal
-                    show={showOrderReviewModal}
-                    onClose={() => setShowOrderReviewModal(false)}
-                    orderId={id}
-                    type="emergency"
-                  />
-                </div>
-              ) : orderData?.hire_status === "cancelledDispute" &&
-                disputeInfo ? (
-                <>
-                  <Link to={`/disputes/emergency/${disputeInfo._id}`}>
-                      <span
-                      className="md:mx-auto px-4 sm:px-6 py-1.5 bg-[#FF0000] text-white rounded-md text-sm sm:text-base font-semibold cursor-pointer hover:bg-red-700 whitespace-nowrap leading-tight block w-fit "
-                    >
-                      Cancelled (disputeId_ {disputeInfo.unique_id || "N/A"})
-                    </span>
-                  </Link>
-                  <p className="text-sm text-gray-700 mt-3">
-                    <span className="text-red-600 font-semibold">
-                      Freezed by Platform
-                    </span>
-                  </p>
-                </>
-              ) : orderData?.hire_status !== "assigned" ? (
-                <button
-                  className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
-                  onClick={() => setShowModal(true)}
-                >
-                  Cancel Task
-                </button>
-              ) : null}
-
-              {showRefundButton && orderData?.platform_fee_paid && (
-                <button
-                  onClick={() => setShowRefundModal(true)}
-                  className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
-                >
-                  Cancel & Get Refund
-                </button>
-              )}
-              {orderData?.refundRequest && (
-                <button className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700">
-                  {orderData?.refundStatus === "pending"
-                    ? "Refund Request Submitted"
-                    : "Refunded"}
-                </button>
-              )}
-              {orderData?.hire_status === "assigned" &&
-                orderData?.platform_fee_paid &&
-                !orderData?.refundRequest && (
-                  <p className="text-gray-800 text-sm font-medium text-center mt-3">
-                    <span className="text-gray-700 font-bold">Note :-</span>{" "}
-                    <span className="text-red-600 font-semibold">
-                      Use "Cancel & Get Refund" to cancel and request refund.
-                    </span>
-                  </p>
-                )}
-            </div>
-
-            {/* Refund Modal */}
-            {showRefundModal && (
-              <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">
-                  Request Refund
-                </h2>
-                <textarea
-                  value={refundReason}
-                  onChange={(e) => setRefundReason(e.target.value)}
-                  placeholder="Enter your refund reason..."
-                  className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={4}
-                />
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => setShowRefundModal(false)}
-                    className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleRefundRequest}
-                    className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
-            )}
-						{(orderData?.refundStatus === "processed" ||
-                orderData?.refundStatus === "rejected") && (
-                <p
-                  className={`mt-2 text-sm font-medium ${
-                    orderData?.refundStatus === "processed"
-                      ? "text-green-600"
-                      : "text-red-600"
+            </span>
+            {orderData?.refundRequest && (
+              <span className="text-gray-600 font-semibold block mt-1">
+                Refund:{" "}
+                <span
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                    orderData?.refundStatus === "pending"
+                      ? "bg-yellow-500"
+                      : "bg-blue-500"
                   }`}
                 >
-                  Admin Remark: {orderData?.refundReasonDetails || "No Remark"}
+                  {orderData?.refundStatus?.charAt(0).toUpperCase() +
+                    orderData?.refundStatus?.slice(1) || "Unknown"}
+                </span>
+              </span>
+            )}
+          </div>
+
+          {/* Deadline & platform fee */}
+          <span className="text-gray-600 text-sm font-semibold block mt-2">
+            Deadline:{" "}
+            {orderData?.deadline
+              ? (() => {
+                  const date = new Date(orderData.deadline);
+                  const day = String(date.getDate()).padStart(2, "0");
+                  const month = String(date.getMonth() + 1).padStart(2, "0");
+                  const year = date.getFullYear();
+
+                  let hours = date.getHours();
+                  const minutes = String(date.getMinutes()).padStart(2, "0");
+                  const ampm = hours >= 12 ? "PM" : "AM";
+
+                  hours = hours % 12 || 12;
+                  hours = String(hours).padStart(2, "0");
+
+                  return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+                })()
+              : "N/A"}
+          </span>
+
+          {orderData?.platform_fee_paid && (
+            <span className="text-gray-600 text-sm font-semibold block mt-1">
+              One Time Project fee :- ₹{orderData?.platform_fee || "0"}
+            </span>
+          )}
+
+          {/* Description block styled like bidding */}
+          <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+            <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
+              {orderData?.description || "No details available."}
+            </p>
+          </div>
+
+          {/* Action Buttons (match bidding layout) */}
+          <div className="text-center mb-6">
+            {orderData?.hire_status === "cancelled" ? (
+              <span className="px-8 py-2 bg-[#FF0000] text-white rounded-lg text-lg font-semibold">
+                Cancelled by User
+              </span>
+            ) : orderData?.hire_status === "completed" ? (
+              <div className="flex justify-center gap-4 flex-wrap">
+                <span className="px-8 py-2 bg-[#228B22] text-white rounded-lg text-lg font-semibold">
+                  Task Completed
+                </span>
+                {orderData?.isReviewedByUser ? (
+                  <span
+                    className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                    onClick={() => setShowOrderReviewModal(true)}
+                  >
+                    See Review
+                  </span>
+                ) : (
+                  <span
+                    className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                    onClick={() => setShowCompletedModal(true)}
+                  >
+                    Add Review
+                  </span>
+                )}
+                <ReviewModal
+                  show={showCompletedModal}
+                  onClose={() => setShowCompletedModal(false)}
+                  service_provider_id={orderData?.service_provider_id._id}
+                  orderId={id}
+                  type="emergency"
+                />
+                <OrderReviewModal
+                  show={showOrderReviewModal}
+                  onClose={() => setShowOrderReviewModal(false)}
+                  orderId={id}
+                  type="emergency"
+                />
+              </div>
+            ) : orderData?.hire_status === "cancelledDispute" && disputeInfo ? (
+              <>
+                <Link to={`/disputes/emergency/${disputeInfo._id}`}>
+                  <span
+  className="
+    px-4 sm:px-6 
+    py-1.5 
+    bg-[#FF0000] 
+    text-white 
+    rounded-md 
+    text-sm sm:text-base 
+    font-semibold 
+    cursor-pointer 
+    hover:bg-red-700 
+    whitespace-nowrap 
+    leading-tight 
+    block 
+    w-fit 
+    mx-auto          /* Center horizontally */
+  "
+>
+  Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
+</span>
+
+                </Link>
+                <p className="text-sm text-gray-700 mt-3">
+                  <span className="text-red-600 font-semibold">
+                    Freezed by Platform
+                  </span>
+                </p>
+              </>
+            ) : orderData?.hire_status !== "assigned" ? (
+              <button
+                className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                onClick={() => setShowModal(true)}
+              >
+                Cancel Task
+              </button>
+            ) : null}
+
+            {showRefundButton && orderData?.platform_fee_paid && (
+              <button
+                onClick={() => setShowRefundModal(true)}
+                className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+              >
+                Cancel & Get Refund
+              </button>
+            )}
+            {orderData?.refundRequest && (
+              <button className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700">
+                {orderData?.refundStatus === "pending"
+                  ? "Refund Request Submitted"
+                  : "Refunded"}
+              </button>
+            )}
+            {orderData?.hire_status === "assigned" &&
+              orderData?.platform_fee_paid &&
+              !orderData?.refundRequest && (
+                <p className="text-gray-800 text-sm font-medium text-center mt-3">
+                  <span className="text-gray-700 font-bold">Note :-</span>{" "}
+                  <span className="text-red-600 font-semibold">
+                    Use "Cancel & Get Refund" to cancel and request refund.
+                  </span>
                 </p>
               )}
-            {orderData?.service_provider_id && orderData?.hire_status == "cancelled" && (
+          </div>
+
+          {/* Refund Modal */}
+          {showRefundModal && (
+            <div className="mt-6 bg-white border border-gray-300 rounded-lg p-6 shadow-md w-full max-w-lg mx-auto">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                Request Refund
+              </h2>
+              <textarea
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="Enter your refund reason..."
+                className="w-full border border-gray-300 rounded-md p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={4}
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowRefundModal(false)}
+                  className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRefundRequest}
+                  className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(orderData?.refundStatus === "processed" ||
+            orderData?.refundStatus === "rejected") && (
+            <p
+              className={`mt-2 text-sm font-medium ${
+                orderData?.refundStatus === "processed"
+                  ? "text-green-600"
+                  : "text-red-600"
+              }`}
+            >
+              Admin Remark: {orderData?.refundReasonDetails || "No Remark"}
+            </p>
+          )}
+
+          {orderData?.service_provider_id &&
+            orderData?.hire_status == "cancelled" && (
               <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
                 <div className="flex items-center space-x-4">
                   <img
@@ -954,87 +1125,87 @@ export default function ViewProfile() {
                 </div>
               </div>
             )}
-            {/* Assigned Worker Section */}
-            {(orderData?.hire_status === "assigned" ||
-              orderData?.hire_status === "completed" ||
-              orderData?.hire_status === "cancelledDispute") &&
-              orderData?.platform_fee_paid && (
-                <>
-                  <Accepted
-                    serviceProvider={orderData?.service_provider_id}
-                    assignedWorker={assignedWorker}
-                    paymentHistory={orderData?.service_payment?.payment_history}
-                    fullPaymentHistory={orderData?.service_payment}
-                    orderId={id}
-                    hireStatus={orderData?.hire_status}
-                    user_id={orderData?.user_id?._id}
-                  />
-                  {(orderData?.hire_status === "assigned" ||
-                    orderData?.hire_status === "completed") && (
-                    <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                      <div className="relative max-w-2xl mx-auto">
-                        <div className="relative z-10 flex justify-center gap-4">
-                          <img
-                            src={Warning1}
-                            alt="Warning"
-                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                          />
-                          <img
-                            src={Warning3}
-                            alt="Warning2"
-                            className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                          />
-                        </div>
-                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                          <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                            Warning Message
-                          </h2>
-                          <p className="text-gray-700 text-sm md:text-base">
-                            Pay securely — no extra charges from the platform.
-                            Choose simple and safe transactions.
-                          </p>
-                        </div>
+
+          {/* Assigned Worker Section */}
+          {(orderData?.hire_status === "assigned" ||
+            orderData?.hire_status === "completed" ||
+            orderData?.hire_status === "cancelledDispute") &&
+            orderData?.platform_fee_paid && (
+              <>
+                <Accepted
+                  serviceProvider={orderData?.service_provider_id}
+                  assignedWorker={assignedWorker}
+                  paymentHistory={orderData?.service_payment?.payment_history}
+                  fullPaymentHistory={orderData?.service_payment}
+                  orderId={id}
+                  hireStatus={orderData?.hire_status}
+                  user_id={orderData?.user_id?._id}
+                />
+                {(orderData?.hire_status === "assigned" ||
+                  orderData?.hire_status === "completed") && (
+                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                    <div className="relative max-w-2xl mx-auto">
+                      <div className="relative z-10 flex justify-center gap-4">
+                        <img
+                          src={Warning1}
+                          alt="Warning"
+                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                        />
+                        <img
+                          src={Warning3}
+                          alt="Warning2"
+                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                        />
                       </div>
-                      <div className="flex space-x-4">
-                        {orderData?.hire_status !== "completed" && (
-                          <>
-                            <button
-                              className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                              onClick={handleMarkComplete}
-                            >
-                              Mark as Complete
-                            </button>
-                            <ReviewModal
-                              show={showCompletedModal}
-                              onClose={() => {
-                                setShowCompletedModal(false);
-                                fetchData();
-                              }}
-                              service_provider_id={
-                                orderData?.service_provider_id._id
-                              }
-                              orderId={id}
-                              type="direct"
-                            />
-                          </>
-                        )}
-                        <Link to={`/dispute/${id}/emergency`}>
-                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                            {orderData?.hire_status === "completed"
-                              ? "Create Dispute"
-                              : "Cancel Task and Create Dispute"}
-                          </button>
-                        </Link>
+                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
+                        <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                          Warning Message
+                        </h2>
+                        <p className="text-gray-700 text-sm md:text-base">
+                          Pay securely — no extra charges from the platform.
+                          Choose simple and safe transactions.
+                        </p>
                       </div>
                     </div>
-                  )}
-                </>
-              )}
-          </div>
+                    <div className="flex space-x-4">
+                      {orderData?.hire_status !== "completed" && (
+                        <>
+                          <button
+                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                            onClick={handleMarkComplete}
+                          >
+                            Mark as Complete
+                          </button>
+                          <ReviewModal
+                            show={showCompletedModal}
+                            onClose={() => {
+                              setShowCompletedModal(false);
+                              fetchData();
+                            }}
+                            service_provider_id={
+                              orderData?.service_provider_id._id
+                            }
+                            orderId={id}
+                            type="direct"
+                          />
+                        </>
+                      )}
+                      <Link to={`/dispute/${id}/emergency`}>
+                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+                          {orderData?.hire_status === "completed"
+                            ? "Create Dispute"
+                            : "Cancel Task and Create Dispute"}
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
         </div>
       </div>
 
-      {/* Service Providers List with Dropdown Filter */}
+      {/* Service Providers List with Dropdown Filter (below main card) */}
       {!isHired &&
         orderData?.hire_status !== "cancelled" &&
         !orderData?.platform_fee_paid && (
