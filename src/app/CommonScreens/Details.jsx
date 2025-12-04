@@ -103,7 +103,6 @@ export default function Details() {
     }
   }, [loading, profile, savedRole, selectedRole, dispatch, navigate]);
 
-
   useEffect(() => {
     if (
       activeTab !== "Worker" ||
@@ -637,9 +636,10 @@ export default function Details() {
         </Link>
       </div>
       {/* Top banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
+      <div
+        className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]"
+      >
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
             Loading banners...
@@ -671,20 +671,22 @@ export default function Details() {
         <div className="flex justify-center gap-10 mt-6">
           <button
             onClick={() => handleTabSwitch("user")}
-            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${activeTab === "user"
+            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
+              activeTab === "user"
                 ? "bg-[#228B22] text-white"
                 : "bg-white text-[#228B22]"
-              }`}
+            }`}
             aria-label="View User Profile"
           >
             User Profile
           </button>
           <button
             onClick={() => handleTabSwitch("Worker")}
-            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${activeTab === "Worker"
+            className={`px-6 py-2 rounded-md font-semibold shadow-md transition-colors duration-300 ${
+              activeTab === "Worker"
                 ? "bg-[#228B22] text-white"
                 : "bg-white text-[#228B22]"
-              }`}
+            }`}
             aria-label="View Worker Profile"
           >
             Worker Profile
@@ -692,18 +694,25 @@ export default function Details() {
         </div>
       </div>
       <div className="container mx-auto px-4 sm:px-6 py-6">
-        <button
-          onClick={Editpage}
-          type="button"
-          className="flex items-center gap-2 text-white bg-[#228B22] hover:bg-[#0254c6] focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 float-right transition-colors duration-300"
-        >
-          <img src={Edit} alt="Edit" width="20px" />
-          Edit Profile
-        </button>
+        <div className="flex flex-col-reverse md:flex-row md:justify-end md:items-start mb-4">
+          {" "}
+          <button
+            onClick={Editpage}
+            type="button"
+            className="self-start w-auto flex items-center gap-2 text-white bg-[#228B22] 
+      hover:bg-[#0254c6] focus:ring-4 focus:outline-none focus:ring-green-300 
+      dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 
+      transition-colors duration-300"
+          >
+            <img src={Edit} alt="Edit" className="w-5 h-5" />
+            Edit Profile
+          </button>
+        </div>
+
         {activeTab === "user" && (
           <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-[80px] items-start">
-              <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              <div className="relative flex justify-center md:justify-start">
                 {testimage ? (
                   <img
                     src={images}
@@ -722,7 +731,11 @@ export default function Details() {
                   aria-label="Edit Profile Image"
                   onClick={handleEditClick}
                 >
-                  <img src={Edit} alt="Edit icon" className="w-7 h-7" />
+                  <img
+                    src={Edit}
+                    alt="Edit icon"
+                    className=" w-4 h-4 md:w-7 h-7 "
+                  />
                 </button>
                 <input
                   type="file"
@@ -732,29 +745,28 @@ export default function Details() {
                   onChange={handleFileChange}
                 />
               </div>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 mt-0 ml-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg sm:text-xl font-bold">
-  {full_name
-    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
-    : ""}
-</h2>
-
+                  <h2 className="text-base font-bold">
+                    {full_name
+                      ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+                      : ""}
+                  </h2>
                 </div>
-                <div className="flex flex-col font-semibold text-base text-gray-700">
+                <div className=" p-2 flex flex-col  gap-2 font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
                   <span>Phone: {phone}</span>
                 </div>
                 <div
-                  className={`p-4 shadow-xl max-w-full sm:max-w-[600px] mt-6 sm:mt-10 rounded-xl bg-white h-[260px]`}
+                  className={`p-2 shadow-xl max-w-full sm:max-w-[600px] md:mt-2 mt-4 rounded-xl bg-white h-[260px]`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg sm:text-xl">
+                    <h3 className="font-semibold text-base">
                       About My Skill
                     </h3>
                   </div>
-                  <p className="mt-2 text-gray-700 text-base leading-relaxed break-all">
+                  <p className=" text-gray-700 text-base leading-relaxed break-all">
                     {aboutus}
                   </p>
                 </div>
@@ -764,8 +776,8 @@ export default function Details() {
         )}
         {activeTab === "Worker" && (
           <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 lg:gap-[80px] items-start">
-              <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              <div className="relative flex justify-center md:justify-start">
                 {testimage ? (
                   <img
                     src={images}
@@ -794,18 +806,18 @@ export default function Details() {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                                <h2 className="text-lg sm:text-xl font-bold">
-  {full_name
-    ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
-    : ""}
-</h2>
+                  <h2 className="text-lg  p-2 sm:text-xl font-bold">
+                    {full_name
+                      ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+                      : ""}
+                  </h2>
                   {profile?.verificationStatus === "verified" && (
                     <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
                       Verified
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col font-semibold text-base text-gray-700">
+                <div className="flex p-2 flex-col font-semibold text-base text-gray-700">
                   <span>Age: {age}</span>
                   <span>Gender: {gender}</span>
                   <span>Phone: {phone}</span>
@@ -815,13 +827,13 @@ export default function Details() {
                     Rating: {rating} ({profile?.totalReview || 0} reviews)
                   </span>
                 </div>
-                <p className="text-base font-semibold text-gray-700">
+                <p className="text-base p-2 font-semibold text-gray-700">
                   <span className="font-semibold text-[#228B22]">
                     Category:{" "}
                   </span>
                   {category_name}
                 </p>
-                <p className="text-base font-semibold text-gray-700">
+                <p className="text-base p-2 font-semibold text-gray-700">
                   <span className="font-semibold text-[#228B22]">
                     Sub-Categories:{" "}
                   </span>
@@ -829,7 +841,7 @@ export default function Details() {
                     ? subcategory_names.join(", ")
                     : subcategory_names}
                 </p>
-                <p className="text-base font-semibold text-gray-700">
+                <p className="text-base  p-2 font-semibold text-gray-700">
                   <span className="font-semibold text-[#228B22]">
                     Emergency Sub-Categories:{" "}
                   </span>
@@ -837,9 +849,9 @@ export default function Details() {
                     ? emergencySubcategory_names.join(", ")
                     : "None"}
                 </p>
-                <div className="p-4 shadow-xl max-w-full sm:max-w-[600px] rounded-xl bg-white">
+                <div className="p-2 shadow-xl max-w-full sm:max-w-[600px] rounded-xl bg-white">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-lg sm:text-xl">
+                    <h3 className="font-semibold text-[#228B22] text-base ">
                       About My Skill
                     </h3>
                   </div>
@@ -856,10 +868,11 @@ export default function Details() {
                     setWorkerTab("work");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "work"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
+                    WorkerTab === "work"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                    } transition-colors duration-300`}
+                  } transition-colors duration-300`}
                   aria-label="View Work"
                 >
                   His Work
@@ -869,10 +882,11 @@ export default function Details() {
                     setWorkerTab("review");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "review"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
+                    WorkerTab === "review"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                    } transition-colors duration-300`}
+                  } transition-colors duration-300`}
                   aria-label="View Customer Reviews"
                 >
                   Customer Review
@@ -882,10 +896,11 @@ export default function Details() {
                     setWorkerTab("business");
                     setCurrentIndex(0);
                   }}
-                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${WorkerTab === "business"
+                  className={`px-4 sm:px-6 py-2 rounded-md shadow-md font-semibold text-sm sm:text-base ${
+                    WorkerTab === "business"
                       ? "bg-[#228B22] text-white"
                       : "bg-green-100 text-[#228B22] hover:bg-green-200"
-                    } transition-colors duration-300`}
+                  } transition-colors duration-300`}
                   aria-label="View Business Details"
                 >
                   Business Details
@@ -1082,23 +1097,29 @@ export default function Details() {
               )}
             </div>
             {activeTab === "Worker" && (
-              <div className="md:w-[700px] w-full mx-auto mt-8 flex flex-col sm:flex-row items-center justify-between p-4 rounded-lg border border-white shadow-lg">
-                <div className="flex items-center gap-2">
-                  <img src={Vector} alt="Warning Icon" className="w-6 h-6" />
-                  <span className="text-black font-medium text-base sm:text-lg max-md:text-sm">
-                    Emergency task
-                  </span>
-                </div>
-                <div className="toggle-wrapper mt-2 sm:mt-0">
+              <div className="md:w-[700px] w-full mx-auto mt-8 flex flex-col  p-4 rounded-lg border border-white shadow-lg">
+                <div className="flex items-center justify-between gap-4 md:gap-100  flex-nowrap">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={Vector}
+                      alt="Warning Icon"
+                      className="w-4 h-4 md:w-6 h-6"
+                    />
+                    <span className="text-black font-medium text-base md:text-xl ">
+                      Emergency task
+                    </span>
+                  </div>
+
                   <button
                     onClick={handleToggleEmergency}
                     disabled={isToggling}
-                    className={`toggle-button w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${isToggling
+                    className={`w-[40px] h-[25px] flex items-center rounded-full p-1 transition-colors duration-300 ${
+                      isToggling
                         ? "bg-gray-400 cursor-not-allowed"
                         : isEmergencyOn
-                          ? "bg-[#228B22] justify-end"
-                          : "bg-[#DF1414] justify-start"
-                      }`}
+                        ? "bg-[#228B22] justify-end"
+                        : "bg-[#DF1414] justify-start"
+                    }`}
                     style={{
                       width: "40px",
                       height: "25px",
@@ -1152,8 +1173,9 @@ export default function Details() {
                               <img
                                 key={imgIndex}
                                 src={img}
-                                alt={`${doc.documentName} image ${imgIndex + 1
-                                  }`}
+                                alt={`${doc.documentName} image ${
+                                  imgIndex + 1
+                                }`}
                                 className="w-20 sm:w-24 h-20 sm:h-24 object-cover rounded-md shadow"
                                 onError={(e) => {
                                   e.target.src =
@@ -1197,10 +1219,11 @@ export default function Details() {
                         {[1, 2, 3, 4, 5].map((star, i) => (
                           <span
                             key={i}
-                            className={`text-lg sm:text-xl ${i < item.rating
+                            className={`text-lg sm:text-xl ${
+                              i < item.rating
                                 ? "text-yellow-400"
                                 : "text-gray-300"
-                              }`}
+                            }`}
                           >
                             ★
                           </span>
