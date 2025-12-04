@@ -24,7 +24,7 @@ const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export default function Header() {
   const capitalize = (str = "") =>
-  str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -362,7 +362,10 @@ export default function Header() {
           // 1. Save all addresses
           if (data?.full_address) {
             setSavedAddresses(data.full_address);
-            localStorage.setItem("savedAddresses", JSON.stringify(data.full_address));
+            localStorage.setItem(
+              "savedAddresses",
+              JSON.stringify(data.full_address)
+            );
           }
 
           // 2. If location exists → match the correct addressId
@@ -414,14 +417,20 @@ export default function Header() {
         setSelectedAddressId(matchedAddress._id);
         localStorage.setItem("selectedAddressTitle", matchedAddress.address);
         localStorage.setItem("selectedAddressId", matchedAddress._id);
-        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
+        localStorage.setItem(
+          "savedAddresses",
+          JSON.stringify(profile.full_address || [])
+        );
       } else if (profile.full_address?.length > 0) {
         const firstAddress = profile.full_address[0];
         setSelectedAddress(firstAddress.address);
         setSelectedAddressId(firstAddress._id);
         localStorage.setItem("selectedAddressTitle", firstAddress.address);
         localStorage.setItem("selectedAddressId", firstAddress._id);
-        localStorage.setItem("savedAddresses", JSON.stringify(profile.full_address || []));
+        localStorage.setItem(
+          "savedAddresses",
+          JSON.stringify(profile.full_address || [])
+        );
       }
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
@@ -481,20 +490,19 @@ export default function Header() {
             ...reduxNotifications,
             ...(data.notifications || []),
           ];
-   const currentUrl = window.location.pathname;
+          const currentUrl = window.location.pathname;
 
-if (currentUrl === "/chats") {
-  // Chats page par chat notifications HIDE
-  setNotifications(
-    combinedNotifications.filter(
-      (n) => n.userType !== "chat" && n.isRead === true
-    )
-  );
-} else {
-  // Baaki pages par bhi sirf read + non-chat
-  setNotifications(combinedNotifications)
-}
-
+          if (currentUrl === "/chats") {
+            // Chats page par chat notifications HIDE
+            setNotifications(
+              combinedNotifications.filter(
+                (n) => n.userType !== "chat" && n.isRead === true
+              )
+            );
+          } else {
+            // Baaki pages par bhi sirf read + non-chat
+            setNotifications(combinedNotifications);
+          }
 
           // console.log("chat",combinedNotifications);
 
@@ -642,7 +650,10 @@ if (currentUrl === "/chats") {
       if (response.ok) {
         toast.success("Location updated successfully!");
         setSavedAddresses(updatedAddresses);
-        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
+        localStorage.setItem(
+          "savedAddresses",
+          JSON.stringify(updatedAddresses)
+        );
         const newIndex =
           editingAddress !== null
             ? editingAddress
@@ -702,7 +713,10 @@ if (currentUrl === "/chats") {
           (_, idx) => idx !== index
         );
         setSavedAddresses(updatedAddresses);
-        localStorage.setItem("savedAddresses", JSON.stringify(updatedAddresses));
+        localStorage.setItem(
+          "savedAddresses",
+          JSON.stringify(updatedAddresses)
+        );
         let newLocation = profile.location;
         if (selectedAddressId === addressId) {
           newLocation = updatedAddresses[0] || null;
@@ -726,10 +740,10 @@ if (currentUrl === "/chats") {
               full_address: updatedAddresses,
               location: newLocation
                 ? {
-                  latitude: newLocation.latitude,
-                  longitude: newLocation.longitude,
-                  address: newLocation.address,
-                }
+                    latitude: newLocation.latitude,
+                    longitude: newLocation.longitude,
+                    address: newLocation.address,
+                  }
                 : null,
             }),
           }
@@ -757,21 +771,20 @@ if (currentUrl === "/chats") {
     }
     setIsAddressDropdownOpen(false);
   };
-const handleDeleteConfirm = (index, addressId) => {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "Do you really want to delete this address?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Yes, delete it",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      handleDeleteAddress(index, addressId); // 👉 Yahi original function chalega
-    }
-  });
-};
-
+  const handleDeleteConfirm = (index, addressId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this address?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteAddress(index, addressId); // 👉 Yahi original function chalega
+      }
+    });
+  };
 
   const handleEditAddress = (index, addressId) => {
     setEditingAddress(index);
@@ -859,10 +872,9 @@ const handleDeleteConfirm = (index, addressId) => {
     acc[section].push(notif);
     return acc;
   }, {});
-  
+
   //Total Notification count
   const totalNotifications = notifications.length;
-
 
   const notificationSections = Object.keys(groupedNotifications).map(
     (section) => ({
@@ -896,12 +908,10 @@ const handleDeleteConfirm = (index, addressId) => {
       } else {
         window.location.href = `/emergency/worker/order-detail/${orderId}`;
       }
-    }
-    else if(notif.userType=="chat"){
-      localStorage.setItem('lastSelectedConvId',notif.orderId);
+    } else if (notif.userType == "chat") {
+      localStorage.setItem("lastSelectedConvId", notif.orderId);
       window.location.href = `/chats`;
-    }
-    else {
+    } else {
       window.location.href = `/disputes`;
     }
   };
@@ -1011,12 +1021,13 @@ const handleDeleteConfirm = (index, addressId) => {
                             Edit
                           </button>
                           <button
-  onClick={() => handleDeleteConfirm(index, address._id)}
-  className="text-sm text-red-600 hover:underline"
->
-  Delete
-</button>
-
+                            onClick={() =>
+                              handleDeleteConfirm(index, address._id)
+                            }
+                            className="text-sm text-red-600 hover:underline"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     ))
@@ -1242,22 +1253,21 @@ const handleDeleteConfirm = (index, addressId) => {
               </div>
 
               {/* Profile Dropdown */}
-                <div className="relative lg:flex hidden " ref={dropdownRef}>
-                  {fullName ? (
-                    <button
-                      onClick={() => setIsOpen(!isOpen)}
-                      className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
-                    >
-                      <span className="truncate max-w-[120px] sm:max-w-[150px]">
-                       <span>{capitalize(fullName)}</span>
-
-                      </span>
-                      <img
-                        src={Dropdown}
-                        alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${
-                          isOpen ? "rotate-180" : "rotate-0"
-                        }`}
+              <div className="relative lg:flex hidden " ref={dropdownRef}>
+                {fullName ? (
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow text-sm font-medium gap-2 cursor-pointer"
+                  >
+                    <span className="truncate max-w-[120px] sm:max-w-[150px]">
+                      <span>{capitalize(fullName)}</span>
+                    </span>
+                    <img
+                      src={Dropdown}
+                      alt="Dropdown"
+                      className={`w-5 h-5 transition-transform duration-300 ${
+                        isOpen ? "rotate-180" : "rotate-0"
+                      }`}
                     />
                   </button>
                 ) : (
@@ -1273,42 +1283,62 @@ const handleDeleteConfirm = (index, addressId) => {
                   <div className="absolute right-0 mt-8 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
                     <Link
                       to="/account"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/account"
-                        ? " bg-green-600 text-white  "
-                        : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname === "/account"
+                          ? " bg-green-600 text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
-                      <img src={Account} alt="Account" className={`w-5 h-5 ${location.pathname === "/account" ? "filter brightness-0 invert" : ""}`} />{" "}
+                      <img
+                        src={Account}
+                        alt="Account"
+                        className={`w-5 h-5 ${
+                          location.pathname === "/account"
+                            ? "filter brightness-0 invert"
+                            : ""
+                        }`}
+                      />{" "}
                       Account
                     </Link>
                     <Link
                       to="/details"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/details"
-                        ? "bg-[#228B22] text-white"
-                        : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname === "/details"
+                          ? "bg-[#228B22] text-white"
+                          : "  text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
-                      <img src={Profile} alt="Profile" className={`w-6 h-6 ${location.pathname === "/details" ? "filter brightness-0 invert" : ""}`} />{" "}
+                      <img
+                        src={Profile}
+                        alt="Profile"
+                        className={`w-6 h-6 ${
+                          location.pathname === "/details"
+                            ? "filter brightness-0 invert"
+                            : ""
+                        }`}
+                      />{" "}
                       Profile
                     </Link>
                     <Link
                       to="/user/work-list/My Hire"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname.startsWith("/user/work-list")
-                        ? " bg-[#228B22] text-white  "
-                        : "text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname.startsWith("/user/work-list")
+                          ? " bg-[#228B22] text-white  "
+                          : "text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
                       <FaUserTie className="w-5 h-5" /> My Hire
                     </Link>
                     <Link
                       to="/worker/work-list/My Hire"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname.startsWith("/worker/work-list")
-                        ? " bg-[#228B22] text-white  "
-                        : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname.startsWith("/worker/work-list")
+                          ? " bg-[#228B22] text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
                       <FaBriefcase className="w-5 h-5" /> My Work
@@ -1317,10 +1347,11 @@ const handleDeleteConfirm = (index, addressId) => {
                     {(role === "service_provider" || role === "both") && (
                       <Link
                         to="/worker/rejected-work"
-                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/worker/rejected-work"
-                          ? " bg-green-600 text-white  "
-                          : "  text-black font-semibold hover:bg-gray-100"
-                          }`}
+                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname === "/worker/rejected-work"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
                         onClick={() => setIsOpen(false)}
                       >
                         <AiFillCloseCircle className="w-5 h-5" /> Rejected Task
@@ -1330,10 +1361,12 @@ const handleDeleteConfirm = (index, addressId) => {
                     {(role === "service_provider" || role === "both") && (
                       <Link
                         to="/worker/emergency/rejected-work"
-                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/worker/emergency/rejected-work"
-                          ? " bg-green-600 text-white  "
-                          : "  text-black font-semibold hover:bg-gray-100"
-                          }`}
+                        className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                          location.pathname ===
+                          "/worker/emergency/rejected-work"
+                            ? " bg-green-600 text-white  "
+                            : "  text-black font-semibold hover:bg-gray-100"
+                        }`}
                         onClick={() => setIsOpen(false)}
                       >
                         <AiFillCloseCircle className="w-5 h-5" /> Emergency Work
@@ -1342,20 +1375,22 @@ const handleDeleteConfirm = (index, addressId) => {
 
                     <Link
                       to="/disputes"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/disputes"
-                        ? " bg-green-600 text-white  "
-                        : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname === "/disputes"
+                          ? " bg-green-600 text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
                       <FaGavel className="w-5 h-5" /> Disputes
                     </Link>
                     <Link
                       to="/promotion"
-                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${location.pathname === "/promotion"
-                        ? " bg-green-600 text-white  "
-                        : "  text-black font-semibold hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-2 px-4 py-2  mt-2 transition-all ${
+                        location.pathname === "/promotion"
+                          ? " bg-green-600 text-white  "
+                          : "  text-black font-semibold hover:bg-gray-100"
+                      }`}
                       onClick={() => setIsOpen(false)}
                     >
                       <FaTrophy className="w-5 h-5" /> Promotion
@@ -1390,26 +1425,26 @@ const handleDeleteConfirm = (index, addressId) => {
           {!(
             location.pathname === "/service-provider-list" && isLargeScreen
           ) && (
-              <button
-                className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+            <button
+              className="lg:hidden p-2 rounded-md border border-gray-300 bg-[#228B22]"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6 text-white"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                  />
-                </svg>
-              </button>
-            )}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1610,8 +1645,9 @@ const handleDeleteConfirm = (index, addressId) => {
                       <img
                         src={Dropdown}
                         alt="Dropdown"
-                        className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : "rotate-0"
-                          }`}
+                        className={`w-5 h-5 transition-transform duration-300 ${
+                          isOpen ? "rotate-180" : "rotate-0"
+                        }`}
                       />
                     </button>
                   ) : (

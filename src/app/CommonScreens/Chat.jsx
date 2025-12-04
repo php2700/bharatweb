@@ -538,6 +538,7 @@ import { FiSend, FiPaperclip, FiImage, FiFileText, FiX } from "react-icons/fi"; 
 import { BsCheck2All } from "react-icons/bs"; // Read receipts icon
 import { UserX } from "lucide-react";
 import { useLocation } from "react-router-dom";
+  
 
 const Base_url = import.meta.env.VITE_SOCKET_URL;
 const socket = io(`${Base_url}`);
