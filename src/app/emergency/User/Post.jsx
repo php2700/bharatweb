@@ -7,8 +7,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import EmergencyTask from "../../../assets/emergTask.png";
 import Logo from "../../../assets/logo.svg";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -22,6 +20,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserProfile } from "../../../redux/userSlice";
+import { Calendar } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const token = localStorage.getItem("bharat_token");
@@ -996,29 +995,49 @@ const Post = () => {
                 <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
               )}
             </div> */}
-            {/* Deadline / Completion Time */}
+            {/* Deadline / Completion Time - matched to DirectHiring.jsx datetime-local UI */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Add Completion Time</label>
+              <label className="block text-xs mb-1 font-bold">
+                Add Completion Time
+              </label>
               <div className="relative w-full">
-                <DatePicker
-                  selected={formData.deadline ? new Date(formData.deadline) : null}
-                  onChange={(date) =>
-                    setFormData((prev) => ({ ...prev, deadline: date.toISOString() }))
+                <input
+                  id="deadline-input"
+                  type="datetime-local"
+                  value={
+                    formData.deadline
+                      ? formData.deadline.slice(0, 16)
+                      : ""
                   }
-                  showTimeSelect
-                  timeFormat="h:mm aa"
-                  timeIntervals={15}
-                  dateFormat="dd MMM yyyy, h:mm aa"  // Isse Date + AM/PM dikhega
-                  placeholderText="Select Date & Time"
-                  minDate={new Date()}
-                  wrapperClassName="w-full"
-                  className={`w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500 ${
-                    validationErrors.deadline ? "border-red-500" : "border-green-500"
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      deadline: e.target.value,
+                    }))
+                  }
+                  className={`w-full border rounded-md px-3 py-2 text-sm cursor-pointer pl-9 pr-4 ${
+                    validationErrors.deadline
+                      ? "border-red-500"
+                      : "border-green-500"
                   }`}
+                  min={new Date().toISOString().slice(0, 16)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("deadline-input")?.showPicker?.();
+                  }}
+                />
+                <Calendar
+                  className="absolute left-3 top-2.5 h-4 w-4 text-gray-400 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("deadline-input")?.showPicker?.();
+                  }}
                 />
               </div>
               {validationErrors.deadline && (
-                <p className="text-red-500 text-xs mt-1">{validationErrors.deadline}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.deadline}
+                </p>
               )}
             </div>
 

@@ -860,59 +860,96 @@ const applySort = (data) => {
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
-        {orderDetail?.image_url?.length > 0 ? (
-          <Carousel
-            showArrows
-            showThumbs={false}
-            infiniteLoop
-            emulateTouch
-            swipeable
-            interval={3000}
-            showStatus={false}
-            autoPlay
-            onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])} // <- reliable click handler
-            className="w-full h-[220px] sm:h-[300px] md:h-[360px]"
-          >
-            {orderDetail.image_url.map((url, index) => (
-              <div key={index} className="cursor-pointer pointer-events-auto">
-                {/* don't add e.stopPropagation here */}
-                <img
-                  src={url}
-                  alt={`Project image ${index + 1}`}
-                  className="w-full h-[220px] sm:h-[300px] md:h-[360px] object-cover"
-                />
-              </div>
-            ))}
-          </Carousel>
-        ) : (
-          <img
-            src={workImage}
-            alt="No project images available"
-            className="w-full h-[220px] sm:h-[300px] md:h-[360px] object-cover mt-5"
-          />
-        )}
+      {orderDetail?.image_url?.length > 0 ? (
+  <Carousel
+    showArrows
+    showThumbs={false}
+    infiniteLoop
+    emulateTouch
+    swipeable
+    interval={3000}
+    showStatus={false}
+    autoPlay
+    onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])}
+    className="w-full 
+               h-[180px]        /* mobile */
+               sm:h-[250px] 
+               md:h-[360px]"   /* desktop unchanged */
+  >
+    {orderDetail.image_url.map((url, index) => (
+      <div key={index} className="cursor-pointer pointer-events-auto">
+        <img
+          src={url}
+          alt={`Project image ${index + 1}`}
+          className="
+            w-full 
+            h-[180px]        /* mobile size updated */
+            sm:h-[250px] 
+            md:h-[360px]     /* desktop same */
+            object-cover 
+            rounded-lg
+          "
+        />
+      </div>
+    ))}
+  </Carousel>
+) : (
+  <img
+    src={workImage}
+    alt="No project images available"
+    className="
+      w-full 
+      h-[180px]        /* mobile */
+      sm:h-[250px] 
+      md:h-[360px]     /* desktop same */
+      object-cover 
+      mt-5
+      rounded-lg
+    "
+  />
+)}
+
 
         {/* Fullscreen modal */}
-        {openImage && (
-          <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
-            onClick={() => setOpenImage(null)} // click outside to close
-          >
-            {/* Close button (stop propagation so clicking it doesn't bubble to overlay) */}
-            <button
-              className="absolute top-4 right-4 text-white text-3xl font-bold z-[10000]"
-              onClick={(e) => { e.stopPropagation(); setOpenImage(null); }}
-            >
-              ✕
-            </button>
+      {openImage && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    onClick={() => setOpenImage(null)}
+  >
+    <div
+      className="relative"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <img
+        src={openImage}
+        alt="Preview"
+        className="
+          max-w-[90vw] 
+          max-h-[90vh] 
+          rounded-xl 
+          shadow-2xl
+        "
+      />
 
-            <img
-              src={openImage}
-              alt="Fullscreen Preview"
-              className="w-full h-full object-contain"
-            />
-          </div>
-        )}
+      <button
+        onClick={() => setOpenImage(null)}
+        className="
+          absolute -top-4 -right-4 
+          h-10 w-10 
+          flex items-center justify-center 
+          bg-white 
+          text-black 
+          rounded-full 
+          shadow-lg 
+          text-2xl
+        "
+      >
+        ×
+      </button>
+    </div>
+  </div>
+)}
+
 
 
 

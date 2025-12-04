@@ -868,7 +868,7 @@ let { conversationId } = location.state || {};
       filePreviews.forEach((preview) => URL.revokeObjectURL(preview));
     };
   }, [filePreviews]);
-console.log('thisis',conversations);
+// console.log('thisis',conversations);
   // --- Render Helpers ---
   const renderFileMessage = (fileUrl) => {
     const isPdf = fileUrl.toLowerCase().endsWith(".pdf");
