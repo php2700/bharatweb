@@ -296,9 +296,8 @@ export default function BiddingNewTask() {
     }
     const script = document.createElement("script");
     script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${
-      import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-    }&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+      }&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => callback();
@@ -834,52 +833,59 @@ export default function BiddingNewTask() {
 
             {/* Cost */}
             <div>
-  <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
-  <input
-    type="text"
-    name="cost"
-    placeholder="Enter cost in INR"
-    value={formData.cost}
-    onChange={(e) => {
-      const value = e.target.value;
+              <label className="block text-xs mb-1 font-bold">Cost (₹)</label>
+              <input
+                type="text"
+                name="cost"
+                placeholder="Enter cost in INR"
+                value={formData.cost}
+                onChange={(e) => {
+                  const value = e.target.value;
 
-      // Only allow digits and max 7 characters
-      if (/^\d{0,7}$/.test(value)) {
-        handleChange(e); // Your existing handler
-      }
-    }}
-    className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
-  />
-</div>
+                  // Only allow digits and max 7 characters
+                  if (/^\d{0,7}$/.test(value)) {
+                    handleChange(e); // Your existing handler
+                  }
+                }}
+                className="w-full border border-green-500 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
 
 
             {/* Deadline */}
-            <div>
-              <label className="block text-xs mb-1 font-bold">
+            <div className="w-full">
+              <label className="block text-xs sm:text-sm mb-1 font-bold">
                 Add Completion time
               </label>
-              <div className="relative">
+
+              <div className="relative w-full">
                 <input
                   id="deadline-input"
                   type="datetime-local"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer"
+                  className="mt-1 block w-full rounded-lg border border-green-500 pl-10 pr-4 py-2 
+                 text-sm sm:text-base 
+                 focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer
+                 min-h-[44px] sm:min-h-[48px]"
                   min={new Date().toISOString().slice(0, 16)}
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("deadline-input").showPicker?.();
+                    document.getElementById('deadline-input').showPicker?.();
                   }}
                 />
+
                 <Calendar
-                  className="absolute left-3 top-3 h-5 w-5 text-gray-400 cursor-pointer"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 
+                 h-5 w-5 text-gray-400 cursor-pointer sm:h-6 sm:w-6"
                   onClick={(e) => {
                     e.preventDefault();
-                    document.getElementById("deadline-input").showPicker?.();
+                    document.getElementById('deadline-input').showPicker?.();
                   }}
                 />
               </div>
             </div>
+
 
             {/* Image Upload */}
             <div className="border border border-green-500 rounded-lg p-3 text-center">
@@ -983,7 +989,7 @@ export default function BiddingNewTask() {
       </div>
 
       {/* BANNER SLIDER */}
-       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
+      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
         {bannerLoading ? (
           <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
         ) : bannerError ? (
