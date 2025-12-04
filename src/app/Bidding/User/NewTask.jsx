@@ -16,8 +16,7 @@ import PostNewTask3 from "../../../assets/bidTask.png";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../../../redux/userSlice";
-import ReactDatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { Calendar } from "lucide-react";
 
 export default function BiddingNewTask() {
   const dispatch = useDispatch();
@@ -50,9 +49,10 @@ export default function BiddingNewTask() {
     googleAddress: "",
     description: "",
     cost: "",
-    deadline: "",
     images: [],
   });
+
+  const [deadline, setDeadline] = useState("");
 
   // ====== NEW ADDRESS MODAL STATES (were missing) ======
   const [newTitle, setNewTitle] = useState("");
@@ -409,8 +409,8 @@ export default function BiddingNewTask() {
     if ((formData.cost * 10) / 100 <= platformFee) {
       return toast.error("Minimum cost is 2300");
     }
-    if (!formData.deadline) return toast.error("Deadline is required");
-    else if (isNaN(new Date(formData.deadline).getTime()))
+    if (!deadline) return toast.error("Deadline is required");
+    else if (isNaN(new Date(deadline).getTime()))
       return toast.error("Please provide a valid deadline date");
 
     try {
@@ -422,7 +422,7 @@ export default function BiddingNewTask() {
       data.append("google_address", formData.googleAddress);
       data.append("description", formData.description);
       data.append("cost", formData.cost);
-      data.append("deadline", formData.deadline);
+      data.append("deadline", deadline);
       formData.images.forEach((file) => data.append("images", file));
 
       const res = await fetch(
@@ -854,45 +854,29 @@ export default function BiddingNewTask() {
 
 
             {/* Deadline */}
-            {/* <div>
-              <label className="block text-xs mb-1 font-bold">Deadline</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <img src={Calender} alt="" className="w-4 h-4" />
-                </div>
-                <input
-                  type="datetime-local"
-                  value={formatDeadlineForInput(formData.deadline)}
-                  onChange={(e) =>
-                    setFormData({ ...formData, deadline: e.target.value })
-                  }
-                  min={new Date().toISOString().slice(0, 16)}
-                  onClick={(e) => e.target.showPicker?.()}
-                  onFocus={(e) => e.target.showPicker?.()}
-                  className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-            </div> */}
-            {/* Deadline */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Deadline</label>
-              <div className="relative w-full">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                  <img src={Calender} alt="" className="w-4 h-4" />
-                </div>
-                <ReactDatePicker
-                  selected={
-                    formData.deadline ? new Date(formData.deadline) : null
-                  }
-                  onChange={(date) =>
-                    setFormData({ ...formData, deadline: date.toISOString() })
-                  }
-                  showTimeSelect
-                  dateFormat="dd MMM yyyy, hh:mm aa"
-                  placeholderText="Select deadline"
-                  minDate={new Date()}
-                  wrapperClassName="w-full" // Ye line jaruri hai width fix karne ke liye
-                  className="w-full border border-green-500 rounded-md pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              <label className="block text-xs mb-1 font-bold">
+                Add Completion time
+              </label>
+              <div className="relative">
+                <input
+                  id="deadline-input"
+                  type="datetime-local"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2 text-base focus:border-[#228B22] focus:ring-[#228B22] cursor-pointer"
+                  min={new Date().toISOString().slice(0, 16)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("deadline-input").showPicker?.();
+                  }}
+                />
+                <Calendar
+                  className="absolute left-3 top-3 h-5 w-5 text-gray-400 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById("deadline-input").showPicker?.();
+                  }}
                 />
               </div>
             </div>
