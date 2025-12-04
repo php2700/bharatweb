@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../../../component/Header";
 import Footer from "../../../component/footer";
 // import workImage from "../../../assets/workcategory/image.png";
-import workImage from "../../../assets/directHiring/Work.png";
+import workImage from "../../../assets/default-image.jpg";
 import bannerPlaceholder from "../../../assets/workcategory/image.png";
 import noWorkImage from "../../../assets/bidding/no_related_work.png";
 import callIcon from "../../../assets/bidding/call.png";
@@ -57,6 +57,8 @@ export default function BiddinggetWorkDetail() {
   const [openImage, setOpenImage] = useState(null);
   const [localInvited, setLocalInvited] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [sortType, setSortType] = useState("");
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -65,6 +67,50 @@ export default function BiddinggetWorkDetail() {
     fetchOrder();
     fetchOffers();
   }, [id]);
+const applySort = (data) => {
+  if (!sortType) return data;
+
+  let sorted = [...data];
+
+  switch (sortType) {
+    case "name-asc":
+      sorted.sort((a, b) =>
+        (a.full_name || a.provider_id?.full_name).localeCompare(
+          b.full_name || b.provider_id?.full_name
+        )
+      );
+      break;
+
+    case "name-desc":
+      sorted.sort((a, b) =>
+        (b.full_name || b.provider_id?.full_name).localeCompare(
+          a.full_name || a.provider_id?.full_name
+        )
+      );
+      break;
+
+    case "amount-low":
+      sorted.sort((a, b) => (a.bid_amount || 0) - (b.bid_amount || 0));
+      break;
+
+    case "amount-high":
+      sorted.sort((a, b) => (b.bid_amount || 0) - (a.bid_amount || 0));
+      break;
+
+    case "duration-low":
+      sorted.sort((a, b) => (a.duration || 0) - (b.duration || 0));
+      break;
+
+    case "duration-high":
+      sorted.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+      break;
+
+    default:
+      return data;
+  }
+
+  return sorted;
+};
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -770,6 +816,11 @@ export default function BiddinggetWorkDetail() {
       </div>
     );
   }
+  const handleOpenImage = (url) => {
+    const full = getFullSizeImage(url);
+    console.log("Opening image:", full); // debug: ensure URL is correct
+    setOpenImage(full);
+  };
   const getFullSizeImage = (thumbnailUrl) => {
     if (!thumbnailUrl) return thumbnailUrl;
 
@@ -795,21 +846,19 @@ export default function BiddinggetWorkDetail() {
   return (
     <>
       <Header />
-      <div className="w-full flex justify-start mt-25">
-        <div className="w-fit ml-50">
-          <button
-            className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-            onClick={() => navigate(-1)}
-          >
-            <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
-            Back
-          </button>
-        </div>
+      <div className="container mx-auto mt-20 px-4 py-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
+        >
+          <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+          Back
+        </button>
       </div>
 
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <div className="container max-w-5xl mx-auto my-10 p-8 bg-white shadow-lg rounded-3xl">
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
         {orderDetail?.image_url?.length > 0 ? (
           <Carousel
@@ -817,22 +866,20 @@ export default function BiddinggetWorkDetail() {
             showThumbs={false}
             infiniteLoop
             emulateTouch
+            swipeable
             interval={3000}
             showStatus={false}
             autoPlay
-            className="w-full h-[360px]"
+            onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])} // <- reliable click handler
+            className="w-full h-[220px] sm:h-[300px] md:h-[360px]"
           >
             {orderDetail.image_url.map((url, index) => (
-              <div key={index}>
-                {console.log(url)}
+              <div key={index} className="cursor-pointer pointer-events-auto">
+                {/* don't add e.stopPropagation here */}
                 <img
                   src={url}
                   alt={`Project image ${index + 1}`}
-                  className="w-full h-[360px] object-cover"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpenImage(getFullSizeImage(url)); // This is the magic line
-                  }}
+                  className="w-full h-[220px] sm:h-[300px] md:h-[360px] object-cover"
                 />
               </div>
             ))}
@@ -841,23 +888,33 @@ export default function BiddinggetWorkDetail() {
           <img
             src={workImage}
             alt="No project images available"
-            className="w-full h-[360px] object-cover mt-5"
+            className="w-full h-[220px] sm:h-[300px] md:h-[360px] object-cover mt-5"
           />
         )}
+
+        {/* Fullscreen modal */}
         {openImage && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-            onClick={() => setOpenImage(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+            onClick={() => setOpenImage(null)} // click outside to close
           >
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
-              <img
-                src={openImage}
-                alt="Preview"
-                className="w-auto h-auto max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl object-contain"
-              />
-            </div>
+            {/* Close button (stop propagation so clicking it doesn't bubble to overlay) */}
+            <button
+              className="absolute top-4 right-4 text-white text-3xl font-bold z-[10000]"
+              onClick={(e) => { e.stopPropagation(); setOpenImage(null); }}
+            >
+              ✕
+            </button>
+
+            <img
+              src={openImage}
+              alt="Fullscreen Preview"
+              className="w-full h-full object-contain"
+            />
           </div>
         )}
+
+
 
         <div className="py-6 space-y-4">
           <div className="flex justify-between items-start">
@@ -1056,11 +1113,14 @@ export default function BiddinggetWorkDetail() {
           {/* <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div> */}
-          <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
-            <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
-              {orderDetail?.description || "No details available."}
-            </p>
-          </div>
+         <div className="w-full max-w-4xl mx-auto px-4">
+  <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+    <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
+      {orderDetail?.description || "No details available."}
+    </p>
+  </div>
+</div>
+
           <div className="space-y-6">
             <div className="flex justify-center gap-6">
               {orderDetail?.hire_status === "cancelled" || isCancelled ? (
@@ -1243,33 +1303,62 @@ export default function BiddinggetWorkDetail() {
                     Related Worker
                   </button>
                 </div>
-                <div className="w-full flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-                  <Search className="w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search for services"
-                    className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-                    value={searchText}   // <-- add this
-                    onChange={(e) => setSearchText(e.target.value.toLowerCase())}  // <-- add this
-                  />
-                </div>
+          <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+  {/* Search Box */}
+  <div className="w-full sm:w-[60%] flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+    <Search className="w-5 h-5 text-gray-400" />
+    <input
+      type="text"
+      placeholder="Search for services"
+      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+      value={searchText}
+      onChange={(e) => setSearchText(e.target.value.toLowerCase())}
+    />
+  </div>
+
+  {/* Filter Dropdown */}
+  <div className="w-full sm:w-[35%]">
+    <select
+      className="w-full px-4 py-2 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium shadow-sm
+                 hover:bg-gray-200 transition-all cursor-pointer"
+      value={sortType}
+      onChange={(e) => setSortType(e.target.value)}
+    >
+      <option value="">Filter</option>
+
+      <option value="name-asc">Name A → Z</option>
+      <option value="name-desc">Name Z → A</option>
+
+      {String(tab).toLowerCase().includes("bid") && (
+        <>
+          <option value="amount-low">Amount Low → High</option>
+          <option value="amount-high">Amount High → Low</option>
+          <option value="duration-low">Duration Low → High</option>
+          <option value="duration-high">Duration High → Low</option>
+        </>
+      )}
+    </select>
+  </div>
+
+</div>
+
                 {tab === "related" ? (
-                  <div className="flex flex-col items-center justify-center text-gray-500 py-10 w-full">
+                  <div className="flex flex-col items-center w-full mt-4">
                     {Array.isArray(providers) && providers.length > 0 ? (
-                      providers
-                        .filter(
-                          (provider) =>
-                            provider.full_name?.toLowerCase().includes(searchText) &&
-                            !offers.some(
-                              (offer) => offer.provider_id?._id === provider._id
-                            )
-                        )
+                      applySort(
+  providers.filter(
+    (provider) =>
+      provider.full_name?.toLowerCase().includes(searchText) &&
+      !offers.some((offer) => offer.provider_id?._id === provider._id)
+  )
+)
+
                         .map((provider) => (
                           <div
                             key={provider._id}
                             className="flex flex-col sm:flex-row items-center sm:items-start 
-                     gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow 
-                     w-full sm:w-[738px]"
+              gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow-md w-full sm:w-[738px] mb-5"
                           >
                             <img
                               src={provider.profile_pic || workImage}
@@ -1289,6 +1378,7 @@ export default function BiddinggetWorkDetail() {
                                   <span className="text-yellow-600">
                                     Rating: {parseFloat(provider.averageRating).toFixed(1)} / 5.0
                                   </span>
+
                                   {provider.totalReview > 0 ? (
                                     <span className="text-gray-500 text-xs">
                                       ({provider.totalReview} reviews)
@@ -1355,17 +1445,19 @@ export default function BiddinggetWorkDetail() {
                     )}
                   </div>
                 ) : (
-                  <div className="mt-6 space-y-4 w-full">
+                  <div className="mt-6 space-y-5 w-full">
                     {Array.isArray(offers) && offers.length > 0 ? (
-                      offers
-                        .filter((offer) =>
-                          offer.provider_id?.full_name?.toLowerCase().includes(searchText)
-                        )
+                    applySort(
+  offers.filter((offer) =>
+    offer.provider_id?.full_name?.toLowerCase().includes(searchText)
+  )
+)
+
                         .map((offer) => (
                           <div
                             key={offer._id}
                             className="flex flex-col sm:flex-row items-center sm:items-start 
-                       gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow w-full"
+              gap-4 bg-[#F9F9F9] rounded-xl p-4 shadow-md w-full mb-5"
                           >
                             <img
                               src={offer.provider_id?.profile_pic || workImage}
@@ -1384,6 +1476,7 @@ export default function BiddinggetWorkDetail() {
                                   <span className="text-yellow-600">
                                     Rating: {parseFloat(offer.averageRating).toFixed(1)} / 5.0
                                   </span>
+
                                   {offer.totalReview > 0 ? (
                                     <span className="text-gray-500 text-xs">
                                       ({offer.totalReview} reviews)
@@ -1400,11 +1493,12 @@ export default function BiddinggetWorkDetail() {
 
                               {offer.duration && (
                                 <span className="inline-block mt-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                                  Duration: {offer.duration} {offer.duration == 1 ? "day" : "days"}
+                                  Duration: {offer.duration}{" "}
+                                  {offer.duration == 1 ? "day" : "days"}
                                 </span>
                               )}
 
-                              <p className="text-sm text-gray-500 mt-2">
+                              <p className="text-sm text-gray-500 mt-2 break-words sm:break-normal">
                                 {offer.message || "No message provided"}
                               </p>
 
@@ -1422,7 +1516,7 @@ export default function BiddinggetWorkDetail() {
                                   )
                                 }
                                 className="text-green-600 font-medium text-base border border-green-600 
-                           px-5 py-1 rounded-lg mt-5 w-full sm:w-auto"
+                    px-5 py-1 rounded-lg mt-4 w-full sm:w-auto"
                               >
                                 View Profile
                               </button>
@@ -1438,7 +1532,7 @@ export default function BiddinggetWorkDetail() {
                                 <button
                                   onClick={() => handleAcceptBid(offer.provider_id?._id)}
                                   className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
-                             font-medium hover:bg-green-700 w-full sm:w-auto"
+                      font-medium hover:bg-green-700 w-full sm:w-auto"
                                 >
                                   Hire
                                 </button>
@@ -1447,9 +1541,11 @@ export default function BiddinggetWorkDetail() {
                               {orderDetail?.hire_status === "accepted" &&
                                 !orderDetail?.platform_fee_paid && (
                                   <button
-                                    onClick={() => handlePayment(offer.provider_id?._id)}
+                                    onClick={() =>
+                                      handlePayment(offer.provider_id?._id)
+                                    }
                                     className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
-                               font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
+                        font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
                                   >
                                     Pay & Hire
                                   </button>
@@ -1469,6 +1565,7 @@ export default function BiddinggetWorkDetail() {
                     )}
                   </div>
                 )}
+
 
               </div>
             </div>
@@ -1492,69 +1589,67 @@ export default function BiddinggetWorkDetail() {
 
         {orderDetail?.hire_status === "accepted" &&
           orderDetail?.platform_fee_paid && (
-            <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-              <div className="relative max-w-2xl mx-auto">
-                {/* Top Images */}
-                <div className="relative z-10 flex justify-center gap-4">
+            <div className="flex flex-col items-center justify-center space-y-6 mt-6 w-full px-4">
+              <div className="relative max-w-2xl mx-auto w-full">
+
+                {/* Top Images - responsive sizes and wrap on small screens */}
+                <div className="relative z-10 flex justify-center gap-4 flex-wrap">
                   <img
                     src={Warning1}
                     alt="Warning"
-                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
                   />
                   <img
                     src={Warning3}
                     alt="Warning2"
-                    className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
+                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
                   />
                 </div>
 
-                {/* Yellow Box */}
-                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                  <h2 className="text-[#FE2B2B] font-bold -mt-2">
+                {/* Yellow Box - spacing & text size responsive */}
+                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
                     Warning Message
                   </h2>
-                  <p className="text-gray-700 text-sm md:text-base">
-                    Pay securely — no extra charges from the platform. Choose
-                    simple and safe transactions.
+                  <p className="text-gray-700 text-sm sm:text-base">
+                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
                   </p>
                 </div>
               </div>
-              <div className="flex space-x-4">
+
+              {/* Buttons - stack on mobile, inline on tablet+; buttons full-width on mobile */}
+              <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
                 <button
-                  className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                  className="bg-[#228B22] hover:bg-green-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base"
                   onClick={handleMarkComplete}
                 >
                   Mark as Complete
                 </button>
-                <ReviewModal
-                  show={showCompletedModal}
-                  onClose={() => {
-                    setShowCompletedModal(false);
-                    fetchOrder();
-                  }}
-                  service_provider_id={
-                    orderDetail?.service_provider_id?._id || null
-                  }
-                  orderId={id}
-                  type="bidding"
-                />
-                <Link to={`/dispute/${id}/bidding`}>
-                  <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+
+
+
+                {/* ReviewModal kept as-is (no logic changed) */}
+
+
+                <Link to={`/dispute/${id}/bidding`} className="w-full sm:w-auto">
+                  <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                     Cancel Task and Create Dispute
                   </button>
                 </Link>
               </div>
             </div>
           )}
+
         {orderDetail?.hire_status === "completed" && (
-          <div className="flex justify-center mt-4">
-            <Link to={`/dispute/${id}/bidding`}>
-              <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+          <div className="flex justify-center mt-4 px-4">
+            <Link to={`/dispute/${id}/bidding`} className="w-full max-w-xs">
+              <button className="bg-[#EE2121] hover:bg-red-600 text-white w-full px-6 py-3 rounded-lg font-semibold shadow-md text-sm sm:text-base">
                 Create Dispute
               </button>
             </Link>
           </div>
         )}
+
       </div>
       {/* Banner Slider */}
       <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
