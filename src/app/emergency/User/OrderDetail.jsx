@@ -309,71 +309,195 @@ export default function ViewProfile() {
     });
   };
 
-  const handleMarkComplete = async () => {
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/emergency-order/completeOrderUser`,
-        { order_id: id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  // const handleMarkComplete = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${BASE_URL}/emergency-order/completeOrderUser`,
+  //       { order_id: id },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
 
-      if (response.status === 200 && response.data.status) {
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Order marked as complete!",
-          confirmButtonColor: "#228B22",
-        }).then(() => {
-          fetchData();
-          setShowCompletedModal(true);
-        });
-      }
-    } catch (err) {
-      if (err.response?.data?.message?.includes("no payment records")) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: "No payment records exist.",
-          confirmButtonColor: "#FF0000",
-        });
-        return;
-      }
-      if (err.response?.status === 400) {
-        const { pendingPaymentsCount } = err.response.data;
-        Swal.fire({
-          icon: "error",
-          title: `Pending: ${pendingPaymentsCount || 0}`,
-          text: "Release pending payments first.",
-          confirmButtonColor: "#FF0000",
-        }).then(async (res) => {
-          if (res.isConfirmed) {
-            const confirm = await Swal.fire({
-              title: "Release All?",
-              icon: "question",
-              showCancelButton: true,
-              confirmButtonColor: "#228B22",
-              cancelButtonColor: "#FF0000",
-            });
-            if (confirm.isConfirmed) {
-              await axios.put(
-                `${BASE_URL}/emergency-order/requestAllPaymentReleases/${id}`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-              );
-              fetchData();
-            }
-          }
-        });
-        return;
-      }
-      Swal.fire({
-        icon: "error",
-        title: "Failed",
-        text: "Could not complete order.",
-        confirmButtonColor: "#FF0000",
-      });
-    }
-  };
+  //     if (response.status === 200 && response.data.status) {
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "Success!",
+  //         text: "Order marked as complete!",
+  //         confirmButtonColor: "#228B22",
+  //       }).then(() => {
+  //         fetchData();
+  //         setShowCompletedModal(true);
+  //       });
+  //     }
+  //   } catch (err) {
+  //     if (err.response?.data?.message?.includes("no payment records")) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Oops!",
+  //         text: "No payment records exist.",
+  //         confirmButtonColor: "#FF0000",
+  //       });
+  //       return;
+  //     }
+  //     if (err.response?.status === 400) {
+  //       const { pendingPaymentsCount } = err.response.data;
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: `Pending: ${pendingPaymentsCount || 0}`,
+  //         text: "Release pending payments first.",
+  //         confirmButtonColor: "#FF0000",
+  //       }).then(async (res) => {
+  //         if (res.isConfirmed) {
+  //           const confirm = await Swal.fire({
+  //             title: "Release All?",
+  //             icon: "question",
+  //             showCancelButton: true,
+  //             confirmButtonColor: "#228B22",
+  //             cancelButtonColor: "#FF0000",
+  //           });
+  //           if (confirm.isConfirmed) {
+  //             await axios.put(
+  //               `${BASE_URL}/emergency-order/requestAllPaymentReleases/${id}`,
+  //               {},
+  //               { headers: { Authorization: `Bearer ${token}` } }
+  //             );
+  //             fetchData();
+  //           }
+  //         }
+  //       });
+  //       return;
+  //     }
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Failed",
+  //       text: "Could not complete order.",
+  //       confirmButtonColor: "#FF0000",
+  //     });
+  //   }
+  // };
+
+
+ const handleMarkComplete = async () => {
+		try {
+			const token = localStorage.getItem("bharat_token");
+
+			const response = await axios.post(
+				`${BASE_URL}/emergency-order/completeOrderUser`,
+				{ order_id: id },
+				{ headers: { Authorization: `Bearer ${token}` } }
+			);
+
+			// ✅ Success: order completed
+			if (response.status === 200 && response.data.status) {
+				Swal.fire({
+					icon: "success",
+					title: "Success!",
+					text: "Order marked as complete successfully!",
+					confirmButtonColor: "#228B22",
+				})
+					.then(() => fetchData())
+					.then(() => {
+						setTimeout(() => {
+							setShowCompletedModal(true);
+						}, 150);
+					});
+			}
+		} catch (err) {
+			console.error(err);
+
+			// ⚠️ If payment is pending (status 400)
+			if (err.response && err.response.status === 400) {
+				const { pendingPaymentsCount, message } = err.response.data;
+
+				Swal.fire({
+					icon: "error",
+					title: `Pending Payments: ${pendingPaymentsCount}`,
+					text: message,
+					confirmButtonText: "OK",
+					confirmButtonColor: "#FF0000",
+				}).then(async (result) => {
+					if (result.isConfirmed) {
+						// 🟢 Ask user if they want to release all payments
+						const confirmRelease = await Swal.fire({
+							title: "Release All Payments?",
+							text: "Do you want to release all pending payments now?",
+							icon: "question",
+							showCancelButton: true,
+							confirmButtonColor: "#228B22",
+							cancelButtonColor: "#FF0000",
+							confirmButtonText: "Yes, release all",
+						});
+
+						if (confirmRelease.isConfirmed) {
+							try {
+								const token = localStorage.getItem("bharat_token");
+								const releaseResponse = await axios.put(
+									`${BASE_URL}/emergency-order/requestAllPaymentReleases/${id}`,
+									{},
+									{ headers: { Authorization: `Bearer ${token}` } }
+								);
+
+								if (
+									releaseResponse.status === 200 &&
+									releaseResponse.data.status
+								) {
+									// 🎉 Payments released successfully
+									Swal.fire({
+										icon: "success",
+										title: "Payments Released!",
+										text: "All pending payments have been successfully released.",
+										confirmButtonColor: "#228B22",
+									}).then(async () => {
+										// ⭐ NEW STEP ADDED HERE ⭐
+										const askToComplete = await Swal.fire({
+											title: "Complete Order?",
+											text: "All payments are released. Do you want to complete the order now?",
+											icon: "question",
+											showCancelButton: true,
+											confirmButtonText: "Yes, Complete Order",
+											cancelButtonText: "No",
+											confirmButtonColor: "#228B22",
+											cancelButtonColor: "#FF0000",
+										});
+
+										if (askToComplete.isConfirmed) {
+											handleMarkComplete(); // 🔁 Call again to complete order
+										}
+									});
+								} else {
+									Swal.fire({
+										icon: "error",
+										title: "Failed!",
+										text:
+											releaseResponse.data.message ||
+											"Failed to release payments.",
+										confirmButtonColor: "#FF0000",
+									});
+								}
+							} catch (releaseErr) {
+								console.error(releaseErr);
+								Swal.fire({
+									icon: "error",
+									title: "Error!",
+									text: "Something went wrong while releasing payments.",
+									confirmButtonColor: "#FF0000",
+								});
+							}
+						}
+					}
+				});
+			} else {
+				// 🚫 Other errors
+				Swal.fire({
+					icon: "error",
+					title: "Oops!",
+					text: "Failed to mark order as complete. Please try again.",
+					confirmButtonColor: "#FF0000",
+				});
+			}
+		}
+	};
+
+
 
   const handleConfirmCancel = async () => {
     setShowModal(false);
