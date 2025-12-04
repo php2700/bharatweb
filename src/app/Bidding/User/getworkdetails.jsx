@@ -67,50 +67,50 @@ export default function BiddinggetWorkDetail() {
     fetchOrder();
     fetchOffers();
   }, [id]);
-const applySort = (data) => {
-  if (!sortType) return data;
+  const applySort = (data) => {
+    if (!sortType) return data;
 
-  let sorted = [...data];
+    let sorted = [...data];
 
-  switch (sortType) {
-    case "name-asc":
-      sorted.sort((a, b) =>
-        (a.full_name || a.provider_id?.full_name).localeCompare(
-          b.full_name || b.provider_id?.full_name
-        )
-      );
-      break;
+    switch (sortType) {
+      case "name-asc":
+        sorted.sort((a, b) =>
+          (a.full_name || a.provider_id?.full_name).localeCompare(
+            b.full_name || b.provider_id?.full_name
+          )
+        );
+        break;
 
-    case "name-desc":
-      sorted.sort((a, b) =>
-        (b.full_name || b.provider_id?.full_name).localeCompare(
-          a.full_name || a.provider_id?.full_name
-        )
-      );
-      break;
+      case "name-desc":
+        sorted.sort((a, b) =>
+          (b.full_name || b.provider_id?.full_name).localeCompare(
+            a.full_name || a.provider_id?.full_name
+          )
+        );
+        break;
 
-    case "amount-low":
-      sorted.sort((a, b) => (a.bid_amount || 0) - (b.bid_amount || 0));
-      break;
+      case "amount-low":
+        sorted.sort((a, b) => (a.bid_amount || 0) - (b.bid_amount || 0));
+        break;
 
-    case "amount-high":
-      sorted.sort((a, b) => (b.bid_amount || 0) - (a.bid_amount || 0));
-      break;
+      case "amount-high":
+        sorted.sort((a, b) => (b.bid_amount || 0) - (a.bid_amount || 0));
+        break;
 
-    case "duration-low":
-      sorted.sort((a, b) => (a.duration || 0) - (b.duration || 0));
-      break;
+      case "duration-low":
+        sorted.sort((a, b) => (a.duration || 0) - (b.duration || 0));
+        break;
 
-    case "duration-high":
-      sorted.sort((a, b) => (b.duration || 0) - (a.duration || 0));
-      break;
+      case "duration-high":
+        sorted.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+        break;
 
-    default:
-      return data;
-  }
+      default:
+        return data;
+    }
 
-  return sorted;
-};
+    return sorted;
+  };
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -860,28 +860,28 @@ const applySort = (data) => {
 
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
-      {orderDetail?.image_url?.length > 0 ? (
-  <Carousel
-    showArrows
-    showThumbs={false}
-    infiniteLoop
-    emulateTouch
-    swipeable
-    interval={3000}
-    showStatus={false}
-    autoPlay
-    onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])}
-    className="w-full 
+        {orderDetail?.image_url?.length > 0 ? (
+          <Carousel
+            showArrows
+            showThumbs={false}
+            infiniteLoop
+            emulateTouch
+            swipeable
+            interval={3000}
+            showStatus={false}
+            autoPlay
+            onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])}
+            className="w-full 
                h-[180px]        /* mobile */
                sm:h-[250px] 
                md:h-[360px]"   /* desktop unchanged */
-  >
-    {orderDetail.image_url.map((url, index) => (
-      <div key={index} className="cursor-pointer pointer-events-auto">
-        <img
-          src={url}
-          alt={`Project image ${index + 1}`}
-          className="
+          >
+            {orderDetail.image_url.map((url, index) => (
+              <div key={index} className="cursor-pointer pointer-events-auto">
+                <img
+                  src={url}
+                  alt={`Project image ${index + 1}`}
+                  className="
             w-full 
             h-[180px]        /* mobile size updated */
             sm:h-[250px] 
@@ -889,15 +889,15 @@ const applySort = (data) => {
             object-cover 
             rounded-lg
           "
-        />
-      </div>
-    ))}
-  </Carousel>
-) : (
-  <img
-    src={workImage}
-    alt="No project images available"
-    className="
+                />
+              </div>
+            ))}
+          </Carousel>
+        ) : (
+          <img
+            src={workImage}
+            alt="No project images available"
+            className="
       w-full 
       h-[180px]        /* mobile */
       sm:h-[250px] 
@@ -906,34 +906,34 @@ const applySort = (data) => {
       mt-5
       rounded-lg
     "
-  />
-)}
+          />
+        )}
 
 
         {/* Fullscreen modal */}
-      {openImage && (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-    onClick={() => setOpenImage(null)}
-  >
-    <div
-      className="relative"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <img
-        src={openImage}
-        alt="Preview"
-        className="
+        {openImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setOpenImage(null)}
+          >
+            <div
+              className="relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={openImage}
+                alt="Preview"
+                className="
           max-w-[90vw] 
           max-h-[90vh] 
           rounded-xl 
           shadow-2xl
         "
-      />
+              />
 
-      <button
-        onClick={() => setOpenImage(null)}
-        className="
+              <button
+                onClick={() => setOpenImage(null)}
+                className="
           absolute -top-4 -right-4 
           h-10 w-10 
           flex items-center justify-center 
@@ -943,12 +943,12 @@ const applySort = (data) => {
           shadow-lg 
           text-2xl
         "
-      >
-        ×
-      </button>
-    </div>
-  </div>
-)}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
 
 
 
@@ -1150,13 +1150,13 @@ const applySort = (data) => {
           {/* <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
               <p>{orderDetail?.description || "No description available"}</p>
             </div> */}
-         <div className="w-full max-w-4xl mx-auto px-4">
-  <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
-    <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
-      {orderDetail?.description || "No details available."}
-    </p>
-  </div>
-</div>
+          <div className="w-full max-w-4xl mx-auto px-4">
+            <div className="border border-green-600 rounded-lg p-4 sm:p-5 md:p-6 bg-gray-50 mb-4 w-full">
+              <p className="text-gray-700 tracking-tight text-sm sm:text-base leading-relaxed break-words">
+                {orderDetail?.description || "No details available."}
+              </p>
+            </div>
+          </div>
 
           <div className="space-y-6">
             <div className="flex justify-center gap-6">
@@ -1340,56 +1340,56 @@ const applySort = (data) => {
                     Related Worker
                   </button>
                 </div>
-          <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 
-  {/* Search Box */}
-  <div className="w-full sm:w-[60%] flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
-    <Search className="w-5 h-5 text-gray-400" />
-    <input
-      type="text"
-      placeholder="Search for services"
-      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value.toLowerCase())}
-    />
-  </div>
+                  {/* Search Box */}
+                  <div className="w-full sm:w-[60%] flex items-center bg-gray-100 rounded-full px-4 py-2 shadow-sm">
+                    <Search className="w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search for services"
+                      className="flex-1 bg-transparent px-3 outline-none text-sm text-gray-700"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value.toLowerCase())}
+                    />
+                  </div>
 
-  {/* Filter Dropdown */}
-  <div className="w-full sm:w-[35%]">
-    <select
-      className="w-full px-4 py-2 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium shadow-sm
+                  {/* Filter Dropdown */}
+                  <div className="w-full sm:w-[35%]">
+                    <select
+                      className="w-full px-4 py-2 rounded-full border border-gray-300 bg-gray-100 text-sm font-medium shadow-sm
                  hover:bg-gray-200 transition-all cursor-pointer"
-      value={sortType}
-      onChange={(e) => setSortType(e.target.value)}
-    >
-      <option value="">Filter</option>
+                      value={sortType}
+                      onChange={(e) => setSortType(e.target.value)}
+                    >
+                      <option value="">Filter</option>
 
-      <option value="name-asc">Name A → Z</option>
-      <option value="name-desc">Name Z → A</option>
+                      <option value="name-asc">Name A → Z</option>
+                      <option value="name-desc">Name Z → A</option>
 
-      {String(tab).toLowerCase().includes("bid") && (
-        <>
-          <option value="amount-low">Amount Low → High</option>
-          <option value="amount-high">Amount High → Low</option>
-          <option value="duration-low">Duration Low → High</option>
-          <option value="duration-high">Duration High → Low</option>
-        </>
-      )}
-    </select>
-  </div>
+                      {String(tab).toLowerCase().includes("bid") && (
+                        <>
+                          <option value="amount-low">Amount Low → High</option>
+                          <option value="amount-high">Amount High → Low</option>
+                          <option value="duration-low">Duration Low → High</option>
+                          <option value="duration-high">Duration High → Low</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
 
-</div>
+                </div>
 
                 {tab === "related" ? (
                   <div className="flex flex-col items-center w-full mt-4">
                     {Array.isArray(providers) && providers.length > 0 ? (
                       applySort(
-  providers.filter(
-    (provider) =>
-      provider.full_name?.toLowerCase().includes(searchText) &&
-      !offers.some((offer) => offer.provider_id?._id === provider._id)
-  )
-)
+                        providers.filter(
+                          (provider) =>
+                            provider.full_name?.toLowerCase().includes(searchText) &&
+                            !offers.some((offer) => offer.provider_id?._id === provider._id)
+                        )
+                      )
 
                         .map((provider) => (
                           <div
@@ -1484,11 +1484,11 @@ const applySort = (data) => {
                 ) : (
                   <div className="mt-6 space-y-5 w-full">
                     {Array.isArray(offers) && offers.length > 0 ? (
-                    applySort(
-  offers.filter((offer) =>
-    offer.provider_id?.full_name?.toLowerCase().includes(searchText)
-  )
-)
+                      applySort(
+                        offers.filter((offer) =>
+                          offer.provider_id?.full_name?.toLowerCase().includes(searchText)
+                        )
+                      )
 
                         .map((offer) => (
                           <div

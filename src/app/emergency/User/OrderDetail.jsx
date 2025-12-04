@@ -49,7 +49,7 @@ export default function ViewProfile() {
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [mapAddress, setMapAddress] = useState("");
   const token = localStorage.getItem("bharat_token");
-   const [openImage, setOpenImage] = useState(null);
+  const [openImage, setOpenImage] = useState(null);
 
   // Sort state
   const [sortBy, setSortBy] = useState("name-asc");
@@ -123,11 +123,11 @@ export default function ViewProfile() {
         }),
         orderData?.hire_status === "pending"
           ? axios.get(
-              `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
-              {
-                headers: { Authorization: `Bearer ${token}` },
-              }
-            )
+            `${BASE_URL}/emergency-order/getAcceptedServiceProviders/${id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
           : { data: { providers: [] } },
       ]);
 
@@ -377,126 +377,126 @@ export default function ViewProfile() {
   // };
 
 
- const handleMarkComplete = async () => {
-		try {
-			const token = localStorage.getItem("bharat_token");
+  const handleMarkComplete = async () => {
+    try {
+      const token = localStorage.getItem("bharat_token");
 
-			const response = await axios.post(
-				`${BASE_URL}/emergency-order/completeOrderUser`,
-				{ order_id: id },
-				{ headers: { Authorization: `Bearer ${token}` } }
-			);
+      const response = await axios.post(
+        `${BASE_URL}/emergency-order/completeOrderUser`,
+        { order_id: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-			// ✅ Success: order completed
-			if (response.status === 200 && response.data.status) {
-				Swal.fire({
-					icon: "success",
-					title: "Success!",
-					text: "Order marked as complete successfully!",
-					confirmButtonColor: "#228B22",
-				})
-					.then(() => fetchData())
-					.then(() => {
-						setTimeout(() => {
-							setShowCompletedModal(true);
-						}, 150);
-					});
-			}
-		} catch (err) {
-			console.error(err);
+      // ✅ Success: order completed
+      if (response.status === 200 && response.data.status) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Order marked as complete successfully!",
+          confirmButtonColor: "#228B22",
+        })
+          .then(() => fetchData())
+          .then(() => {
+            setTimeout(() => {
+              setShowCompletedModal(true);
+            }, 150);
+          });
+      }
+    } catch (err) {
+      console.error(err);
 
-			// ⚠️ If payment is pending (status 400)
-			if (err.response && err.response.status === 400) {
-				const { pendingPaymentsCount, message } = err.response.data;
+      // ⚠️ If payment is pending (status 400)
+      if (err.response && err.response.status === 400) {
+        const { pendingPaymentsCount, message } = err.response.data;
 
-				Swal.fire({
-					icon: "error",
-					title: `Pending Payments: ${pendingPaymentsCount}`,
-					text: message,
-					confirmButtonText: "OK",
-					confirmButtonColor: "#FF0000",
-				}).then(async (result) => {
-					if (result.isConfirmed) {
-						// 🟢 Ask user if they want to release all payments
-						const confirmRelease = await Swal.fire({
-							title: "Release All Payments?",
-							text: "Do you want to release all pending payments now?",
-							icon: "question",
-							showCancelButton: true,
-							confirmButtonColor: "#228B22",
-							cancelButtonColor: "#FF0000",
-							confirmButtonText: "Yes, release all",
-						});
+        Swal.fire({
+          icon: "error",
+          title: `Pending Payments: ${pendingPaymentsCount}`,
+          text: message,
+          confirmButtonText: "OK",
+          confirmButtonColor: "#FF0000",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            // 🟢 Ask user if they want to release all payments
+            const confirmRelease = await Swal.fire({
+              title: "Release All Payments?",
+              text: "Do you want to release all pending payments now?",
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonColor: "#228B22",
+              cancelButtonColor: "#FF0000",
+              confirmButtonText: "Yes, release all",
+            });
 
-						if (confirmRelease.isConfirmed) {
-							try {
-								const token = localStorage.getItem("bharat_token");
-								const releaseResponse = await axios.put(
-									`${BASE_URL}/emergency-order/requestAllPaymentReleases/${id}`,
-									{},
-									{ headers: { Authorization: `Bearer ${token}` } }
-								);
+            if (confirmRelease.isConfirmed) {
+              try {
+                const token = localStorage.getItem("bharat_token");
+                const releaseResponse = await axios.put(
+                  `${BASE_URL}/emergency-order/requestAllPaymentReleases/${id}`,
+                  {},
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-								if (
-									releaseResponse.status === 200 &&
-									releaseResponse.data.status
-								) {
-									// 🎉 Payments released successfully
-									Swal.fire({
-										icon: "success",
-										title: "Payments Released!",
-										text: "All pending payments have been successfully released.",
-										confirmButtonColor: "#228B22",
-									}).then(async () => {
-										// ⭐ NEW STEP ADDED HERE ⭐
-										const askToComplete = await Swal.fire({
-											title: "Complete Order?",
-											text: "All payments are released. Do you want to complete the order now?",
-											icon: "question",
-											showCancelButton: true,
-											confirmButtonText: "Yes, Complete Order",
-											cancelButtonText: "No",
-											confirmButtonColor: "#228B22",
-											cancelButtonColor: "#FF0000",
-										});
+                if (
+                  releaseResponse.status === 200 &&
+                  releaseResponse.data.status
+                ) {
+                  // 🎉 Payments released successfully
+                  Swal.fire({
+                    icon: "success",
+                    title: "Payments Released!",
+                    text: "All pending payments have been successfully released.",
+                    confirmButtonColor: "#228B22",
+                  }).then(async () => {
+                    // ⭐ NEW STEP ADDED HERE ⭐
+                    const askToComplete = await Swal.fire({
+                      title: "Complete Order?",
+                      text: "All payments are released. Do you want to complete the order now?",
+                      icon: "question",
+                      showCancelButton: true,
+                      confirmButtonText: "Yes, Complete Order",
+                      cancelButtonText: "No",
+                      confirmButtonColor: "#228B22",
+                      cancelButtonColor: "#FF0000",
+                    });
 
-										if (askToComplete.isConfirmed) {
-											handleMarkComplete(); // 🔁 Call again to complete order
-										}
-									});
-								} else {
-									Swal.fire({
-										icon: "error",
-										title: "Failed!",
-										text:
-											releaseResponse.data.message ||
-											"Failed to release payments.",
-										confirmButtonColor: "#FF0000",
-									});
-								}
-							} catch (releaseErr) {
-								console.error(releaseErr);
-								Swal.fire({
-									icon: "error",
-									title: "Error!",
-									text: "Something went wrong while releasing payments.",
-									confirmButtonColor: "#FF0000",
-								});
-							}
-						}
-					}
-				});
-			} else {
-				// 🚫 Other errors
-				Swal.fire({
-					icon: "error",
-					title: "Oops!",
-					text: "Failed to mark order as complete. Please try again.",
-					confirmButtonColor: "#FF0000",
-				});
-			}
-		}
-	};
+                    if (askToComplete.isConfirmed) {
+                      handleMarkComplete(); // 🔁 Call again to complete order
+                    }
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Failed!",
+                    text:
+                      releaseResponse.data.message ||
+                      "Failed to release payments.",
+                    confirmButtonColor: "#FF0000",
+                  });
+                }
+              } catch (releaseErr) {
+                console.error(releaseErr);
+                Swal.fire({
+                  icon: "error",
+                  title: "Error!",
+                  text: "Something went wrong while releasing payments.",
+                  confirmButtonColor: "#FF0000",
+                });
+              }
+            }
+          }
+        });
+      } else {
+        // 🚫 Other errors
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Failed to mark order as complete. Please try again.",
+          confirmButtonColor: "#FF0000",
+        });
+      }
+    }
+  };
 
 
 
@@ -619,7 +619,7 @@ export default function ViewProfile() {
         {error}
       </div>
     );
- const handleOpenImage = (url) => {
+  const handleOpenImage = (url) => {
     const full = getFullSizeImage(url);
     console.log("Opening image:", full); // debug: ensure URL is correct
     setOpenImage(full);
@@ -662,34 +662,34 @@ export default function ViewProfile() {
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
 
         {/* TOP IMAGE / CAROUSEL styled like getworkdetails.jsx */}
-      {orderData?.image_urls?.length > 0 ? (
-  <Carousel
-    showArrows
-    showThumbs={false}
-    infiniteLoop
-    emulateTouch
-    swipeable
-    interval={3000}
-    showStatus={false}
-    autoPlay={false}
-    // use correct plural name and optional chaining
-    onClickItem={(index) => handleOpenImage(orderData?.image_urls?.[index])}
-     className="w-full 
+        {orderData?.image_urls?.length > 0 ? (
+          <Carousel
+            showArrows
+            showThumbs={false}
+            infiniteLoop
+            emulateTouch
+            swipeable
+            interval={3000}
+            showStatus={false}
+            autoPlay={false}
+            // use correct plural name and optional chaining
+            onClickItem={(index) => handleOpenImage(orderData?.image_urls?.[index])}
+            className="w-full 
                h-[180px]        /* mobile */
                sm:h-[250px] 
                md:h-[360px]"   /* desktop unchanged */
-  >
-    {orderData.image_urls.map((url, i) => (
-      <div
-        key={i}
-        
-        className="cursor-pointer pointer-events-auto"
-        
-        >
-        <img
-          src={url}
-          alt={`Project image ${i + 1}`}
-            className="
+          >
+            {orderData.image_urls.map((url, i) => (
+              <div
+                key={i}
+
+                className="cursor-pointer pointer-events-auto"
+
+              >
+                <img
+                  src={url}
+                  alt={`Project image ${i + 1}`}
+                  className="
             w-full 
             h-[180px]        /* mobile size updated */
             sm:h-[250px] 
@@ -697,15 +697,15 @@ export default function ViewProfile() {
             object-cover 
             rounded-lg
           "
-          />
-      </div>
-    ))}
-  </Carousel>
-) : (
-  <img
-  src={workImage}
-  alt="No images"
-  className="
+                />
+              </div>
+            ))}
+          </Carousel>
+        ) : (
+          <img
+            src={workImage}
+            alt="No images"
+            className="
       w-full 
       h-[180px]        /* mobile */
       sm:h-[250px] 
@@ -714,32 +714,32 @@ export default function ViewProfile() {
       mt-5
       rounded-lg
     "
-  />
-)}
+          />
+        )}
 
-      {openImage && (
-        <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        onClick={() => setOpenImage(null)}
-        >
-    <div
-      className="relative"
-      onClick={(e) => e.stopPropagation()}
-      >
-      <img
-        src={openImage}
-        alt="Preview"
-        className="
+        {openImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setOpenImage(null)}
+          >
+            <div
+              className="relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={openImage}
+                alt="Preview"
+                className="
         max-w-[90vw] 
         max-h-[90vh] 
         rounded-xl 
         shadow-2xl
         "
-        />
+              />
 
-      <button
-        onClick={() => setOpenImage(null)}
-        className="
+              <button
+                onClick={() => setOpenImage(null)}
+                className="
         absolute -top-4 -right-4 
         h-10 w-10 
         flex items-center justify-center 
@@ -749,21 +749,21 @@ export default function ViewProfile() {
           shadow-lg 
           text-2xl
         "
-      >
-        ×
-      </button>
-    </div>
-  </div>
-)}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
         <div className="py-6 space-y-4">
-            {/* Order Details */}
+          {/* Order Details */}
           <div className="flex justify-between items-start">
             <div className="w-full md:w-auto space-y-1 text-gray-800">
               <p className="text-lg font-semibold">
                 Title :-{" "}
                 {orderData?.title
                   ? orderData.title.charAt(0).toUpperCase() +
-                    orderData.title.slice(1)
+                  orderData.title.slice(1)
                   : "Unknown Title"}
               </p>
               <p className="text-sm text-green-600 font-semibold">
@@ -798,59 +798,55 @@ export default function ViewProfile() {
                 Posted:{" "}
                 {orderData?.createdAt
                   ? (() => {
-                      const date = new Date(orderData.createdAt);
-                      const day = String(date.getDate()).padStart(2, "0");
-                      const month = String(date.getMonth() + 1).padStart(2, "0");
-                      const year = date.getFullYear();
-                      return `${day}/${month}/${year}`;
-                    })()
+                    const date = new Date(orderData.createdAt);
+                    const day = String(date.getDate()).padStart(2, "0");
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const year = date.getFullYear();
+                    return `${day}/${month}/${year}`;
+                  })()
                   : "N/A"}
               </span>
 
               <span className="text-gray-600 font-semibold block">
                 Status:{" "}
                 <span
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                    orderData?.hire_status === "pending"
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
                       ? "bg-yellow-500"
                       : ""
-                  } ${
-                    orderData?.hire_status === "cancelled" ||
-                    orderData?.hire_status === "cancelledDispute"
+                    } ${orderData?.hire_status === "cancelled" ||
+                      orderData?.hire_status === "cancelledDispute"
                       ? "bg-[#FF0000]"
                       : ""
-                  } ${
-                    orderData?.hire_status === "completed" ||
-                    orderData?.hire_status === "assigned"
+                    } ${orderData?.hire_status === "completed" ||
+                      orderData?.hire_status === "assigned"
                       ? "bg-[#228B22]"
                       : ""
-                  }`}
+                    }`}
                 >
                   {orderData?.hire_status === "cancelledDispute"
                     ? "Cancelled Dispute"
                     : orderData?.hire_status
-                        ?.split(" ")
-                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                        .join(" ") || "Unknown"}
+                      ?.split(" ")
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(" ") || "Unknown"}
                 </span>
               </span>
               {orderData?.refundRequest && (
                 <span className="text-gray-600 font-semibold block">
                   Refund:{" "}
                   <span
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                      orderData?.refundStatus === "pending"
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
                         ? "bg-yellow-500"
                         : "bg-blue-500"
-                    }`}
+                      }`}
                   >
                     {orderData?.refundStatus?.charAt(0).toUpperCase() +
                       orderData?.refundStatus?.slice(1) || "Unknown"}
                   </span>
                 </span>
               )}
-              </div>
             </div>
+          </div>
           {/* Mobile mirror of right side */}
           <div className="block sm:hidden mt-4 text-left">
             <span className="bg-gray-800 text-white px-4 py-1 rounded-full text-sm inline-block text-center">
@@ -860,50 +856,46 @@ export default function ViewProfile() {
               Posted:{" "}
               {orderData?.createdAt
                 ? (() => {
-                    const date = new Date(orderData.createdAt);
-                    const day = String(date.getDate()).padStart(2, "0");
-                    const month = String(date.getMonth() + 1).padStart(2, "0");
-                    const year = date.getFullYear();
-                    return `${day}/${month}/${year}`;
-                  })()
+                  const date = new Date(orderData.createdAt);
+                  const day = String(date.getDate()).padStart(2, "0");
+                  const month = String(date.getMonth() + 1).padStart(2, "0");
+                  const year = date.getFullYear();
+                  return `${day}/${month}/${year}`;
+                })()
                 : "N/A"}
             </span>
             <span className="text-gray-600 font-semibold block mt-1">
               Status:{" "}
               <span
-                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                  orderData?.hire_status === "pending"
+                className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
                     ? "bg-yellow-500"
                     : ""
-                } ${
-                  orderData?.hire_status === "cancelled" ||
-                  orderData?.hire_status === "cancelledDispute"
+                  } ${orderData?.hire_status === "cancelled" ||
+                    orderData?.hire_status === "cancelledDispute"
                     ? "bg-[#FF0000]"
                     : ""
-                } ${
-                  orderData?.hire_status === "completed" ||
-                  orderData?.hire_status === "assigned"
+                  } ${orderData?.hire_status === "completed" ||
+                    orderData?.hire_status === "assigned"
                     ? "bg-[#228B22]"
                     : ""
-                }`}
+                  }`}
               >
                 {orderData?.hire_status === "cancelledDispute"
                   ? "Cancelled Dispute"
                   : orderData?.hire_status
-                      ?.split(" ")
-                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                      .join(" ") || "Unknown"}
+                    ?.split(" ")
+                    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                    .join(" ") || "Unknown"}
               </span>
             </span>
             {orderData?.refundRequest && (
               <span className="text-gray-600 font-semibold block mt-1">
                 Refund:{" "}
                 <span
-                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
-                    orderData?.refundStatus === "pending"
+                  className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
                       ? "bg-yellow-500"
                       : "bg-blue-500"
-                  }`}
+                    }`}
                 >
                   {orderData?.refundStatus?.charAt(0).toUpperCase() +
                     orderData?.refundStatus?.slice(1) || "Unknown"}
@@ -917,20 +909,20 @@ export default function ViewProfile() {
             Deadline:{" "}
             {orderData?.deadline
               ? (() => {
-                  const date = new Date(orderData.deadline);
-                  const day = String(date.getDate()).padStart(2, "0");
-                  const month = String(date.getMonth() + 1).padStart(2, "0");
-                  const year = date.getFullYear();
+                const date = new Date(orderData.deadline);
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = date.getFullYear();
 
-                  let hours = date.getHours();
-                  const minutes = String(date.getMinutes()).padStart(2, "0");
-                  const ampm = hours >= 12 ? "PM" : "AM";
+                let hours = date.getHours();
+                const minutes = String(date.getMinutes()).padStart(2, "0");
+                const ampm = hours >= 12 ? "PM" : "AM";
 
-                  hours = hours % 12 || 12;
-                  hours = String(hours).padStart(2, "0");
+                hours = hours % 12 || 12;
+                hours = String(hours).padStart(2, "0");
 
-                  return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
-                })()
+                return `${day}/${month}/${year} ${hours}:${minutes} ${ampm}`;
+              })()
               : "N/A"}
           </span>
 
@@ -991,7 +983,7 @@ export default function ViewProfile() {
               <>
                 <Link to={`/disputes/emergency/${disputeInfo._id}`}>
                   <span
-  className="
+                    className="
     px-4 sm:px-6 
     py-1.5 
     bg-[#FF0000] 
@@ -1007,9 +999,9 @@ export default function ViewProfile() {
     w-fit 
     mx-auto          /* Center horizontally */
   "
->
-  Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
-</span>
+                  >
+                    Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
+                  </span>
 
                 </Link>
                 <p className="text-sm text-gray-700 mt-3">
@@ -1086,16 +1078,15 @@ export default function ViewProfile() {
 
           {(orderData?.refundStatus === "processed" ||
             orderData?.refundStatus === "rejected") && (
-            <p
-              className={`mt-2 text-sm font-medium ${
-                orderData?.refundStatus === "processed"
-                  ? "text-green-600"
-                  : "text-red-600"
-              }`}
-            >
-              Admin Remark: {orderData?.refundReasonDetails || "No Remark"}
-            </p>
-          )}
+              <p
+                className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
+                    ? "text-green-600"
+                    : "text-red-600"
+                  }`}
+              >
+                Admin Remark: {orderData?.refundReasonDetails || "No Remark"}
+              </p>
+            )}
 
           {orderData?.service_provider_id &&
             orderData?.hire_status == "cancelled" && (
@@ -1103,9 +1094,8 @@ export default function ViewProfile() {
                 <div className="flex items-center space-x-4">
                   <img
                     src={orderData?.service_provider_id?.profile_pic || Profile}
-                    alt={`Profile of ${
-                      orderData?.service_provider_id?.full_name || "Worker"
-                    }`}
+                    alt={`Profile of ${orderData?.service_provider_id?.full_name || "Worker"
+                      }`}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div className="flex items-center w-full">
@@ -1143,63 +1133,65 @@ export default function ViewProfile() {
                 />
                 {(orderData?.hire_status === "assigned" ||
                   orderData?.hire_status === "completed") && (
-                  <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-                    <div className="relative max-w-2xl mx-auto">
-                      <div className="relative z-10 flex justify-center gap-4">
-                        <img
-                          src={Warning1}
-                          alt="Warning"
-                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                        />
-                        <img
-                          src={Warning3}
-                          alt="Warning2"
-                          className="w-50 h-50 bg-white border border-[#228B22] rounded-lg p-2"
-                        />
+                    <div className="flex flex-col items-center justify-center space-y-6 mt-6">
+                      <div className="relative max-w-2xl mx-auto">
+                        {/* Top Images - responsive sizes and wrap on small screens */}
+                                                <div className="relative z-10 flex justify-center gap-4 flex-wrap">
+                                                  <img
+                                                    src={Warning1}
+                                                    alt="Warning"
+                                                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                                                  />
+                                                  <img
+                                                    src={Warning3}
+                                                    alt="Warning2"
+                                                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                                                  />
+                                                </div>
+                        
+                                                {/* Yellow Box - spacing & text size responsive */}
+                                                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                                                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
+                                                    Warning Message
+                                                  </h2>
+                                                  <p className="text-gray-700 text-sm sm:text-base">
+                                                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                                                  </p>
+                                                </div>
                       </div>
-                      <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-16 pt-20 text-center">
-                        <h2 className="text-[#FE2B2B] font-bold -mt-2">
-                          Warning Message
-                        </h2>
-                        <p className="text-gray-700 text-sm md:text-base">
-                          Pay securely — no extra charges from the platform.
-                          Choose simple and safe transactions.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-4">
-                      {orderData?.hire_status !== "completed" && (
-                        <>
-                          <button
-                            className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
-                            onClick={handleMarkComplete}
-                          >
-                            Mark as Complete
+                      <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
+                        {orderData?.hire_status !== "completed" && (
+                          <>
+                            <button
+    className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto"
+    onClick={handleMarkComplete}
+  >
+    Mark as Complete
+  </button>
+                            <ReviewModal
+                              show={showCompletedModal}
+                              onClose={() => {
+                                setShowCompletedModal(false);
+                                fetchData();
+                              }}
+                              service_provider_id={
+                                orderData?.service_provider_id._id
+                              }
+                              orderId={id}
+                              type="direct"
+                            />
+                          </>
+                        )}
+                        <Link to={`/dispute/${id}/emergency`}>
+                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                            {orderData?.hire_status === "completed"
+                              ? "Create Dispute"
+                              : "Cancel Task and Create Dispute"}
                           </button>
-                          <ReviewModal
-                            show={showCompletedModal}
-                            onClose={() => {
-                              setShowCompletedModal(false);
-                              fetchData();
-                            }}
-                            service_provider_id={
-                              orderData?.service_provider_id._id
-                            }
-                            orderId={id}
-                            type="direct"
-                          />
-                        </>
-                      )}
-                      <Link to={`/dispute/${id}/emergency`}>
-                        <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
-                          {orderData?.hire_status === "completed"
-                            ? "Create Dispute"
-                            : "Cancel Task and Create Dispute"}
-                        </button>
-                      </Link>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </>
             )}
         </div>

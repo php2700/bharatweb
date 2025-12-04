@@ -1009,27 +1009,27 @@ export default function ViewProfile() {
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
 
         {/* TOP IMAGE / CAROUSEL (same style as getworkdetails.jsx) */}
-      {images.length > 0 ? (
-              <Carousel
-                showArrows={true}
-                showThumbs={false}
-                infiniteLoop={true}
-                autoPlay={true}
-                interval={3000}
-                emulateTouch={true}
-                showStatus={false}
-                onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
-                  className="w-full 
+        {images.length > 0 ? (
+          <Carousel
+            showArrows={true}
+            showThumbs={false}
+            infiniteLoop={true}
+            autoPlay={true}
+            interval={3000}
+            emulateTouch={true}
+            showStatus={false}
+            onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+            className="w-full 
                h-[180px]        /* mobile */
                sm:h-[250px] 
                md:h-[360px]"   /* desktop unchanged */
-              >
-                {images.map((url, index) => (
-                  <div key={index} className="cursor-pointer pointer-events-auto">
-                    <img
-                      src={url}
-                      alt={`Project image ${index + 1}`}
-                        className="
+          >
+            {images.map((url, index) => (
+              <div key={index} className="cursor-pointer pointer-events-auto">
+                <img
+                  src={url}
+                  alt={`Project image ${index + 1}`}
+                  className="
             w-full 
             h-[180px]        /* mobile size updated */
             sm:h-[250px] 
@@ -1037,16 +1037,16 @@ export default function ViewProfile() {
             object-cover 
             rounded-lg
           "
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            
-          ) : (
-            <img
-              src={defaultWorkImage}
-              alt="No project images available"
-               className="
+                />
+              </div>
+            ))}
+          </Carousel>
+
+        ) : (
+          <img
+            src={defaultWorkImage}
+            alt="No project images available"
+            className="
       w-full 
       h-[180px]        /* mobile */
       sm:h-[250px] 
@@ -1055,8 +1055,8 @@ export default function ViewProfile() {
       mt-5
       rounded-lg
     "
-            />
-          )}
+          />
+        )}
 
 
         {/* Fullscreen modal (copied layout from getworkdetails.jsx) */}
@@ -1416,8 +1416,8 @@ export default function ViewProfile() {
                               provider.status === "pending" && (
                                 <button
                                   className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
-                                      ? "bg-green-600"
-                                      : "bg-[#FB3523]"
+                                    ? "bg-green-600"
+                                    : "bg-[#FB3523]"
                                     } text-white font-semibold rounded-lg shadow`}
                                   onClick={async () => {
                                     if (provider.isRejectedByUser) {
@@ -1528,7 +1528,7 @@ export default function ViewProfile() {
               <>
                 <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
                   <span
-  className="
+                    className="
     px-4 sm:px-6 
     py-1.5 
     bg-[#FF0000] 
@@ -1544,9 +1544,9 @@ export default function ViewProfile() {
     w-fit 
     mx-auto          /* Center horizontally */
   "
->
-  Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
-</span>
+                  >
+                    Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
+                  </span>
 
                 </Link>
 
@@ -1588,12 +1588,12 @@ export default function ViewProfile() {
             {orderData?.refundRequest && (
               <button
                 className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : orderData?.refundStatus === "processed"
-                      ? "bg-green-600 hover:bg-green-700"
-                      : orderData?.refundStatus === "rejected"
-                        ? "bg-red-600 hover:bg-red-700"
-                        : "bg-gray-500"
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : orderData?.refundStatus === "processed"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : orderData?.refundStatus === "rejected"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-gray-500"
                   }`}
               >
                 {orderData?.refundStatus === "pending" &&
@@ -1607,8 +1607,8 @@ export default function ViewProfile() {
               orderData?.refundStatus === "rejected") && (
                 <p
                   className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
-                      ? "text-green-600"
-                      : "text-red-600"
+                    ? "text-green-600"
+                    : "text-red-600"
                     }`}
                 >
                   Admin Remark: {orderData?.refundReasonDetails}
@@ -1695,14 +1695,14 @@ export default function ViewProfile() {
                         </div>
 
                         {/* Yellow Box - spacing & text size responsive */}
-                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
-                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
-                    Warning Message
-                  </h2>
-                  <p className="text-gray-700 text-sm sm:text-base">
-                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
-                  </p>
-                </div>
+                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                          <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
+                            Warning Message
+                          </h2>
+                          <p className="text-gray-700 text-sm sm:text-base">
+                            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                          </p>
+                        </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
@@ -1731,7 +1731,7 @@ export default function ViewProfile() {
                           </>
                         )}
                         <Link to={`/dispute/${id}/direct`}>
-                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                             {orderData?.hire_status === "completed"
                               ? "Create Dispute"
                               : "Cancel Task and Create Dispute"}
