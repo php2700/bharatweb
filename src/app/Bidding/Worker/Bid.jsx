@@ -367,7 +367,7 @@ export default function Bid() {
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="container mx-auto mt-20 px-4 py-4">
+      <div className="container mx-auto  pt-20 px-4 py-4">
         <button
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
           onClick={() => window.history.back()}
@@ -378,7 +378,7 @@ export default function Bid() {
       </div>
 
       <div className="min-h-screen p-4">
-        <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
+        <div className="container max-w-5xl mx-auto  my-2 p-2 shadow-lg rounded-3xl">
           <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
 
           {/* Work Image with Click Zoom */}

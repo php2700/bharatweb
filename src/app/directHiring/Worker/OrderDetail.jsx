@@ -602,30 +602,33 @@ export default function ViewProfile() {
             )}
             {orderData?.hire_status === "pending" ||
             orderData?.hire_status === "cancelled" ? (
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-black mb-4">
+              <div className="mb-8 px-4 sm:px-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-5 text-center sm:text-left">
                   User Details
                 </h2>
 
                 {orderData?.user_id ? (
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-md p-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
                     {/* User Profile Section */}
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-6">
-                      <img
-                        src={orderData.user_id.profile_pic || Profile}
-                        alt={orderData.user_id.full_name || "User"}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-gray-200 shadow-lg flex-shrink-0"
-                      />
-                      <p className="text-lg font-semibold text-center sm:text-left break-words flex-1">
-                        {orderData?.user_id?.full_name
-                          .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ") || "Unknown User"}
-                      </p>
-                      {/* <button
+                    <div className="p-6 sm:p-8">
+                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-lef">
+                        <img
+                          src={orderData.user_id.profile_pic || Profile}
+                          alt={orderData.user_id.full_name || "User"}
+                          className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-gray-200 shadow-xl flex-shrink-0"
+                        />
+                        <div className="flex-1">
+                        <p className="text-lg font-semibold text-center sm:text-left break-words flex-1">
+                          {orderData?.user_id?.full_name
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ") || "Unknown User"}
+                        </p>
+                        </div>  
+                        {/* <button
                           className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
                           onClick={() =>
                             navigate(
@@ -635,19 +638,20 @@ export default function ViewProfile() {
                         >
                           View Profile
                         </button> */}
+                      </div>
                     </div>
 
                     {orderData?.hire_status === "cancelled" ||
                     orderData?.hire_status === "cancelledDispute" ? (
                       " "
                     ) : (
-                      <div className="mt-10 sm:mt-8 pb-8 ">
-                    <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-8">
+                      <div className="bg-gradient-to-b from-gray-50 to-white px-6 py-8 border-t border-gray-200 ">
+                        <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-8 text-center">
                           Contact
                         </p>
 
                         {/* Perfectly Responsive Icons – Side by side on all phones */}
-                      <div className="flex justify-center items-center gap-8 sm:gap-12">
+                        <div className="flex justify-center items-center gap-8 sm:gap-12">
                           <button
                             onClick={() =>
                               window.open(
@@ -655,13 +659,13 @@ export default function ViewProfile() {
                                 "_self"
                               )
                             }
-                            className="p-6 bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
+                            className="group p-6 sm:p-8 bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
                             title="Call"
                           >
                             <img
                               src={CallIcon}
                               alt="Call"
-                              className="w-12 h-12 object-contain"
+                              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto mb-2"
                             />
                           </button>
 
@@ -669,13 +673,13 @@ export default function ViewProfile() {
                             onClick={() =>
                               handleChatOpen(orderData.user_id._id, userId)
                             }
-                            className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-blue-200"
+                            className="roup p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-blue-200"
                             title="Chat"
                           >
                             <img
                               src={ChatIcon}
                               alt="Chat"
-                              className="w-12 h-12 object-contain"
+                              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto mb-2"
                             />
                           </button>
                         </div>

@@ -738,12 +738,12 @@ export default function AboutUs() {
   return (
     <>
       <Header />
-      <div className="mx-auto px-4 sm:px-10 md:px-20 py-16 mt-20 font-poppins">
+      <div className="mx-auto px-4 sm:px-10 md:px-20 py-6 mt-20 font-poppins">
         <motion.h2 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center text-4xl md:text-5xl font-bold mb-16 text-gray-900 tracking-tight"
+          className="text-center text-4xl md:text-5xl font-bold mb-4 text-gray-900 tracking-tight"
         >
           About Us
         </motion.h2>

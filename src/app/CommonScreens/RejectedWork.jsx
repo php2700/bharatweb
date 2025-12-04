@@ -339,18 +339,31 @@ export default function RejectedWorklist() {
   // Load banner images
   const fetchBannerImages = async () => {
     try {
-      const { data } = await axios.get(
+      if (!token) throw new Error("No authentication token found");
+
+      const response = await axios.get(
         `${BASE_URL}/banner/getAllBannerImages`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      if (data?.success && data.images?.length > 0) {
-        setBannerImages(data.images);
+      if (
+        response.data?.success &&
+        Array.isArray(response.data.images) &&
+        response.data.images.length > 0
+      ) {
+        setBannerImages(response.data.images);
+      } else {
+        setBannerImages([]);
+        setBannerError("No banners available");
       }
     } catch (err) {
-      console.error("Banner Load Error:", err);
+      console.error("Error fetching banner images:", err.message);
+      setBannerError(err.message || "Failed to load banners");
     } finally {
       setBannerLoading(false);
     }
@@ -526,22 +539,49 @@ export default function RejectedWorklist() {
       </div>
 
       {/* Banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden h-[350px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="text-center mt-36">Loading banners...</p>
-        ) : (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((b, i) => (
-              <div key={i}>
-                <img
-                  src={b}
-                  className="w-full h-[350px] object-cover"
-                  onError={(e) => (e.currentTarget.src = Work)}
-                />
-              </div>
-            ))}
-          </Slider>
-        )}
+
+      <div className="w-full px-4 sm:px-0 mt-4 sm:mt-0">
+        <div className="block sm:hidden">
+          <div className="w-full max-w-[92%] mx-auto rounded-[40px] overflow-hidden bg-[#f2e7ca]">
+            <Slider {...sliderSettings}>
+              {bannerImages.length > 0 ? (
+                bannerImages.map((b, i) => (
+                  <div key={i}>
+                    <img
+                      src={b}
+                      className="w-full h-[220px] object-cover"
+                      onError={(e) => (e.currentTarget.src = Work)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="w-full h-[220px] bg-gray-200 flex items-center justify-center">
+                  <p className="text-gray-600">No banners</p>
+                </div>
+              )}
+            </Slider>
+          </div>
+        </div>
+
+        <div className="hidden sm:block w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden h-[350px] bg-[#f2e7ca]">
+          {bannerLoading ? (
+            <p className="text-center mt-36 text-gray-600">
+              Loading banners...
+            </p>
+          ) : (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((b, i) => (
+                <div key={i}>
+                  <img
+                    src={b}
+                    className="w-full h-[350px] object-cover"
+                    onError={(e) => (e.currentTarget.src = Work)}
+                  />
+                </div>
+              ))}
+            </Slider>
+          )}
+        </div>
       </div>
 
       {/* Title */}
@@ -550,36 +590,40 @@ export default function RejectedWorklist() {
       </h1>
 
       {/* Tabs */}
-      <div className="flex justify-center gap-10 bg-gray-100 p-2 mt-4">
-        {["Direct Rejected", "Bidding Rejected"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-6 py-2 rounded-full font-semibold ${
-              activeTab === tab
-                ? "bg-[#228B22] text-white"
-                : "border border-[#228B22] text-green-600"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="w-full p-3 sm:p-4 mt-4 rounded-xl">
+        <div className="flex flex-wrap justify-center gap-6 md:gap-3">
+          {["Direct Rejected", "Bidding Rejected"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2.5 rounded-full font-semibold text-sm sm:text-base whitespace-nowrap transition-all duration-200 shadow-sm ${
+                activeTab === tab
+                  ? "bg-[#228B22] text-white shadow-md"
+                  : "border border-[#228B22] text-green-600"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Search */}
-      <div className="flex justify-center mt-6">
-        <div className="relative w-full max-w-4xl">
-          <img
-            src={Search}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-5"
-          />
-          <input
-            type="search"
-            placeholder="Search rejected tasks..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 py-2 bg-gray-100 rounded-lg"
-          />
+      <div className="w-full    flex justify-center mt-6 px-4">
+        <div className=" w-full max-w-4xl  ">
+          <div className="relative">
+            <img
+              src={Search}
+              className="absolute  left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none"
+            />
+            <input
+              type="search"
+              placeholder="Search rejected tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-12 py-3 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#228B22] focus:border-transparent transition-all duration-200 text-base placeholder-gray-500"
+            />
+          </div>
         </div>
       </div>
 
@@ -595,30 +639,37 @@ export default function RejectedWorklist() {
               key={task.id}
               className="flex flex-col sm:flex-row bg-white rounded-xl shadow-md"
             >
-              {/* Image */}
-              <div className="w-full sm:w-1/3 h-48 bg-gray-100 relative">
+              <div className="block sm:hidden px-4 pt-4">
+                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-100">
+                  <img
+                    src={task.image}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.currentTarget.src = Work)}
+                  />
+                  <span className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1.5 rounded-full shadow-md">
+                    {task?.project_id}
+                  </span>
+                </div>
+              </div>
+
+              <div className="hidden sm:block w-full sm:w-1/3 bg-gray-100 rounded-xl overflow-hidden relative aspect-[4/3] ml-2">
                 <img
                   src={task.image}
                   className="w-full h-full object-cover"
                   onError={(e) => (e.currentTarget.src = Work)}
                 />
-                <span
-                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
-                   bg-black/80 backdrop-blur text-white text-xs 
-                   px-4 py-1 rounded-full shadow-md"
-                  >
-                    {task?.project_id}
-                  </span>
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full shadow-md">
+                  {task?.project_id}
+                </span>
               </div>
-              
-              {/* Content */}
-              <div className="w-full sm:w-2/3 p-4 flex flex-col justify-between">
-                <div className="flex justify-between">
-                  <h2 className="font-semibold text-lg">
-  {task.name.charAt(0).toUpperCase() + task.name.slice(1)}
-</h2>
 
-                  <p className="text-sm">Posted: {task.date}</p>
+              <div className="w-full sm:w-2/3 px-4 sm:px-6 lg:px-8 py-4 flex flex-col justify-between">
+                <div className="flex justify-between">
+                  <h2 className="font-bold text-lg sm:text-xl text-gray-800 line-clamp-2">
+                    {task.name.charAt(0).toUpperCase() + task.name.slice(1)}
+                  </h2>
+
+                  <p className="text-sm font-bold">Posted Date: {task.date}</p>
                 </div>
 
                 {/* Description */}
@@ -711,7 +762,13 @@ export default function RejectedWorklist() {
                         }
                       )
                     }
-                    className="border border-green-600 text-green-600 px-4 py-1 rounded-lg"
+                    className="border border-[#228B22] text-[#228B22] font-bold 
+             px-3 py-1.5 
+             text-xs sm:text-sm md:text-base 
+             rounded-lg 
+             hover:bg-[#228B22] hover:text-white 
+             transition-all duration-200 
+             whitespace-nowrap  "
                   >
                     View Details
                   </button>

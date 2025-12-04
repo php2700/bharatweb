@@ -796,14 +796,14 @@ export default function EditProfile() {
     <>
       <Header />
       <div className="mt-20">
-        <button onClick={() => navigate(-1)} className="flex items-center text-green-700 mb-4 hover:underline ml-10">
+        <button onClick={() => navigate(-1)} className="flex items-center text-green-700  hover:underline ml-10">
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
           Back
         </button>
       </div>
 
-      <div className="max-w-[50rem] mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+      <div className="max-w-[50rem] mx-auto p-4 bg-white rounded-2xl shadow-xl">
+        <h2 className="text-xl md:text-3xl font-bold text-gray-800 mb-8 text-center">
           {activeTab === "worker" ? "Get your profile verified" : "Update User Profile"}
         </h2>
 
@@ -839,8 +839,8 @@ export default function EditProfile() {
           )}
 
           {/* Name */}
-          <div>
-            <label className="block mb-2 font-semibold text-gray-700">Name</label>
+          <div  className="ml-6">
+            <label className="block  mb-2 font-semibold text-gray-700">Name</label>
             <input
               type="text"
               name="name"
@@ -853,7 +853,7 @@ export default function EditProfile() {
           </div>
 
           {/* Age */}
-          <div>
+          <div className="ml-6">
             <label className="block mb-2 font-semibold text-gray-700">Age</label>
             <input
               type="text"
@@ -867,7 +867,7 @@ export default function EditProfile() {
           </div>
 
           {/* Gender */}
-          <div>
+          <div className="ml-6">
             <label className="block mb-2 font-semibold text-gray-700">Gender</label>
             <select
               name="gender"
@@ -901,7 +901,7 @@ export default function EditProfile() {
           {activeTab === "worker" && (
             <>
               {/* Category */}
-              <div>
+              <div className="ml-6">
                 <label className="block mb-2 font-semibold text-gray-700">Category</label>
                 <Select
                   options={categories}
@@ -924,7 +924,7 @@ export default function EditProfile() {
               </div>
 
               {/* Subcategory */}
-              <div>
+              <div className="ml-6">
                 <label className="block mb-2 font-semibold text-gray-700">Subcategory</label>
                 <Select
                   options={subcategories}
@@ -942,7 +942,7 @@ export default function EditProfile() {
               </div>
 
               {/* Emergency Subcategory */}
-              <div>
+              <div className="ml-6">
                 <label className="block mb-2 font-semibold text-gray-700">Emergency Subcategory</label>
                 <Select
                   options={emergencysubcategories}
@@ -962,8 +962,8 @@ export default function EditProfile() {
               {/* Documents */}
               <div className="space-y-8">
                 {/* Aadhaar */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.aadhaar ? "ring-2 ring-red-500" : ""}`}>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">Aadhaar Card <span className="text-red-600">*</span></h3>
+                <div className={`bg-gray-50 ml-6 rounded-xl ${errors.aadhaar ? "ring-2 ring-red-500" : ""}`}>
+                  <h3 className=" mb-4 font-semibold text-gray-700">Aadhaar Card <span className="text-red-600">*</span></h3>
                   {errors.aadhaar && <p className="text-red-500 text-sm -mt-2 mb-2">{errors.aadhaar}</p>}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Front */}
@@ -1039,12 +1039,12 @@ export default function EditProfile() {
                 </div>
 
                 {/* PAN */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.pan ? "ring-2 ring-red-500" : ""}`}>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">PAN Card <span className="text-red-600">*</span></h3>
+                <div className={`bg-gray-50 ml-6 rounded-xl ${errors.pan ? "ring-2 ring-red-500" : ""}`}>
+                  <h3 className=" font-semibold mb-4 text-gray-700">PAN Card <span className="text-red-600">*</span></h3>
                   {errors.pan && <p className="text-red-500 text-sm -mt-2 mb-2">{errors.pan}</p>}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                      <label className="font-medium text-gray-700">Front Side</label>
+                      <label className="font-medium mb-1 text-gray-700">Front Side</label>
                       <label className="block cursor-pointer">
                         <div className="flex flex-col items-center justify-center px-6 py-10 bg-white border-2 border-dashed rounded-xl hover:bg-gray-50 transition">
                           <svg className="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1114,8 +1114,8 @@ export default function EditProfile() {
                 </div>
 
                 {/* Selfie */}
-                <div className={`bg-gray-50 p-6 rounded-xl ${errors.selfie ? "ring-2 ring-red-500" : ""}`}>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">Selfie <span className="text-red-600">*</span></h3>
+                <div className={`bg-gray-50 ml-6 rounded-xl ${errors.selfie ? "ring-2 ring-red-500" : ""}`}>
+                  <h3 className=" font-semibold mb-4 text-gray-700">Selfie <span className="text-red-600">*</span></h3>
                   {errors.selfie && <p className="text-red-500 text-sm -mt-2 mb-2">{errors.selfie}</p>}
                   <div className="max-w-sm mx-auto space-y-4">
                     <label className="block cursor-pointer">
@@ -1153,7 +1153,7 @@ export default function EditProfile() {
               </div>
 
               {/* Has Shop */}
-              <div>
+              <div className="ml-6">
                 <label className="block mb-2 font-semibold text-gray-700">Do you have a shop?</label>
                 <div className="flex items-center space-x-6">
                   <label className="flex items-center">
@@ -1170,7 +1170,7 @@ export default function EditProfile() {
 
               {/* Shop Address */}
               {formData.hasShop === "yes" && (
-                <div className="space-y-3">
+                <div className="space-y-3 ml-6">
                   <label className="block font-semibold text-gray-700">Shop Address <span className="text-red-600">*</span></label>
                   <Select
                     options={buildAddressOptions()}
@@ -1205,7 +1205,7 @@ export default function EditProfile() {
           )}
 
           {/* About / Skill */}
-          <div>
+          <div className="ml-6">
             <label className="block mb-2 font-semibold text-gray-700">
               {activeTab === "worker" ? "About My Skill" : "About Us"}
             </label>
