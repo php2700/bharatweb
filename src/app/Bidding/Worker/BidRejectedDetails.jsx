@@ -1,4 +1,4 @@
-import { useState, useEffect  } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Footer from "../../../component/footer";
 import Header from "../../../component/Header";
@@ -17,7 +17,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import Accepted from "./Accepted";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Arrow from "../../../assets/profile/arrow_back.svg";
 export default function Bid() {
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -25,25 +25,20 @@ export default function Bid() {
   const { id } = useParams();
   const service_provider = localStorage.getItem("user_id");
   const bidding_offer_id = localStorage.getItem("bidding_offer_id");
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // Modal States
   const [isBidModal, setIsBidModal] = useState(false);
   const [isEditBidModal, setIsEditBidModal] = useState(false);
 
-  // Data States
   const [data, setData] = useState(null);
   const [worker, setWorker] = useState(null);
 
-  // // Existing Bid (fetched from API)
-  const [existingBid, setExistingBid] = useState(null); // { _id, amount, description }
+  const [existingBid, setExistingBid] = useState(null);
   const [bidLoading, setBidLoading] = useState(false);
 
-  // Offer / Negotiation
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
 
-  // Loading / Error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [bannerImages, setBannerImages] = useState([]);
@@ -51,8 +46,7 @@ export default function Bid() {
   const [bannerError, setBannerError] = useState(null);
   const [assignedWorker, setAssignedWorker] = useState(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
- 
-
+  const [showFullLocation, setShowFullLocation] = useState(false);
 
   // Slider settings
   const sliderSettings = {
@@ -99,18 +93,17 @@ export default function Bid() {
     window.scrollTo(0, 0);
   }, [BASE_URL]);
 
-  
   const { state } = useLocation();
 
   const task = state?.task;
-    console.log(task);
+  console.log(task);
   const hasMyBid = !!task?.offer;
 
   useEffect(() => {
-  if (task?.offer) {
-    setExistingBid(task.offer);
-  }
-}, [task]);
+    if (task?.offer) {
+      setExistingBid(task.offer);
+    }
+  }, [task]);
 
   if (!task) {
     return (
@@ -124,21 +117,22 @@ export default function Bid() {
   return (
     <>
       <Header />
-       <div className="container mx-auto px-4 py-4 mt-20">
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
-              >
-                <img src={Arrow} alt="Back" className="w-6 h-6 mr-2" />
-                Back
-              </button>
-            </div>
       
-      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
+     <div className="container mx-auto mt-20 px-4 py-4">
+             <button
+               onClick={() => navigate(-1)}
+               className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
+             >
+               <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
+               Back
+             </button>
+           </div>
 
-      <div className="min-h-screen p-4 sm:p-6">
-        <div className="container max-w-5xl mx-auto my-10 p-8 shadow-lg rounded-3xl">
-          <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
+      <div className="min-h-screen sm:p-6">
+        <div className="container max-w-5xl mx-auto p-4 shadow-lg rounded-3xl">
+          <h1 className="text-xl md:text-2xl text-center font-bold mb-4">
+            Work Detail
+          </h1>
 
           {/* Work Image */}
           {worker?.image?.length > 0 ? (
@@ -147,14 +141,14 @@ export default function Bid() {
               showThumbs={false}
               infiniteLoop={true}
               autoPlay={true}
-              className="w-full h-[360px]"
+              className="w-full h-[200px] sm:h-[300px] md:h-[360px]"
             >
               {worker.image.map((url, index) => (
                 <div key={index}>
                   <img
                     src={url}
                     alt={`Project image ${index + 1}`}
-                    className="w-full h-[360px] object-cover"
+                    className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover"
                   />
                 </div>
               ))}
@@ -163,31 +157,58 @@ export default function Bid() {
             <img
               src={hisWorkImg}
               alt="No project images available"
-              className="w-full h-[360px] object-cover mt-5"
+              className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover mt-2"
             />
           )}
 
           {task && (
             <div className="py-6 space-y-4">
-              <div className="flex justify-between items-start">
+              <div className=" flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold">{task.title}</h2>
-                  {/* <span className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2">
-                    <FaMapMarkerAlt size={18} color="#228B22" />
-                    <span className="truncate">{worker.location || "N/A"}</span>
-                  </span> */}
-                  <span
-                    onClick={() => setIsMapModalOpen(true)}
-                    className="flex items-center gap-2 cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full mt-2"
-                  >
-                    <FaMapMarkerAlt size={18} color="#228B22" />
-                    <span className="truncate">{task.location || "N/A"}</span>
-                  </span>
-                  <p className="font-semibold text-lg my-2 text-[#008000]">
+                  <h2 className=" text-base md:text-lg font-semibold">{task.title}</h2>
+
+                  <div className="flex items-start mt-2">
+                    <span
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="flex   cursor-pointer text-gray-700 text-sm font-semibold px-3 py-1 rounded-full "
+                    >
+                      <FaMapMarkerAlt size={15} color="#228B22" />
+                    </span>
+                    <div className="flex-1">
+                      <p
+                        lassName={`${
+                          showFullLocation ? "whitespace-normal" : "truncate"
+                        } max-w-[140px] sm:max-w-none`}
+                      >
+                        {task.location || "N/A"}
+                      </p>
+
+                      {task.location &&
+                        task.location.split(" ").length > 8 &&
+                        !showFullLocation && (
+                          <button
+                            onClick={() => setShowFullLocation(true)}
+                            className="text-blue-600 text-xs font-semibold mt-1 sm:hidden"
+                          >
+                            See more
+                          </button>
+                        )}
+
+                      {showFullLocation && (
+                        <button
+                          onClick={() => setShowFullLocation(false)}
+                          className="text-blue-600 text-xs font-semibold mt-1 sm:hidden"
+                        >
+                          See less
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="font-semibold text-base md:text-lg my-2 text-[#008000]">
                     Cost :- ₹{task.cost}/-
                   </p>
                   <div className="text-gray-600">
-                    <p className="text-lg">
+                    <p className=" text-base md:text-lg">
                       <strong>Deadline:</strong>{" "}
                       {task.deadline
                         ? new Date(
@@ -197,13 +218,13 @@ export default function Bid() {
                     </p>
                   </div>
                 </div>
-                <div className="text-right space-y-6">
-                  <p className="bg-black text-white text-md px-4 rounded-full inline-block">
+                <div className="text-right space-y-3">
+                  <p className="bg-gray-800 text-white px-4 py-1 rounded-full  text-base md:text-lg block text-center">
                     {task.project_id}
                   </p>
-                  <div className="text-gray-600">
-                    <p className="text-lg">
-                      <strong> Posted Date:</strong>{" "}
+                  <div className="text-gray-800   block">
+                    <p className=" text-base md:text-lg">
+                   <span className="font-semibold text-gray-700 mr-2">Posted Date:</span>    
                       {task.deadline
                         ? new Date(
                             task.createdAt.split("/").reverse().join("-")
@@ -211,8 +232,10 @@ export default function Bid() {
                         : "N/A"}
                     </p>
                   </div>
-                  <span className="text-gray-600 font-semibold block">
-                    Status:{" "}
+                  <div className="flex items-center  text-base md:text-lg gap-2">
+                    <span className="text-gray-700  font-semibold">
+                      Order_Status:
+                    </span>
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
                         ${task.hire_status === "pending" ? "bg-yellow-500" : ""}
@@ -241,11 +264,13 @@ export default function Bid() {
                             .join(" ")
                         : "Unknown Status"}
                     </span>
-                  </span>
+                  </div>
                 </div>
               </div>
 
-              <p className="font-semibold">
+         
+
+              {/* <p className="font-semibold">
                 Category:
                 {task.category_id?.name ||
                   task.category_name ||
@@ -256,14 +281,13 @@ export default function Bid() {
               <p className="font-semibold">
                 SubCategory:{" "}
                 {task?.sub_category_ids?.map((sub) => sub.name).join(", ")}
-              </p>
+              </p> */}
 
-              <h3 className="text-lg font-semibold">Task Details</h3>
+              <h3 className=" text-base md:text-lg font-semibold">Task Details</h3>
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{task.description || "No description available"}</p>
               </div>
 
-              {/* BID / EDIT BID BUTTONS */}
               <div className="flex justify-center gap-6">
                 {task.hire_status === "cancelled" && (
                   <div className="flex items-center justify-center gap-2 bg-[#FF0000] text-white px-6 py-3 rounded-lg font-medium">
@@ -279,20 +303,19 @@ export default function Bid() {
                   </div>
                 )}
 
-                {/* Pending Case */}
                 {task.hire_status === "pending" && (
                   <>
                     {hasMyBid ? (
                       <button
                         onClick={() => setIsEditBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                        className=" text-base md:text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
                       >
                         Edit Bid (₹{existingBid?.bid_amount})
                       </button>
                     ) : (
                       <button
                         onClick={() => setIsBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                        className=" text-base md:text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
                       >
                         Bid
                       </button>
@@ -306,10 +329,10 @@ export default function Bid() {
           {/* Offer / Negotiate Section */}
           {task?.hire_status === "pending" && (
             <div className="flex flex-col items-center p-6">
-              <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
+              <div className="flex flex-wrap gap-3 mb-12 md:bg-[#EDEDED] rounded-[50px] p-3 justify-center">
                 <button
                   onClick={() => setIsOfferActive(true)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-sm ${
+                  className={`w-full sm:w-auto px-6 sm:px-16 py-2 rounded-full font-medium shadow-sm text-center  text-base md:text-lg ${
                     isOfferActive
                       ? "bg-[#228B22] text-white border border-green-600"
                       : "border border-green-600 text-green-600"
@@ -319,7 +342,7 @@ export default function Bid() {
                 </button>
                 <button
                   onClick={() => setIsOfferActive(false)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-md ${
+                  className={`w-full sm:w-auto  text-base md:text-lg px-6 sm:px-16 py-2 rounded-full font-medium shadow-md text-center ${
                     !isOfferActive
                       ? "bg-[#228B22] text-white hover:bg-[#228B22]"
                       : "border border-green-600 text-green-600"
@@ -335,7 +358,7 @@ export default function Bid() {
                   placeholder="Enter your offer amount"
                   value={offer}
                   onChange={(e) => setOffer(e.target.value)}
-                  className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                  className="  w-[280px] md:w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
                   min="0"
                 />
               )}
@@ -343,9 +366,9 @@ export default function Bid() {
           )}
 
           {task?.hire_status === "pending" && (
-            <div className="text-center">
+            <div className="text-center  text-base md:text-lg">
               <button
-                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold"
+                className="bg-[#228B22] text-white   w-80 md:w-100 px-10 py-3 rounded-md font-semibold"
                 onClick={() => {
                   if (isOfferActive) {
                     handleAcceptNegotiation(data?._id, "service_provider");
@@ -377,29 +400,31 @@ export default function Bid() {
           )}
       </div>
 
-      {/* Warning Section */}
+      {/* Warning Section
       {task?.hire_status === "accepted" && task?.platform_fee_paid && (
-        <div className="flex flex-col items-center justify-center space-y-6 mt-6">
-          <div className="relative max-w-2xl mx-auto">
-            <div className="relative z-10">
+        <div className="flex flex-col items-center justify-center space-y-6 mt-6 px-4">
+          <div className="relative w-full max-w-md mx-auto">
+            <div className="relative z-10 flex justify-center">
               <img
                 src={warningIcon}
                 alt="Warning"
-                className="w-40 h-40 mx-auto bg-white border border-[#228B22] rounded-lg px-2"
+                className="w-28 h-28 sm:w-40 sm:h-40 bg-white border border-[#228B22] rounded-lg p-2"
               />
             </div>
-            <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 -mt-20 pt-24 text-center">
-              <h2 className="text-[#FE2B2B] font-bold -mt-2">
+            <div className="bg-[#FBFBBA]border border-yellow-300 rounded-lg shadow-md 
+                      p-3 sm:p-4 -mt-14 sm:-mt-20 pt-16 sm:pt-24 text-center">
+              <h2 className="text-[#FE2B2B] font-bold text-base sm:text-lg">
                 Warning Message
               </h2>
-              <p className="text-gray-700 text-sm md:text-base">
+              <p className="text-gray-700 text-xs sm:text-sm md:text-base">
                 Lorem Ipsum is simply dummy text...
               </p>
             </div>
           </div>
-          <div className="flex space-x-4">
+          <div className="w-full max-w-md">
             <Link to={`/dispute/${id}/bidding`}>
-              <button className="bg-[#EE2121] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-semibold shadow-md">
+              <button className="bg-[#EE2121] w-full sm:w-auto  hover:bg-red-600 text-white 
+                           px-6 py-3 rounded-lg font-semibold shadow-md">
                 {task?.hire_status === "completed"
                   ? "Create Dispute"
                   : "Cancel Task and Create Dispute"}
@@ -407,10 +432,10 @@ export default function Bid() {
             </Link>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
+      {/* <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden relative bg-[#f2e7ca] h-[400px] my-10">
         {bannerLoading ? (
           <p className="absolute inset-0 flex items-center justify-center text-gray-500">
             Loading banners...
@@ -439,7 +464,36 @@ export default function Bid() {
             No banners available
           </p>
         )}
-      </div>
+      </div> */}
+       <div className="w-full pt-2 sm:pt-4 lg:pt-5 px-3 sm:px-6 mb-5 lg:px-0">
+                      <div
+                        className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
+                              h-[220px] sm:h-[400px] "
+                      >
+                        <Slider {...sliderSettings}>
+                          {bannerImages.length > 0 ? (
+                            bannerImages.map((banner, index) => (
+                              <div key={index} className="w-full h-[220px] sm:h-[400px]">
+                                <img
+                                  src={banner}
+                                  alt={`Banner ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.src = "/src/assets/Home-SP/default.png";
+                                  }}
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                              <p className="text-gray-600 font-medium">
+                                No banners available
+                              </p>
+                            </div>
+                          )}
+                        </Slider>
+                      </div>
+                    </div>
 
       <Footer />
       {isMapModalOpen && (

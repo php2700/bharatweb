@@ -883,9 +883,9 @@ export default function BiddinggetWorkDetail() {
                   alt={`Project image ${index + 1}`}
                   className="
             w-full 
-            h-[180px]        /* mobile size updated */
+            h-[180px]        
             sm:h-[250px] 
-            md:h-[360px]     /* desktop same */
+            md:h-[360px]   
             object-cover 
             rounded-lg
           "
@@ -899,9 +899,9 @@ export default function BiddinggetWorkDetail() {
             alt="No project images available"
             className="
       w-full 
-      h-[180px]        /* mobile */
+      h-[180px]        
       sm:h-[250px] 
-      md:h-[360px]     /* desktop same */
+      md:h-[360px]     
       object-cover 
       mt-5
       rounded-lg

@@ -604,41 +604,31 @@ export default function ViewProfile() {
             {orderData?.hire_status === "pending" ||
             orderData?.hire_status === "cancelled" ? (
               <div className="mb-8 px-4 sm:px-0">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-5 text-center sm:text-left">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-5 md:text-center text-left">
                   User Details
                 </h2>
 
                 {orderData?.user_id ? (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-                    {/* User Profile Section */}
+                  <div className="bg-white rounded-2xl mb-10 pb-6 border border-gray-200 shadow-lg overflow-hidde">
                     <div className="p-6 sm:p-8">
-                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-lef">
-                        <img
-                          src={orderData.user_id.profile_pic || Profile}
-                          alt={orderData.user_id.full_name || "User"}
-                          className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-gray-200 shadow-xl flex-shrink-0"
-                        />
-                        <div className="flex-1">
-                        <p className="text-lg font-semibold text-center sm:text-left break-words flex-1">
-                          {orderData?.user_id?.full_name
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ") || "Unknown User"}
-                        </p>
-                        </div>  
-                        {/* <button
-                          className="mt-2 px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                          onClick={() =>
-                            navigate(
-                              `/profile-user-details/${orderData.user_id._id}`
-                            )
-                          }
-                        >
-                          View Profile
-                        </button> */}
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ">
+                        <div className="flex items-center gap-5 flex-1 min-w-0">
+                          <img
+                            src={orderData.user_id.profile_pic || Profile}
+                            alt={orderData.user_id.full_name || "User"}
+                            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-gray-200 shadow-xl flex-shrink-0"
+                          />
+
+                          <p className="text-lg font-semibold text-left break-words truncate">
+                            {orderData?.user_id?.full_name
+                              .split(" ")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(" ") || "Unknown User"}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
@@ -646,13 +636,13 @@ export default function ViewProfile() {
                     orderData?.hire_status === "cancelledDispute" ? (
                       " "
                     ) : (
-                      <div className="bg-gradient-to-b from-gray-50 to-white px-6 py-8 border-t border-gray-200 ">
+                      <div className=" from-gray-50 to-white px-6 py-8 border-t border-gray-200 ">
                         <p className="text-xl sm:text-2xl font-bold text-gray-800 mb-8 text-center">
                           Contact
                         </p>
 
                         {/* Perfectly Responsive Icons – Side by side on all phones */}
-                        <div className="flex justify-center items-center gap-8 sm:gap-12">
+                        <div className="flex justify-center items-center gap-6 sm:gap-8">
                           <button
                             onClick={() =>
                               window.open(
@@ -660,13 +650,13 @@ export default function ViewProfile() {
                                 "_self"
                               )
                             }
-                            className="group p-6 sm:p-8 bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
+                            className="group  p-3 sm:p-4  bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
                             title="Call"
                           >
                             <img
                               src={CallIcon}
                               alt="Call"
-                              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto mb-2"
+                              className="w-6 h-6 sm:w-8 sm:h-8 object-contain "
                             />
                           </button>
 
@@ -674,33 +664,29 @@ export default function ViewProfile() {
                             onClick={() =>
                               handleChatOpen(orderData.user_id._id, userId)
                             }
-                            className="roup p-6 sm:p-8 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-blue-200"
+                            className="group   p-3 sm:p-4  bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-3xl shadow-xl transition-all duration-300 active:scale-95 border-2 border-green-200"
                             title="Chat"
                           >
                             <img
                               src={ChatIcon}
                               alt="Chat"
-                              className="w-12 h-12 sm:w-16 sm:h-16 object-contain mx-auto mb-2"
+                              className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
                             />
                           </button>
                         </div>
                       </div>
                     )}
-
-                    {orderData?.hire_status === "cancelled" ? (
-                      <div className=" mt-10 sm:mt-12  text-center ">
-                        <span className="inline-block px-6 sm:px-10 py-3 sm:py-4 bg-red-600 text-white font-bold text-lg sm:text-xl rounded-full shadow-lg">
+                    <div className="flex flex-col items-center justify-center gap-6 px-6 py-8">
+                      {orderData?.hire_status === "cancelled" ? (
+                        <span className="px-8 py-3 bg-red-600 text-white font-bold rounded-full text-base shadow-xl">
                           Project Cancelled by User
                         </span>
-                      </div>
-                    ) : offerStatus === "accepted" ? (
-                      <>
-                        <div className="space-y-5 text-center">
-                          <span className="px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium">
+                      ) : offerStatus === "accepted" ? (
+                        <>
+                          <span className="px-8 py-3 bg-[#228B22] text-white font-bold rounded-full text-base shadow-xl">
                             Accepted
                           </span>
-                        </div>
-                        <div className="px-0 sm:px-4">
+
                           <button
                             type="button"
                             className="mx-auto block w-full max-w-md px-10 py-3.5 bg-[#228B22] hover:bg-green-700 text-white font-semibold text-lg rounded-2xl shadow-lg transition-all duration-200"
@@ -708,36 +694,36 @@ export default function ViewProfile() {
                           >
                             Assign Work
                           </button>
+                        </>
+                      ) : offerStatus === "rejected" ? (
+                        <span className="px-8 py-3 bg-red-600 text-white font-bold rounded-full text-base shadow-xl">
+                          Rejected
+                        </span>
+                      ) : offerStatus === "assigned" ? (
+                        <span className="px-8 py-3 bg-blue-600 text-white font-bold rounded-full text-base shadow-xl">
+                          Work Assigned{" "}
+                        </span>
+                      ) : (
+                        <div className="flex gap-8">
+                          <button
+                            type="button"
+                            className="px-5 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
+                            onClick={handleAcceptOffer}
+                            disabled={isAccepting}
+                          >
+                            {isAccepting ? "Accepting..." : "Accept"}
+                          </button>
+                          <button
+                            type="button"
+                            className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
+                            onClick={handleRejectOffer}
+                            disabled={isRejecting}
+                          >
+                            {isRejecting ? "Rejecting..." : "Reject"}
+                          </button>
                         </div>
-                      </>
-                    ) : offerStatus === "rejected" ? (
-                      <span className="px-4 py-2 bg-[#FF0000] text-white rounded-lg text-sm font-medium">
-                        Rejected
-                      </span>
-                    ) : offerStatus === "assigned" ? (
-                      <span className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-                        Work Assigned
-                      </span>
-                    ) : (
-                      <div className="flex space-x-2">
-                        <button
-                          type="button"
-                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg hover:bg-green-700"
-                          onClick={handleAcceptOffer}
-                          disabled={isAccepting}
-                        >
-                          {isAccepting ? "Accepting..." : "Accept"}
-                        </button>
-                        <button
-                          type="button"
-                          className="px-4 py-2 bg-[#FF0000] text-white rounded-lg hover:bg-red-700"
-                          onClick={handleRejectOffer}
-                          disabled={isRejecting}
-                        >
-                          {isRejecting ? "Rejecting..." : "Reject"}
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center text-gray-600">

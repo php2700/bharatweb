@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
@@ -17,7 +17,8 @@ import man1 from "../../assets/Homepage/man1.jpg";
 import man2 from "../../assets/Homepage/man2.jpg";
 import man3 from "../../assets/Homepage/man3.jpg";
 import man4 from "../../assets/Homepage/man4.jpg";
-import footer from  "../../assets/Homepage/footer.svg";
+import footer from "../../assets/Homepage/footer.svg";
+import Work from "../../assets/directHiring/Work.png";
 
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
@@ -32,7 +33,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { profile } = useSelector((state) => state.user);
   console.log("profile role:", profile?.role);
-  // 🔹 1. If user is already logged in, redirect to home (or dashboard)
+
   useEffect(() => {
     const token = localStorage.getItem("bharat_token"); // change key as per your login storage
     if (token) {
@@ -57,7 +58,9 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/bidding-order/getAllPostedBiddingOrders`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/bidding-order/getAllPostedBiddingOrders`
         );
         console.log("bedding works response:", response.data);
 
@@ -79,7 +82,9 @@ export default function Home() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/emergency-order/getAllPostedEmergencyOrders`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/emergency-order/getAllPostedEmergencyOrders`
         );
         console.log("bedding works response:", response.data);
 
@@ -95,7 +100,6 @@ export default function Home() {
     fetchWorks();
   }, []);
 
-  //Api call for Feature Workers slider data
   useEffect(() => {
     const fetchWorks = async () => {
       try {
@@ -105,7 +109,6 @@ export default function Home() {
         );
         console.log("bedding works response:", response.data);
 
-        // FIX: use response.data.data
         setUser(response.data.data || []);
       } catch (error) {
         console.error("Error fetching recent works:", error);
@@ -116,10 +119,6 @@ export default function Home() {
 
     fetchWorks();
   }, []);
-
-  // Render rest of page while loading; show loading/empty messages
-  // inside the Bidding Posted Work section so the whole page remains visible.
-
 
   const servicesData = [
     {
@@ -216,8 +215,6 @@ export default function Home() {
     }
   };
 
-
-
   const handlePostWorkClick = () => {
     const isLoggedIn = !!localStorage.getItem("bharat_token");
     if (!isLoggedIn) {
@@ -249,7 +246,6 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="container mx-auto mt-20 px-4 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 items-center gap-6">
-
         {/* Left Content */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -317,13 +313,10 @@ export default function Home() {
             className="w-full max-w-[652px] h-auto object-cover rounded-bl-[100px] sm:rounded-bl-[168px] rounded-tr-[50px] sm:rounded-tr-[72px] shadow-lg"
           />
         </motion.div>
-
       </div>
-
 
       {/* Overlay Section */}
       <div className="relative w-full h-auto py-8 sm:py-12 md:py-16 mt-5">
-
         {/* BACKGROUND IMAGE */}
         <motion.img
           initial={{ opacity: 0, scale: 0.95 }}
@@ -347,7 +340,6 @@ export default function Home() {
         {/* CENTER CONTENT */}
         <div className="relative z-10 flex items-center justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-20 text-center text-white px-4">
-
             {/* Stat 1 */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -386,10 +378,8 @@ export default function Home() {
               </h2>
               <p className="text-sm sm:text-lg mt-2">Dedicated Cleaners</p>
             </motion.div>
-
           </div>
         </div>
-
       </div>
 
       {/* Services Section */}
@@ -405,26 +395,21 @@ export default function Home() {
         </motion.h2>
       </div>
       <div className="container mx-auto px-4 py-8 md:py-16">
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 text-center">
           {visibleServices.map((service) => (
             <motion.div
               key={service.id}
-
               // Animation Only ↓↓↓
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-
               whileHover={{ scale: 1.05 }}
-
               className="p-4 md:p-6 hover:shadow-lg transition"
             >
               <div className="flex justify-center mb-4">
                 <motion.div
                   className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center rounded-full bg-[#008000]"
-
                   whileHover={{ scale: 1.12 }}
                 >
                   <img
@@ -462,16 +447,13 @@ export default function Home() {
         <div className="flex justify-center mt-6 md:mt-10">
           <motion.button
             onClick={() => setShowAll(!showAll)}
-
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-
             className="text-[#008000] font-semibold text-base md:text-lg hover:underline"
           >
             {showAll ? "Show Less" : "See All"}
           </motion.button>
         </div>
-
       </div>
 
       {/* Center Image Section */}
@@ -491,7 +473,6 @@ export default function Home() {
 
       {/* Bidding Posted Work */}
       <div className="bg-[#EDFFF3] py-8 md:py-1">
-
         {/* ====================== BIDDING POSTED WORK ====================== */}
         <div className="container mx-auto px-4">
           <motion.h2
@@ -522,7 +503,10 @@ export default function Home() {
                   className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
                 >
                   <img
-                    src={bidding.imageUrl || "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop"}
+                    src={
+                      bidding.imageUrl ||
+                      "https://images.unsplash.com/photo-1763321402439-41eb2a0c7e7b?q=80&w=696&auto=format&fit=crop"
+                    }
                     className="w-full h-[120px] object-cover rounded-md"
                   />
 
@@ -574,7 +558,9 @@ export default function Home() {
                     className="flex-shrink-0 w-[240px] h-[260px] bg-white p-3 rounded-xl shadow hover:shadow-xl transition mr-5 overflow-hidden flex flex-col"
                   >
                     <img
-                      src={ "https://plus.unsplash.com/premium_photo-1686750875768-59660514f05d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+                      src={
+                        "https://plus.unsplash.com/premium_photo-1686750875768-59660514f05d?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                      }
                       className="w-full h-[120px] object-cover rounded-md"
                     />
 
@@ -626,14 +612,30 @@ export default function Home() {
                   initial="hidden"
                   animate="visible"
                   whileHover={{ scale: 1.08 }}
-                  className="flex-shrink-0 w-[200px] h-[200px] bg-white p-4 rounded-xl shadow hover:shadow-xl transition mr-5 flex flex-col justify-center text-center"
+                  className="flex-shrink-0 w-[200px] min-h-[200px] bg-white p-4 rounded-xl shadow hover:shadow-xl transition mr-5 flex flex-col text-center"
                 >
-                    <h3 className="text-base font-bold text-gray-900 break-words">
-                      Name: {worker.full_name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-2 break-words">
-                      Phone: {worker.phone}
-                    </p>
+                  <div className="w-full flex flex-col items-start ">
+                    <div className="w-full h-40 rounded-md overflow-hidden flex-shrink-0">
+                      <img
+                        src={
+                          worker?.businessImage?.length > 0
+                            ? worker.businessImage[0]
+                            : Work
+                        }
+                        alt="Business"
+                        className="w-full h-full rounded-md object-cover"
+                      />
+                    </div>
+
+                    <div className="mt-2   flex-grow min-h-fit">
+                      <h3 className="text-base font-bold text-gray-900 break-words leading-normal">
+                        Name:
+                        <span className="text-gray-700 ml-2 font-semibold">
+                          {worker.full_name}
+                        </span>
+                      </h3>
+                    </div>
+                  </div>      
                 </motion.div>
               ))}
             </motion.div>
@@ -654,11 +656,9 @@ export default function Home() {
         </style>
       </div>
 
-
       {/* Why Choose Us Section */}
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6 md:gap-8">
-
           {/* Left Image Animated */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -687,7 +687,6 @@ export default function Home() {
             </h2>
 
             <div className="space-y-6 md:space-y-8 mt-6 md:mt-10">
-
               {/* Item 1 */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -700,11 +699,14 @@ export default function Home() {
                   1
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">Exceptional Expertise</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
+                    Exceptional Expertise
+                  </h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    Choose us because of our extensive experience and expertise in the cleaning industry.
-                    Our dedicated team is highly skilled and trained to deliver top-notch services that
-                    meet your exact needs.
+                    Choose us because of our extensive experience and expertise
+                    in the cleaning industry. Our dedicated team is highly
+                    skilled and trained to deliver top-notch services that meet
+                    your exact needs.
                   </p>
                 </div>
               </motion.div>
@@ -721,11 +723,14 @@ export default function Home() {
                   2
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">High-Quality Standards</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
+                    High-Quality Standards
+                  </h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
-                    When you choose us, you opt for the highest standards of cleanliness and hygiene.
-                    We maintain strict quality control procedures, using industry-leading equipment
-                    and eco-friendly products.
+                    When you choose us, you opt for the highest standards of
+                    cleanliness and hygiene. We maintain strict quality control
+                    procedures, using industry-leading equipment and
+                    eco-friendly products.
                   </p>
                 </div>
               </motion.div>
@@ -742,7 +747,9 @@ export default function Home() {
                   3
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">Customer-Centric Approach</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-[#228B22]">
+                    Customer-Centric Approach
+                  </h3>
                   <p className="text-gray-600 text-xs sm:text-sm md:text-base mt-1">
                     We prioritize our customers’ satisfaction and convenience.
                     Our friendly and responsive support team ensures a smooth
@@ -750,13 +757,10 @@ export default function Home() {
                   </p>
                 </div>
               </motion.div>
-
             </div>
           </motion.div>
-
         </div>
       </section>
-
 
       {/* Three Easy Steps Section */}
       <motion.div
@@ -789,7 +793,6 @@ export default function Home() {
         </svg>
 
         <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[850px] z-10 px-4">
-
           {/* Step 1 */}
           <motion.div
             className="flex flex-col items-center mb-6 sm:mb-0"
@@ -800,13 +803,19 @@ export default function Home() {
           >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img src={one} alt="Step 1" className="w-full h-full object-cover" />
+                <img
+                  src={one}
+                  alt="Step 1"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute -bottom-1 right-4 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 1
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Book Service Online</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Book Service Online
+            </p>
           </motion.div>
 
           {/* Step 2 */}
@@ -819,13 +828,19 @@ export default function Home() {
           >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img src={two} alt="Step 2" className="w-full h-full object-cover" />
+                <img
+                  src={two}
+                  alt="Step 2"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute top-2 -right-1 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 2
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Wait till Completion</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Wait till Completion
+            </p>
           </motion.div>
 
           {/* Step 3 */}
@@ -838,22 +853,25 @@ export default function Home() {
           >
             <div className="relative w-32 sm:w-40 h-32 sm:h-40">
               <div className="w-full h-full rounded-full overflow-hidden shadow-lg">
-                <img src={three} alt="Step 3" className="w-full h-full object-cover" />
+                <img
+                  src={three}
+                  alt="Step 3"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="absolute -bottom-1 right-3 w-6 sm:w-8 h-6 sm:h-8 rounded-full bg-[#228B22] flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
                 3
               </div>
             </div>
-            <p className="mt-3 font-bold text-sm sm:text-base">Enjoy the Services</p>
+            <p className="mt-3 font-bold text-sm sm:text-base">
+              Enjoy the Services
+            </p>
           </motion.div>
-
         </div>
       </div>
 
-
       {/* Pricing Section */}
       <div className="w-full bg-[#382C28] py-8 md:py-16 px-4 text-center mt-15">
-
         {/* Heading Animation */}
         <motion.h2
           initial={{ opacity: 0, scale: 0.9 }}
@@ -867,7 +885,6 @@ export default function Home() {
         </motion.h2>
 
         <div className="container mx-auto px-4 py-8 md:py-16 flex flex-col md:flex-row md:justify-center md:gap-5 max-w-[90%] lg:max-w-[70%]">
-
           {[
             {
               title: "₹999",
@@ -913,7 +930,9 @@ export default function Home() {
 
                 <p className="text-3xl sm:text-3xl md:text-4xl font-bold text-[#382C28] group-hover:text-[#228B22] mt-6 md:mt-10 transition">
                   {plan.price}
-                  <span className="text-sm sm:text-base md:text-xl font-medium">/yr.</span>
+                  <span className="text-sm sm:text-base md:text-xl font-medium">
+                    /yr.
+                  </span>
                 </p>
 
                 <ul className="mt-6 md:mt-10 space-y-2 flex flex-col items-start w-full text-left px-2 sm:px-4">
@@ -931,7 +950,11 @@ export default function Home() {
                           stroke="currentColor"
                           strokeWidth="3"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </span>
                       {feature}
@@ -946,10 +969,8 @@ export default function Home() {
               >
                 BOOK NOW
               </button>
-
             </motion.div>
           ))}
-
         </div>
       </div>
 
@@ -1017,7 +1038,6 @@ export default function Home() {
       {/* Footer Image Section */}
       {/* Mobile Layout (Image top, Green box below) */}
       <div className="flex flex-col items-center justify-center mt-8 md:hidden w-full">
-
         {/* Image */}
         <motion.img
           initial={{ opacity: 0, scale: 0.9 }}
@@ -1059,7 +1079,6 @@ export default function Home() {
 
       {/* Desktop / Tablet Layout (Same as your original) */}
       <div className="relative w-full justify-center items-center mt-8 md:mt-12 hidden md:flex">
-
         <motion.img
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -1099,10 +1118,7 @@ export default function Home() {
             Post Work
           </motion.button>
         </motion.div>
-
       </div>
-
-
 
       <div className="mt-8 md:mt-10">
         <Footer />
