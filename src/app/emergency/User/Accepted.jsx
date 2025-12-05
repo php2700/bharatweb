@@ -399,7 +399,7 @@ export default function Accepted({
 
                 {/* View Profile Button */}
                 <button
-                  className="w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
+                  className="cursor-pointer w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
                      text-[#228B22] bg-white rounded-lg font-semibold 
                      hover:bg-green-50 cursor-pointer text-center"
                   onClick={() => handleRouteHire(serviceProvider._id, true)}
@@ -447,7 +447,7 @@ export default function Accepted({
             px-6 py-2 
             border border-[#228B22] text-[#228B22] bg-white 
             rounded-lg font-semibold hover:bg-green-50 
-            max-sm:px-4 max-sm:py-1.5 max-sm:text-sm max-sm:w-full max-sm:text-center
+            max-sm:px-4 max-sm:py-1.5 max-sm:text-sm max-sm:w-full max-sm:text-center cursor-pointer
           "
                 >
                   View Profile
@@ -471,7 +471,7 @@ export default function Accepted({
         {hireStatus === "assigned" && (
           <button
             onClick={() => setShowForm(true)}
-            className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
+            className="cursor-pointer bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
           >
             Create Payment
           </button>
@@ -531,7 +531,7 @@ export default function Accepted({
               hireStatus === "assigned" && (
                 <button
                   onClick={() => handlePay(payment._id)}
-                  className="bg-[#228B22] text-white px-4 py-1 rounded-md text-xs hover:bg-green-700"
+                  className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-md text-xs hover:bg-green-700"
                 >
                   Pay
                 </button>
@@ -582,7 +582,7 @@ export default function Accepted({
                   }
                 });
               }}
-              className="bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-indigo-400"
+              className="cursor-pointer bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-indigo-400"
             >
               Info
             </button>
@@ -613,7 +613,7 @@ export default function Accepted({
             hireStatus === "assigned" && (
               <button
                 onClick={() => handlePay(payment._id)}
-                className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700"
+                className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700"
               >
                 Pay
               </button>
@@ -649,7 +649,7 @@ export default function Accepted({
                 confirmButtonText: "Close",
               });
             }}
-            className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm hover:bg-indigo-400"
+            className="cursor-pointer bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm hover:bg-indigo-400"
           >
             Info
           </button>
@@ -698,13 +698,13 @@ export default function Accepted({
         <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
           <button
             onClick={handlePaymentSubmit}
-            className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700 w-full sm:w-auto"
+            className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700 w-full sm:w-auto"
           >
             Submit
           </button>
           <button
             onClick={handleCancel}
-            className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50 w-full sm:w-auto"
+            className="cursor-pointer border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50 w-full sm:w-auto"
           >
             Cancel
           </button>

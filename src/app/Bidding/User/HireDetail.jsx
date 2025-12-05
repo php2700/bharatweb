@@ -1128,7 +1128,7 @@ export default function HireDetail() {
               <div className="text-center mt-4">
                 <button
                   onClick={() => setShowAllReviews(true)}
-                  className="text-[#228B22] font-semibold hover:underline"
+                  className="cursor-pointer text-[#228B22] font-semibold hover:underline"
                 >
                   See All Reviews
                 </button>
