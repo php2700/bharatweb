@@ -88,7 +88,7 @@ export default function ServiceProviderList() {
           { category_id, subcategory_ids },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log("Data",data)
+        console.log("Data", data)
         if (data?.status) {
           const withToggle = (data.data || []).map((w) => ({
             ...w,
@@ -400,154 +400,154 @@ export default function ServiceProviderList() {
             </h1>
 
             <div className="flex flex-col lg:flex-row gap-4 w-full">
-  {/* SEARCH */}
-  <div className="relative flex-1 lg:max-w-sm">
-    <input
-      type="search"
-      placeholder="Search by Name, ID or Skill..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="
+              {/* SEARCH */}
+              <div className="relative flex-1 lg:max-w-sm">
+                <input
+                  type="search"
+                  placeholder="Search by Name, ID or Skill..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="
         w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-gray-200
         text-gray-700 placeholder-gray-400 text-sm lg:text-base
         shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
         transition-all duration-200
       "
-    />
-    <svg
-      className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  </div>
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
 
-  {/* SUB-CATEGORY MULTI SELECT */}
-  <div className="relative w-full lg:w-64">
-    <select
-      multiple
-      size={1}
-      value={selectedSubcats}
-      onChange={(e) => {
-        const opts = Array.from(e.target.selectedOptions, (o) => o.value);
-        setSelectedSubcats(opts);
-      }}
-      className="
+              {/* SUB-CATEGORY MULTI SELECT */}
+              <div className="relative w-full lg:w-64">
+                <select
+                  multiple
+                  size={1}
+                  value={selectedSubcats}
+                  onChange={(e) => {
+                    const opts = Array.from(e.target.selectedOptions, (o) => o.value);
+                    setSelectedSubcats(opts);
+                  }}
+                  className="
         w-full px-4 py-3 pr-10 rounded-xl bg-white border border-gray-200
         text-gray-700 text-sm lg:text-base shadow-sm
         focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
         transition-all duration-200 cursor-pointer
         hover:border-gray-300
       "
-      style={{ appearance: "none" }}
-    >
-      <option disabled className="text-gray-400">
-        {allSubcategories.length ? "— Select Sub-categories —" : "No sub-categories"}
-      </option>
-      {allSubcategories.map((sc) => (
-        <option
-          key={sc}
-          value={sc}
-          className="py-2 px-3 text-gray-700 hover:bg-green-50 checked:bg-green-100"
-        >
-          {selectedSubcats.includes(sc) ? "✓ " : "   "}
-          {sc}
-        </option>
-      ))}
-    </select>
+                  style={{ appearance: "none" }}
+                >
+                  <option disabled className="text-gray-400">
+                    {allSubcategories.length ? "— Select Sub-categories —" : "No sub-categories"}
+                  </option>
+                  {allSubcategories.map((sc) => (
+                    <option
+                      key={sc}
+                      value={sc}
+                      className="py-2 px-3 text-gray-700 hover:bg-green-50 checked:bg-green-100"
+                    >
+                      {selectedSubcats.includes(sc) ? "✓ " : "   "}
+                      {sc}
+                    </option>
+                  ))}
+                </select>
 
-    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-      <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </div>
-  </div>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </div>
 
-  {/* SORT + RATING & SUBSCRIPTION FILTER */}
-  <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-    {/* Sort & Rating */}
-    <div className="relative min-w-[220px]">
-      <select
-        value={`${sortOrder}|${minRating}`}
-        onChange={(e) => {
-          const [order, rating] = e.target.value.split("|");
-          setSortOrder(order);
-          setMinRating(rating);
-        }}
-        className="
+              {/* SORT + RATING & SUBSCRIPTION FILTER */}
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                {/* Sort & Rating */}
+                <div className="relative min-w-[220px]">
+                  <select
+                    value={`${sortOrder}|${minRating}`}
+                    onChange={(e) => {
+                      const [order, rating] = e.target.value.split("|");
+                      setSortOrder(order);
+                      setMinRating(rating);
+                    }}
+                    className="
           w-full px-4 py-3 pr-10 rounded-xl bg-white border border-gray-200
           text-gray-700 text-sm lg:text-base shadow-sm
           focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
           transition-all duration-200 cursor-pointer hover:border-gray-300
         "
-        style={{ appearance: "none" }}
-      >
-        <optgroup label="Alphabetical">
-          <option value="asc|">A → Z</option>
-          <option value="desc|">Z → A</option>
-        </optgroup>
-        <optgroup label="Rating">
-          <option value="asc|5">5 stars & up</option>
-          <option value="asc|4">4 stars & up</option>
-          <option value="asc|3">3 stars & up</option>
-          <option value="asc|2">2 stars & up</option>
-          <option value="asc|1">1 star & up</option>
-          <option value="asc|">All Ratings</option>
-        </optgroup>
-        <optgroup label="Tasks">
-          <option value="tasks-desc|">Most Tasks First</option>
-          <option value="tasks-asc|">Fewest Tasks First</option>
-        </optgroup>
-      </select>
+                    style={{ appearance: "none" }}
+                  >
+                    <optgroup label="Alphabetical">
+                      <option value="asc|">A → Z</option>
+                      <option value="desc|">Z → A</option>
+                    </optgroup>
+                    <optgroup label="Rating">
+                      <option value="asc|5">5 stars & up</option>
+                      <option value="asc|4">4 stars & up</option>
+                      <option value="asc|3">3 stars & up</option>
+                      <option value="asc|2">2 stars & up</option>
+                      <option value="asc|1">1 star & up</option>
+                      <option value="asc|">All Ratings</option>
+                    </optgroup>
+                    <optgroup label="Tasks">
+                      <option value="tasks-desc|">Most Tasks First</option>
+                      <option value="tasks-asc|">Fewest Tasks First</option>
+                    </optgroup>
+                  </select>
 
-      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-        <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-    </div>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
 
-    {/* Subscription Filter */}
-    <div className="relative min-w-[180px]">
-      <select
-        value={subscriptionFilter}
-        onChange={(e) => setSubscriptionFilter(e.target.value)}
-        className="
+                {/* Subscription Filter */}
+                <div className="relative min-w-[180px]">
+                  <select
+                    value={subscriptionFilter}
+                    onChange={(e) => setSubscriptionFilter(e.target.value)}
+                    className="
           w-full px-4 py-3 pr-10 rounded-xl bg-white border border-gray-200
           text-gray-700 text-sm lg:text-base shadow-sm
           focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
           transition-all duration-200 cursor-pointer hover:border-gray-300
         "
-        style={{ appearance: "none" }}
-      >
-        <option value="">All Subscriptions</option>
-        <option value="premium">Premium</option>
-        <option value="professional">Professional</option>
-        <option value="starter">Starter</option>
-      </select>
+                    style={{ appearance: "none" }}
+                  >
+                    <option value="">All Subscriptions</option>
+                    <option value="premium">Premium</option>
+                    <option value="professional">Professional</option>
+                    <option value="starter">Starter</option>
+                  </select>
 
-      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-        <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-    </div>
-  </div>
-</div>
+                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                    <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ---------- LIST ---------- */}
@@ -595,7 +595,7 @@ export default function ServiceProviderList() {
                         className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold shadow-sm
         ${hasPlan ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}
       `}
-                        title={  planNameDisplay || "Starter"}
+                        title={planNameDisplay || "Starter"}
                       >
                         <span className="max-w-[160px] truncate">
                           {planNameDisplay || "Starter "}
@@ -655,8 +655,8 @@ export default function ServiceProviderList() {
                         <div className="flex items-center flex-1 min-w-0">
                           <span
                             className={`inline-block text-sm ${worker.isSubcatExpanded
-                                ? "break-words"
-                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              ? "break-words"
+                              : "whitespace-nowrap overflow-hidden text-ellipsis"
                               }`}
                             title={subcatString}
                           >
@@ -682,8 +682,8 @@ export default function ServiceProviderList() {
                           <div className="flex items-center flex-1 min-w-0">
                             <span
                               className={`inline-block text-sm ${worker.isSkillExpanded
-                                  ? "break-words"
-                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                ? "break-words"
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
                                 }`}
                               title={fullSkill}
                             >
@@ -712,8 +712,8 @@ export default function ServiceProviderList() {
                           <div className="min-w-0">
                             <span
                               className={`inline-block text-sm ${worker.isAddressExpanded
-                                  ? "break-words"
-                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                ? "break-words"
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
                                 }`}
                               title={fullAddress}
                             >
