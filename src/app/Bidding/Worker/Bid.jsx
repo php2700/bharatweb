@@ -447,10 +447,10 @@ export default function Bid() {
                     Cost :- ₹{worker.amount}/-
                   </p>
                   <p className="text-sm">
-                    <span className="font-semibold">
-                      Completion Date:{" "}
-                      {new Date(worker.completionDate).toLocaleString()}
-                    </span>
+                   <span className="font-semibold">
+  Completion Date: {new Date(worker.completionDate).toLocaleDateString("en-GB")}
+</span>
+
                   </p>
                 </div>
                 <div className="md:text-right ">

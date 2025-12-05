@@ -4,6 +4,7 @@ import Footer from "../../../component/footer";
 // import Profile from "../../../assets/default-image.jpg";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
+import backArrow from "../../../assets/profile/arrow_back.svg"; // <-- added
 import aadharImg from "../../../assets/Details/profile-line.svg";
 import defaultPic from "../../../assets/default-image.jpg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -481,6 +482,7 @@ export default function HireDetail() {
                 localStorage.setItem(docUnlockKey, "true");
               }
             } else {
+              console.log("Verify Response:", verifyResult);
               toast.error(verifyResult.message || "Payment verification failed ❌");
             }
           } catch (err) {
@@ -581,6 +583,7 @@ export default function HireDetail() {
               unlockDocuments();
               // Optionally refresh UI or update state
             } else {
+              console.log("Verify Response:", verifyResult);
               toast.error(
                 verifyResult.message || "Payment verification failed ❌"
               );
@@ -611,31 +614,42 @@ export default function HireDetail() {
   return (
     <>
       <Header />
-
+<div className="container mx-auto  px-4 py-4 fixed top-20 left-8 z-50">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
+        >
+          <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+          Back
+        </button>
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
+      
       <div className="min-h-screen bg-gray-50 mt-35">
         {/* Banner */}
-        {/* Top Banner Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[200px] sm:h-[300px] md:h-[400px] mt-5">
+       
+       
+      {/* Banner Slider */}
+       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
               Loading banners...
             </p>
           ) : bannerError ? (
             <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              Error: {bannerError}
+              {bannerError}
             </p>
           ) : bannerImages.length > 0 ? (
             <Slider {...sliderSettings}>
-              {bannerImages.map((banner, index) => (
-                <div key={index}>
+              {bannerImages.map((banner, i) => (
+                <div key={i} className="w-full h-[220px] sm:h-[400px]">
                   <img
-                    src={banner || "/src/assets/banner.png"}
-                    alt={`Banner ${index + 1}`}
-                    className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/banner.png";
-                    }}
+                    src={banner}
+                    alt={`Banner ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.target.src = Work)}
                   />
                 </div>
               ))}
@@ -656,166 +670,164 @@ export default function HireDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 
                 gap-6 sm:gap-10 md:gap-[80px] items-start">
 
-  {/* Profile Pic */}
-  <div className="relative w-full">
-    <img
-      src={providerDetail?.profilePic || defaultPic}
-      alt="Service Provider"
-      className="w-full h-[260px] sm:h-[350px] md:h-[450px] 
+              {/* Profile Pic */}
+              <div className="relative w-full">
+                <img
+                  src={providerDetail?.profilePic || defaultPic}
+                  alt="Service Provider"
+                  className="w-full h-[260px] sm:h-[350px] md:h-[450px] 
                  object-cover rounded-2xl shadow-lg"
-      onError={(e) => {
-        e.currentTarget.onerror = null;
-        e.currentTarget.src = defaultPic;
-      }}
-    />
-  </div>
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = defaultPic;
+                  }}
+                />
+              </div>
 
-  {/* Right Side */}
-  <div className="flex flex-col gap-4 mt-4 md:mt-0 px-1 sm:px-0">
+              {/* Right Side */}
+              <div className="flex flex-col gap-4 mt-4 md:mt-0 px-1 sm:px-0">
 
-    {/* Name + Rating */}
-    <div className="flex items-center justify-between w-full flex-wrap">
-      <div className="flex items-center gap-2 flex-wrap">
-        <h2 className="text-lg sm:text-xl font-bold">
-          {full_name
-            ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
-            : ""}
-        </h2>
+                {/* Name + Rating */}
+                <div className="flex items-center justify-between w-full flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg sm:text-xl font-bold">
+                      {full_name
+                        ? full_name.charAt(0).toUpperCase() + full_name.slice(1)
+                        : ""}
+                    </h2>
 
-        {verificationStatus === "verified" && (
-          <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
-            Verified
-          </span>
-        )}
-      </div>
-      </div>
+                    {verificationStatus === "verified" && (
+                      <span className="bg-[#228B22] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-    {/* ID */}
-    <div className="flex items-center gap-2 text-gray-600 font-semibold">
-      <span className="font-semibold text-[#228B22]">Id-</span>
-      <span>{unique_id}</span>
-    </div>
+                {/* ID */}
+                <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                  <span className="font-semibold text-[#228B22]">Id-</span>
+                  <span>{unique_id}</span>
+                </div>
 
-    {/* Location */}
-    <div className="flex items-center gap-2 text-gray-600 font-semibold">
-      <img src={locationIcon} alt="Location" className="w-5 h-5" />
-      <span>{providerDetail.location?.address || "Location not available"}</span>
-    </div>
+                {/* Location */}
+                <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                  <img src={locationIcon} alt="Location" className="w-5 h-5" />
+                  <span>{providerDetail.location?.address || "Location not available"}</span>
+                </div>
 
-    {/* Category */}
-    <p className="text-base font-semibold text-gray-700">
-      <span className="font-semibold text-[#228B22]">Category-</span>{" "}
-      {providerDetail.category?.name ||
-        providerDetail.category_name ||
-        "Not Available"}
-    </p>
+                {/* Category */}
+                <p className="text-base font-semibold text-gray-700">
+                  <span className="font-semibold text-[#228B22]">Category-</span>{" "}
+                  {providerDetail.category?.name ||
+                    providerDetail.category_name ||
+                    "Not Available"}
+                </p>
 
-    {/* Subcategories */}
-    <p className="text-base font-semibold text-gray-700 -mt-2">
-      <span className="font-semibold text-[#228B22]">Sub-Categories-</span>{" "}
-      {providerDetail.subcategory_names?.length > 0
-        ? providerDetail.subcategory_names.map((name, index) => (
-            <span key={index}>
-              {name.trim()}
-              {index !== providerDetail.subcategory_names.length - 1 ? ", " : ""}
-            </span>
-          ))
-        : "Not Available"}
-    </p>
+                {/* Subcategories */}
+                <p className="text-base font-semibold text-gray-700 -mt-2">
+                  <span className="font-semibold text-[#228B22]">Sub-Categories-</span>{" "}
+                  {providerDetail.subcategory_names?.length > 0
+                    ? providerDetail.subcategory_names.map((name, index) => (
+                      <span key={index}>
+                        {name.trim()}
+                        {index !== providerDetail.subcategory_names.length - 1 ? ", " : ""}
+                      </span>
+                    ))
+                    : "Not Available"}
+                </p>
 
-    {/* About Section */}
-    <div className="p-3 sm:p-4 shadow-xl rounded-xl 
+                {/* About Section */}
+                <div className="p-3 sm:p-4 shadow-xl rounded-xl 
                     max-w-full sm:max-w-[600px] 
                     h-auto sm:h-[260px]">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-lg">About My Skill</h3>
-      </div>
-      <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
-        {providerDetail.skill || "No skill info available."}
-      </p>
-    </div>
-  </div>
-</div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg">About My Skill</h3>
+                  </div>
+                  <p className="mt-1 text-gray-700 text-base leading-relaxed break-all">
+                    {providerDetail.skill || "No skill info available."}
+                  </p>
+                </div>
+              </div>
+            </div>
 
 
             {/* Tabs - His Work & Customer Review - Exactly same as first code */}
             <div className="container mx-auto px-4 py-6">
-  <div
-    className="
+              <div
+                className="
       flex flex-col sm:flex-row 
       justify-center items-center 
       gap-3 sm:gap-6 
       p-3 sm:p-4 
       mt-4 sm:mt-6
     "
-  >
-    <button
-      onClick={() => {
-        setWorkerTab("work");
-        setWorkIndex(0);
-      }}
-      className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold 
-        ${
-          WorkerTab === "work"
-            ? "bg-[#228B22] text-white"
-            : "bg-green-100 text-[#228B22]"
-        }`}
-      aria-label="View Work"
-    >
-      His Work
-    </button>
+              >
+                <button
+                  onClick={() => {
+                    setWorkerTab("work");
+                    setWorkIndex(0);
+                  }}
+                  className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold 
+        ${WorkerTab === "work"
+                      ? "bg-[#228B22] text-white"
+                      : "bg-green-100 text-[#228B22]"
+                    }`}
+                  aria-label="View Work"
+                >
+                  His Work
+                </button>
 
-    <button
-      onClick={() => {
-        setWorkerTab("review");
-        setReviewIndex(0);
-      }}
-      className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold 
-        ${
-          WorkerTab === "review"
-            ? "bg-[#228B22] text-white"
-            : "bg-green-100 text-[#228B22]"
-        }`}
-      aria-label="View Customer Reviews"
-    >
-      Customer Review
-    </button>
-  </div>
-</div>
+                <button
+                  onClick={() => {
+                    setWorkerTab("review");
+                    setReviewIndex(0);
+                  }}
+                  className={`px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold 
+        ${WorkerTab === "review"
+                      ? "bg-[#228B22] text-white"
+                      : "bg-green-100 text-[#228B22]"
+                    }`}
+                  aria-label="View Customer Reviews"
+                >
+                  Customer Review
+                </button>
+              </div>
+            </div>
 
           </div>
         </div>
 
         {/* Document Preview Modal */}
         {selectedImage && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-    <div className="bg-white p-3 sm:p-4 rounded-lg w-full max-w-[90vw] sm:max-w-3xl relative">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+            <div className="bg-white p-3 sm:p-4 rounded-lg w-full max-w-[90vw] sm:max-w-3xl relative">
 
-      <button
-        onClick={closeModal}
-        className="absolute top-2 right-2 sm:top-4 sm:right-4 
+              <button
+                onClick={closeModal}
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 
                    bg-white text-gray-700 hover:text-gray-900 shadow-lg 
                    w-8 h-8 sm:w-10 sm:h-10 rounded-full 
                    flex items-center justify-center text-xl sm:text-2xl font-bold"
-        aria-label="Close image preview"
-      >
-        ×
-      </button>
+                aria-label="Close image preview"
+              >
+                ×
+              </button>
 
-      <img
-        src={selectedImage}
-        alt="Document Preview"
-        className="w-full h-auto 
+              <img
+                src={selectedImage}
+                alt="Document Preview"
+                className="w-full h-auto 
                    max-h-[70vh] sm:max-h-[78vh] 
                    max-w-full sm:max-w-[85vw] 
                    object-contain"
-        onError={(e) => {
-          e.target.src = defaultPic;
-        }}
-      />
-    </div>
-  </div>
-)}
+                onError={(e) => {
+                  e.target.src = defaultPic;
+                }}
+              />
+            </div>
+          </div>
+        )}
 
 
         {/* Work / Customer Review Image Sections */}
@@ -1126,85 +1138,85 @@ export default function HireDetail() {
 
           <div>
 
-         {/* Offer/Negotiate Section */}
-{hire_status === "pending" && (
-  <div className="flex flex-col items-center p-4 sm:p-6">
+            {/* Offer/Negotiate Section */}
+            {hire_status === "pending" && (
+              <div className="flex flex-col items-center p-4 sm:p-6">
 
-    {/* Tabs */}
-    <div className="flex flex-col sm:flex-row sm:space-x-4 mb-8 sm:mb-12 bg-[#EDEDED] 
+                {/* Tabs */}
+                <div className="flex flex-col sm:flex-row sm:space-x-4 mb-8 sm:mb-12 bg-[#EDEDED] 
                     rounded-[30px] sm:rounded-[50px] p-3 sm:p-[12px] w-full 
                     sm:w-auto justify-center gap-3">
 
-      <button
-        onClick={() => setIsOfferActive(true)}
-        className={`px-6 sm:px-16 py-2 rounded-full cursor-pointer font-medium shadow-sm 
+                  <button
+                    onClick={() => setIsOfferActive(true)}
+                    className={`px-6 sm:px-16 py-2 rounded-full cursor-pointer font-medium shadow-sm 
           ${isOfferActive
-            ? "bg-[#228B22] text-white border border-green-600"
-            : "border border-green-600 text-green-600"
-          }`}
-      >
-        Offer Price ({data?.offer_amount || 0})
-      </button>
+                        ? "bg-[#228B22] text-white border border-green-600"
+                        : "border border-green-600 text-green-600"
+                      }`}
+                  >
+                    Offer Price ({data?.offer_amount || 0})
+                  </button>
 
-      <button
-        onClick={() => setIsOfferActive(false)}
-        className={`px-6 sm:px-16 py-2 rounded-full cursor-pointer font-medium shadow-md 
+                  <button
+                    onClick={() => setIsOfferActive(false)}
+                    className={`px-6 sm:px-16 py-2 rounded-full cursor-pointer font-medium shadow-md 
           ${!isOfferActive
-            ? "bg-[#228B22] text-white"
-            : "border border-green-600 text-green-600"
-          }`}
-      >
-        Negotiate
-      </button>
-    </div>
+                        ? "bg-[#228B22] text-white"
+                        : "border border-green-600 text-green-600"
+                      }`}
+                  >
+                    Negotiate
+                  </button>
+                </div>
 
-    {/* Input Field (Mobile Responsive) */}
-    {!isOfferActive && (
-      <input
-        type="number"
-        placeholder="Enter your offer amount"
-        value={offer}
-        onChange={(e) => setOffer(e.target.value)}
-        className="w-full sm:w-[531px] px-4 py-2 border-2 border-[#dce1dc] 
+                {/* Input Field (Mobile Responsive) */}
+                {!isOfferActive && (
+                  <input
+                    type="number"
+                    placeholder="Enter your offer amount"
+                    value={offer}
+                    onChange={(e) => setOffer(e.target.value)}
+                    className="w-full sm:w-[531px] px-4 py-2 border-2 border-[#dce1dc] 
                    rounded-md text-center text-[#453e3f] placeholder-green-600
                    focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
-      />
-    )}
-  </div>
-)}
+                  />
+                )}
+              </div>
+            )}
 
-{/* Accept / Send Request */}
-{hire_status === "pending" && (
-  <div className="text-center px-4">
-    <button
-      className="bg-[#228B22] text-white w-full cursor-pointer px-6 sm:px-10 py-3 
+            {/* Accept / Send Request */}
+            {hire_status === "pending" && (
+              <div className="text-center px-4">
+                <button
+                  className="bg-[#228B22] text-white w-full cursor-pointer px-6 sm:px-10 py-3 
                  rounded-md font-semibold"
-      onClick={() => {
-        if (isOfferActive) {
-          handleAcceptNegotiation(data._id, "user", order_id, id);
-        } else {
-          handleNagotiation(offer);
-        }
-      }}
-    >
-      {isOfferActive ? "Accept Request" : "Send Request"}
-    </button>
-  </div>
-)}
+                  onClick={() => {
+                    if (isOfferActive) {
+                      handleAcceptNegotiation(data._id, "user", order_id, id);
+                    } else {
+                      handleNagotiation(offer);
+                    }
+                  }}
+                >
+                  {isOfferActive ? "Accept Request" : "Send Request"}
+                </button>
+              </div>
+            )}
 
-{hire_status === "accepted" && !platFormFee && (
-  <div className="text-center px-4">
-    <button
-      className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md 
+            {hire_status === "accepted" && !platFormFee && (
+              <div className="text-center px-4">
+                <button
+                  className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md 
                  font-semibold cursor-pointer"
-      onClick={() => {
-        handlePayment(order_id, id);
-      }}
-    >
-      Pay Now
-    </button>
-  </div>
-)}
+                  onClick={() => {
+                    handlePayment(order_id, id);
+                  }}
+                >
+                  Pay Now
+                </button>
+              </div>
+            )}
 
           </div>
         </div>

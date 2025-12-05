@@ -405,9 +405,9 @@ const MAX_LENGTH = 30;
                   />
 
                   <span
-                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
+                    className="absolute bottom-2 left-8 xs:left-12 sm:left-1/2 left-1/2 -translate-x-1/2 
                    bg-black/80 backdrop-blur text-white text-xs 
-                   px-4 py-1 rounded-full shadow-md"
+                   px-4 py-1 rounded-full shadow-md max-w-[120px] truncate"
                   >
                     {task?.project_id}
                   </span>
@@ -497,7 +497,8 @@ const MAX_LENGTH = 30;
                   {/* Completion + Status */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
                     <p className="text-sm text-[#334247] font-medium">
-                      Completion: {task.completiondate}
+                      Completion: {new Date(task.completiondate).toLocaleDateString("en-GB").replace(/\d{4}/, y => y.slice(-2))}
+
                     </p>
                     <p
                       className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${task.status === "pending"

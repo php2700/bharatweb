@@ -525,40 +525,55 @@ export default function Accepted({
                     <button
                       onClick={() => {
                         Swal.fire({
-                          title: `<span style="font-size:18px; font-weight:600; color:#228B22;">Payment Details</span>`,
+                          title: `<span style="font-size:17px; font-weight:600; color:#228B22;">Payment Details</span>`,
                           html: `
-    <div style="max-width:100%; margin:auto;">
-      <table style="width:100%; border-collapse: collapse; font-size:13px;">
-        <thead>
-          <tr style="background-color:#228B22; color:white; font-size:14px;">
-            <th style="padding:8px;">Payment ID</th>
-            <th style="padding:8px;">Amount</th>
-            <th style="padding:8px;">Method</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${paymentHistory
+        <div style="max-width:100%; margin:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:11.5px; table-layout:fixed;">
+            <thead>
+              <tr style="background-color:#228B22; color:white;">
+                <th style="padding:7px 4px; font-size:12px; word-wrap:break-word;">ID</th>
+                <th style="padding:7px 4px; font-size:12px;">Amount</th>
+                <th style="padding:7px 4px; font-size:12px;">Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${paymentHistory
                               .map(
                                 (p) => `
-              <tr style="background:#f9f9f9;">
-                <td style="padding:8px; border-bottom:1px solid #ddd;">${p.payment_id || "N/A"}</td>
-                <td style="padding:8px; border-bottom:1px solid #ddd;">${p.amount}</td>
-                <td style="padding:8px; border-bottom:1px solid #ddd;">${p.method || "N/A"}</td>
-              </tr>`
+                <tr style="background:#f9f9f9;">
+                  <td style="padding:7px 4px; border-bottom:1px solid #eee; word-break:break-all; font-size:11px; line-height:1.3;">
+                    ${p.payment_id?.slice(-10) || "N/A"}<!-- Sirf last 10 digits dikhao -->
+                  </td>
+                  <td style="padding:7px 4px; border-bottom:1px solid #eee; font-size:11px; white-space:nowrap;">
+                    ₹${p.amount}
+                  </td>
+                  <td style="padding:7px 4px; border-bottom:1px solid #eee; font-size:11px; text-transform:capitalize;">
+                    ${p.method || "N/A"}
+                  </td>
+                </tr>`
                               )
                               .join("")}
-        </tbody>
-      </table>
-    </div>
-  `,
-                          width: 380, // 🔥 Smaller Container for cleaner UI
-                          padding: "12px",
+            </tbody>
+          </table>
+        </div>
+      `,
+                          width: "90%",                  // 360px pe bhi safe
+                          maxWidth: "360px",             // Chhoti screen ke liye perfect
+                          padding: "10px",
                           background: "white",
                           showConfirmButton: true,
                           confirmButtonText: "Close",
                           confirmButtonColor: "#228B22",
+                          customClass: {
+                            popup: "no-scroll-popup"
+                          },
+                          didOpen: () => {
+                            // Extra safety - force no horizontal scroll
+                            document.querySelectorAll('.swal2-popup').forEach(p => {
+                              p.style.overflowX = "hidden";
+                            });
+                          }
                         });
-
                       }}
                       className="bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-indigo-400"
                     >

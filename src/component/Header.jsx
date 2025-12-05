@@ -17,10 +17,12 @@ import Biding from "../assets/Homepage/bidding.svg";
 import Emergency from "../assets/Homepage/emergency.png";
 import DirectHiring from "../assets/Homepage/deirecthiring.png";
 import Swal from "sweetalert2";
-
+import io from "socket.io-client";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const Base_url = import.meta.env.VITE_SOCKET_URL;
+const socket = io(`${Base_url}`);
 
 export default function Header() {
   const capitalize = (str = "") =>
@@ -82,6 +84,25 @@ export default function Header() {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
   const [isPostATastDropdown, setPostATaskDropdown] = useState(false);
   const postTaskRef = useRef(null);
+  console.log(profile);
+
+useEffect(() => {
+  socket.on("increment-notification-count", (data) => {
+    const user_id = localStorage.getItem("user_id");
+
+    // Check if this notification belongs to the logged-in user
+    if (user_id && data.userId == user_id) {
+      setNotificationCount(prev => prev + (data.increment || 1));
+      console.log("🔔 Notification count updated for THIS user!");
+    } else {
+      console.log("❌ Notification ignored (not for this user)");
+    }
+  });
+
+  return () => socket.off("increment-notification-count");
+}, []);
+
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -434,116 +455,93 @@ export default function Header() {
       }
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
+  
+
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setIsNotifLoading(true);
-        const token = localStorage.getItem("bharat_token");
-        if (!token) {
-          setNotifError("User not logged in");
-          toast.error("Please log in to view notifications");
-          return;
+  const fetchNotifications = async () => {
+    try {
+      setIsNotifLoading(true);
+      const token = localStorage.getItem("bharat_token");
+
+      if (!token) {
+        setNotifError("User not logged in");
+        toast.error("Please log in to view notifications");
+        return;
+      }
+
+      if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
+        handleUnauthorized();
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        const combinedNotifications = [
+          ...reduxNotifications,
+          ...(data.notifications || []),
+        ];
+
+        const currentUrl = window.location.pathname;
+
+        if (currentUrl === "/chats") {
+          setNotifications(
+            combinedNotifications.filter(
+              (n) => n.userType !== "chat" && n.isRead === true
+            )
+          );
+        } else {
+          setNotifications(combinedNotifications);
         }
 
-        if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
+        // 🔥 API unread count SET ONLY ON FETCH
+        const unreadCount = combinedNotifications.filter(
+          (notif) => !notif.isRead
+        ).length;
+
+        setNotificationCount(unreadCount);
+
+      } else {
+        if (res.status === 401) {
           handleUnauthorized();
           return;
         }
 
-        //   const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-        //     method: "GET",
-        //     headers: { Authorization: `Bearer ${token}` },
-        //   });
-        //   const data = await res.json();
-
-        //   if (res.ok && data.success) {
-        //     const combinedNotifications = [
-        //       ...reduxNotifications,
-        //       ...(data.notifications || []),
-        //     ];
-        //     setNotifications(combinedNotifications);
-
-        //     const count = combinedNotifications.filter((notif) => !notif.isRead);
-        //     setNotificationCount(count.length);
-        //   } else {
-        //     if (res.status === 401) {
-        //       handleUnauthorized();
-        //       return;
-        //     }
-        //     setNotifError(data.message || "Failed to fetch notifications");
-        //     toast.error(data.message || "Failed to fetch notifications");
-        //   }
-        // } catch (err) {
-        //   setNotifError("Something went wrong while fetching notifications");
-        // } finally {
-        //   setIsNotifLoading(false);
-        // }
-        const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          const combinedNotifications = [
-            ...reduxNotifications,
-            ...(data.notifications || []),
-          ];
-          const currentUrl = window.location.pathname;
-
-          if (currentUrl === "/chats") {
-            // Chats page par chat notifications HIDE
-            setNotifications(
-              combinedNotifications.filter(
-                (n) => n.userType !== "chat" && n.isRead === true
-              )
-            );
-          } else {
-            // Baaki pages par bhi sirf read + non-chat
-            setNotifications(combinedNotifications);
-          }
-
-          // console.log("chat",combinedNotifications);
-
-          const count = combinedNotifications.filter((notif) => !notif.isRead);
-          setNotificationCount(count.length);
-        } else {
-          if (res.status === 401) {
-            handleUnauthorized();
-            return;
-          }
-
-          if (
-            data?.status === false &&
-            data?.message === "Admin has disabled your account."
-          ) {
-            localStorage.removeItem("bharat_token");
-            localStorage.removeItem("isProfileComplete");
-            localStorage.removeItem("otp");
-            localStorage.removeItem("role");
-            toast.error("Admin has disabled your account.");
-
-            return;
-          }
-
-          setNotifError(data.message || "Failed to fetch notifications");
-          toast.error(data.message || "Failed to fetch notifications");
+        if (
+          data?.status === false &&
+          data?.message === "Admin has disabled your account."
+        ) {
+          localStorage.removeItem("bharat_token");
+          localStorage.removeItem("isProfileComplete");
+          localStorage.removeItem("otp");
+          localStorage.removeItem("role");
+          toast.error("Admin has disabled your account.");
+          return;
         }
-      } catch (err) {
-        setNotifError("Something went wrong while fetching notifications");
-      } finally {
-        setIsNotifLoading(false);
-      }
-    };
 
-    if (isLoggedIn) {
-      fetchNotifications();
-    } else {
-      setNotifications(reduxNotifications);
-      setNotificationCount(reduxNotifications.length);
+        setNotifError(data.message || "Failed to fetch notifications");
+        toast.error(data.message || "Failed to fetch notifications");
+      }
+    } catch (err) {
+      setNotifError("Something went wrong while fetching notifications");
+    } finally {
+      setIsNotifLoading(false);
     }
-  }, [isLoggedIn, reduxNotifications, refreshNotifications]);
+  };
+
+  if (isLoggedIn) {
+    fetchNotifications();
+  } else {
+    setNotifications(reduxNotifications);
+    setNotificationCount(reduxNotifications.length);
+  }
+}, [isLoggedIn, reduxNotifications, refreshNotifications]);
+
 
   const handleNotificationClick = async () => {
     const nextState = !isNotifOpen;

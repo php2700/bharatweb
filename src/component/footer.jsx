@@ -81,7 +81,7 @@ navigate('/homeuser')
             </h3>
             <ul className="space-y-2 text-[13px] sm:text-[14px] text-gray-300">
               <li>
-                <Link to={homeLink} className="font-bold hover:text-white">
+                <Link to="/" className="font-bold hover:text-white">
                   Home
                 </Link>
               </li>
@@ -96,7 +96,7 @@ navigate('/homeuser')
                 </Link>
               </li>
               <li>
-                <Link to="/subscription" className="font-bold hover:text-white">
+                <Link to="/account" className="font-bold hover:text-white">
                   Pricing
                 </Link>
               </li>

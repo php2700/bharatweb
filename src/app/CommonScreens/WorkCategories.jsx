@@ -19,7 +19,7 @@ import defaultWork from "../../assets/directHiring/Work.png";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
-  const profile = useSelector((state) => state.user.profile);   // <-- ADDED
+  const profile = useSelector((state) => state.user.profile);
   const token = localStorage.getItem("bharat_token");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
@@ -340,28 +340,27 @@ const handleBankUpdate = () => {
 )}
 
 
-        {/* Hero Section with Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-2 md:mt-5">
-          
+        {/* banner Section with Slider */}
+         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
           {bannerLoading ? (
             <p className="absolute inset-0 flex items-center justify-center text-gray-500">
               Loading banners...
             </p>
           ) : bannerError ? (
             <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              Error: {bannerError}
+              {bannerError}
             </p>
           ) : bannerImages.length > 0 ? (
             <Slider {...sliderSettings}>
-              {bannerImages.map((banner, index) => (
-                <div key={index}>
+              {bannerImages.map((banner, i) => (
+                <div key={i} className="w-full h-[220px] sm:h-[400px]">
                   <img
-                    src={banner || "/src/assets/workcategory/default.png"} // Fallback image
-                    alt={`Banner ${index + 1}`}
-                    className="w-full h-[400px] object-cover"
-                    onError={(e) => {
-                      e.target.src = "/src/assets/workcategory/default.png"; // Fallback on image load error
-                    }}
+                    src={banner}
+                    alt={`Banner ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.target.src = Work)}
                   />
                 </div>
               ))}

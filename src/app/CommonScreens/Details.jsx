@@ -785,9 +785,11 @@ export default function Details() {
                     className="w-full sm:w-[85%] h-[300px] sm:h-[400px] object-cover rounded-2xl shadow-md"
                   />
                 ) : (
-                  <div className="w-full sm:w-[85%] h-[300px] sm:h-[400px] flex items-center justify-center bg-gray-200 rounded-2xl shadow-md text-gray-700 font-semibold">
-                    No Profile Picture available
-                  </div>
+                  <img
+                    src={Default}
+                    alt="Worker Profile"
+                    className="w-full sm:w-[85%] h-[300px] sm:h-[400px] object-cover rounded-2xl shadow-md"
+                  />
                 )}
                 <button
                   className="absolute bottom-3 left-3 bg-[#228B22] p-2 rounded-full shadow-md"
