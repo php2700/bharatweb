@@ -614,7 +614,7 @@ export default function HireDetail() {
   return (
     <>
       <Header />
-<div className="container mx-auto  px-4 py-4 fixed top-20 left-8 z-50">
+      <div className="container mx-auto  px-4 py-4 fixed top-20 left-8 z-50">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
@@ -624,13 +624,13 @@ export default function HireDetail() {
         </button>
       </div>
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <div className="min-h-screen bg-gray-50 mt-35">
         {/* Banner */}
-       
-       
-      {/* Banner Slider */}
-       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+
+
+        {/* Banner Slider */}
+        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
   h-[220px] sm:h-[400px]">
 
           {bannerLoading ? (
@@ -1090,9 +1090,10 @@ export default function HireDetail() {
                           />
                           <h3 className="font-semibold">{item.user.name}</h3>
                         </div>
-                        <p className="text-gray-600 text-sm mb-2">
+                        <p className="text-gray-600 text-sm mb-2 break-words whitespace-normal overflow-hidden">
                           {item.review}
                         </p>
+
                         <p className="text-xs text-gray-400 mb-2">
                           {new Date(item.createdAt).toLocaleDateString()} •{" "}
                           {item.order_type}
