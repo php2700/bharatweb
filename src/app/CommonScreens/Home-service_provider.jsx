@@ -1159,7 +1159,7 @@
               <div className="w-full pt-16 sm:pt-20 lg:pt-15 px-4 sm:px-6 lg:px-0">
                 <div
                   className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
-                      h-[220px] sm:h-[400px]"
+                        h-[220px] sm:h-[400px]"
                 >
                   <Slider {...sliderSettings}>
                     {bannerImages.length > 0 ? (
@@ -1168,7 +1168,7 @@
                           <img
                             src={banner}
                             alt={`Banner ${index + 1}`}
-                            className="w-full h-[200px] sm:h-[260px] lg:h-[300px] object-cover"
+                            className="w-full h-full object-cover"
                             onError={(e) => {
                               e.target.src = "/src/assets/Home-SP/default.png";
                             }}
@@ -1176,7 +1176,7 @@
                         </div>
                       ))
                     ) : (
-                      <div className="w-full h-[220px] sm:h-[300px] lg:h-[400px] bg-gray-300 flex items-center justify-center">
+                      <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
                         <p className="text-gray-600 font-medium">
                           No banners available
                         </p>
@@ -1242,10 +1242,15 @@
             <div className="w-full bg-[#EDFFF3] py-12 mt-10">
               <div className="max-w-[90%] mx-auto">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-black max-md:text-lg">Emergency</h2>
-                  {emergency.length > 4 && (
-                    <button onClick={() => handleSeeAll("/emergency/tasks")} className="text-black font-medium hover:text-[#228B22]">See All</button>
-                  )}
+                  <h2 className="text-xl font-bold text-black max-md:text-lg">Recent Direct Hiring</h2>
+                 {directHiring.length > 4 && (
+                   <button
+                 onClick={() => handleSeeAll("/worker/work-list/My Hire")}
+                     className="text-black font-medium text-base cursor-pointer max-md:text-sm hover:text-[#228B22]"
+                   >
+                     See All
+                   </button>
+                 )}
                 </div>
 
                 {directHiringLoading ? (

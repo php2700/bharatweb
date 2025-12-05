@@ -405,9 +405,9 @@ const MAX_LENGTH = 30;
                   />
 
                   <span
-                    className="absolute bottom-2 left-1/2 -translate-x-1/2 
+                    className="absolute bottom-2 left-8 xs:left-12 sm:left-1/2 left-1/2 -translate-x-1/2 
                    bg-black/80 backdrop-blur text-white text-xs 
-                   px-4 py-1 rounded-full shadow-md"
+                   px-4 py-1 rounded-full shadow-md max-w-[120px] truncate"
                   >
                     {task?.project_id}
                   </span>

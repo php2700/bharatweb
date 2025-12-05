@@ -107,8 +107,13 @@ export default function RejectedWorkDetails() {
         </button>
       </div>
 
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+      <div className="container mx-auto px-4  max-w-4xl">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden"
+        >
+            <h1 className="text-xl md:text-2xl text-center font-bold mb-4">
+            Work Detail
+          </h1>
+
           {images.length > 0 ? (
             <Carousel
               showArrows={true}
@@ -124,7 +129,7 @@ export default function RejectedWorkDetails() {
                   <img
                     src={url}
                     alt=""
-                    className="w-full h-96 object-cover cursor-pointer"
+                    className="w-full h-[200px] sm:h-[300px] md:h-[360px]"
                   />
                 </div>
               ))}
@@ -133,7 +138,7 @@ export default function RejectedWorkDetails() {
             <img
               src={defaultWorkImage}
               alt="No image"
-              className="w-full h-96 object-cover"
+              className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover"
             />
           )}
 
@@ -161,7 +166,7 @@ export default function RejectedWorkDetails() {
           <div className="p-6 md:p-10">
             <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-6">
               <div className="space-y-4">
-                <h1 className="text-xl md:text-3xl font-bold text-gray-800">
+                <h1 className="text-xl md:text-lg font-bold text-gray-800">
                   {task.title}
                 </h1>
                 <div
@@ -172,7 +177,7 @@ export default function RejectedWorkDetails() {
                   <span className="text-lg">{task.location}</span>
                 </div>
                 <div className="text-gray-600">
-                  <p className="text-lg">
+                  <p className=" text-base md:text-lg">
                     <strong>Deadline:</strong>{" "}
                     {task.deadline
                       ? new Date(
@@ -187,43 +192,17 @@ export default function RejectedWorkDetails() {
                   {task.project_id || "#N/A"}
                 </span>
 
-                <span className="text-gray-600 font-semibold block">
-                  Posted Date:{" "}
+                <span className=" text-base md:text-lg text-gray-600  block">
+                 <strong> Posted Date:</strong>{" "}
                   {task.createdAt
                     ? new Date(
                         task.createdAt.split("/").reverse().join("-")
                       ).toLocaleDateString("en-GB")
                     : "N/A"}
                 </span>
-               {/* <div className="flex items-center gap-2">
-  <span className="text-gray-700 font-semibold">Order_Status:</span>
+          
 
-  <div
-    className={`px-4 py-1 rounded-full text-sm text-white flex items-center gap-2
-      ${
-        task?.hire_status === "pending"
-          ? "bg-yellow-500"
-          : task?.hire_status === "cancelled"
-          ? "bg-red-500"
-          : task?.hire_status === "completed"
-          ? "bg-[#228B22]"
-          : task?.hire_status === "cancelledDispute"
-          ? "bg-[#FF0000]"
-          : task?.hire_status === "accepted"
-          ? "bg-[#228B22]"
-          : "bg-gray-500"
-      }
-    `}
-  >
-    <p className="text-white text-sm">
-      {task?.hire_status
-        ? task.hire_status.charAt(0).toUpperCase() + task.hire_status.slice(1)
-        : ""}
-    </p>
-  </div>
-
-
-                </div> */}
+            
               </div>
             </div>
 
@@ -234,12 +213,12 @@ export default function RejectedWorkDetails() {
             </div>
 
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-black mb-4">
+              <h2 className="text-xl md:text-lg font-semibold text-black mb-4">
                 User Details
               </h2>
-              <div className="bg-white rounded-2xl shadow-2xl h-[150px]   overflow-hidden">
-                <div className="p-4 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-                  <div className="flex items-center space-x-6">
+              <div className="bg-white rounded-2xl shadow-2xl p-4  ">
+                <div className=" flex flex-col md:flex-row items-center md:items-center justify-between gap-6">
+                  <div className="flex items-center space-x-4">
                     <img
                       src={
                         task.user_profile || task.user?.profile_pic || Profile
@@ -248,7 +227,7 @@ export default function RejectedWorkDetails() {
                       className="w-24 h-24 rounded-full object-cover border-4 border-red-100 shadow-xl"
                     />
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-800">
+                      <h3 className=" text-base md:text-lg font-bold text-gray-800">
                         {task.title || "Unknown User"}
                       </h3>
                     </div>
@@ -268,7 +247,7 @@ export default function RejectedWorkDetails() {
         </div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden h-[400px] my-16 bg-[#f2e7ca]">
+      {/* <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden h-[400px] my-16 bg-[#f2e7ca]">
         {bannerLoading ? (
           <div className="flex items-center justify-center h-full text-gray-600">
             Loading banners...
@@ -291,7 +270,36 @@ export default function RejectedWorkDetails() {
             className="w-full h-full object-cover"
           />
         )}
-      </div>
+      </div> */}
+   <div className="w-full pt-2 sm:pt-4 lg:pt-5 px-3 sm:px-6 mb-5 lg:px-0">
+                      <div
+                        className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
+                              h-[220px] sm:h-[400px] "
+                      >
+                        <Slider {...sliderSettings}>
+                          {bannerImages.length > 0 ? (
+                            bannerImages.map((banner, index) => (
+                              <div key={index} className="w-full h-[220px] sm:h-[400px]">
+                                <img
+                                  src={banner}
+                                  alt={`Banner ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.target.src = "/src/assets/Home-SP/default.png";
+                                  }}
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                              <p className="text-gray-600 font-medium">
+                                No banners available
+                              </p>
+                            </div>
+                          )}
+                        </Slider>
+                      </div>
+                    </div>
 
       {isMapModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">

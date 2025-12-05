@@ -872,9 +872,9 @@ const applySort = (data) => {
     autoPlay
     onClickItem={(index) => handleOpenImage(orderDetail.image_url[index])}
     className="w-full 
-               h-[180px]        /* mobile */
+               h-[180px]        
                sm:h-[250px] 
-               md:h-[360px]"   /* desktop unchanged */
+               md:h-[360px]"  
   >
     {orderDetail.image_url.map((url, index) => (
       <div key={index} className="cursor-pointer pointer-events-auto">
@@ -883,9 +883,9 @@ const applySort = (data) => {
           alt={`Project image ${index + 1}`}
           className="
             w-full 
-            h-[180px]        /* mobile size updated */
+            h-[180px]        
             sm:h-[250px] 
-            md:h-[360px]     /* desktop same */
+            md:h-[360px]   
             object-cover 
             rounded-lg
           "
@@ -899,9 +899,9 @@ const applySort = (data) => {
     alt="No project images available"
     className="
       w-full 
-      h-[180px]        /* mobile */
+      h-[180px]        
       sm:h-[250px] 
-      md:h-[360px]     /* desktop same */
+      md:h-[360px]     
       object-cover 
       mt-5
       rounded-lg
