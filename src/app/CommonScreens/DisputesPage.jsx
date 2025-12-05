@@ -270,7 +270,7 @@ export default function DisputesPage() {
       <div className="mt-20 mx-4 sm:mx-8">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-green-700 mb-6 hover:underline"
+          className="cursor-pointer flex items-center text-green-700 mb-6 hover:underline"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
@@ -295,7 +295,7 @@ export default function DisputesPage() {
         {/* Main Tabs */}
         <div className="flex border-b border-gray-200 mb-6">
           <button
-            className={`flex-1 py-3 px-4 text-center font-semibold text-lg transition-colors duration-300 ${
+            className={`cursor-pointer flex-1 py-3 px-4 text-center font-semibold text-lg transition-colors duration-300 ${
               activeTab === "raisedBy"
                 ? "text-green-600 border-b-2 border-green-600"
                 : "text-gray-600 hover:text-green-600"
@@ -305,7 +305,7 @@ export default function DisputesPage() {
             Raised by Me
           </button>
           <button
-            className={`flex-1 py-3 px-4 text-center font-semibold text-lg transition-colors duration-300 ${
+            className={`cursor-pointer flex-1 py-3 px-4 text-center font-semibold text-lg transition-colors duration-300 ${
               activeTab === "against"
                 ? "text-green-600 border-b-2 border-green-600"
                 : "text-gray-600 hover:text-green-600"
@@ -321,7 +321,7 @@ export default function DisputesPage() {
           {["Direct", "Bidding", "Emergency"].map((tab) => (
             <button
               key={tab}
-              className={`px-4 py-2 rounded-full font-medium text-sm sm:text-base transition-colors duration-200 ${
+              className={`cursor-pointer px-4 py-2 rounded-full font-medium text-sm sm:text-base transition-colors duration-200 ${
                 subTab === tab
                   ? "bg-green-600 text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-green-100"

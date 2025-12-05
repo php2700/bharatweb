@@ -1194,7 +1194,7 @@ export default function BiddinggetWorkDetail() {
             {showRefundButton && orderDetail?.platform_fee_paid && (
               <button
                 onClick={() => setShowRefundModal(true)}
-                className="w-full px-6 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+                className="cursor-pointer w-full px-6 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
               >
                 Get Refund
               </button>
@@ -1203,7 +1203,7 @@ export default function BiddinggetWorkDetail() {
             {orderDetail?.refundRequest && (
               <button
                 disabled
-                className="w-full px-4 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold opacity-75 cursor-not-allowed"
+                className="cursor-pointer w-full px-4 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold opacity-75 cursor-not-allowed"
               >
                 {orderDetail?.refundStatus == "pending"
                   ? "Refund Request Submitted"
@@ -1229,13 +1229,13 @@ export default function BiddinggetWorkDetail() {
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={() => setShowRefundModal(false)}
-                    className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                    className="cursor-pointer px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleRefundRequest}
-                    className="px-4 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                    className="cursor-pointer px-4 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
                   >
                     Submit
                   </button>
@@ -1281,7 +1281,7 @@ export default function BiddinggetWorkDetail() {
                   <span
                     className="
     px-8 py-2 bg-[#FF8C00] text-white rounded-lg text-lg font-semibold 
-    cursor-pointer hover:bg-orange-600
+    cursor-pointer hover:bg-orange-600 cursor-pointer 
 
     flex sm:inline-flex items-center gap-1   /* Mobile = flex (single line), Desktop = inline-flex */
     whitespace-nowrap                        /* Line break avoid */
@@ -1441,7 +1441,7 @@ export default function BiddinggetWorkDetail() {
 
                               <button
                                 onClick={() => handleView(provider._id, null, id)}
-                                className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto"
+                                className="cursor-pointer text-green-600 font-medium text-sm mt-2 w-full sm:w-auto"
                               >
                                 View Profile
                               </button>
@@ -1455,7 +1455,7 @@ export default function BiddinggetWorkDetail() {
                                   localInvited.includes(provider._id) ||
                                   orderDetail?.invited_providers?.includes(provider._id)
                                 }
-                                className={`px-4 sm:px-6 py-2 rounded-lg font-medium text-white w-full sm:w-auto
+                                className={`cursor-pointer px-4 sm:px-6 py-2 rounded-lg font-medium text-white w-full sm:w-auto
                   ${localInvited.includes(provider._id) ||
                                     orderDetail?.invited_providers?.includes(provider._id)
                                     ? "bg-gray-400 cursor-not-allowed"
@@ -1552,7 +1552,7 @@ export default function BiddinggetWorkDetail() {
                                     offer.order_id
                                   )
                                 }
-                                className="text-green-600 font-medium text-base border border-green-600 
+                                className="cursor-pointer text-green-600 font-medium text-base border border-green-600 
                     px-5 py-1 rounded-lg mt-4 w-full sm:w-auto"
                               >
                                 View Profile
@@ -1568,7 +1568,7 @@ export default function BiddinggetWorkDetail() {
                               {orderDetail?.hire_status === "pending" && (
                                 <button
                                   onClick={() => handleAcceptBid(offer.provider_id?._id)}
-                                  className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                                  className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
                       font-medium hover:bg-green-700 w-full sm:w-auto"
                                 >
                                   Hire
@@ -1581,7 +1581,7 @@ export default function BiddinggetWorkDetail() {
                                     onClick={() =>
                                       handlePayment(offer.provider_id?._id)
                                     }
-                                    className="bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
+                                    className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
                         font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
                                   >
                                     Pay & Hire
@@ -1657,7 +1657,7 @@ export default function BiddinggetWorkDetail() {
               {/* Buttons - stack on mobile, inline on tablet+; buttons full-width on mobile */}
               <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
                 <button
-                  className="bg-[#228B22] hover:bg-green-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base"
+                  className="cursor-pointer bg-[#228B22] hover:bg-green-700 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base"
                   onClick={handleMarkComplete}
                 >
                   Mark as Complete
@@ -1669,7 +1669,7 @@ export default function BiddinggetWorkDetail() {
 
 
                 <Link to={`/dispute/${id}/bidding`} className="w-full sm:w-auto">
-                  <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                  <button className="cursor-pointer bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                     Cancel Task and Create Dispute
                   </button>
                 </Link>
@@ -1680,7 +1680,7 @@ export default function BiddinggetWorkDetail() {
         {orderDetail?.hire_status === "completed" && (
           <div className="flex justify-center mt-4 px-4">
             <Link to={`/dispute/${id}/bidding`} className="w-full max-w-xs">
-              <button className="bg-[#EE2121] hover:bg-red-600 text-white w-full px-6 py-3 rounded-lg font-semibold shadow-md text-sm sm:text-base">
+              <button className="cursor-pointer bg-[#EE2121] hover:bg-red-600 text-white w-full px-6 py-3 rounded-lg font-semibold shadow-md text-sm sm:text-base">
                 Create Dispute
               </button>
             </Link>

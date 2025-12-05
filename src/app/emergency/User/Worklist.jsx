@@ -557,7 +557,7 @@ export default function Worklist() {
                         };
                         navigate(`/${routes[activeTab]}/order-detail/${task.id}`);
                       }}
-                      className="px-4 sm:px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 text-sm whitespace-nowrap"
+                      className="cursor-pointer px-4 sm:px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50 text-sm whitespace-nowrap"
                     >
                       View Details
                     </button>

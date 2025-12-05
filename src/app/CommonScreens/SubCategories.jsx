@@ -196,7 +196,7 @@ export default function OurSubCategories() {
       <div className="flex justify-center mt-10 mb-6">
         <button
           onClick={handleHire}
-          className="bg-[#228B22] text-white px-10 py-3 rounded-md text-lg font-semibold shadow-md hover:bg-green-700 transition"
+          className="bg-[#228B22] text-white px-10 py-3 cursor-pointer rounded-md text-lg font-semibold shadow-md hover:bg-green-700 transition"
         >
           Hire
         </button>

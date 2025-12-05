@@ -193,7 +193,7 @@ export default function MyHireBidding() {
 
 <Link
   to={`/bidding/getworkdetail/${order._id}`}
-  className="text-white py-1 px-7 border border-[#228B22] rounded-lg bg-[#228B22] inline-block text-center"
+  className="cursor-pointer text-white py-1 px-7 border border-[#228B22] rounded-lg bg-[#228B22] inline-block text-center"
 >
   View Profile
 </Link>
@@ -211,7 +211,7 @@ export default function MyHireBidding() {
           <div className="flex justify-center my-8">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="py-2 px-8 text-white rounded-full bg-[#228B22]"
+              className="cursor-pointer py-2 px-8 text-white rounded-full bg-[#228B22]"
             >
               {showAll ? "Show Less" : "See All"}
             </button>
