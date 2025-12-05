@@ -519,12 +519,13 @@ export default function ViewProfile() {
                     {orderData?.user_id?.location?.address ||
                       "Unknown Location"}
                   </div>
-                  <span className="text-gray-600 text-sm font-semibold block mt-2 mb-2">
-                    Deadline Date&Time:{" "}
-                    {orderData?.deadline
-                      ? new Date(orderData.deadline).toLocaleString()
-                      : "N/A"}
-                  </span>
+                 <span className="text-gray-600 text-sm font-semibold block mt-2 mb-2">
+  Deadline Date&Time:{" "}
+  {orderData?.deadline
+    ? new Date(orderData.deadline).toLocaleDateString("en-GB")
+    : "N/A"}
+</span>
+
                 </div>
               </div>
               <div className="text-right space-y-2 tracking-tight">

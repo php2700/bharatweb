@@ -19,7 +19,7 @@ import defaultWork from "../../assets/directHiring/Work.png";
 
 export default function WorkCategories() {
   const selectedRoles = useSelector((state) => state.role.selectedRoles);
-  const profile = useSelector((state) => state.user.profile);   // <-- ADDED
+  const profile = useSelector((state) => state.user.profile);
   const token = localStorage.getItem("bharat_token");
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();

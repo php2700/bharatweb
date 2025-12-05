@@ -876,11 +876,13 @@
     const navigate = useNavigate();
     const token = localStorage.getItem("bharat_token");
     const { profile } = useSelector((state) => state.user);
+    
     const dispatch = useDispatch();
 
     const [bannerImages, setBannerImages] = useState([]);
     const [bannerLoading, setBannerLoading] = useState(false);
     const [bannerError, setBannerError] = useState(null);
+    const [showBankWarning, setShowBankWarning] = useState(false);
 
     const [directHiring, setDirectHiring] = useState([]);
     const [directHiringLoading, setDirectHiringLoading] = useState(false);
@@ -994,6 +996,20 @@
         setBannerLoading(false);
       }
     };
+    useEffect(() => {
+      if (!profile) return;
+    
+      const bankdetail = profile?.bankdetail;
+    
+      const isBankFilled =
+        bankdetail &&
+        bankdetail.bankName &&
+        bankdetail.accountNumber &&
+        bankdetail.ifscCode &&
+        bankdetail.accountHolderName;
+    
+      setShowBankWarning(!isBankFilled); // ❗Banner open if bank details missing
+    }, [profile]);
 
     const fetchDirectHiring = async () => {
       try {
@@ -1141,10 +1157,17 @@
     const visibleDirectHiring = directHiring.slice(0, 4);
     const visibleBidding = bidding.slice(0, 4);
     const visibleEmergency = emergency.slice(0, 4);
-
+const handleBankUpdate = () => {
+  navigate("/account", {
+    state: {
+      openBankSection: true,   // 👈 flag to directly open bank details
+    },
+  });
+};
     return (
       <>
         <Header />
+  
         {token ? (
           <>
             {/* ... Banners ... */}
@@ -1157,6 +1180,36 @@
             </div> */}
             {/* Responsive Banner – Desktop Full Size, Mobile Smaller & Padded */}
               <div className="w-full pt-16 sm:pt-20 lg:pt-15 px-4 sm:px-6 lg:px-0">
+                      {showBankWarning && (
+  <div
+    className="
+      max-w-[90%] mx-auto bg-gradient-to-r from-yellow-50 to-yellow-100
+      border-l-[6px] border-yellow-600
+      text-yellow-900 p-4 px-6 text-sm font-medium
+      flex justify-between items-center shadow-lg
+     rounded-[17px]
+      animate-slideDownFade relative lg:-top-[42px] mt-[80px]
+    "
+  >
+    <span className="flex items-center gap-2 font-semibold" style={{fontWeight:'650'}}>
+      ⚠️ Your bank details are incomplete.
+    </span>
+
+   <button
+  onClick={handleBankUpdate}
+  className="
+    bg-yellow-600 text-white font-semibold 
+    px-4 py-1.5 rounded-lg shadow 
+    hover:bg-yellow-700 hover:shadow-xl 
+    transition-all duration-300 cursor-pointer
+    transform hover:scale-[1.05] active:scale-[0.98]
+  "
+>
+  Update Now →
+</button>
+
+  </div>
+)}
                 <div
                   className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
                       h-[220px] sm:h-[400px]"
@@ -1200,6 +1253,7 @@
                 </div>
               </div> */}
               <div className="w-full mt-4  px-6 md:px-4 lg:px-0">
+                
               <div className="w-full max-w-[95%] mx-auto relative rounded-3xl overflow-hidden shadow-2xl border border-[#228B22]">
                 <img
                   src={Promise}

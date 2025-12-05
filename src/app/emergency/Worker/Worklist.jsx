@@ -497,7 +497,8 @@ const MAX_LENGTH = 30;
                   {/* Completion + Status */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mt-2">
                     <p className="text-sm text-[#334247] font-medium">
-                      Completion: {task.completiondate}
+                      Completion: {new Date(task.completiondate).toLocaleDateString("en-GB").replace(/\d{4}/, y => y.slice(-2))}
+
                     </p>
                     <p
                       className={`text-xs sm:text-sm font-semibold px-2 py-1 rounded capitalize ${task.status === "pending"

@@ -12,6 +12,7 @@ import { useLocation } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Account() {
+  
   const [activeTab, setActiveTab] = useState("membership");
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
