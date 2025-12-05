@@ -340,7 +340,7 @@ const handleBankUpdate = () => {
 )}
 
 
-        {/* Hero Section with Slider */}
+        {/* banner Section with Slider */}
          <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
   h-[220px] sm:h-[400px]">
 
