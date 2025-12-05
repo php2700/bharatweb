@@ -1009,27 +1009,27 @@ export default function ViewProfile() {
         <div className="text-2xl text-center font-bold mb-4">Work Detail</div>
 
         {/* TOP IMAGE / CAROUSEL (same style as getworkdetails.jsx) */}
-      {images.length > 0 ? (
-              <Carousel
-                showArrows={true}
-                showThumbs={false}
-                infiniteLoop={true}
-                autoPlay={true}
-                interval={3000}
-                emulateTouch={true}
-                showStatus={false}
-                onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
-                  className="w-full 
+        {images.length > 0 ? (
+          <Carousel
+            showArrows={true}
+            showThumbs={false}
+            infiniteLoop={true}
+            autoPlay={true}
+            interval={3000}
+            emulateTouch={true}
+            showStatus={false}
+            onClickItem={(index) => setOpenImage(images[index])} // 🔥 FIX
+            className="w-full 
                h-[180px]        /* mobile */
                sm:h-[250px] 
                md:h-[360px]"   /* desktop unchanged */
-              >
-                {images.map((url, index) => (
-                  <div key={index} className="cursor-pointer pointer-events-auto">
-                    <img
-                      src={url}
-                      alt={`Project image ${index + 1}`}
-                        className="
+          >
+            {images.map((url, index) => (
+              <div key={index} className="cursor-pointer pointer-events-auto">
+                <img
+                  src={url}
+                  alt={`Project image ${index + 1}`}
+                  className="
             w-full 
             h-[180px]        /* mobile size updated */
             sm:h-[250px] 
@@ -1037,16 +1037,16 @@ export default function ViewProfile() {
             object-cover 
             rounded-lg
           "
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            
-          ) : (
-            <img
-              src={defaultWorkImage}
-              alt="No project images available"
-               className="
+                />
+              </div>
+            ))}
+          </Carousel>
+
+        ) : (
+          <img
+            src={defaultWorkImage}
+            alt="No project images available"
+            className="
       w-full 
       h-[180px]        /* mobile */
       sm:h-[250px] 
@@ -1055,8 +1055,8 @@ export default function ViewProfile() {
       mt-5
       rounded-lg
     "
-            />
-          )}
+          />
+        )}
 
 
         {/* Fullscreen modal (copied layout from getworkdetails.jsx) */}
@@ -1299,13 +1299,18 @@ export default function ViewProfile() {
                       key={provider.provider_id._id}
                       className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-[#F9F9F9] rounded-xl shadow-md w-full"
                     >
-                      <img
-                        src={provider.provider_id.profile_pic || Profile}
-                        alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                      />
+                      {/* Profile Image */}
+                      <div className="flex justify-center sm:justify-start">
+                        <img
+                          src={provider.provider_id.profile_pic || Profile}
+                          alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
+                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                        />
+                      </div>
 
-                      <div className="flex-1 text-left w-full">
+                      {/* Middle Section - Center on Mobile */}
+                      <div className="flex-1 text-center sm:text-left w-full flex flex-col items-center sm:items-start">
+                        {/* Name + ID */}
                         <p className="text-[17px] font-bold text-[#303030] break-words">
                           {provider.provider_id.full_name
                             .split(" ")
@@ -1316,13 +1321,10 @@ export default function ViewProfile() {
                           </span>
                         </p>
 
-                        <div className="flex items-start gap-2 mt-2 text-sm">
-                          <FaMapMarkerAlt
-                            className="text-[#F27773] mt-1 flex-shrink-0"
-                            color="#228B22"
-                            size={18}
-                          />
-                          <p className="text-gray-700 leading-snug break-words">
+                        {/* Location - Icon inline with text */}
+                        <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 text-sm">
+                          <FaMapMarkerAlt className="text-[#F27773] flex-shrink-0" size={18} />
+                          <p className="text-gray-700 leading-snug break-words text-left">
                             {truncateAddress(
                               provider.provider_id?.location?.address,
                               provider.provider_id._id
@@ -1331,7 +1333,7 @@ export default function ViewProfile() {
                             {provider.provider_id?.location?.address?.length > 50 && (
                               <button
                                 onClick={() => toggleAddress(provider.provider_id._id)}
-                                className="text-[#228B22] font-semibold ml-2 hover:underline"
+                                className="text-[#228B22] font-semibold ml-2 hover:underline inline"
                               >
                                 {expandedAddresses[provider.provider_id._id]
                                   ? "See Less"
@@ -1341,30 +1343,31 @@ export default function ViewProfile() {
                           </p>
                         </div>
 
+                        {/* View Profile Button - Center on Mobile */}
                         <button
-                          onClick={() =>
-                            handleRouteHire(provider.provider_id._id, true)
-                          }
-                          className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto border border-green-600 px-5 py-1 rounded-lg"
+                          onClick={() => handleRouteHire(provider.provider_id._id, true)}
+                          className="text-green-600 font-medium text-sm mt-3 w-full sm:w-auto max-w-[200px] border border-green-600 px-5 py-1 rounded-lg"
                         >
                           View Profile
                         </button>
                       </div>
 
-                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0 gap-2">
+                      {/* Right Section - Contact + Status Buttons */}
+                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-4 sm:mt-0 gap-3">
+                        {/* Contact Buttons */}
                         {orderData.hire_status !== "cancelled" && (
-                          <>
+                          <div className="flex flex-col items-center gap-3">
                             <p className="text-gray-600 font-medium">Contact</p>
-                            <div className="flex space-x-3 mt-1">
+                            <div className="flex space-x-4">
                               <button
-                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() => window.open(`tel:${provider.phone}`, "_self")}
                               >
                                 <img src={CallIcon} alt="Call" className="w-6 h-6" />
                               </button>
 
                               <button
-                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() =>
                                   handleChatOpen(provider?.provider_id?._id, userId)
                                 }
@@ -1372,116 +1375,115 @@ export default function ViewProfile() {
                                 <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                               </button>
                             </div>
-                          </>
-                        )}
-
-                        {offerStatuses[provider.provider_id._id] === "pending" ? (
-                          <span className="mt-2 text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold text-center">
-                            Cancelled
-                          </span>
-                        ) : (
-                          <div className="flex flex-col gap-2 w-full sm:w-auto mt-2">
-                            {!provider.isRejectedByUser && (
-                              <button
-                                className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed text-center
-                                  ${provider.status === "pending" ? "bg-yellow-500" : ""}
-                                  ${provider.status === "accepted" ? "bg-green-600" : ""}
-                                  ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                disabled
-                              >
-                                {Array.isArray(provider.status)
-                                  ? provider.status
-                                    .map(
-                                      (word) =>
-                                        word.charAt(0).toUpperCase() + word.slice(1)
-                                    )
-                                    .join(" ")
-                                  : provider.status
-                                    ? provider.status.charAt(0).toUpperCase() +
-                                    provider.status.slice(1)
-                                    : ""}
-                              </button>
-                            )}
-
-                            {provider.isRejectedByUser && (
-                              <button
-                                className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed text-center"
-                                disabled
-                              >
-                                Rejected by Me
-                              </button>
-                            )}
-
-                            {orderData?.hire_status === "pending" &&
-                              provider.status === "pending" && (
-                                <button
-                                  className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
-                                      ? "bg-green-600"
-                                      : "bg-[#FB3523]"
-                                    } text-white font-semibold rounded-lg shadow`}
-                                  onClick={async () => {
-                                    if (provider.isRejectedByUser) {
-                                      setShowChangeProvider(true);
-                                      return;
-                                    }
-
-                                    const result = await Swal.fire({
-                                      title: "Are you sure?",
-                                      text: "Do you really want to change the service provider?",
-                                      icon: "warning",
-                                      showCancelButton: true,
-                                      confirmButtonColor: "#3085d6",
-                                      cancelButtonColor: "#d33",
-                                      confirmButtonText: "Yes, change it!",
-                                    });
-
-                                    if (result.isConfirmed) {
-                                      try {
-                                        const token = localStorage.getItem("bharat_token");
-
-                                        await axios.post(
-                                          `${BASE_URL}/direct-order/userRejectOffer`,
-                                          {
-                                            order_id: orderData._id,
-                                            provider_id: provider.provider_id._id,
-                                          },
-                                          {
-                                            headers: {
-                                              "Content-Type": "application/json",
-                                              Authorization: `Bearer ${token}`,
-                                            },
-                                          }
-                                        );
-
-                                        Swal.fire({
-                                          title: "Offer Rejected!",
-                                          text: "You have rejected this offer successfully.",
-                                          icon: "success",
-                                          timer: 1500,
-                                          showConfirmButton: false,
-                                        });
-
-                                        setShowChangeProvider(true);
-                                        fetchData();
-                                      } catch (error) {
-                                        Swal.fire({
-                                          title: "Error",
-                                          text:
-                                            error.response?.data?.message ||
-                                            "Failed to reject the offer.",
-                                          icon: "error",
-                                        });
-                                      }
-                                    }
-                                  }}
-                                >
-                                  {showChangeProvider || provider.isRejectedByUser
-                                    ? "Rejected by Me"
-                                    : "Change Service Provider"}
-                                </button>
-                              )}
                           </div>
                         )}
+
+                        {/* Status & Action Buttons */}
+                        <div className="flex flex-col gap-2 w-full sm:w-auto items-center">
+                          {offerStatuses[provider.provider_id._id] === "pending" ? (
+                            <span className="mt-2 text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
+                              Cancelled
+                            </span>
+                          ) : (
+                            <>
+                              {!provider.isRejectedByUser && (
+                                <button
+                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed w-full sm:w-auto min-w-[140px]
+                ${provider.status === "pending" ? "bg-yellow-500" : ""}
+                ${provider.status === "accepted" ? "bg-green-600" : ""}
+                ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+                                  disabled
+                                >
+                                  {Array.isArray(provider.status)
+                                    ? provider.status
+                                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                      .join(" ")
+                                    : provider.status
+                                      ? provider.status.charAt(0).toUpperCase() + provider.status.slice(1)
+                                      : ""}
+                                </button>
+                              )}
+
+                              {provider.isRejectedByUser && (
+                                <button
+                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed w-full sm:w-auto min-w-[140px]"
+                                  disabled
+                                >
+                                  Rejected by Me
+                                </button>
+                              )}
+
+                              {orderData?.hire_status === "pending" &&
+                                provider.status === "pending" && (
+                                  <button
+                                    className={`px-6 py-2 w-full sm:w-auto min-w-[200px] text-white font-semibold rounded-lg shadow transition ${showChangeProvider || provider.isRejectedByUser
+                                        ? "bg-green-600"
+                                        : "bg-[#FB3523]"
+                                      }`}
+                                    onClick={async () => {
+                                      if (provider.isRejectedByUser) {
+                                        setShowChangeProvider(true);
+                                        return;
+                                      }
+
+                                      const result = await Swal.fire({
+                                        title: "Are you sure?",
+                                        text: "Do you really want to change the service provider?",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#3085d6",
+                                        cancelButtonColor: "#d33",
+                                        confirmButtonText: "Yes, change it!",
+                                      });
+
+                                      if (result.isConfirmed) {
+                                        try {
+                                          const token = localStorage.getItem("bharat_token");
+
+                                          await axios.post(
+                                            `${BASE_URL}/direct-order/userRejectOffer`,
+                                            {
+                                              order_id: orderData._id,
+                                              provider_id: provider.provider_id._id,
+                                            },
+                                            {
+                                              headers: {
+                                                "Content-Type": "application/json",
+                                                Authorization: `Bearer ${token}`,
+                                              },
+                                            }
+                                          );
+
+                                          Swal.fire({
+                                            title: "Offer Rejected!",
+                                            text: "You have rejected this offer successfully.",
+                                            icon: "success",
+                                            timer: 1500,
+                                            showConfirmButton: false,
+                                          });
+
+                                          setShowChangeProvider(true);
+                                          fetchData();
+                                        } catch (error) {
+                                          Swal.fire({
+                                            title: "Error",
+                                            text:
+                                              error.response?.data?.message ||
+                                              "Failed to reject the offer.",
+                                            icon: "error",
+                                          });
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    {showChangeProvider || provider.isRejectedByUser
+                                      ? "Rejected by Me"
+                                      : "Change Service Provider"}
+                                  </button>
+                                )}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1528,7 +1530,7 @@ export default function ViewProfile() {
               <>
                 <Link to={`/disputes/${disputeInfo.flow_type?.toLowerCase()}/${disputeInfo._id}`}>
                   <span
-  className="
+                    className="
     px-4 sm:px-6 
     py-1.5 
     bg-[#FF0000] 
@@ -1544,9 +1546,9 @@ export default function ViewProfile() {
     w-fit 
     mx-auto          /* Center horizontally */
   "
->
-  Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
-</span>
+                  >
+                    Cancelledssss (disputeId_ {disputeInfo.unique_id || "N/A"})
+                  </span>
 
                 </Link>
 
@@ -1588,12 +1590,12 @@ export default function ViewProfile() {
             {orderData?.refundRequest && (
               <button
                 className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : orderData?.refundStatus === "processed"
-                      ? "bg-green-600 hover:bg-green-700"
-                      : orderData?.refundStatus === "rejected"
-                        ? "bg-red-600 hover:bg-red-700"
-                        : "bg-gray-500"
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : orderData?.refundStatus === "processed"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : orderData?.refundStatus === "rejected"
+                      ? "bg-red-600 hover:bg-red-700"
+                      : "bg-gray-500"
                   }`}
               >
                 {orderData?.refundStatus === "pending" &&
@@ -1607,8 +1609,8 @@ export default function ViewProfile() {
               orderData?.refundStatus === "rejected") && (
                 <p
                   className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
-                      ? "text-green-600"
-                      : "text-red-600"
+                    ? "text-green-600"
+                    : "text-red-600"
                     }`}
                 >
                   Admin Remark: {orderData?.refundReasonDetails}
@@ -1695,14 +1697,14 @@ export default function ViewProfile() {
                         </div>
 
                         {/* Yellow Box - spacing & text size responsive */}
-                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
-                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
-                    Warning Message
-                  </h2>
-                  <p className="text-gray-700 text-sm sm:text-base">
-                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
-                  </p>
-                </div>
+                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                          <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
+                            Warning Message
+                          </h2>
+                          <p className="text-gray-700 text-sm sm:text-base">
+                            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                          </p>
+                        </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
@@ -1731,7 +1733,7 @@ export default function ViewProfile() {
                           </>
                         )}
                         <Link to={`/dispute/${id}/direct`}>
-                         <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                             {orderData?.hire_status === "completed"
                               ? "Create Dispute"
                               : "Cancel Task and Create Dispute"}
@@ -2043,30 +2045,38 @@ export default function ViewProfile() {
           </div>
         ) */}
 
-      {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
-        ) : bannerError ? (
-          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i}>
-                <img
-                  src={banner}
-                  alt=""
-                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
-                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
-                />
-              </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
-        )}
-      </div>
 
+      {/* Banner Slider */}
+       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+  h-[220px] sm:h-[400px]">
+
+          {bannerLoading ? (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              Loading banners...
+            </p>
+          ) : bannerError ? (
+            <p className="absolute inset-0 flex items-center justify-center text-red-500">
+              {bannerError}
+            </p>
+          ) : bannerImages.length > 0 ? (
+            <Slider {...sliderSettings}>
+              {bannerImages.map((banner, i) => (
+                <div key={i} className="w-full h-[220px] sm:h-[400px]">
+                  <img
+                    src={banner}
+                    alt={`Banner ${i + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.target.src = Work)}
+                  />
+                </div>
+              ))}
+            </Slider>
+          ) : (
+            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+              No banners available
+            </p>
+          )}
+        </div>
       <Footer />
       {showModal && (
         <div
