@@ -1012,7 +1012,7 @@ export default function ViewProfile() {
               </>
             ) : orderData?.hire_status !== "assigned" ? (
               <button
-                className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                className="cursor-pointer px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
                 onClick={() => setShowModal(true)}
               >
                 Cancel Task
@@ -1022,7 +1022,7 @@ export default function ViewProfile() {
             {showRefundButton && orderData?.platform_fee_paid && (
               <button
                 onClick={() => setShowRefundModal(true)}
-                className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+                className="cursor-pointer mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
               >
                 Cancel & Get Refund
               </button>
@@ -1062,13 +1062,13 @@ export default function ViewProfile() {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowRefundModal(false)}
-                  className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                  className="cursor-pointer px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRefundRequest}
-                  className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                  className="cursor-pointer px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
                 >
                   Submit
                 </button>
@@ -1163,7 +1163,7 @@ export default function ViewProfile() {
                         {orderData?.hire_status !== "completed" && (
                           <>
                             <button
-    className="bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto"
+    className="cursor-pointer bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto"
     onClick={handleMarkComplete}
   >
     Mark as Complete
@@ -1183,7 +1183,7 @@ export default function ViewProfile() {
                           </>
                         )}
                         <Link to={`/dispute/${id}/emergency`}>
-                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                          <button className="cursor-pointer bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                             {orderData?.hire_status === "completed"
                               ? "Create Dispute"
                               : "Cancel Task and Create Dispute"}
@@ -1307,14 +1307,14 @@ export default function ViewProfile() {
                         {provider?.location?.address || "No Address Provided"}
                       </div>
                       <button
-                        className="ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
+                        className="cursor-pointer ml-auto px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-50"
                         onClick={() => handleRouteHire(provider._id, false)}
                       >
                         View Profile
                       </button>
                     </div>
                     <button
-                      className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+                      className="cursor-pointer px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
                       // onClick={() => handleHire(provider._id)}
                       onClick={() => handleHireConfirmation(provider._id)}
                     >
@@ -1354,7 +1354,7 @@ export default function ViewProfile() {
         orderData?.hire_status === "assigned" && (
           <div className="flex justify-center">
             <button
-              className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+              className="cursor-pointer px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
               onClick={handlePayment}
             >
               Pay

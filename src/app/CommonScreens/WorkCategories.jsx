@@ -416,7 +416,7 @@ const handleBankUpdate = () => {
           <div className="flex justify-center mt-8">
             <button
               onClick={SeeAll}
-              className="w-[200px] sm:w-[222px] h-[46px] bg-[#228B22] text-white rounded-[15px] hover:scale-105 transition-all duration-300"
+              className="w-[200px] sm:w-[222px] h-[46px] bg-[#228B22] text-white rounded-[15px] cursor-pointer hover:scale-105 transition-all duration-300"
             >
               See All
             </button>
@@ -488,7 +488,7 @@ const handleBankUpdate = () => {
             </p>
             <button
               onClick={postWork}
-              className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
+              className="mt-8 sm:mt-20 w-[143px] cursor-pointer bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
               Post Work
             </button>
@@ -507,7 +507,7 @@ const handleBankUpdate = () => {
               </p>
               <button
                 onClick={postEmergencyWork}
-                className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
+                className="mt-8 sm:mt-20 w-[143px] bg-[#228B22] cursor-pointer text-white px-6 py-2 rounded-[33px] shadow-[0px_1px_1px_1px_#7e7e7e] border border-[#aba8a8] hover:bg-[#1a6b1a] hover:shadow-lg hover:scale-105 transition-all duration-300"
               >
                 Post Work
               </button>
@@ -530,7 +530,7 @@ const handleBankUpdate = () => {
                 onClick={() => {
                   navigate("/user/work-list/My Hire");
                 }}
-                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+                className="cursor-pointer w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
               >
                 Direct Hiring
               </button>
@@ -547,7 +547,7 @@ const handleBankUpdate = () => {
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
               <button
                 onClick={handleBidding}
-                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+                className="cursor-pointer w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
               >
                 Bidding
               </button>
@@ -563,7 +563,7 @@ const handleBankUpdate = () => {
             />
             <div className="absolute bottom-[20px] left-1/2 transform -translate-x-1/2">
               <button
-                className="w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
+                className="cursor-pointer w-[200px] sm:w-[227px] h-[53px] bg-[#228B22] border-2 border-white text-[14px] sm:text-[15px] text-white font-semibold rounded-full hover:bg-[#1a6f1a] hover:scale-105 transition-all duration-300"
                 onClick={() => navigate("/user/work-list/My Emergency")}
               >
                 Emergency

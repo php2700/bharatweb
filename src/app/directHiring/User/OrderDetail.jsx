@@ -1091,6 +1091,7 @@ export default function ViewProfile() {
                   rounded-full 
                   shadow-lg 
                   text-2xl
+                  cursor-pointer
                 "
               >
                 ×
@@ -1333,7 +1334,7 @@ export default function ViewProfile() {
                             {provider.provider_id?.location?.address?.length > 50 && (
                               <button
                                 onClick={() => toggleAddress(provider.provider_id._id)}
-                                className="text-[#228B22] font-semibold ml-2 hover:underline inline"
+                                className="cursor-pointer text-[#228B22] font-semibold ml-2 hover:underline inline"
                               >
                                 {expandedAddresses[provider.provider_id._id]
                                   ? "See Less"
@@ -1346,7 +1347,7 @@ export default function ViewProfile() {
                         {/* View Profile Button - Center on Mobile */}
                         <button
                           onClick={() => handleRouteHire(provider.provider_id._id, true)}
-                          className="text-green-600 font-medium text-sm mt-3 w-full sm:w-auto max-w-[200px] border border-green-600 px-5 py-1 rounded-lg"
+                          className="cursor-pointer text-green-600 font-medium text-sm mt-3 w-full sm:w-auto max-w-[200px] border border-green-600 px-5 py-1 rounded-lg"
                         >
                           View Profile
                         </button>
@@ -1360,14 +1361,14 @@ export default function ViewProfile() {
                             <p className="text-gray-600 font-medium">Contact</p>
                             <div className="flex space-x-4">
                               <button
-                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                                className="cursor-pointer p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() => window.open(`tel:${provider.phone}`, "_self")}
                               >
                                 <img src={CallIcon} alt="Call" className="w-6 h-6" />
                               </button>
 
                               <button
-                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                                className="cursor-pointer p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() =>
                                   handleChatOpen(provider?.provider_id?._id, userId)
                                 }
@@ -1416,7 +1417,7 @@ export default function ViewProfile() {
                               {orderData?.hire_status === "pending" &&
                                 provider.status === "pending" && (
                                   <button
-                                    className={`px-6 py-2 w-full sm:w-auto min-w-[200px] text-white font-semibold rounded-lg shadow transition ${showChangeProvider || provider.isRejectedByUser
+                                    className={`cursor-pointer px-6 py-2 w-full sm:w-auto min-w-[200px] text-white font-semibold rounded-lg shadow transition ${showChangeProvider || provider.isRejectedByUser
                                         ? "bg-green-600"
                                         : "bg-[#FB3523]"
                                       }`}
@@ -1505,14 +1506,14 @@ export default function ViewProfile() {
 
                 {orderData?.isReviewedByUser ? (
                   <span
-                    className="px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
+                    className="cursor-pointer px-8 py-2 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold cursor-pointer"
                     onClick={() => setShowOrderReviewModal(true)}
                   >
                     See Review
                   </span>
                 ) : (
                   <span
-                    className="px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
+                    className="cursor-pointer px-8 py-2 bg-[#FFD700] text-black rounded-lg text-lg font-semibold cursor-pointer"
                     onClick={() => setShowCompletedModal(true)}
                   >
                     Add Review
@@ -1521,7 +1522,7 @@ export default function ViewProfile() {
               </div>
             ) : orderData?.hire_status === "pending" ? (
               <button
-                className="px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
+                className="cursor-pointer px-8 py-3 bg-[#FF0000] text-white rounded-lg text-lg font-semibold hover:bg-red-700"
                 onClick={handleCancelOffer}
               >
                 Cancel Task
@@ -1581,7 +1582,7 @@ export default function ViewProfile() {
             {showRefundButton && (
               <button
                 onClick={() => setShowRefundModal(true)}
-                className="mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
+                className="cursor-pointer mt-4 ml-4 px-8 py-3 bg-[#1E90FF] text-white rounded-lg text-lg font-semibold hover:bg-blue-700"
               >
                 Get Refund
               </button>
@@ -1589,7 +1590,7 @@ export default function ViewProfile() {
 
             {orderData?.refundRequest && (
               <button
-                className={`mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
+                className={`cursor-pointer mt-4 ml-4 px-8 py-3 text-white rounded-lg text-lg font-semibold ${orderData?.refundStatus === "pending"
                   ? "bg-blue-600 hover:bg-blue-700"
                   : orderData?.refundStatus === "processed"
                     ? "bg-green-600 hover:bg-green-700"
@@ -1638,13 +1639,13 @@ export default function ViewProfile() {
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={() => setShowRefundModal(false)}
-                    className="px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                    className="cursor-pointer px-5 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleRefundRequest}
-                    className="px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
+                    className="cursor-pointer px-5 py-2 bg-[#1E90FF] text-white rounded-lg hover:bg-blue-700"
                   >
                     Submit
                   </button>
@@ -1733,7 +1734,7 @@ export default function ViewProfile() {
                           </>
                         )}
                         <Link to={`/dispute/${id}/direct`}>
-                          <button className="bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
+                          <button className="cursor-pointer bg-[#EE2121] hover:bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto text-sm sm:text-base">
                             {orderData?.hire_status === "completed"
                               ? "Create Dispute"
                               : "Cancel Task and Create Dispute"}
@@ -1937,14 +1938,14 @@ export default function ViewProfile() {
                         </div>
                         <button
                           onClick={() => handleRouteHire(worker._id, false)}
-                          className="text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
+                          className="cursor-pointer text-[#228B22] border-green-600 border px-6 py-2 rounded-md text-base font-semibold mt-4 inline-block"
                         >
                           View Profile
                         </button>
                       </div>
                       <div className="flex flex-col gap-2">
                         <button
-                          className="px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
+                          className="cursor-pointer px-4 py-2 bg-[#228B22] text-white rounded hover:bg-green-700"
                           onClick={() => handleHire(worker._id)}
                         >
                           Hire

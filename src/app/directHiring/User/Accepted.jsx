@@ -393,7 +393,7 @@ export default function Accepted({
 
                 {/* View Profile Button */}
                 <button
-                  className="w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
+                  className="cursor-pointer w-full sm:w-auto sm:ml-auto px-6 py-2 border border-[#228B22] 
                      text-[#228B22] bg-white rounded-lg font-semibold 
                      hover:bg-green-50 cursor-pointer text-center"
                   onClick={() => handleRouteHire(serviceProvider._id, true)}
@@ -452,7 +452,7 @@ export default function Accepted({
                 {hireStatus == "accepted" && (
                   <button
                     onClick={() => setShowForm(true)}
-                    className="bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
+                    className="cursor-pointer bg-[#228B22] text-white px-4 py-2 rounded-md hover:bg-green-700 w-fit"
                   >
                     Create Payment
                   </button>
@@ -577,7 +577,7 @@ export default function Accepted({
                           }
                         });
                       }}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-indigo-400"
+                      className="cursor-pointer bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-medium hover:bg-indigo-400"
                     >
                       Info
                     </button>
@@ -611,7 +611,7 @@ export default function Accepted({
                     hireStatus === "accepted" && (
                       <button
                         onClick={() => handlePay(payment._id)}
-                        className="bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700"
+                        className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-md text-sm hover:bg-green-700"
                       >
                         Pay
                       </button>
@@ -649,7 +649,7 @@ export default function Accepted({
                         background: "white",
                       });
                     }}
-                    className="bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm hover:bg-indigo-400"
+                    className="cursor-pointer bg-indigo-500 text-white px-3 py-1 rounded-md font-medium text-sm hover:bg-indigo-400"
                   >
                     Info
                   </button>
@@ -700,13 +700,13 @@ export default function Accepted({
                 <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
                   <button
                     onClick={handlePaymentSubmit}
-                    className="bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700 w-full sm:w-auto"
+                    className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-md hover:bg-green-700 w-full sm:w-auto"
                   >
                     Submit
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50 w-full sm:w-auto"
+                    className="cursor-pointer border border-[#228B22] text-[#228B22] px-4 py-1 rounded-md hover:bg-green-50 w-full sm:w-auto"
                   >
                     Cancel
                   </button>

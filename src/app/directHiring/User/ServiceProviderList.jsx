@@ -517,35 +517,7 @@ export default function ServiceProviderList() {
                   </div>
                 </div>
 
-                {/* Subscription Filter */}
-                <div className="relative min-w-[180px]">
-                  <select
-                    value={subscriptionFilter}
-                    onChange={(e) => setSubscriptionFilter(e.target.value)}
-                    className="
-          w-full px-4 py-3 pr-10 rounded-xl bg-white border border-gray-200
-          text-gray-700 text-sm lg:text-base shadow-sm
-          focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
-          transition-all duration-200 cursor-pointer hover:border-gray-300
-        "
-                    style={{ appearance: "none" }}
-                  >
-                    <option value="">All Subscriptions</option>
-                    <option value="premium">Premium</option>
-                    <option value="professional">Professional</option>
-                    <option value="starter">Starter</option>
-                  </select>
-
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                </div>
+              
               </div>
             </div>
           </div>
@@ -707,28 +679,27 @@ export default function ServiceProviderList() {
 
                         {/* Address */}
                         <div className="sm:col-span-8 flex items-start gap-2 text-gray-600 text-sm min-w-0">
-  <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
+                          <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
 
-  <div className="min-w-0 flex-1"> {/* ye flex-1 + min-w-0 magic hai */}
-    <div
-      className={`inline-block text-sm break-words hyphens-auto ${
-        !worker.isAddressExpanded ? "line-clamp-1" : ""
-      }`}
-      title={fullAddress}
-    >
-      {displayedAddress}
-    </div>
+                          <div className="min-w-0 flex-1"> {/* ye flex-1 + min-w-0 magic hai */}
+                            <div
+                              className={`inline-block text-sm break-words hyphens-auto ${!worker.isAddressExpanded ? "line-clamp-1" : ""
+                                }`}
+                              title={fullAddress}
+                            >
+                              {displayedAddress}
+                            </div>
 
-    {addressLong && (
-      <button
-        onClick={() => toggleField(worker._id, "isAddressExpanded")}
-        className="ml-1 text-xs font-medium text-green-600 hover:underline focus:outline-none"
-      >
-        {worker.isAddressExpanded ? "See Less" : "See More"}
-      </button>
-    )}
-  </div>
-</div>
+                            {addressLong && (
+                              <button
+                                onClick={() => toggleField(worker._id, "isAddressExpanded")}
+                                className="ml-1 text-xs font-medium text-green-600 hover:underline focus:outline-none"
+                              >
+                                {worker.isAddressExpanded ? "See Less" : "See More"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       {/* Buttons */}
                       <div className="sm:col-span-4 flex flex-wrap sm:flex-nowrap gap-2 justify-start sm:justify-end">

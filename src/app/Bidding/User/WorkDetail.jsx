@@ -63,7 +63,7 @@ export default function BiddingWorkerDetail() {
       <Header />
       <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
         <div className="w-full max-w-6xl mx-auto flex justify-start mb-4">
-          <button className="text-[#228B22] text-sm hover:underline">
+          <button className="cursor-pointer text-[#228B22] text-sm hover:underline">
             &lt; Back
           </button>
         </div>
@@ -135,7 +135,7 @@ export default function BiddingWorkerDetail() {
                           <p className="text-sm text-gray-600">
                             Project Fees - <span className="font-medium">₹200/-</span>
                           </p>
-                          <button className="bg-[#228B22] text-white px-6 py-1 rounded-lg text-sm mt-2">
+                          <button className="cursor-pointer bg-[#228B22] text-white px-6 py-1 rounded-lg text-sm mt-2">
                             View Profile
                           </button>
                         </div>
@@ -143,11 +143,11 @@ export default function BiddingWorkerDetail() {
             
                       <div className="text-center">
                         <p className="font-medium mb-2">Contact with him</p>
-                        <div className="flex gap-3 justify-center">
+                        <div className="cursor-pointer flex gap-3 justify-center">
                           <button className="p-2 bg-gray-200 rounded-full">
                             <img src={callIcon} className="h-5 w-5" />
                           </button>
-                          <button className="p-2 bg-gray-200 rounded-full">
+                          <button className="cursor-pointer p-2 bg-gray-200 rounded-full">
                             <img src={messageIcon} className="h-5 w-5" />
                           </button>
                         </div>
@@ -162,7 +162,7 @@ export default function BiddingWorkerDetail() {
                     <div className="border  border-[#228B22] bg-gray-100 rounded-lg shadow-sm p-4">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-semibold">Payment</h3>
-                        <button className="bg-[#228B22] text-white px-4 py-1 rounded-lg text-sm">
+                        <button className="cursor-pointer bg-[#228B22] text-white px-4 py-1 rounded-lg text-sm">
                           Create Payment
                         </button>
                       </div>
@@ -178,7 +178,7 @@ export default function BiddingWorkerDetail() {
                         <div className="flex justify-between items-center bg-white py-3 px-6 pb-2">
                           <span className="font-semibold">2</span>
                           <span className="font-semibold "> Starting Payment</span>
-                          <button className="bg-[#228B22] border rounded-lg px-4 text-white py-1 text-md">
+                          <button className="cursor-pointer bg-[#228B22] border rounded-lg px-4 text-white py-1 text-md">
                             Pay
                           </button>
                           <span className="font-semibold">₹20,000</span>
@@ -199,10 +199,10 @@ export default function BiddingWorkerDetail() {
                             />
                           </div>
                           <div className="flex gap-3 justify-center mt-3">
-                            <button className="bg-[#228B22] text-white px-4 py-2 rounded-lg text-sm">
+                            <button className="cursor-pointer bg-[#228B22] text-white px-4 py-2 rounded-lg text-sm">
                               Submit
                             </button>
-                            <button className=" text-[#228B22] border px-4 py-2 rounded-lg text-sm">
+                            <button className="cursor-pointer text-[#228B22] border px-4 py-2 rounded-lg text-sm">
                               Cancel
                             </button>
                           </div>
