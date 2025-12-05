@@ -30,7 +30,7 @@ export default function ServiceProviderList() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc"); // asc / desc
-  
+
   const [selectedSubcats, setSelectedSubcats] = useState([]); // multi‑select
   const [minRating, setMinRating] = useState(""); // NEW: rating filter
 
@@ -87,7 +87,7 @@ export default function ServiceProviderList() {
           { category_id, subcategory_ids },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
+        console.log("Data",data)
         if (data?.status) {
           const withToggle = (data.data || []).map((w) => ({
             ...w,
@@ -105,7 +105,7 @@ export default function ServiceProviderList() {
     };
 
     fetchWorkers();
-  }, [category_id, subcategory_ids,location.key]);
+  }, [category_id, subcategory_ids, location.key]);
 
   /* collapse expandables when any filter changes */
   useEffect(() => {
@@ -158,7 +158,7 @@ export default function ServiceProviderList() {
   //   return Array.from(set).sort((a, b) => a.localeCompare(b));
   // }, [workers]);
 
-    const allSubcategories = useMemo(() => {
+  const allSubcategories = useMemo(() => {
     const subs = [];
     workers.forEach((w) => {
       if (w.subcategory_names) {
@@ -187,34 +187,34 @@ export default function ServiceProviderList() {
   // -------------------------------------------------------------------
   // 3️⃣ Convert incoming subcategory_ids → names  
   // -------------------------------------------------------------------
-useEffect(() => {
-  // ignore if no subcategory_ids
-  if (!subcategory_ids || selectedSubcats.length > 0) return;
+  useEffect(() => {
+    // ignore if no subcategory_ids
+    if (!subcategory_ids || selectedSubcats.length > 0) return;
 
-  // If already names
-  if (
-    Array.isArray(subcategory_ids) &&
-    subcategory_ids.every(
-      (x) => typeof x === "string" && allSubcategories.includes(x)
-    )
-  ) {
-    setSelectedSubcats(subcategory_ids);
-    return;
-  }
+    // If already names
+    if (
+      Array.isArray(subcategory_ids) &&
+      subcategory_ids.every(
+        (x) => typeof x === "string" && allSubcategories.includes(x)
+      )
+    ) {
+      setSelectedSubcats(subcategory_ids);
+      return;
+    }
 
-  // IDs → names
-  if (Array.isArray(subcategory_ids)) {
-    const names = subcategory_ids
-  .map((id) => subcategoryIdToName[id])
-  .filter(Boolean);
+    // IDs → names
+    if (Array.isArray(subcategory_ids)) {
+      const names = subcategory_ids
+        .map((id) => subcategoryIdToName[id])
+        .filter(Boolean);
 
-setSelectedSubcats(names);
+      setSelectedSubcats(names);
 
-  }
-}, [subcategory_ids, allSubcategories, subcategoryIdToName]);
+    }
+  }, [subcategory_ids, allSubcategories, subcategoryIdToName]);
 
 
-  
+
 
 
   /** Filtered & sorted list */
@@ -337,276 +337,325 @@ setSelectedSubcats(names);
         </div>
 
         {/* Workers list */}
-       
-    <div className="container max-w-5xl mx-auto my-6 px-4">
-      {/* ---------- STYLISH FILTER BAR (desktop logic unchanged) ---------- */}
-      <div
-        className="
+
+        <div className="container max-w-5xl mx-auto my-6 px-4">
+          {/* ---------- STYLISH FILTER BAR (desktop logic unchanged) ---------- */}
+          <div
+            className="
           flex flex-col lg:flex-row justify-between lg:items-center p-4 lg:p-5 gap-4
           bg-white/80 backdrop-blur-xl rounded-2xl
           shadow-[0_8px_20px_rgba(0,0,0,0.08)] border border-gray-200 transition-all w-full
         "
-      >
-        <h1 className="text-lg lg:text-xl font-bold text-gray-600 tracking-tight">
-          Direct Hiring
-        </h1>
+          >
+            <h1 className="text-lg lg:text-xl font-bold text-gray-600 tracking-tight">
+              Direct Hiring
+            </h1>
 
-        <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 w-full">
-          {/* SEARCH */}
-          <div className="relative w-full lg:w-72">
-            <input
-              type="search"
-              placeholder="Search by Name, Id or Skill..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="
+            <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 w-full">
+              {/* SEARCH */}
+              <div className="relative w-full lg:w-72">
+                <input
+                  type="search"
+                  placeholder="Search by Name, Id or Skill..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="
                 w-full pl-10 pr-3 py-2.5 rounded-xl bg-gray-50 border border-gray-300
                 text-sm lg:text-base text-gray-700 shadow-inner focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
                 transition-all
               "
-            />
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
 
-          {/* SUB-CATEGORY MULTI SELECT */}
-          <div className="relative w-full lg:w-64">
-            <select
-              multiple
-              size={1}
-              style={{ appearance: "none" }}
-              value={selectedSubcats}
-              onChange={(e) => {
-                const opts = Array.from(e.target.selectedOptions, (o) => o.value);
-                setSelectedSubcats(opts);
-              }}
-              className="
+              {/* SUB-CATEGORY MULTI SELECT */}
+              <div className="relative w-full lg:w-64">
+                <select
+                  multiple
+                  size={1}
+                  style={{ appearance: "none" }}
+                  value={selectedSubcats}
+                  onChange={(e) => {
+                    const opts = Array.from(e.target.selectedOptions, (o) => o.value);
+                    setSelectedSubcats(opts);
+                  }}
+                  className="
                 w-full p-2.5 pr-8 rounded-xl cursor-pointer bg-gray-50 border border-gray-300
                 text-sm lg:text-base text-gray-700 shadow-inner focus:outline-none focus:ring-2 focus:ring-green-500
                 transition-all max-h-44 overflow-y-auto
               "
-            >
-              <option disabled className="text-gray-400">
-                {allSubcategories.length ? "— Select Sub-categories —" : "No sub-categories"}
-              </option>
+                >
+                  <option disabled className="text-gray-400">
+                    {allSubcategories.length ? "— Select Sub-categories —" : "No sub-categories"}
+                  </option>
 
-              {allSubcategories.map((sc) => (
-                <option key={sc} value={sc} className="py-1.5 pl-2 pr-8 rounded hover:bg-green-50 cursor-pointer text-sm">
-                  {selectedSubcats.includes(sc) ? "✓ " : ""}
-                  {sc}
-                </option>
-              ))}
-            </select>
+                  {allSubcategories.map((sc) => (
+                    <option key={sc} value={sc} className="py-1.5 pl-2 pr-8 rounded hover:bg-green-50 cursor-pointer text-sm">
+                      {selectedSubcats.includes(sc) ? "✓ " : ""}
+                      {sc}
+                    </option>
+                  ))}
+                </select>
 
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              <svg className="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </div>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg className="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
 
-          {/* SORT + RATING */}
-          <div className="relative w-full lg:w-56">
-            <select
-              value={`${sortOrder}|${minRating}`}
-              onChange={(e) => {
-                const [order, rating] = e.target.value.split("|");
-                setSortOrder(order);
-                setMinRating(rating);
-              }}
-              className="
+              {/* SORT + RATING */}
+              <div className="relative w-full lg:w-56">
+                <select
+                  value={`${sortOrder}|${minRating}`}
+                  onChange={(e) => {
+                    const [order, rating] = e.target.value.split("|");
+                    setSortOrder(order);
+                    setMinRating(rating);
+                  }}
+                  className="
                 w-full p-2.5 pr-8 rounded-xl bg-gray-50 border border-gray-300 text-sm lg:text-base text-gray-700 shadow-inner
                 focus:outline-none focus:ring-2 focus:ring-green-500 hover:border-gray-400 transition-all
               "
-              style={{ appearance: "none" }}
-            >
-              <option value="asc|">A → Z (Alphabetical)</option>
-              <option value="desc|">Z → A (Alphabetical)</option>
+                  style={{ appearance: "none" }}
+                >
+                  <option value="asc|">A → Z (Alphabetical)</option>
+                  <option value="desc|">Z → A (Alphabetical)</option>
 
-              <option disabled>───── Rating ─────</option>
-              <option value="asc|5">5 stars & up</option>
-              <option value="asc|4">4 stars & up</option>
-              <option value="asc|3">3 stars & up</option>
-              <option value="asc|2">2 stars & up</option>
-              <option value="asc|1">1 star & up</option>
-              <option value="asc|">All Ratings</option>
-              <option disabled>───── Tasks ─────</option>
-              <option value="tasks-desc|">Task Count High → Low</option>
-              <option value="tasks-asc|">Task Count Low → High</option>
-            </select>
+                  <option disabled>───── Rating ─────</option>
+                  <option value="asc|5">5 stars & up</option>
+                  <option value="asc|4">4 stars & up</option>
+                  <option value="asc|3">3 stars & up</option>
+                  <option value="asc|2">2 stars & up</option>
+                  <option value="asc|1">1 star & up</option>
+                  <option value="asc|">All Ratings</option>
+                  <option disabled>───── Tasks ─────</option>
+                  <option value="tasks-desc|">Task Count High → Low</option>
+                  <option value="tasks-asc|">Task Count Low → High</option>
+                </select>
 
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-              <svg className="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ---------- LIST ---------- */}
-      {loading ? (
-        <p className="text-center text-gray-500 mt-8">Loading workers...</p>
-      ) : filteredWorkers.length === 0 ? (
-        <p className="text-center text-gray-500 mt-8">No workers found.</p>
-      ) : (
-        <div className="mt-6 space-y-4">
-          {filteredWorkers.map((worker) => {
-            const fullAddress = capitalizeWords(worker?.location?.address) || "Unknown";
-            const addressLong = fullAddress.length > 70;
-            const displayedAddress = worker.isAddressExpanded ? fullAddress : getTruncated(fullAddress, 12);
-
-            const fullSkill = capitalizeWords(worker?.skill) || "";
-            const skillLong = fullSkill.length > 70;
-            const displayedSkill = worker.isSkillExpanded ? fullSkill : getTruncated(fullSkill, 12);
-
-            const subcatString = (worker?.subcategory_names || []).join(", ");
-            const subcatLong = subcatString.length > 70;
-            const displayedSubcat = worker.isSubcatExpanded ? subcatString : getTruncated(subcatString, 12);
-
-            return (
-              <div
-                key={worker._id}
-                className="
-                  grid grid-cols-12 bg-white rounded-xl shadow-md p-4 sm:p-5 gap-4
-                  transition hover:shadow-xl overflow-hidden
-                "
-              >
-                {/* Image */}
-                <div className="col-span-12 sm:col-span-4 flex justify-center sm:justify-start">
-                  <img
-                    src={worker.profile_pic || Default}
-                    alt={worker.full_name}
-                    className="
-                      h-36 w-36 sm:h-[200px] sm:w-[200px] rounded-xl object-cover shadow flex-shrink-0
-                    "
-                    onError={(e) => {
-                      if (Default) e.currentTarget.src = Default;
-                    }}
-                  />
-                </div>
-
-                {/* Details */}
-                <div className="col-span-12 sm:col-span-8 flex flex-col justify-between min-w-0">
-                  {/* Name + rating */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h2 className="text-base sm:text-xl font-semibold text-gray-800 truncate max-w-full">
-                      {capitalizeWords(worker.full_name)}{" "}
-                      <span className="text-gray-600 text-xs sm:text-sm font-medium">
-                        (Id: {worker?.unique_id})
-                      </span>
-                    </h2>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      {ratingImg ? <img className="h-4 w-4 sm:h-5 sm:w-5" src={ratingImg} alt="Rating" /> : null}
-                      <span className="font-medium text-sm">{worker?.averageRating ?? "N/A"}</span>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-gray-700 mt-1 truncate">
-                    Category:{" "}
-                    <span className="font-medium">{worker?.category_name}</span>
-                  </p>
-
-                  <p className="text-sm text-gray-600 mt-1">
-                    Total Tasks: <span className="font-medium">{worker?.totalTasks ?? 0}</span>
-                  </p>
-
-                  {/* Sub-categories */}
-                  <div className="flex items-center gap-2 text-gray-700 mt-2">
-                    <span className="font-medium text-sm">SubCategories:</span>
-                    <div className="flex items-center flex-1 min-w-0">
-                      <span
-                        className={`inline-block text-sm ${worker.isSubcatExpanded ? "break-words" : "whitespace-nowrap overflow-hidden text-ellipsis"}`}
-                        title={subcatString}
-                      >
-                        {displayedSubcat}
-                      </span>
-                      {subcatLong && (
-                        <button
-                          onClick={() => toggleField(worker._id, "isSubcatExpanded")}
-                          className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
-                        >
-                          {worker.isSubcatExpanded ? "See Less" : "See More"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Skill */}
-                  <div className="mt-2">
-                    <p className="font-medium text-gray-800 text-sm">About My Skill</p>
-                    <div className="flex items-center gap-1">
-                      <div className="flex items-center flex-1 min-w-0">
-                        <span
-                          className={`inline-block text-sm ${worker.isSkillExpanded ? "break-words" : "whitespace-nowrap overflow-hidden text-ellipsis"}`}
-                          title={fullSkill}
-                        >
-                          {displayedSkill}
-                        </span>
-                        {skillLong && (
-                          <button
-                            onClick={() => toggleField(worker._id, "isSkillExpanded")}
-                            className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
-                          >
-                            {worker.isSkillExpanded ? "See Less" : "See More"}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Address + Buttons */}
-                  <div className="mt-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <div className="flex items-center gap-2 text-gray-600 text-sm flex-1 min-w-0">
-                      <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0" />
-                      <div className="min-w-0">
-                        <span
-                          className={`inline-block text-sm ${worker.isAddressExpanded ? "break-words" : "whitespace-nowrap overflow-hidden text-ellipsis"}`}
-                          title={fullAddress}
-                        >
-                          {displayedAddress}
-                        </span>
-                        {addressLong && (
-                          <button
-                            onClick={() => toggleField(worker._id, "isAddressExpanded")}
-                            className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
-                          >
-                            {worker.isAddressExpanded ? "See Less" : "See More"}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => handleRouteHire(worker._id)}
-                        className="px-3 py-1.5 text-sm text-green-600 border border-green-600 rounded-md hover:bg-green-50 transition"
-                      >
-                        View Profile
-                      </button>
-                      <button
-                        onClick={() => handleHire(worker._id)}
-                        className="px-4 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                      >
-                        Hire
-                      </button>
-                    </div>
-                  </div>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg className="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                  </svg>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* ---------- LIST ---------- */}
+          {loading ? (
+            <p className="text-center text-gray-500 mt-8">Loading workers...</p>
+          ) : filteredWorkers.length === 0 ? (
+            <p className="text-center text-gray-500 mt-8">No workers found.</p>
+          ) : (
+            <div className="mt-6 space-y-4">
+              {filteredWorkers.map((worker) => {
+                // --- add these (place AFTER displayedSubcat / subcatString definitions) ---
+                const plan = worker?.subscriptionPlan?.[0];
+                const hasPlan = Boolean(plan);
+                const planNameDisplay =
+                  plan?.name ||
+                  (worker?.subscriptionStatus
+                    ? capitalizeWords(worker.subscriptionStatus.replace(/_/g, " "))
+                    : null);
+                // ---------------------------------------------------------------------
+
+                const fullAddress = capitalizeWords(worker?.location?.address) || "Unknown";
+                const addressLong = fullAddress.length > 70;
+                const displayedAddress = worker.isAddressExpanded ? fullAddress : getTruncated(fullAddress, 12);
+
+                const fullSkill = capitalizeWords(worker?.skill) || "";
+                const skillLong = fullSkill.length > 70;
+                const displayedSkill = worker.isSkillExpanded ? fullSkill : getTruncated(fullSkill, 12);
+
+                const subcatString = (worker?.subcategory_names || []).join(", ");
+                const subcatLong = subcatString.length > 70;
+                const displayedSubcat = worker.isSubcatExpanded ? subcatString : getTruncated(subcatString, 12);
+
+                return (
+                  <div
+                    key={worker._id}
+                    className="
+    grid grid-cols-12 bg-white rounded-xl shadow-md p-4 sm:p-5 gap-4
+    transition hover:shadow-xl overflow-hidden
+  "
+                  >
+
+                    {/* 🌟 Subscription Badge (Card top, above image) */}
+                    <div className="col-span-12 flex justify-start">
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold shadow-sm
+        ${hasPlan ? "bg-green-600 text-white" : "bg-gray-200 text-gray-800"}
+      `}
+                        title={  planNameDisplay || "Starter"}
+                      >
+                        <span className="max-w-[160px] truncate">
+                          {planNameDisplay || "Starter "}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Image section (NO CHANGE) */}
+                    <div className="col-span-12 sm:col-span-4 relative flex justify-center sm:justify-start">
+                      <img
+                        src={worker.profile_pic || Default}
+                        alt={worker.full_name}
+                        className="h-36 w-36 sm:h-[200px] sm:w-[200px] rounded-xl object-cover shadow flex-shrink-0"
+                        onError={(e) => {
+                          if (Default) e.currentTarget.src = Default;
+                        }}
+                      />
+                    </div>
+
+
+
+
+                    {/* Details */}
+                    <div className="col-span-12 sm:col-span-8 flex flex-col justify-between min-w-0">
+
+                      {/* NAME + RATING */}
+                      <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center gap-2">
+                        <h2 className="text-base sm:text-xl font-semibold text-gray-800 truncate max-w-full min-w-0">
+                          {capitalizeWords(worker.full_name)}{" "}
+                          <span className="text-gray-600 text-xs sm:text-sm font-medium">
+                            (Id: {worker?.unique_id})
+                          </span>
+                        </h2>
+
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          {ratingImg ? (
+                            <img className="h-4 w-4 sm:h-5 sm:w-5" src={ratingImg} alt="Rating" />
+                          ) : null}
+                          <span className="font-medium text-sm">{worker?.averageRating ?? "N/A"}</span>
+                        </div>
+                      </div>
+
+                      {/* Category */}
+                      <p className="text-sm text-gray-700 mt-1 truncate w-full min-w-0">
+                        Category: <span className="font-medium">{worker?.category_name}</span>
+                      </p>
+
+                      {/* Total Tasks */}
+                      <p className="text-sm text-gray-600 mt-1 w-full">
+                        Total Tasks: <span className="font-medium">{worker?.totalTasks ?? 0}</span>
+                      </p>
+
+                      {/* SUBCATEGORY */}
+                      <div className="flex items-start gap-2 text-gray-700 mt-2 w-full">
+                        <span className="font-medium text-sm flex-shrink-0">SubCategories:</span>
+
+                        <div className="flex items-center flex-1 min-w-0">
+                          <span
+                            className={`inline-block text-sm ${worker.isSubcatExpanded
+                                ? "break-words"
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              }`}
+                            title={subcatString}
+                          >
+                            {displayedSubcat}
+                          </span>
+
+                          {subcatLong && (
+                            <button
+                              onClick={() => toggleField(worker._id, "isSubcatExpanded")}
+                              className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
+                            >
+                              {worker.isSubcatExpanded ? "See Less" : "See More"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* SKILL */}
+                      <div className="mt-2 w-full">
+                        <p className="font-medium text-gray-800 text-sm">About My Skill</p>
+
+                        <div className="flex items-start gap-1 w-full">
+                          <div className="flex items-center flex-1 min-w-0">
+                            <span
+                              className={`inline-block text-sm ${worker.isSkillExpanded
+                                  ? "break-words"
+                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                }`}
+                              title={fullSkill}
+                            >
+                              {displayedSkill}
+                            </span>
+
+                            {skillLong && (
+                              <button
+                                onClick={() => toggleField(worker._id, "isSkillExpanded")}
+                                className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
+                              >
+                                {worker.isSkillExpanded ? "See Less" : "See More"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ADDRESS + BUTTONS */}
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-12 gap-3 w-full">
+
+                        {/* Address */}
+                        <div className="sm:col-span-8 flex items-start gap-2 text-gray-600 text-sm min-w-0">
+                          <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
+
+                          <div className="min-w-0">
+                            <span
+                              className={`inline-block text-sm ${worker.isAddressExpanded
+                                  ? "break-words"
+                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                                }`}
+                              title={fullAddress}
+                            >
+                              {displayedAddress}
+                            </span>
+
+                            {addressLong && (
+                              <button
+                                onClick={() => toggleField(worker._id, "isAddressExpanded")}
+                                className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
+                              >
+                                {worker.isAddressExpanded ? "See Less" : "See More"}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Buttons */}
+                      <div className="sm:col-span-4 flex flex-wrap sm:flex-nowrap gap-2 justify-start sm:justify-end">
+                        <button
+                          onClick={() => handleRouteHire(worker._id)}
+                          className="px-3 py-1.5 text-sm text-green-600 border border-green-600 rounded-md hover:bg-green-50 transition w-full sm:w-auto"
+                        >
+                          View Profile
+                        </button>
+
+                        <button
+                          onClick={() => handleHire(worker._id)}
+                          className="px-4 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition w-full sm:w-auto"
+                        >
+                          Hire
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  
+
 
 
         {/* BANNER SLIDER (same UI as NewTask.jsx) */}

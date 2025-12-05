@@ -429,24 +429,24 @@ export default function Worklist() {
         "
               >
                 {/* IMAGE — NO GAP — FULL FIT */}
-             <div
-  className="relative w-full sm:w-1/3 aspect-video sm:aspect-square bg-black overflow-hidden"
->
-  <img
-    src={task?.image}
-    alt={task?.name}
-    className="
+                <div
+                  className="relative w-full sm:w-1/3 aspect-video sm:aspect-square bg-black overflow-hidden"
+                >
+                  <img
+                    src={task?.image}
+                    alt={task?.name}
+                    className="
       absolute inset-0 w-full h-full
       object-cover
       sm:object-fill sm:scale-[1.15]
     "
-    onError={(e) => (e.currentTarget.src = Work)}
-  />
+                    onError={(e) => (e.currentTarget.src = Work)}
+                  />
 
-  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
-    {task?.project_id}
-  </span>
-</div>
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-4 py-1 rounded-full">
+                    {task?.project_id}
+                  </span>
+                </div>
 
 
                 {/* CONTENT */}

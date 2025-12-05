@@ -1299,13 +1299,18 @@ export default function ViewProfile() {
                       key={provider.provider_id._id}
                       className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-[#F9F9F9] rounded-xl shadow-md w-full"
                     >
-                      <img
-                        src={provider.provider_id.profile_pic || Profile}
-                        alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
-                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-                      />
+                      {/* Profile Image */}
+                      <div className="flex justify-center sm:justify-start">
+                        <img
+                          src={provider.provider_id.profile_pic || Profile}
+                          alt={`Profile of ${provider.provider_id.full_name || "Provider"}`}
+                          className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                        />
+                      </div>
 
-                      <div className="flex-1 text-left w-full">
+                      {/* Middle Section - Center on Mobile */}
+                      <div className="flex-1 text-center sm:text-left w-full flex flex-col items-center sm:items-start">
+                        {/* Name + ID */}
                         <p className="text-[17px] font-bold text-[#303030] break-words">
                           {provider.provider_id.full_name
                             .split(" ")
@@ -1316,13 +1321,10 @@ export default function ViewProfile() {
                           </span>
                         </p>
 
-                        <div className="flex items-start gap-2 mt-2 text-sm">
-                          <FaMapMarkerAlt
-                            className="text-[#F27773] mt-1 flex-shrink-0"
-                            color="#228B22"
-                            size={18}
-                          />
-                          <p className="text-gray-700 leading-snug break-words">
+                        {/* Location - Icon inline with text */}
+                        <div className="flex items-center justify-center sm:justify-start gap-2 mt-2 text-sm">
+                          <FaMapMarkerAlt className="text-[#F27773] flex-shrink-0" size={18} />
+                          <p className="text-gray-700 leading-snug break-words text-left">
                             {truncateAddress(
                               provider.provider_id?.location?.address,
                               provider.provider_id._id
@@ -1331,7 +1333,7 @@ export default function ViewProfile() {
                             {provider.provider_id?.location?.address?.length > 50 && (
                               <button
                                 onClick={() => toggleAddress(provider.provider_id._id)}
-                                className="text-[#228B22] font-semibold ml-2 hover:underline"
+                                className="text-[#228B22] font-semibold ml-2 hover:underline inline"
                               >
                                 {expandedAddresses[provider.provider_id._id]
                                   ? "See Less"
@@ -1341,30 +1343,31 @@ export default function ViewProfile() {
                           </p>
                         </div>
 
+                        {/* View Profile Button - Center on Mobile */}
                         <button
-                          onClick={() =>
-                            handleRouteHire(provider.provider_id._id, true)
-                          }
-                          className="text-green-600 font-medium text-sm mt-2 w-full sm:w-auto border border-green-600 px-5 py-1 rounded-lg"
+                          onClick={() => handleRouteHire(provider.provider_id._id, true)}
+                          className="text-green-600 font-medium text-sm mt-3 w-full sm:w-auto max-w-[200px] border border-green-600 px-5 py-1 rounded-lg"
                         >
                           View Profile
                         </button>
                       </div>
 
-                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0 gap-2">
+                      {/* Right Section - Contact + Status Buttons */}
+                      <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-4 sm:mt-0 gap-3">
+                        {/* Contact Buttons */}
                         {orderData.hire_status !== "cancelled" && (
-                          <>
+                          <div className="flex flex-col items-center gap-3">
                             <p className="text-gray-600 font-medium">Contact</p>
-                            <div className="flex space-x-3 mt-1">
+                            <div className="flex space-x-4">
                               <button
-                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() => window.open(`tel:${provider.phone}`, "_self")}
                               >
                                 <img src={CallIcon} alt="Call" className="w-6 h-6" />
                               </button>
 
                               <button
-                                className="p-2 bg-gray-200 rounded-full flex items-center justify-center"
+                                className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition"
                                 onClick={() =>
                                   handleChatOpen(provider?.provider_id?._id, userId)
                                 }
@@ -1372,116 +1375,115 @@ export default function ViewProfile() {
                                 <img src={ChatIcon} alt="Chat" className="w-6 h-6" />
                               </button>
                             </div>
-                          </>
-                        )}
-
-                        {offerStatuses[provider.provider_id._id] === "pending" ? (
-                          <span className="mt-2 text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold text-center">
-                            Cancelled
-                          </span>
-                        ) : (
-                          <div className="flex flex-col gap-2 w-full sm:w-auto mt-2">
-                            {!provider.isRejectedByUser && (
-                              <button
-                                className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed text-center
-                                  ${provider.status === "pending" ? "bg-yellow-500" : ""}
-                                  ${provider.status === "accepted" ? "bg-green-600" : ""}
-                                  ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
-                                disabled
-                              >
-                                {Array.isArray(provider.status)
-                                  ? provider.status
-                                    .map(
-                                      (word) =>
-                                        word.charAt(0).toUpperCase() + word.slice(1)
-                                    )
-                                    .join(" ")
-                                  : provider.status
-                                    ? provider.status.charAt(0).toUpperCase() +
-                                    provider.status.slice(1)
-                                    : ""}
-                              </button>
-                            )}
-
-                            {provider.isRejectedByUser && (
-                              <button
-                                className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed text-center"
-                                disabled
-                              >
-                                Rejected by Me
-                              </button>
-                            )}
-
-                            {orderData?.hire_status === "pending" &&
-                              provider.status === "pending" && (
-                                <button
-                                  className={`px-6 py-2 ${showChangeProvider || provider.isRejectedByUser
-                                    ? "bg-green-600"
-                                    : "bg-[#FB3523]"
-                                    } text-white font-semibold rounded-lg shadow`}
-                                  onClick={async () => {
-                                    if (provider.isRejectedByUser) {
-                                      setShowChangeProvider(true);
-                                      return;
-                                    }
-
-                                    const result = await Swal.fire({
-                                      title: "Are you sure?",
-                                      text: "Do you really want to change the service provider?",
-                                      icon: "warning",
-                                      showCancelButton: true,
-                                      confirmButtonColor: "#3085d6",
-                                      cancelButtonColor: "#d33",
-                                      confirmButtonText: "Yes, change it!",
-                                    });
-
-                                    if (result.isConfirmed) {
-                                      try {
-                                        const token = localStorage.getItem("bharat_token");
-
-                                        await axios.post(
-                                          `${BASE_URL}/direct-order/userRejectOffer`,
-                                          {
-                                            order_id: orderData._id,
-                                            provider_id: provider.provider_id._id,
-                                          },
-                                          {
-                                            headers: {
-                                              "Content-Type": "application/json",
-                                              Authorization: `Bearer ${token}`,
-                                            },
-                                          }
-                                        );
-
-                                        Swal.fire({
-                                          title: "Offer Rejected!",
-                                          text: "You have rejected this offer successfully.",
-                                          icon: "success",
-                                          timer: 1500,
-                                          showConfirmButton: false,
-                                        });
-
-                                        setShowChangeProvider(true);
-                                        fetchData();
-                                      } catch (error) {
-                                        Swal.fire({
-                                          title: "Error",
-                                          text:
-                                            error.response?.data?.message ||
-                                            "Failed to reject the offer.",
-                                          icon: "error",
-                                        });
-                                      }
-                                    }
-                                  }}
-                                >
-                                  {showChangeProvider || provider.isRejectedByUser
-                                    ? "Rejected by Me"
-                                    : "Change Service Provider"}
-                                </button>
-                              )}
                           </div>
                         )}
+
+                        {/* Status & Action Buttons */}
+                        <div className="flex flex-col gap-2 w-full sm:w-auto items-center">
+                          {offerStatuses[provider.provider_id._id] === "pending" ? (
+                            <span className="mt-2 text-[#FF0000] border border-[#FF0000] px-3 py-1 rounded-lg font-semibold">
+                              Cancelled
+                            </span>
+                          ) : (
+                            <>
+                              {!provider.isRejectedByUser && (
+                                <button
+                                  className={`px-4 py-2 rounded font-semibold text-white cursor-not-allowed w-full sm:w-auto min-w-[140px]
+                ${provider.status === "pending" ? "bg-yellow-500" : ""}
+                ${provider.status === "accepted" ? "bg-green-600" : ""}
+                ${provider.status === "rejected" ? "bg-orange-500" : ""}`}
+                                  disabled
+                                >
+                                  {Array.isArray(provider.status)
+                                    ? provider.status
+                                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                      .join(" ")
+                                    : provider.status
+                                      ? provider.status.charAt(0).toUpperCase() + provider.status.slice(1)
+                                      : ""}
+                                </button>
+                              )}
+
+                              {provider.isRejectedByUser && (
+                                <button
+                                  className="px-4 py-2 rounded font-semibold text-white bg-orange-500 cursor-not-allowed w-full sm:w-auto min-w-[140px]"
+                                  disabled
+                                >
+                                  Rejected by Me
+                                </button>
+                              )}
+
+                              {orderData?.hire_status === "pending" &&
+                                provider.status === "pending" && (
+                                  <button
+                                    className={`px-6 py-2 w-full sm:w-auto min-w-[200px] text-white font-semibold rounded-lg shadow transition ${showChangeProvider || provider.isRejectedByUser
+                                        ? "bg-green-600"
+                                        : "bg-[#FB3523]"
+                                      }`}
+                                    onClick={async () => {
+                                      if (provider.isRejectedByUser) {
+                                        setShowChangeProvider(true);
+                                        return;
+                                      }
+
+                                      const result = await Swal.fire({
+                                        title: "Are you sure?",
+                                        text: "Do you really want to change the service provider?",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#3085d6",
+                                        cancelButtonColor: "#d33",
+                                        confirmButtonText: "Yes, change it!",
+                                      });
+
+                                      if (result.isConfirmed) {
+                                        try {
+                                          const token = localStorage.getItem("bharat_token");
+
+                                          await axios.post(
+                                            `${BASE_URL}/direct-order/userRejectOffer`,
+                                            {
+                                              order_id: orderData._id,
+                                              provider_id: provider.provider_id._id,
+                                            },
+                                            {
+                                              headers: {
+                                                "Content-Type": "application/json",
+                                                Authorization: `Bearer ${token}`,
+                                              },
+                                            }
+                                          );
+
+                                          Swal.fire({
+                                            title: "Offer Rejected!",
+                                            text: "You have rejected this offer successfully.",
+                                            icon: "success",
+                                            timer: 1500,
+                                            showConfirmButton: false,
+                                          });
+
+                                          setShowChangeProvider(true);
+                                          fetchData();
+                                        } catch (error) {
+                                          Swal.fire({
+                                            title: "Error",
+                                            text:
+                                              error.response?.data?.message ||
+                                              "Failed to reject the offer.",
+                                            icon: "error",
+                                          });
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    {showChangeProvider || provider.isRejectedByUser
+                                      ? "Rejected by Me"
+                                      : "Change Service Provider"}
+                                  </button>
+                                )}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
