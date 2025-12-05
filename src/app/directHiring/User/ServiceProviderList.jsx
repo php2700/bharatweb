@@ -266,7 +266,7 @@ const filteredWorkers = useMemo(() => {
   }
 
   // ——————————————————————————————————
-  // SABSE PEHLE: Subscription Priority (Premium > Pro > Starter)
+  // Subscription Priority (Premium > Pro > Starter)
   // ——————————————————————————————————
   const getSubscriptionRank = (w) => {
     const planName = (
@@ -284,14 +284,13 @@ const filteredWorkers = useMemo(() => {
   list = [...list].sort((a, b) => {
     const rankA = getSubscriptionRank(a);
     const rankB = getSubscriptionRank(b);
-    if (rankA !== rankB) return rankA - rankB; // Premium sabse upar
+    if (rankA !== rankB) return rankA - rankB; // Premium top
 
     // Same subscription tier → ab rating descending
     const ratingA = Number(a.averageRating) || 0;
     const ratingB = Number(b.averageRating) || 0;
     if (ratingB !== ratingA) return ratingB - ratingA;
 
-    // Ab user ka selected sort apply karo
     switch (sortOrder) {
       case "asc":
         return a.full_name.localeCompare(b.full_name);
