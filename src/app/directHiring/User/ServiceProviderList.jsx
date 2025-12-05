@@ -219,105 +219,95 @@ export default function ServiceProviderList() {
 
 
   /** Filtered & sorted list */
-  const filteredWorkers = useMemo(() => {
-    let list = workers;
+const filteredWorkers = useMemo(() => {
+  let list = workers;
 
-    // SEARCH
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (w) =>
-          (w.full_name || "").toLowerCase().includes(q) ||
-          (w.skill || "").toLowerCase().includes(q) ||
-          (w.unique_id || "").toLowerCase().includes(q)
-      );
-    }
-
-    // SUB‑CATEGORY FILTER
-    if (selectedSubcats.length) {
-      list = list.filter((w) =>
-        w.subcategory_names?.some((s) => selectedSubcats.includes(s))
-      );
-    }
-
-    // RATING FILTER
-    if (minRating) {
-      const min = Number(minRating);
-      list = list.filter((w) => {
-        const rating = Number(w.averageRating) || 0;
-        return rating >= min;
-      });
-    }
-
-    // SUBSCRIPTION FILTER (optional)
-    if (subscriptionFilter) {
-      const filter = subscriptionFilter.toLowerCase();
-      list = list.filter((w) => {
-        const planName = (
-          (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
-        )
-          .toString()
-          .toLowerCase();
-
-        if (filter === "premium") return planName.includes("premium");
-        if (filter === "professional") return planName.includes("professional") || planName.includes("pro");
-        if (filter === "starter") return planName.includes("starter") || planName === "";
-        return true;
-      });
-    }
-
-    // ALPHABETICAL SORT
-    list = [...list].sort((a, b) =>
-      sortOrder === "asc"
-        ? a.full_name.localeCompare(b.full_name)
-        : b.full_name.localeCompare(a.full_name)
+  // 1. SEARCH
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(
+      (w) =>
+        (w.full_name || "").toLowerCase().includes(q) ||
+        (w.skill || "").toLowerCase().includes(q) ||
+        (w.unique_id || "").toLowerCase().includes(q)
     );
-    list = [...list].sort((a, b) => {
-      switch (sortOrder) {
-        case "tasks-desc":
-          return (b.totalTasks || 0) - (a.totalTasks || 0);
-        case "tasks-asc":
-          return (a.totalTasks || 0) - (b.totalTasks || 0);
-        case "desc":
-          return b.full_name.localeCompare(a.full_name);
-        case "asc":
-        default:
-          return a.full_name.localeCompare(b.full_name);
-      }
+  }
+
+  // 2. SUB-CATEGORY FILTER
+  if (selectedSubcats.length) {
+    list = list.filter((w) =>
+      w.subcategory_names?.some((s) => selectedSubcats.includes(s))
+    );
+  }
+
+  // 3. RATING FILTER
+  if (minRating) {
+    const min = Number(minRating);
+    list = list.filter((w) => {
+      const rating = Number(w.averageRating) || 0;
+      return rating >= min;
     });
+  }
 
-    // If category + subcategory are selected, prefer subscription-type + rating ordering
-    if (category_id && subcategory_ids) {
-      const rankOf = (w) => {
-        const planName = (
-          (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
-        )
-          .toString()
-          .toLowerCase();
+  // 4. SUBSCRIPTION FILTER (if applied manually)
+  if (subscriptionFilter) {
+    const filter = subscriptionFilter.toLowerCase();
+    list = list.filter((w) => {
+      const planName = (
+        (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
+      )
+        .toString()
+        .toLowerCase();
+      if (filter === "premium") return planName.includes("premium");
+      if (filter === "professional") return planName.includes("professional") || planName.includes("pro");
+      if (filter === "starter") return planName.includes("starter") || planName === "";
+      return true;
+    });
+  }
 
-        if (planName.includes("premium")) return 1;
-        if (planName.includes("professional") || planName.includes("pro")) return 2;
-        if (planName.includes("starter")) return 3;
-        return 4; // unknown / fallback
-      };
+  // ——————————————————————————————————
+  // SABSE PEHLE: Subscription Priority (Premium > Pro > Starter)
+  // ——————————————————————————————————
+  const getSubscriptionRank = (w) => {
+    const planName = (
+      (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
+    )
+      .toString()
+      .toLowerCase();
 
-      list = [...list].sort((a, b) => {
-        const rA = rankOf(a);
-        const rB = rankOf(b);
-        if (rA !== rB) return rA - rB; // lower rank value => higher precedence
+    if (planName.includes("premium")) return 1;
+    if (planName.includes("professional") || planName.includes("pro")) return 2;
+    if (planName.includes("starter") || planName === "") return 3;
+    return 4;
+  };
 
-        // Same subscription rank → sort by rating descending
-        const ra = Number(a.averageRating) || 0;
-        const rb = Number(b.averageRating) || 0;
-        if (rb !== ra) return rb - ra;
+  list = [...list].sort((a, b) => {
+    const rankA = getSubscriptionRank(a);
+    const rankB = getSubscriptionRank(b);
+    if (rankA !== rankB) return rankA - rankB; // Premium sabse upar
 
-        // fallback: keep alphabetical ordering
+    // Same subscription tier → ab rating descending
+    const ratingA = Number(a.averageRating) || 0;
+    const ratingB = Number(b.averageRating) || 0;
+    if (ratingB !== ratingA) return ratingB - ratingA;
+
+    // Ab user ka selected sort apply karo
+    switch (sortOrder) {
+      case "asc":
         return a.full_name.localeCompare(b.full_name);
-      });
+      case "desc":
+        return b.full_name.localeCompare(a.full_name);
+      case "tasks-desc":
+        return (b.totalTasks || 0) - (a.totalTasks || 0);
+      case "tasks-asc":
+        return (a.totalTasks || 0) - (b.totalTasks || 0);
+      default:
+        return a.full_name.localeCompare(b.full_name);
     }
+  });
 
-    return list;
-  }, [workers, searchQuery, selectedSubcats, sortOrder, minRating, subscriptionFilter, category_id, subcategory_ids]);
+  return list;
+}, [workers, searchQuery, selectedSubcats, sortOrder, minRating, subscriptionFilter]);
 
   const handleRouteHire = (id) =>
     navigate(`/profile-details/${id}/direct`, {
