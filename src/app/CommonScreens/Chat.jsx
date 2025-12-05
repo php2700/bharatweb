@@ -156,7 +156,6 @@
 //   }
 // }, [senderId, receiverId]); // ✅ depend on receiverId too
 
-
 //   useEffect(() => {
 //     socket.emit("addUser", senderId);
 //     socket.on("getUsers", (users) => {
@@ -524,10 +523,6 @@
 
 // export default Chat;
 
-
-
-
-
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import axios from "axios";
@@ -538,14 +533,13 @@ import { FiSend, FiPaperclip, FiImage, FiFileText, FiX } from "react-icons/fi"; 
 import { BsCheck2All } from "react-icons/bs"; // Read receipts icon
 import { UserX } from "lucide-react";
 import { useLocation } from "react-router-dom";
-  
 
 const Base_url = import.meta.env.VITE_SOCKET_URL;
 const socket = io(`${Base_url}`);
 
 const Chat = () => {
   const senderId = localStorage.getItem("user_id");
-  const user_id=localStorage.getItem('user_id');
+  const user_id = localStorage.getItem("user_id");
   const receiverId = localStorage.getItem("receiverId");
   const [conversations, setConversations] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
@@ -558,7 +552,7 @@ const Chat = () => {
   const [isChatInitialized, setIsChatInitialized] = useState(false);
   const scrollRef = useRef();
   const location = useLocation();
-let { conversationId } = location.state || {};
+  let { conversationId } = location.state || {};
   const fileInputRef = useRef(null);
 
   // --- Logic Same as before ---
@@ -604,7 +598,7 @@ let { conversationId } = location.state || {};
             },
           }
         );
-         
+
         let conversationsWithUnread = res.data.conversations.map((conv) => ({
           ...conv,
           unreadCount: 0,
@@ -664,15 +658,12 @@ let { conversationId } = location.state || {};
           localStorage.removeItem("receiverId");
         } else {
           const lastSelectedConvId = localStorage.getItem("lastSelectedConvId");
-          
 
-         
-          if(lastSelectedConvId){
+          if (lastSelectedConvId) {
             selectedChat = conversationsWithUnread.find(
               (conv) => conv._id === lastSelectedConvId
             );
           }
-          
         }
 
         setCurrentChat(selectedChat);
@@ -869,7 +860,7 @@ let { conversationId } = location.state || {};
       filePreviews.forEach((preview) => URL.revokeObjectURL(preview));
     };
   }, [filePreviews]);
-// console.log('thisis',conversations);
+  // console.log('thisis',conversations);
   // --- Render Helpers ---
   const renderFileMessage = (fileUrl) => {
     const isPdf = fileUrl.toLowerCase().endsWith(".pdf");
@@ -911,44 +902,50 @@ let { conversationId } = location.state || {};
     <>
       <Header />
       {/* Main Container - Fixed Height Calculation */}
-      <div className="flex bg-gray-100 mt-[80px]" style={{ height: "calc(100vh - 80px)" }}>
-        
+      <div
+        className="flex bg-gray-100 mt-[80px]"
+        style={{ height: "calc(100vh - 80px)" }}
+      >
         {/* Sidebar */}
         <div className="w-80 md:w-96 bg-white border-r border-gray-200 flex flex-col h-full z-10">
           <div className="p-4 border-b border-gray-100 bg-white">
             <h2 className="text-xl font-bold text-gray-800">Messages</h2>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {conversations.length === 0 && (
-              
               <p className="flex items-center gap-2 text-left text-gray-400 mt-4 ml-4">
-  <UserX className="w-5 h-5 text-gray-400" />
-  No user found
-</p>
-
+                <UserX className="w-5 h-5 text-gray-400" />
+                No user found
+              </p>
             )}
-            
+
             {conversations.map((conv) => {
               const otherUser = conv.members.find((m) => m._id !== senderId);
               const isActive = conv._id === currentChat?._id;
-              
+
               return (
                 <div
                   key={conv._id}
                   onClick={() => setCurrentChat(conv)}
                   className={`relative flex items-center p-4 cursor-pointer transition-all duration-200 border-b border-gray-50
-                    ${isActive ? "bg-blue-50 border-l-4 border-l-[#228B22]" : "hover:bg-gray-50 border-l-4 border-l-transparent"}`}
+                    ${
+                      isActive
+                        ? "bg-blue-50 border-l-4 border-l-[#228B22]"
+                        : "hover:bg-gray-50 border-l-4 border-l-transparent"
+                    }`}
                 >
                   <div className="relative">
-                     <img
+                    <img
                       src={otherUser?.profile_pic || defaultPic}
                       alt="User"
                       className="w-12 h-12 rounded-full object-cover border border-gray-200"
                     />
                     {/* Online Status Dot (Optional) */}
-                    {onlineUsers.some(user => user.userId === otherUser?._id) && (
-                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                    {onlineUsers.some(
+                      (user) => user.userId === otherUser?._id
+                    ) && (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                     )}
                   </div>
 
@@ -957,15 +954,28 @@ let { conversationId } = location.state || {};
                       {/* <h3 className={`text-sm font-semibold truncate ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
                         {otherUser?.full_name || "User"}
                       </h3> */}
-                      <h3 className={`text-sm font-semibold truncate capitalize ${isActive ? "text-[#228B22]" : "text-gray-900"}`}>
-  {otherUser?.full_name || "User"}
-</h3>
+                      <h3
+                        className={`text-sm font-semibold truncate capitalize ${
+                          isActive ? "text-[#228B22]" : "text-gray-900"
+                        }`}
+                      >
+                        {otherUser?.full_name || "User"}
+                      </h3>
                       {/* Placeholder for time - add timestamps to data if available */}
                       {/* <span className="text-xs text-gray-400">Now</span>  */}
                     </div>
                     <div className="flex justify-between items-center mt-1">
-                      <p className={`text-sm truncate w-4/5 ${conv.unreadCount > 0 ? "font-semibold text-gray-800" : "text-gray-500"}`}>
-                        {conv.lastMessage || (conv.members.length > 0 ? "Start a conversation" : "...")}
+                      <p
+                        className={`text-sm truncate w-4/5 ${
+                          conv.unreadCount > 0
+                            ? "font-semibold text-gray-800"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {conv.lastMessage ||
+                          (conv.members.length > 0
+                            ? "Start a conversation"
+                            : "...")}
                       </p>
                       {conv.unreadCount > 0 && (
                         <span className="flex items-center justify-center w-5 h-5 bg-[#228B22] text-white text-xs font-bold rounded-full">
@@ -989,27 +999,34 @@ let { conversationId } = location.state || {};
                 <div className="flex items-center gap-3">
                   <img
                     src={
-                      currentChat.members.find((m) => m._id !== senderId)?.profile_pic || defaultPic
+                      currentChat.members.find((m) => m._id !== senderId)
+                        ?.profile_pic || defaultPic
                     }
                     className="w-10 h-10 rounded-full object-cover"
                     alt="Current User"
                   />
                   <div>
                     <h3 className="font-bold text-gray-800">
-                      {(currentChat.members.find((m) => m._id !== senderId)?.full_name || "Chat")
-  .replace(/^\w/, (c) => c.toUpperCase())}
-
+                      {(
+                        currentChat.members.find((m) => m._id !== senderId)
+                          ?.full_name || "Chat"
+                      ).replace(/^\w/, (c) => c.toUpperCase())}
                     </h3>
-                     {/* Check online status */}
+                    {/* Check online status */}
                     {/* <p className="text-xs text-[#228B22] font-medium">
                        {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? "Online" : "Offline"}
                     </p> */}
-                       <p className="text-xs font-medium">
-                       {onlineUsers.some(u => u.userId === currentChat.members.find((m) => m._id !== senderId)?._id) ? (
-                         <span className="text-[#228B22]">Online</span>
-                       ) : (
-                         <span className="text-gray-500"></span>
-                       )}
+                    <p className="text-xs font-medium">
+                      {onlineUsers.some(
+                        (u) =>
+                          u.userId ===
+                          currentChat.members.find((m) => m._id !== senderId)
+                            ?._id
+                      ) ? (
+                        <span className="text-[#228B22]">Online</span>
+                      ) : (
+                        <span className="text-gray-500"></span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -1028,36 +1045,64 @@ let { conversationId } = location.state || {};
                       <div
                         key={msg._id || index}
                         ref={index === messages.length - 1 ? scrollRef : null}
-                        className={`flex w-full ${isMe ? "justify-end" : "justify-start"}`}
+                        className={`flex w-full ${
+                          isMe ? "justify-end" : "justify-start"
+                        }`}
                       >
                         <div
                           className={`relative max-w-[70%] lg:max-w-[50%] p-3 shadow-sm rounded-2xl
-                            ${isMe 
-                              ? "bg-[#228B22] text-white rounded-tr-none" 
-                              : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
+                            ${
+                              isMe
+                                ? "bg-[#228B22] text-white rounded-tr-none"
+                                : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
                             }`}
                         >
                           {/* Image/File Rendering */}
-                          {msg.messageType === "image" && msg.image?.length > 0 && (
-                            <div className={`grid gap-2 mb-2 ${msg.image.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-                              {msg.image.map((fileUrl, idx) => (
-                                <div key={idx} className="overflow-hidden rounded-lg">
-                                  {renderFileMessage(fileUrl)}
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          {msg.messageType === "image" &&
+                            msg.image?.length > 0 && (
+                              <div
+                                className={`grid gap-2 mb-2 ${
+                                  msg.image.length > 1
+                                    ? "grid-cols-2"
+                                    : "grid-cols-1"
+                                }`}
+                              >
+                                {msg.image.map((fileUrl, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="overflow-hidden rounded-lg"
+                                  >
+                                    {renderFileMessage(fileUrl)}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
 
                           {/* Text Message */}
                           {msg.message && (
-                             <p className={`text-sm leading-relaxed ${isMe ? "text-white" : "text-gray-800"}`}>
-                                {msg.message}
-                             </p>
+                            <p
+                              className={`text-sm leading-relaxed ${
+                                isMe ? "text-white" : "text-gray-800"
+                              }`}
+                            >
+                              {msg.message}
+                            </p>
                           )}
 
                           {/* Time & Status (Mock) */}
-                          <div className={`text-[10px] mt-1 flex items-center justify-end gap-1 ${isMe ? "text-green-100" : "text-gray-400"}`}>
-                            <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                          <div
+                            className={`text-[10px] mt-1 flex items-center justify-end gap-1 ${
+                              isMe ? "text-green-100" : "text-gray-400"
+                            }`}
+                          >
+                            <span>
+                              {new Date(
+                                msg.createdAt || Date.now()
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
                             {isMe && <BsCheck2All size={14} />}
                           </div>
                         </div>
@@ -1074,27 +1119,48 @@ let { conversationId } = location.state || {};
                 {(filePreviews.length > 0 || files.length > 0) && (
                   <div className="flex gap-3 mb-3 overflow-x-auto pb-2">
                     {filePreviews.map((src, i) => (
-                      <div key={i} className="relative w-16 h-16 flex-shrink-0 group">
-                        <img src={src} className="w-full h-full object-cover rounded-md border" alt="Preview" />
-                         <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
-                            <FiX size={10} />
-                         </button>
+                      <div
+                        key={i}
+                        className="relative w-16 h-16 flex-shrink-0 group"
+                      >
+                        <img
+                          src={src}
+                          className="w-full h-full object-cover rounded-md border"
+                          alt="Preview"
+                        />
+                        <button
+                          onClick={() => removeFile(i)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
+                        >
+                          <FiX size={10} />
+                        </button>
                       </div>
                     ))}
                     {/* Non-image files */}
-                    {files.filter(f => !f.type.startsWith('image/')).map((f, i) => (
-                         <div key={i} className="relative w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center bg-gray-100 rounded-md border">
-                            <FiFileText className="text-gray-500" />
-                            <span className="text-[8px] text-gray-500 truncate w-full text-center px-1">{f.name}</span>
-                            <button onClick={() => removeFile(i)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
-                                <FiX size={10} />
-                            </button>
-                         </div>
-                    ))}
+                    {files
+                      .filter((f) => !f.type.startsWith("image/"))
+                      .map((f, i) => (
+                        <div
+                          key={i}
+                          className="relative w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center bg-gray-100 rounded-md border"
+                        >
+                          <FiFileText className="text-gray-500" />
+                          <span className="text-[8px] text-gray-500 truncate w-full text-center px-1">
+                            {f.name}
+                          </span>
+                          <button
+                            onClick={() => removeFile(i)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
+                          >
+                            <FiX size={10} />
+                          </button>
+                        </div>
+                      ))}
                   </div>
                 )}
 
                 <div className="flex items-center gap-2">
+                  {/*
                   <div className="flex items-center gap-1 text-gray-400">
                     <label className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition">
                       <input
@@ -1105,7 +1171,7 @@ let { conversationId } = location.state || {};
                         className="hidden"
                         disabled={isLoading || !isChatInitialized}
                       />
-                      {/* <FiImage size={20} /> */}
+                       <FiImage size={20} /> 
                     </label>
                     <label className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition">
                       <input
@@ -1117,16 +1183,21 @@ let { conversationId } = location.state || {};
                         className="hidden"
                         disabled={isLoading || !isChatInitialized}
                       />
-                      {/* <FiPaperclip size={20} /> */}
+                       <FiPaperclip size={20} /> 
                     </label>
                   </div>
-
+                  */}
                   <input
                     type="text"
                     placeholder="Type a message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => !isLoading && isChatInitialized && e.key === "Enter" && sendMessage()}
+                    onKeyPress={(e) =>
+                      !isLoading &&
+                      isChatInitialized &&
+                      e.key === "Enter" &&
+                      sendMessage()
+                    }
                     className="flex-1 bg-gray-100 text-gray-800 rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-[#228B22] focus:bg-white transition-all text-sm"
                     disabled={isLoading || !isChatInitialized}
                   />
@@ -1135,10 +1206,17 @@ let { conversationId } = location.state || {};
                     onClick={sendMessage}
                     disabled={!message.trim() && files.length === 0}
                     className={`p-3 rounded-full shadow-lg transition-transform transform active:scale-95 flex items-center justify-center
-                      ${(!message.trim() && files.length === 0) ? "bg-gray-300 cursor-not-allowed" : "bg-[#228B22] hover:bg-green-700 text-white"}
+                      ${
+                        !message.trim() && files.length === 0
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-[#228B22] hover:bg-green-700 text-white"
+                      }
                     `}
                   >
-                    <FiSend size={20} className={message.trim() ? "ml-1" : ""} />
+                    <FiSend
+                      size={20}
+                      className={message.trim() ? "ml-1" : ""}
+                    />
                   </button>
                 </div>
               </div>
@@ -1147,9 +1225,11 @@ let { conversationId } = location.state || {};
             /* Empty State */
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
               <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                 <FiSend size={40} className="text-gray-400 ml-2" />
+                <FiSend size={40} className="text-gray-400 ml-2" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-600">Your Messages</h3>
+              <h3 className="text-lg font-semibold text-gray-600">
+                Your Messages
+              </h3>
               <p className="text-sm">Select a chat to start conversation</p>
             </div>
           )}
