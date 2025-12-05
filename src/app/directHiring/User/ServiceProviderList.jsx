@@ -707,29 +707,28 @@ export default function ServiceProviderList() {
 
                         {/* Address */}
                         <div className="sm:col-span-8 flex items-start gap-2 text-gray-600 text-sm min-w-0">
-                          <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
+  <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
 
-                          <div className="min-w-0">
-                            <span
-                              className={`inline-block text-sm ${worker.isAddressExpanded
-                                ? "break-words"
-                                : "whitespace-nowrap overflow-hidden text-ellipsis"
-                                }`}
-                              title={fullAddress}
-                            >
-                              {displayedAddress}
-                            </span>
+  <div className="min-w-0 flex-1"> {/* ye flex-1 + min-w-0 magic hai */}
+    <div
+      className={`inline-block text-sm break-words hyphens-auto ${
+        !worker.isAddressExpanded ? "line-clamp-1" : ""
+      }`}
+      title={fullAddress}
+    >
+      {displayedAddress}
+    </div>
 
-                            {addressLong && (
-                              <button
-                                onClick={() => toggleField(worker._id, "isAddressExpanded")}
-                                className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
-                              >
-                                {worker.isAddressExpanded ? "See Less" : "See More"}
-                              </button>
-                            )}
-                          </div>
-                        </div>
+    {addressLong && (
+      <button
+        onClick={() => toggleField(worker._id, "isAddressExpanded")}
+        className="ml-1 text-xs font-medium text-green-600 hover:underline focus:outline-none"
+      >
+        {worker.isAddressExpanded ? "See Less" : "See More"}
+      </button>
+    )}
+  </div>
+</div>
                       </div>
                       {/* Buttons */}
                       <div className="sm:col-span-4 flex flex-wrap sm:flex-nowrap gap-2 justify-start sm:justify-end">
