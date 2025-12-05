@@ -4,6 +4,7 @@ import Footer from "../../../component/footer";
 // import Profile from "../../../assets/default-image.jpg";
 import locationIcon from "../../../assets/directHiring/location-icon.png";
 import ratingImgages from "../../../assets/directHiring/rating.png";
+import backArrow from "../../../assets/profile/arrow_back.svg"; // <-- added
 import aadharImg from "../../../assets/Details/profile-line.svg";
 import defaultPic from "../../../assets/default-image.jpg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -481,6 +482,7 @@ export default function HireDetail() {
                 localStorage.setItem(docUnlockKey, "true");
               }
             } else {
+              console.log("Verify Response:", verifyResult);
               toast.error(verifyResult.message || "Payment verification failed ❌");
             }
           } catch (err) {
@@ -581,6 +583,7 @@ export default function HireDetail() {
               unlockDocuments();
               // Optionally refresh UI or update state
             } else {
+              console.log("Verify Response:", verifyResult);
               toast.error(
                 verifyResult.message || "Payment verification failed ❌"
               );
@@ -611,8 +614,17 @@ export default function HireDetail() {
   return (
     <>
       <Header />
-
+<div className="container mx-auto  px-4 py-4 fixed top-20 left-8 z-50">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
+        >
+          <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
+          Back
+        </button>
+      </div>
       <ToastContainer position="top-right" autoClose={3000} />
+      
       <div className="min-h-screen bg-gray-50 mt-35">
         {/* Banner */}
         {/* Top Banner Slider */}
