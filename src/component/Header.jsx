@@ -86,23 +86,21 @@ export default function Header() {
   const postTaskRef = useRef(null);
   console.log(profile);
 
-useEffect(() => {
-  socket.on("increment-notification-count", (data) => {
-    const user_id = localStorage.getItem("user_id");
+  useEffect(() => {
+    socket.on("increment-notification-count", (data) => {
+      const user_id = localStorage.getItem("user_id");
 
-    // Check if this notification belongs to the logged-in user
-    if (user_id && data.userId == user_id) {
-      setNotificationCount(prev => prev + (data.increment || 1));
-      console.log("🔔 Notification count updated for THIS user!");
-    } else {
-      console.log("❌ Notification ignored (not for this user)");
-    }
-  });
+      // Check if this notification belongs to the logged-in user
+      if (user_id && data.userId == user_id) {
+        setNotificationCount((prev) => prev + (data.increment || 1));
+        console.log("🔔 Notification count updated for THIS user!");
+      } else {
+        console.log("❌ Notification ignored (not for this user)");
+      }
+    });
 
-  return () => socket.off("increment-notification-count");
-}, []);
-
-
+    return () => socket.off("increment-notification-count");
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -455,93 +453,89 @@ useEffect(() => {
       }
     }
   }, [dispatch, isLoggedIn, profile, loading, error]);
-  
-
 
   useEffect(() => {
-  const fetchNotifications = async () => {
-    try {
-      setIsNotifLoading(true);
-      const token = localStorage.getItem("bharat_token");
+    const fetchNotifications = async () => {
+      try {
+        setIsNotifLoading(true);
+        const token = localStorage.getItem("bharat_token");
 
-      if (!token) {
-        setNotifError("User not logged in");
-        toast.error("Please log in to view notifications");
-        return;
-      }
-
-      if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
-        handleUnauthorized();
-        return;
-      }
-
-      const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        const combinedNotifications = [
-          ...reduxNotifications,
-          ...(data.notifications || []),
-        ];
-
-        const currentUrl = window.location.pathname;
-
-        if (currentUrl === "/chats") {
-          setNotifications(
-            combinedNotifications.filter(
-              (n) => n.userType !== "chat" && n.isRead === true
-            )
-          );
-        } else {
-          setNotifications(combinedNotifications);
+        if (!token) {
+          setNotifError("User not logged in");
+          toast.error("Please log in to view notifications");
+          return;
         }
 
-        // 🔥 API unread count SET ONLY ON FETCH
-        const unreadCount = combinedNotifications.filter(
-          (notif) => !notif.isRead
-        ).length;
-
-        setNotificationCount(unreadCount);
-
-      } else {
-        if (res.status === 401) {
+        if (!token.match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
           handleUnauthorized();
           return;
         }
 
-        if (
-          data?.status === false &&
-          data?.message === "Admin has disabled your account."
-        ) {
-          localStorage.removeItem("bharat_token");
-          localStorage.removeItem("isProfileComplete");
-          localStorage.removeItem("otp");
-          localStorage.removeItem("role");
-          toast.error("Admin has disabled your account.");
-          return;
+        const res = await fetch(`${BASE_URL}/user/getAllNotification`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          const combinedNotifications = [
+            ...reduxNotifications,
+            ...(data.notifications || []),
+          ];
+
+          const currentUrl = window.location.pathname;
+
+          if (currentUrl === "/chats") {
+            setNotifications(
+              combinedNotifications.filter(
+                (n) => n.userType !== "chat" && n.isRead === true
+              )
+            );
+          } else {
+            setNotifications(combinedNotifications);
+          }
+
+          // 🔥 API unread count SET ONLY ON FETCH
+          const unreadCount = combinedNotifications.filter(
+            (notif) => !notif.isRead
+          ).length;
+
+          setNotificationCount(unreadCount);
+        } else {
+          if (res.status === 401) {
+            handleUnauthorized();
+            return;
+          }
+
+          if (
+            data?.status === false &&
+            data?.message === "Admin has disabled your account."
+          ) {
+            localStorage.removeItem("bharat_token");
+            localStorage.removeItem("isProfileComplete");
+            localStorage.removeItem("otp");
+            localStorage.removeItem("role");
+            toast.error("Admin has disabled your account.");
+            return;
+          }
+
+          setNotifError(data.message || "Failed to fetch notifications");
+          toast.error(data.message || "Failed to fetch notifications");
         }
-
-        setNotifError(data.message || "Failed to fetch notifications");
-        toast.error(data.message || "Failed to fetch notifications");
+      } catch (err) {
+        setNotifError("Something went wrong while fetching notifications");
+      } finally {
+        setIsNotifLoading(false);
       }
-    } catch (err) {
-      setNotifError("Something went wrong while fetching notifications");
-    } finally {
-      setIsNotifLoading(false);
+    };
+
+    if (isLoggedIn) {
+      fetchNotifications();
+    } else {
+      setNotifications(reduxNotifications);
+      setNotificationCount(reduxNotifications.length);
     }
-  };
-
-  if (isLoggedIn) {
-    fetchNotifications();
-  } else {
-    setNotifications(reduxNotifications);
-    setNotificationCount(reduxNotifications.length);
-  }
-}, [isLoggedIn, reduxNotifications, refreshNotifications]);
-
+  }, [isLoggedIn, reduxNotifications, refreshNotifications]);
 
   const handleNotificationClick = async () => {
     const nextState = !isNotifOpen;
@@ -1449,7 +1443,9 @@ useEffect(() => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="lg:hidden bg-white shadow-lg fixed top-[60px] left-0 w-full z-40">
-          <div className="px-4 py-4 space-y-3 text-[#969696] font-medium flex flex-col items-center text-center">
+          <div 
+          
+           className="px-4 py-4 space-y-3 text-[#969696] font-medium flex flex-col items-center text-center">
             <Link
               to={homeLink}
               className="hover:text-black"
@@ -1659,79 +1655,98 @@ useEffect(() => {
                     </Link>
                   )}
                   {isOpen && fullName && (
-                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
-                      <Link
-                        to="/account"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
+                    <div
+                      className="fixed inset-0 z-50"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <div
+                        className="absolute right-4 top-20 sm:right-8 sm:top-20 text-center 
+                 min-w-[180px] w-fit max-w-[260px] bg-white rounded-2xl shadow-2xl border border-gray-100
+                 overflow-y-auto
+                 animate-in fade-in zoom-in-95 duration-200"
                       >
-                        <img src={Account} alt="Account" className="w-5 h-5" />{" "}
-                        Account
-                      </Link>
-                      <Link
-                        to="/details"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <img src={Profile} alt="Profile" className="w-5 h-5" />{" "}
-                        Profile
-                      </Link>
-                      <Link
-                        to="/user/work-list/My Hire"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaUserTie className="w-5 h-5" /> My Hire
-                      </Link>
-                      <Link
-                        to="/worker/work-list/My Hire"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaBriefcase className="w-5 h-5" /> My Work
-                      </Link>
+                        <Link
+                          to="/account"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                          
+                        >
+                          <img
+                            src={Account}
+                            alt="Account"
+                            className="w-5 h-5"
+                          />{" "}
+                          Account
+                        </Link>
+                        <Link
+                          to="/details"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <img
+                            src={Profile}
+                            alt="Profile"
+                            className="w-5 h-5"
+                          />{" "}
+                          Profile
+                        </Link>
+                        <Link
+                          to="/user/work-list/My Hire"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <FaUserTie className="w-5 h-5" /> My Hire
+                        </Link>
+                        <Link
+                          to="/worker/work-list/My Hire"
+                          className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <FaBriefcase className="w-5 h-5" /> My Work
+                        </Link>
 
-                      {(role === "service_provider" || role === "both") && (
+                        {(role === "service_provider" || role === "both") && (
+                          <Link
+                            to="/worker/rejected-work"
+                            className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            <AiFillCloseCircle className="w-5 h-5" />
+                            Rejected Task
+                          </Link>
+                        )}
+                        {(role === "service_provider" || role === "both") && (
+                          <Link
+                            to="/worker/emergency/rejected-work"
+                            className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            <AiFillCloseCircle className="w-5 h-5" /> Emergency
+                            Work
+                          </Link>
+                        )}
                         <Link
-                          to="/worker/rejected-work"
+                          to="/disputes"
                           className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
                           onClick={() => setIsOpen(false)}
                         >
-                          <AiFillCloseCircle className="w-5 h-5" />
-                          Rejected Task
+                          <FaGavel className="w-5 h-5" /> Disputes
                         </Link>
-                      )}
-                      {(role === "service_provider" || role === "both") && (
                         <Link
-                          to="/worker/emergency/rejected-work"
+                          to="/promotion"
                           className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
                           onClick={() => setIsOpen(false)}
                         >
-                          <AiFillCloseCircle className="w-5 h-5" /> Emergency
-                          Work
+                          <FaTrophy className="w-5 h-5" /> Promotion
                         </Link>
-                      )}
-                      <Link
-                        to="/disputes"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaGavel className="w-5 h-5" /> Disputes
-                      </Link>
-                      <Link
-                        to="/promotion"
-                        className="flex items-center gap-2 px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FaTrophy className="w-5 h-5" /> Promotion
-                      </Link>
-                      <button
-                        onClick={logoutdestroy}
-                        className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
-                      >
-                        <img src={Logout} alt="Logout" className="w-5 h-5" />{" "}
-                        Logout
-                      </button>
+                        <button
+                          onClick={logoutdestroy}
+                          className="flex items-center gap-2 w-full text-left px-4 py-2 text-black font-semibold hover:bg-gray-100"
+                        >
+                          <img src={Logout} alt="Logout" className="w-5 h-5" />{" "}
+                          Logout
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

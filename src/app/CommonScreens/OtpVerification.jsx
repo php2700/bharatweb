@@ -1,10 +1,9 @@
-import React, { useState,useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "../../component/Header";
 import Footer from "../../component/footer";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,12 +13,11 @@ import logo from "../../assets/logo.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function OtpVerification() {
-  
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
-   const [bannerImages, setBannerImages] = useState([]);
+  const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(false);
   const [bannerError, setBannerError] = useState(null);
 
@@ -38,7 +36,7 @@ export default function OtpVerification() {
         headers: headers,
       });
       const data = await res.json();
-      
+
       if (res.ok && Array.isArray(data.images)) {
         setBannerImages(data.images);
       } else {
@@ -95,22 +93,22 @@ export default function OtpVerification() {
         toast.success("OTP verified successfully!");
 
         localStorage.removeItem("mobileNumber");
-        
+
         // setTimeout(() => {
         //   navigate("/select-role");
         // }, 2000);
 
-				setTimeout(() => {
-    if (data.role === "both") {
-      navigate("/homeservice");
-    } else if (data.role === "service_provider") {
-      navigate("/homeservice");
-    } else if (data.role === "user") {
-      navigate("/homeuser");
-    } else {
-      navigate("/select-role"); // fallback
-    }
-  }, 2000);
+        setTimeout(() => {
+          if (data.role === "both") {
+            navigate("/homeservice");
+          } else if (data.role === "service_provider") {
+            navigate("/homeservice");
+          } else if (data.role === "user") {
+            navigate("/homeuser");
+          } else {
+            navigate("/select-role"); // fallback
+          }
+        }, 2000);
       } else {
         toast.error(data.message || "OTP verification failed");
       }
@@ -149,20 +147,25 @@ export default function OtpVerification() {
     <>
       <Header />
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen flex items-center justify-center bg-white mt-[50px]">
+     <div className="pt-4 flex items-center justify-center bg-white mt-[50px] md:min-h-screen">
         <div className="flex flex-col md:flex-row w-full max-w-[100rem] overflow-hidden">
           {/* Left Image */}
-          <div className="md:block md:w-1/2">
+          <div className="w-full md:w-1/2 md:flex md:justify-center">
             <img
               src={image}
               alt="Plumber working"
-              className="w-full h-full object-contain [border-top-right-radius:100px] [border-bottom-right-radius:100px]"
+              className="w-full h-full  object-cover object-center 
+                     md:object-contain 
+         [border-top-right-radius:80px] 
+         sm:[border-top-right-radius:100px]
+         [border-bottom-right-radius:80px] 
+                   sm:[border-bottom-right-radius:100px]"
             />
           </div>
 
           {/* Right Section */}
           <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-16">
-            {/* ✅ Wrapped everything in a form */}
+        
             <form
               onSubmit={handleSubmit}
               className="flex flex-col items-center space-y-6"
@@ -173,7 +176,7 @@ export default function OtpVerification() {
                 className="w-[200px] md:w-[286px] h-auto object-contain "
               />
               <h1 className="text-[#ff2108] text-[20px]">Otp is : {otpv}</h1>
-              <h2 className="text-2xl font-bold text-gray-900 relative top-[18px]">
+              <h2 className="text-2xl font-bold text-gray-900 relative top-[10px]">
                 Verify OTP
               </h2>
               <p className="text-[#334247] font-sans text-[17px]">
@@ -253,7 +256,7 @@ export default function OtpVerification() {
         />
         
       </div> */}
-         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5 shadow-lg">
+      {/* <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5 shadow-lg">
         {bannerLoading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-gray-500 text-lg">Loading banners...</p>
@@ -279,6 +282,31 @@ export default function OtpVerification() {
              <p className="text-gray-500">No banners available</p>
           </div>
         )}
+      </div> */}
+      <div
+        className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
+                        h-[220px] sm:h-[400px]"
+      >
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div key={index} className="w-full h-[220px] sm:h-[400px]">
+                <img
+                  src={banner}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">No banners available</p>
+            </div>
+          )}
+        </Slider>
       </div>
 
       <div className="mt-[50px]">

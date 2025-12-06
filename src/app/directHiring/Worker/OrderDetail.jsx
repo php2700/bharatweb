@@ -443,7 +443,7 @@ export default function ViewProfile() {
                 // 🔥 FIX
               >
                 {images.map((url, index) => (
-                  <div key={index} className="h-[360px] cursor-pointer">
+                  <div key={index} className="w-full h-[200px] sm:h-[300px] md:h-[360px]">
                     <div key={index} className="h-[360px]">
                       <img
                         src={url}
@@ -463,7 +463,7 @@ export default function ViewProfile() {
               <img
                 src={defaultWorkImage}
                 alt="No project images available"
-                className="w-full h-[360px] object-cover mt-5"
+                cl className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover"
               />
             </div>
           )}

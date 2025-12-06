@@ -635,7 +635,7 @@ export default function Home() {
                         </span>
                       </h3>
                     </div>
-                  </div>      
+                  </div>
                 </motion.div>
               ))}
             </motion.div>
@@ -1036,9 +1036,9 @@ export default function Home() {
       </div>
 
       {/* Footer Image Section */}
-      {/* Mobile Layout (Image top, Green box below) */}
-      <div className="flex flex-col items-center justify-center mt-8 md:hidden w-full">
-        {/* Image */}
+      {/* Mobile Layout (Image top, Green box below)  */}
+      <div className="relative w-full flex justify-center items-center mt-8 md:hidden">
+  
         <motion.img
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -1046,21 +1046,27 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           src={footer}
           alt="Service Illustration"
-          className="w-full max-w-[95%] h-auto 
-      max-h-[260px] object-cover rounded-lg shadow-lg"
+          className="w-full max-w-[95%] sm:max-w-[90%] lg:max-w-4xl 
+               h-[280px] sm:h-[360px] md:h-[420px] lg:h-[480px]   
+               object-cover rounded-xl shadow-2xl"
         />
-
-        {/* Green Box (Below) */}
+  
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="bg-[#228B22] w-[90%] mt-4 rounded-lg flex flex-col 
-        items-center justify-center py-6 px-3"
+          className="absolute inset-x-4 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+             w-[85%] sm:w-[75%] md:w-[65%] lg:w-[55%] max-w-lg
+               bg-[#228B22] 
+               rounded-lg shadow-2xl
+               flex flex-col items-center justify-center
+               py-6 sm:py-7 md:py-8
+               md:px-8 px-6 text-center"
         >
-          <p className="text-white text-xl font-bold text-center px-2">
-            Click here to post your project <br /> and get started!
+          <p className="text-white font-bold text-xl leading-tight">
+            Click here to post your project <br />
+            and get started!
           </p>
 
           <motion.button
@@ -1069,14 +1075,14 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
             onClick={handlePostWorkClick}
-            className="mt-4 bg-white text-[#228B22] font-semibold 
-        px-6 py-2 rounded-sm shadow hover:bg-gray-100 cursor-pointer"
+            className="mt-5 bg-white text-[#228B22] font-semibold 
+                 px-8 py-3 rounded-sm shadow-lg 
+                 hover:bg-gray-100 transition"
           >
             Post Work
           </motion.button>
         </motion.div>
       </div>
-
       {/* Desktop / Tablet Layout (Same as your original) */}
       <div className="relative w-full justify-center items-center mt-8 md:mt-12 hidden md:flex">
         <motion.img
@@ -1101,7 +1107,7 @@ export default function Home() {
         rounded-lg flex flex-col items-center justify-center
         px-2 sm:px-4"
         >
-          <p className="text-white text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center px-2 sm:px-4">
+          <p className="text-white text-base sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center px-6 sm:px-6 lg:px-8">
             Click here to post your project and get <br /> started!
           </p>
 

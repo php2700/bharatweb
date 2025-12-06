@@ -247,26 +247,37 @@ export default function RejectedWorklist() {
       </div>
 
       {/* Banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden h-[350px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="text-center mt-36">Loading banners...</p>
-        ) : (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((b, i) => (
-              <div key={i}>
-                <img
-                  src={b}
-                  className="w-full h-[350px] object-cover"
-                  onError={(e) => (e.currentTarget.src = Work)}
-                />
-              </div>
-            ))}
-          </Slider>
-        )}
-      </div>
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+              <Slider {...sliderSettings}>
+                {bannerImages.length > 0 ? (
+                  bannerImages.map((banner, index) => (
+                    <div
+                      key={index}
+                      className="w-full h-[220px] sm:h-[400px] relative"
+                    >
+                      {/* Yeh image class perfect fit karegi har device pe */}
+                      <img
+                        src={banner}
+                        alt={`Banner ${index + 1}`}
+                        className="w-full h-full object-fill object-center"
+                        onError={(e) => {
+                          e.target.src = "/src/assets/Home-SP/default.png";
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                    <p className="text-gray-600 font-medium">
+                      No banners available
+                    </p>
+                  </div>
+                )}
+              </Slider>
+            </div>
 
       {/* Title */}
-      <h1 className="text-xl sm:text-2xl text-center mt-10 font-bold">
+      <h1 className="text-xl sm:text-2xl text-center mt-5 font-bold">
         Emergency Work
       </h1>
 

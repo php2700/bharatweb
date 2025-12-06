@@ -369,7 +369,7 @@ export default function Bid() {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="container mx-auto  pt-20 px-4 py-4">
         <button
-          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold"
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
           onClick={() => window.history.back()}
         >
           <img src={backArrow} className="w-6 h-6 mr-2" alt="Back" />
@@ -378,8 +378,8 @@ export default function Bid() {
       </div>
 
       <div className="min-h-screen p-4">
-        <div className="container max-w-5xl mx-auto  my-2 p-2 shadow-lg rounded-3xl">
-          <h1 className="text-2xl text-center font-bold mb-4">Work Detail</h1>
+        <div className="container max-w-5xl mx-auto p-4 shadow-lg rounded-3xl">
+          <h1 className="text-xl md:text-2xl text-center font-bold mb-4">Work Detail</h1>
 
           {/* Work Image with Click Zoom */}
           {worker?.image?.length > 0 ? (
@@ -388,7 +388,7 @@ export default function Bid() {
               showThumbs={false}
               infiniteLoop={true}
               autoPlay={true}
-              className="w-full h-[360px]"
+              className="w-full h-[200px] sm:h-[300px] md:h-[360px]"
               emulateTouch={true}
               onClickItem={(index) => setOpenImage(worker.image[index])}
             >
@@ -397,7 +397,7 @@ export default function Bid() {
                   <img
                     src={url}
                     alt={`Project image ${index + 1}`}
-                    className="w-full h-[360px] object-cover"
+                    className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover"
                   />
                 </div>
               ))}
@@ -410,7 +410,7 @@ export default function Bid() {
               <img
                 src={hisWorkImg}
                 alt="No project images available"
-                className="w-full h-[360px] object-cover mt-5"
+                className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover mt-2"
               />
             </div>
           )}
@@ -443,27 +443,29 @@ export default function Bid() {
                       )}
                     </div>
                   </div>
-                  <p className="font-semibold text-lg my-2 text-[#008000]">
+                  <p className="font-semibold  text-base md:text-lg my-2 text-[#008000]">
                     Cost :- ₹{worker.amount}/-
                   </p>
                   <p className="text-sm">
-                   <span className="font-semibold">
-  Completion Date: {new Date(worker.completionDate).toLocaleDateString("en-GB")}
-</span>
-
+                    <span className="font-semibold">
+                      Completion Date:{" "}
+                      {new Date(worker.completionDate).toLocaleDateString(
+                        "en-GB"
+                      )}
+                    </span>
                   </p>
                 </div>
                 <div className="md:text-right ">
-                  <p className="bg-black text-white text-md px-4 rounded-full inline-block">
+                  <p className="bg-black text-white   text-base md:text-lg text-md px-4 rounded-full inline-block">
                     {worker.project_id}
                   </p>
-                  <p className="text-md mt-2">
+                  <p className="  text-base md:text-lg  mt-2">
                     <span className="font-semibold">
                       Posted Date:{" "}
                       {new Date(worker.date).toLocaleDateString("en-GB")}
                     </span>
                   </p>
-                  <span className="text-gray-600 font-semibold block">
+                  <span className="  text-base md:text-lg text-gray-600 font-semibold block">
                     Status:{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-white text-sm font-medium
@@ -505,7 +507,7 @@ export default function Bid() {
                 </div>
               </div>
 
-              <p className="font-semibold">
+              <p className=" text-sm sm:text-xl md:text-2xl font-semibold">
                 Category: {worker?.category_id?.name}
               </p>
               <p className="font-semibold">
@@ -547,7 +549,7 @@ export default function Bid() {
                     {!bidLoading && !existingBid && (
                       <button
                         onClick={() => setIsBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                        className=" text-base md:text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
                       >
                         Bid
                       </button>
@@ -556,7 +558,7 @@ export default function Bid() {
                     {!bidLoading && existingBid && (
                       <button
                         onClick={() => setIsEditBidModal(true)}
-                        className="text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
+                        className=" text-base md:text-lg font-semibold text-white py-2 px-4 rounded-lg bg-[#008000] hover:bg-green-700"
                       >
                         Edit Bid: (₹{existingBid.bid_amount})
                       </button>
@@ -574,10 +576,10 @@ export default function Bid() {
           {/* Offer / Negotiate Section */}
           {worker?.hire_status === "pending" && !bidLoading && existingBid && (
             <div className="flex flex-col items-center p-6">
-              <div className="flex space-x-4 mb-12 bg-[#EDEDED] rounded-[50px] p-[12px]">
+              <div className="flex flex-wrap gap-3 mb-12 md:bg-[#EDEDED] rounded-[50px] p-3 justify-center">
                 <button
                   onClick={() => setIsOfferActive(true)}
-                  className={`px-16 py-2 rounded-full font-medium cursor-pointer shadow-sm ${
+                  className={`w-full sm:w-auto px-6 sm:px-16 py-2 rounded-full font-medium shadow-sm text-center  text-base md:text-lg ${
                     isOfferActive
                       ? "bg-[#228B22] text-white border border-green-600"
                       : "border border-green-600 text-green-600"
@@ -587,7 +589,7 @@ export default function Bid() {
                 </button>
                 <button
                   onClick={() => setIsOfferActive(false)}
-                  className={`px-16 py-2 rounded-full font-medium shadow-md cursor-pointer ${
+                  className={`w-full sm:w-auto  text-base md:text-lg px-6 sm:px-16 py-2 rounded-full font-medium shadow-md text-center ${
                     !isOfferActive
                       ? "bg-[#228B22] text-white hover:bg-[#228B22]"
                       : "border border-green-600 text-green-600"
@@ -603,7 +605,7 @@ export default function Bid() {
                   placeholder="Enter your offer amount"
                   value={offer}
                   onChange={(e) => setOffer(e.target.value)}
-                  className="w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                  className=" w-[280px] md:w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
                   min="0"
                 />
               )}
@@ -611,9 +613,9 @@ export default function Bid() {
           )}
 
           {worker?.hire_status === "pending" && !bidLoading && existingBid && (
-            <div className="text-center">
+            <div className="text-center w-full px-4">
               <button
-                className="bg-[#228B22] text-white w-100 px-10 py-3 rounded-md font-semibold cursor-pointer"
+                className="bg-[#228B22] text-white w-full py-4 rounded-xl font-semibold"
                 onClick={() => {
                   if (isOfferActive) {
                     handleAcceptNegotiation(data?._id, "service_provider");

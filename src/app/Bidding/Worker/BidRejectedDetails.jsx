@@ -35,6 +35,7 @@ export default function Bid() {
 
   const [existingBid, setExistingBid] = useState(null);
   const [bidLoading, setBidLoading] = useState(false);
+  const [openImage, setOpenImage] = useState(null);
 
   const [offer, setOffer] = useState("");
   const [isOfferActive, setIsOfferActive] = useState(false);
@@ -117,16 +118,16 @@ export default function Bid() {
   return (
     <>
       <Header />
-      
-     <div className="container mx-auto mt-20 px-4 py-4">
-             <button
-               onClick={() => navigate(-1)}
-               className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
-             >
-               <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
-               Back
-             </button>
-           </div>
+
+      <div className="container mx-auto mt-20 px-4 py-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-[#228B22] hover:text-green-800 font-semibold cursor-pointer"
+        >
+          <img src={Arrow} className="w-6 h-6 mr-2" alt="Back" />
+          Back
+        </button>
+      </div>
 
       <div className="min-h-screen sm:p-6">
         <div className="container max-w-5xl mx-auto p-4 shadow-lg rounded-3xl">
@@ -154,18 +155,25 @@ export default function Bid() {
               ))}
             </Carousel>
           ) : (
-            <img
-              src={hisWorkImg}
-              alt="No project images available"
-              className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover mt-2"
-            />
+            <div
+              onClick={() => setOpenImage(hisWorkImg)}
+              className="cursor-pointer"
+            >
+              <img
+                src={hisWorkImg}
+                alt="No project images available"
+                className="w-full h-[200px] sm:h-[300px] md:h-[360px] object-cover mt-2"
+              />
+            </div>
           )}
 
           {task && (
             <div className="py-6 space-y-4">
               <div className=" flex flex-col sm:flex-row justify-between items-start sm:items-start gap-4">
                 <div>
-                  <h2 className=" text-base md:text-lg font-semibold">{task.title}</h2>
+                  <h2 className=" text-base md:text-lg font-semibold">
+                    {task.title}
+                  </h2>
 
                   <div className="flex items-start mt-2">
                     <span
@@ -224,7 +232,9 @@ export default function Bid() {
                   </p>
                   <div className="text-gray-800   block">
                     <p className=" text-base md:text-lg">
-                   <span className="font-semibold text-gray-700 mr-2">Posted Date:</span>    
+                      <span className="font-semibold text-gray-700 mr-2">
+                        Posted Date:
+                      </span>
                       {task.deadline
                         ? new Date(
                             task.createdAt.split("/").reverse().join("-")
@@ -268,8 +278,6 @@ export default function Bid() {
                 </div>
               </div>
 
-         
-
               {/* <p className="font-semibold">
                 Category:
                 {task.category_id?.name ||
@@ -283,7 +291,9 @@ export default function Bid() {
                 {task?.sub_category_ids?.map((sub) => sub.name).join(", ")}
               </p> */}
 
-              <h3 className=" text-base md:text-lg font-semibold">Task Details</h3>
+              <h3 className=" text-base md:text-lg font-semibold">
+                Task Details
+              </h3>
               <div className="border border-[#228B22] rounded-lg p-4 text-sm text-gray-700 space-y-3">
                 <p>{task.description || "No description available"}</p>
               </div>
@@ -358,7 +368,7 @@ export default function Bid() {
                   placeholder="Enter your offer amount"
                   value={offer}
                   onChange={(e) => setOffer(e.target.value)}
-                  className="  w-[280px] md:w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
+                  className=" w-[280px] md:w-[531px] px-4 py-2 border-2 border-[#dce1dc] rounded-md text-center text-[#453e3f] placeholder-green-600 focus:outline-none focus:ring-2 focus:ring-[#d1d1d1]"
                   min="0"
                 />
               )}
@@ -465,35 +475,35 @@ export default function Bid() {
           </p>
         )}
       </div> */}
-       <div className="w-full pt-2 sm:pt-4 lg:pt-5 px-3 sm:px-6 mb-5 lg:px-0">
-                      <div
-                        className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
+      <div className="w-full pt-2 sm:pt-4 lg:pt-5 px-3 sm:px-6 mb-5 lg:px-0">
+        <div
+          className="w-full  max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 
                               h-[220px] sm:h-[400px] "
-                      >
-                        <Slider {...sliderSettings}>
-                          {bannerImages.length > 0 ? (
-                            bannerImages.map((banner, index) => (
-                              <div key={index} className="w-full h-[220px] sm:h-[400px]">
-                                <img
-                                  src={banner}
-                                  alt={`Banner ${index + 1}`}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.target.src = "/src/assets/Home-SP/default.png";
-                                  }}
-                                />
-                              </div>
-                            ))
-                          ) : (
-                            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                              <p className="text-gray-600 font-medium">
-                                No banners available
-                              </p>
-                            </div>
-                          )}
-                        </Slider>
-                      </div>
-                    </div>
+        >
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div key={index} className="w-full h-[220px] sm:h-[400px]">
+                  <img
+                    src={banner}
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/Home-SP/default.png";
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
+        </div>
+      </div>
 
       <Footer />
       {isMapModalOpen && (

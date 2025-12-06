@@ -35,70 +35,66 @@ export default function Accepted({
         <h2 className="text-lg font-semibold mb-4">User Details</h2>
 
         {/* Service Provider Details */}
-        {serviceProvider && (
-          <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
-            <div className="flex items-center justify-between">
-              {/* --- Left: Profile Info --- */}
-              <div className="flex items-center space-x-4">
-                <img
-                  src={serviceProvider.profile_pic || Profile}
-                  alt={`Profile of ${
-                    serviceProvider.full_name || "Unknown User"
-                  }`}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <p className="text-lg font-semibold">
-                  {serviceProvider.full_name
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ") || "Unknown User"}
-                </p>
-              </div>
+       {serviceProvider && (
+    <div className="bg-gray-100 border border-[#228B22] p-4 rounded-lg mb-4">
+   
+      <div className="flex flex-col gap-5 md:flex-row md:items-center">
+        
+        {/* Left: Profile */}
+        <div className="flex items-center space-x-4 flex-1 min-w-0">
+          <img
+            src={serviceProvider.profile_pic || Profile}
+            alt={serviceProvider.full_name || "User"}
+            className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+          />
+          <p className="text-lg font-semibold truncate">
+            {serviceProvider.full_name
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ") || "Unknown User"}
+          </p>
+        </div>
 
-              {/* --- Center: Call & Message Icons --- */}
-              {hireStatus === "cancelled" ||
-              hireStatus === "cancelledDispute" ? (
-                ""
+
+        {hireStatus !== "cancelled" && hireStatus !== "cancelledDispute" && (
+          <div className="flex flex-col sm:flex-row items-center flex-3 gap-4">
+            {/* Call & Chat Icons */}
+            <div className="flex items-center space-x-6  mx-auto">
+              <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
+                <img src={Call} alt="Call" className="w-5 h-5" />
+              </div>
+              <div
+                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
+                onClick={() => handleChatOpen(serviceProvider._id, user_id)}
+              >
+                <img src={Message} alt="Message" className="w-5 h-5" />
+              </div>
+            </div>
+
+        
+            <div className=" ml-4 w-full sm:w-auto  flex-shrink-0  ">
+              {assignedWorker ? (
+                <button className="w-full sm:w-auto px-6 py-2 border border-[#228B22]  text-[#228B22] bg-white rounded-lg font-medium  cursor-not-allowed ">
+                  Assigned
+                </button>
               ) : (
-                <>
-                  {" "}
-                  <div className="flex items-center space-x-3 justify-center">
-                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer">
-                      <img src={Call} alt="Call" className="w-5 h-5" />
-                    </div>
-                    <div
-                      className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full cursor-pointer"
-                      onClick={() =>
-                        handleChatOpen(serviceProvider._id, user_id)
-                      }
-                    >
-                      <img src={Message} alt="Message" className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    {/* <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white"
-							onClick={() => navigate(`/profile-user-details/${serviceProvider._id}`)}
-							>
-                View Profile
-              </button> */}
-                    {hireStatus === "completed" ? null : assignedWorker ? (
-                      <button className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white">
-                        Assigned
-                      </button>
-                    ) : (
-                      <Link
-                        to={`/assign-work/${orderId}/direct`}
-                        className="px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-semibold hover:bg-green-600 hover:text-white text-center"
-                      >
-                        Assign work
-                      </Link>
-                    )}
-                  </div>
-                </>
+                <Link
+                  to={`/assign-work/${orderId}/direct`}
+                  className="block text-center px-6 py-2 border border-[#228B22] text-[#228B22] bg-white rounded-lg font-medium  hover:bg-green-600 hover:text-white"
+                >
+                  Assign work
+                </Link>
               )}
             </div>
           </div>
         )}
+      </div>  
+
+
+    </div>  
+  )}
+
+ 
 
         {/* Assigned Worker Details */}
         {assignedWorker && (
