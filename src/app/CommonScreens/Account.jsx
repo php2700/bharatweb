@@ -12,7 +12,14 @@ import { useLocation } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Account() {
-  
+  const token = localStorage.getItem("bharat_token");
+  useEffect(()=>{
+      if(!token){
+    window.location.href='/login';
+  }
+  },token)
+
+
   const [activeTab, setActiveTab] = useState("membership");
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
@@ -29,7 +36,7 @@ export default function Account() {
   // Fetch banner images
   const fetchBannerImages = async () => {
     try {
-      const token = localStorage.getItem("bharat_token");
+      
       if (!token) {
         throw new Error("No authentication token found");
       }
