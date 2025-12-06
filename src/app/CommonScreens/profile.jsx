@@ -6,6 +6,9 @@ import banner from "../../assets/profile/banner.png";
 import Arrow from "../../assets/profile/arrow_back.svg";
 import RegistrationCompleted from "../../assets/registration_completed.png";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const libraries = ["places"];
 
@@ -22,12 +25,25 @@ export default function Profile() {
     address: "",
     referral: "",
   });
+   const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false, // Arrows hidden for cleaner look on OTP page
+  };
 
   const [errors, setErrors] = useState({});
   const [addressErrors, setAddressErrors] = useState({});
   const [showAddressFields, setShowAddressFields] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+     const [bannerImages, setBannerImages] = useState([]);
+    const [bannerLoading, setBannerLoading] = useState(false);
+    const [bannerError, setBannerError] = useState(null);
 
   /* ---------- MAP STATE ---------- */
   const [map, setMap] = useState(null); // google.maps.Map
@@ -45,11 +61,40 @@ export default function Profile() {
     latitude: null,
     longitude: null,
   });
+    const token = localStorage.getItem("bharat_token");
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
+   const fetchBannerImages = async () => {
+      try {
+        setBannerLoading(true);
+        // Note: Usually public banners don't need a token, but included as per your request
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+  
+        const res = await fetch(`${BASE_URL}/banner/getAllBannerImages`, {
+          headers: headers,
+        });
+        const data = await res.json();
+        
+        if (res.ok && Array.isArray(data.images)) {
+          setBannerImages(data.images);
+        } else {
+          setBannerImages([]);
+        }
+      } catch (err) {
+        setBannerError(err.message);
+      } finally {
+        setBannerLoading(false);
+      }
+    };
+    useEffect(() => {
+      fetchBannerImages();
+    }, []);
 
   /* ---------- HELPERS ---------- */
   const ProfileComplete = () => {
@@ -231,7 +276,7 @@ export default function Profile() {
 
     if (formData.referral.trim()) {
       try {
-        const token = localStorage.getItem("bharat_token");
+      
         const res = await fetch(`${BASE_URL}/user/checkReferralCode`, {
           method: "POST",
           headers: {
@@ -575,12 +620,32 @@ export default function Profile() {
       )}
 
       {/* ---------- BOTTOM BANNER ---------- */}
-      <div className="w-full max-w-[77rem] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5">
-        <img
-          src={banner}
-          alt="Gardening illustration"
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full object-cover"
-        />
+       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] h-[400px] mt-5 shadow-lg">
+        {bannerLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500 text-lg">Loading banners...</p>
+          </div>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((imgUrl, index) => (
+              <div key={index} className="h-[400px] outline-none">
+                <img
+                  src={imgUrl}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png"; // Fallback if image fails
+                  }}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          // Fallback if no banners are returned
+          <div className="flex items-center justify-center h-full bg-gray-200">
+             <p className="text-gray-500">No banners available</p>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
