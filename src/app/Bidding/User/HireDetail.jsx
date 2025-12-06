@@ -224,6 +224,7 @@ export default function HireDetail() {
         hire_status,
         isHired: !!isHiredFlag,
         platFormFee,
+        serviceProviderId: orderDetail?.service_provider_id?._id, // ← Yeh add karo
       },
     });
   };
@@ -1205,19 +1206,28 @@ export default function HireDetail() {
               </div>
             )}
 
-            {hire_status === "accepted" && !platFormFee && (
-              <div className="text-center px-4">
-                <button
-                  className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md 
-                 font-semibold cursor-pointer"
-                  onClick={() => {
-                    handlePayment(order_id, id);
-                  }}
-                >
-                  Pay Now
-                </button>
-              </div>
-            )}
+            {/* Pay Now - Sirf tab dikhe jab yeh bidder wahi ho jiski bid accept hui hai */}
+{hire_status === "accepted" && 
+ !platFormFee && 
+ location.state?.acceptedProviderId === id && (   // ← Yeh condition add karo
+  <div className="text-center px-4">
+    <button
+      className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md font-semibold cursor-pointer"
+      onClick={() => handlePayment(order_id, id)}
+    >
+      Pay Now
+    </button>
+  </div>
+)}
+{hire_status === "accepted" && 
+ location.state?.acceptedProviderId && 
+ location.state?.acceptedProviderId !== id && (
+  <div className="text-center py-6">
+    <p className="text-gray-600 font-medium text-lg">
+      Another bidder has been selected for this job.
+    </p>
+  </div>
+)}
 
           </div>
         </div>

@@ -585,6 +585,7 @@ export default function BiddinggetWorkDetail() {
         order_id: orderId,
         hire_status: orderDetail?.hire_status || null,
         platFormFee: orderDetail?.platform_fee_paid,
+        acceptedProviderId: orderDetail?.service_provider_id?._id || null,
       },
     });
   };
@@ -1560,32 +1561,40 @@ export default function BiddinggetWorkDetail() {
                             </div>
 
                             {/* RIGHT SIDE PRICE + BUTTON */}
+                            {/* RIGHT SIDE PRICE + BUTTON */}
                             <div className="flex flex-col items-center sm:items-end w-full sm:w-auto mt-3 sm:mt-0">
                               <span className="text-lg font-semibold text-gray-800 mb-2">
                                 ₹{offer.bid_amount || "N/A"}
                               </span>
 
+                              {/* Hire Button - Only when pending */}
                               {orderDetail?.hire_status === "pending" && (
                                 <button
-                                  onClick={() => handleAcceptBid(offer.provider_id?._id)}
-                                  className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
-                      font-medium hover:bg-green-700 w-full sm:w-auto"
+                                  onClick={() => confirmAccept(offer.provider_id?._id)}
+                                  className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 w-full sm:w-auto"
                                 >
                                   Hire
                                 </button>
                               )}
 
+                              {/* Pay & Hire - Only for the ACCEPTED bidder */}
                               {orderDetail?.hire_status === "accepted" &&
-                                !orderDetail?.platform_fee_paid && (
+                                !orderDetail?.platform_fee_paid &&
+                                orderDetail?.service_provider_id?._id === offer.provider_id?._id && (
                                   <button
-                                    onClick={() =>
-                                      handlePayment(offer.provider_id?._id)
-                                    }
-                                    className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg 
-                        font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
+                                    onClick={() => handlePayment(offer.provider_id?._id)}
+                                    className="cursor-pointer bg-[#228B22] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:bg-green-700 w-full sm:w-auto mt-2"
                                   >
                                     Pay & Hire
                                   </button>
+                                )}
+
+                              {/* Optional: Dusre bidders ko dikhao ki bid accepted hai */}
+                              {orderDetail?.hire_status === "accepted" &&
+                                orderDetail?.service_provider_id?._id !== offer.provider_id?._id && (
+                                  <span className="text-sm text-gray-500 mt-2">
+                                    Not Selected
+                                  </span>
                                 )}
                             </div>
                           </div>
@@ -1689,36 +1698,36 @@ export default function BiddinggetWorkDetail() {
 
       </div>
       {/* Banner Slider */}
-       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
+      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
   h-[220px] sm:h-[400px]">
 
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i} className="w-full h-[220px] sm:h-[400px]">
-                  <img
-                    src={banner}
-                    alt={`Banner ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.target.src = Work)}
-                  />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
-        </div>
+        {bannerLoading ? (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            Loading banners...
+          </p>
+        ) : bannerError ? (
+          <p className="absolute inset-0 flex items-center justify-center text-red-500">
+            {bannerError}
+          </p>
+        ) : bannerImages.length > 0 ? (
+          <Slider {...sliderSettings}>
+            {bannerImages.map((banner, i) => (
+              <div key={i} className="w-full h-[220px] sm:h-[400px]">
+                <img
+                  src={banner}
+                  alt={`Banner ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.target.src = Work)}
+                />
+              </div>
+            ))}
+          </Slider>
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
+            No banners available
+          </p>
+        )}
+      </div>
 
 
       <Footer />
