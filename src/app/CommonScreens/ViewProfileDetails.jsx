@@ -443,35 +443,33 @@ export default function ViewProfileDetails() {
       {/* Banner Slider */}
 
       {/* Banner Slider */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-        {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
-        ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            {bannerError}
-          </p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i} className="w-full h-[220px] sm:h-[400px]">
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div
+                key={index}
+                className="w-full h-[220px] sm:h-[400px] relative"
+              >
+                {/* Yeh image class perfect fit karegi har device pe */}
                 <img
                   src={banner}
-                  alt={`Banner ${i + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => (e.target.src = Work)}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-fill object-center"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
                 />
               </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
-        )}
+            ))
+          ) : (
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">
+                No banners available
+              </p>
+            </div>
+          )}
+        </Slider>
       </div>
       <div className="container mx-auto px-6 py-6">
         <h2 className="text-3xl font-bold text-black mb-3 text-left ml-10 mt-10">
@@ -579,8 +577,8 @@ export default function ViewProfileDetails() {
                   setWorkIndex(0);
                 }}
                 className={`px-4 sm:px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "work"
-                    ? "bg-[#228B22] text-white"
-                    : "bg-green-100 text-[#228B22]"
+                  ? "bg-[#228B22] text-white"
+                  : "bg-green-100 text-[#228B22]"
                   }`}
               >
                 His Work
@@ -592,8 +590,8 @@ export default function ViewProfileDetails() {
                   setReviewIndex(0);
                 }}
                 className={`px-4 sm:px-6 py-2 rounded-md cursor-pointer shadow-md font-semibold ${WorkerTab === "review"
-                    ? "bg-[#228B22] text-white"
-                    : "bg-green-100 text-[#228B22]"
+                  ? "bg-[#228B22] text-white"
+                  : "bg-green-100 text-[#228B22]"
                   }`}
               >
                 Customer Review

@@ -81,8 +81,6 @@ const Post = () => {
   const mapRef = useRef(null);
   const mapAutocompleteRef = useRef(null);
 
-
-
   let location = "";
   if (profile && profile.data) {
     location = profile.data.full_address || "";
@@ -100,8 +98,9 @@ const Post = () => {
     }
     const script = document.createElement("script");
     script.id = "google-maps-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-      }&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    }&libraries=places`;
     script.async = true;
     script.defer = true;
 
@@ -119,7 +118,7 @@ const Post = () => {
 
       const center = {
         lat: pickedLocation.latitude || 28.6139,
-        lng: pickedLocation.longitude || 77.2090
+        lng: pickedLocation.longitude || 77.209,
       };
 
       const map = new window.google.maps.Map(mapRef.current, {
@@ -186,9 +185,6 @@ const Post = () => {
     });
   }, [isAddAddressModalOpen]);
 
-
-
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -249,7 +245,10 @@ const Post = () => {
 
   // keep address in sync with profile and localStorage (mirror NewTask behavior)
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('selectedAddressTitle') : null;
+    const stored =
+      typeof window !== "undefined"
+        ? localStorage.getItem("selectedAddressTitle")
+        : null;
     if (profile?.location?.address) {
       setAddress(profile.location.address);
       setSelectedAddress(profile.location.address);
@@ -258,7 +257,6 @@ const Post = () => {
       setSelectedAddress(stored);
     }
   }, [profile?.location?.address]);
-
 
   useEffect(() => {
     const fetchPlatformFee = async () => {
@@ -628,10 +626,10 @@ const Post = () => {
     : "N/A";
   const formattedTime = formData.deadline
     ? new Date(formData.deadline).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    })
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
     : "N/A";
 
   const updateAddress = async (location) => {
@@ -646,7 +644,7 @@ const Post = () => {
         },
         body: JSON.stringify({
           latitude: location?.latitude || 28.6139,
-          longitude: location?.longitude || 77.2090,
+          longitude: location?.longitude || 77.209,
           address: location?.address || "",
         }),
       });
@@ -655,8 +653,10 @@ const Post = () => {
         // update local UI state to reflect chosen address
         setAddress(location?.address || "");
         // persist a small hint for other parts of the app (same as NewTask)
-        if (location?._id) localStorage.setItem("selectedAddressId", location._id);
-        if (location?.address) localStorage.setItem("selectedAddressTitle", location.address);
+        if (location?._id)
+          localStorage.setItem("selectedAddressId", location._id);
+        if (location?.address)
+          localStorage.setItem("selectedAddressTitle", location.address);
 
         // refresh profile in redux so Header picks up the new location
         try {
@@ -678,7 +678,11 @@ const Post = () => {
   // ================= SAVE NEW ADDRESS API =================
   const handleSaveNewAddress = async () => {
     if (!newTitle || !newHouseNo || !newPincode || !pickedLocation.address) {
-      return Swal.fire("Required", "Please fill all required fields and pick a location on the map", "warning");
+      return Swal.fire(
+        "Required",
+        "Please fill all required fields and pick a location on the map",
+        "warning"
+      );
     }
 
     const newAddress = {
@@ -697,24 +701,20 @@ const Post = () => {
       location: {
         latitude: pickedLocation.latitude,
         longitude: pickedLocation.longitude,
-        address: pickedLocation.address
+        address: pickedLocation.address,
       },
-      full_address: [...(profile.full_address || []), newAddress]
+      full_address: [...(profile.full_address || []), newAddress],
     };
 
     try {
       if (!token) throw new Error("Not authenticated");
 
-      const res = await axios.post(
-        `${BASE_URL}/user/updateUserProfile`,
-        body,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
+      const res = await axios.post(`${BASE_URL}/user/updateUserProfile`, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       Swal.fire("Success", "Address added successfully!", "success");
 
@@ -726,16 +726,21 @@ const Post = () => {
 
       // persist for other pages too (only after API OK)
       if (res?.status === 200) {
-        if (newAddress._id) localStorage.setItem("selectedAddressId", newAddress._id);
-        if (newAddress.address) localStorage.setItem("selectedAddressTitle", newAddress.address);
+        if (newAddress._id)
+          localStorage.setItem("selectedAddressId", newAddress._id);
+        if (newAddress.address)
+          localStorage.setItem("selectedAddressTitle", newAddress.address);
       }
 
       // refresh redux
       dispatch(fetchUserProfile());
-
     } catch (err) {
       console.log("API Error Response:", err.response?.data);
-      Swal.fire("Error", err.response?.data?.message || "Failed to save new address", "error");
+      Swal.fire(
+        "Error",
+        err.response?.data?.message || "Failed to save new address",
+        "error"
+      );
     }
   };
 
@@ -745,14 +750,13 @@ const Post = () => {
       <div className="w-full max-w-[1000px] mx-auto mt-20 px-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-green-700 mb-4 hover:underline"
+          className="flex items-center text-green-700 mb-4 hover:underline cursor-pointer"
         >
           <img src={Arrow} className="w-6 h-6 mr-2" alt="Back arrow" />
           Back
         </button>
       </div>
       <div className="flex flex-col lg:flex-row justify-center items-start bg-white px-3 gap-6 py-6">
-
         {/* LEFT IMAGE BLOCK (same styling as first code) */}
         <div className="w-full sm:w-[350px] md:w-[420px] lg:w-[480px] xl:w-[520px] object-contain rounded-xl shadow-md mt-20 md:mt-24 lg:mt-28 mb-6 mr-0 lg:mr-20 xl:mr-28">
           <img
@@ -764,7 +768,6 @@ const Post = () => {
 
         {/* RIGHT FORM BLOCK (same compact card UI as first code) */}
         <div className="bg-white rounded-xl p-4 w-full lg:w-[380px] shadow-md max-h-screen overflow-y-auto">
-
           <h2 className="text-[26px] font-bold text-center text-[#191A1D] mb-3">
             Post Emergency Task
           </h2>
@@ -772,8 +775,10 @@ const Post = () => {
           {error && <p className="text-red-500 text-center">{error}</p>}
           {loading && <p className="text-center">Loading...</p>}
 
-          <form className="w-full space-y-3 text-left text-sm" onSubmit={handleSubmit}>
-
+          <form
+            className="w-full space-y-3 text-left text-sm"
+            onSubmit={handleSubmit}
+          >
             {/* Title */}
             <div>
               <label className="block text-xs mb-1 font-bold">Title</label>
@@ -783,8 +788,9 @@ const Post = () => {
                 value={formData.title}
                 onChange={handleInputChange}
                 placeholder="Enter Title"
-                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.title ? "border-red-500" : "border-green-500"
-                  }`}
+                className={`w-full border rounded-md px-3 py-2 text-sm ${
+                  validationErrors.title ? "border-red-500" : "border-green-500"
+                }`}
               />
               {validationErrors.title && (
                 <p className="text-red-500 text-xs">{validationErrors.title}</p>
@@ -793,15 +799,20 @@ const Post = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Description</label>
+              <label className="block text-xs mb-1 font-bold">
+                Description
+              </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Enter description"
                 rows={3}
-                className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${validationErrors.description ? "border-red-500" : "border-green-500"
-                  }`}
+                className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${
+                  validationErrors.description
+                    ? "border-red-500"
+                    : "border-green-500"
+                }`}
               />
               {validationErrors.description && (
                 <p className="text-red-500 text-xs mt-1">
@@ -812,26 +823,37 @@ const Post = () => {
 
             {/* Category */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Work Category</label>
+              <label className="block text-xs mb-1 font-bold">
+                Work Category
+              </label>
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                className={`w-full border rounded-md px-3 py-2 text-sm ${validationErrors.category_id ? "border-red-500" : "border-green-500"
-                  }`}
+                className={`w-full border rounded-md px-3 py-2 text-sm ${
+                  validationErrors.category_id
+                    ? "border-red-500"
+                    : "border-green-500"
+                }`}
               >
                 <option value="">Select category</option>
                 {categories.map((c) => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
+                  <option key={c._id} value={c._id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
               {validationErrors.category_id && (
-                <p className="text-red-500 text-xs">{validationErrors.category_id}</p>
+                <p className="text-red-500 text-xs">
+                  {validationErrors.category_id}
+                </p>
               )}
             </div>
 
             {/* Subcategories */}
             <div>
-              <label className="block text-xs mb-1 font-bold">Emergency Subcategories</label>
+              <label className="block text-xs mb-1 font-bold">
+                Emergency Subcategories
+              </label>
               <Select
                 isMulti
                 options={subcategoryOptions}
@@ -845,20 +867,24 @@ const Post = () => {
                     borderColor: validationErrors.sub_category_ids
                       ? "#EF4444"
                       : "#10B981",
-                    minHeight: 36
+                    minHeight: 36,
                   }),
                 }}
               />
 
               {validationErrors.sub_category_ids && (
-                <p className="text-red-500 text-xs">{validationErrors.sub_category_ids}</p>
+                <p className="text-red-500 text-xs">
+                  {validationErrors.sub_category_ids}
+                </p>
               )}
             </div>
 
             {/* Address Section (same UI as first code + Add New Address button added) */}
             <div className="relative">
               <div className="flex justify-between items-center mb-1">
-                <label className="text-xs font-bold text-gray-600">Address</label>
+                <label className="text-xs font-bold text-gray-600">
+                  Address
+                </label>
 
                 {/* ADD NEW ADDRESS BUTTON (copied from first code) */}
                 <button
@@ -879,14 +905,27 @@ const Post = () => {
                 className="w-full border border-green-500 rounded-md px-3 py-2 text-sm cursor-pointer pr-10"
               />
 
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 absolute right-3 top-9 text-gray-500 pointer-events-none"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 9l6 6 6-6"
+                />
               </svg>
 
               {showOptions && (
                 <ul className="absolute z-10 bg-white border rounded-lg shadow-md w-full mt-1 max-h-44 overflow-y-auto text-sm">
                   <li className="px-3 py-2 bg-gray-100">
-                    <h3 className="text-sm font-semibold text-[#191A1D]">Select an Address</h3>
+                    <h3 className="text-sm font-semibold text-[#191A1D]">
+                      Select an Address
+                    </h3>
                   </li>
 
                   {profile?.full_address?.length > 0 ? (
@@ -900,16 +939,26 @@ const Post = () => {
                           setShowOptions(false);
                         }}
                       >
-                        <input type="radio" className="mr-2 mt-1" checked={address === loc.address} />
+                        <input
+                          type="radio"
+                          className="mr-2 mt-1"
+                          checked={address === loc.address}
+                        />
                         <p className="flex-1">
                           <span className="font-medium block">{loc.title}</span>
-                          <span className="text-gray-600 block">{loc.landmark}</span>
-                          <span className="text-gray-500 block text-xs">{loc.address}</span>
+                          <span className="text-gray-600 block">
+                            {loc.landmark}
+                          </span>
+                          <span className="text-gray-500 block text-xs">
+                            {loc.address}
+                          </span>
                         </p>
                       </li>
                     ))
                   ) : (
-                    <li className="px-3 py-2 text-gray-500 text-xs">No saved addresses</li>
+                    <li className="px-3 py-2 text-gray-500 text-xs">
+                      No saved addresses
+                    </li>
                   )}
                 </ul>
               )}
@@ -920,30 +969,110 @@ const Post = () => {
                 <div className="bg-white rounded-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold">Add New Address</h3>
-                    <button onClick={() => setIsAddAddressModalOpen(false)} className="text-red-600 font-semibold cursor-pointer">Close</button>
+                    <button
+                      onClick={() => setIsAddAddressModalOpen(false)}
+                      className="text-red-600 font-semibold cursor-pointer"
+                    >
+                      Close
+                    </button>
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
                     <div className="flex flex-col gap-3 overflow-auto pr-2">
-                      <label className="block"><span className="text-sm font-medium">Title *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Home / Office" /></label>
-                      <label className="block"><span className="text-sm font-medium">House No. *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newHouseNo} onChange={(e) => setNewHouseNo(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Street</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newStreet} onChange={(e) => setNewStreet(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Area</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newArea} onChange={(e) => setNewArea(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Pincode *</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newPincode} onChange={(e) => setNewPincode(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Landmark</span><input className="w-full border rounded-lg px-3 py-2 mt-1" value={newLandmark} onChange={(e) => setNewLandmark(e.target.value)} /></label>
-                      <label className="block"><span className="text-sm font-medium">Selected Address (from map) *</span><input readOnly className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100" value={pickedLocation.address || ""} /><p className="text-xs text-gray-500 mt-1">Pick location on map or search using box on right.</p></label>
+                      <label className="block">
+                        <span className="text-sm font-medium">Title *</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newTitle}
+                          onChange={(e) => setNewTitle(e.target.value)}
+                          placeholder="Home / Office"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">House No. *</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newHouseNo}
+                          onChange={(e) => setNewHouseNo(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">Street</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newStreet}
+                          onChange={(e) => setNewStreet(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">Area</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newArea}
+                          onChange={(e) => setNewArea(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">Pincode *</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newPincode}
+                          onChange={(e) => setNewPincode(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">Landmark</span>
+                        <input
+                          className="w-full border rounded-lg px-3 py-2 mt-1"
+                          value={newLandmark}
+                          onChange={(e) => setNewLandmark(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="text-sm font-medium">
+                          Selected Address (from map) *
+                        </span>
+                        <input
+                          readOnly
+                          className="w-full border rounded-lg px-3 py-2 mt-1 bg-gray-100"
+                          value={pickedLocation.address || ""}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Pick location on map or search using box on right.
+                        </p>
+                      </label>
                       <div className="flex gap-3 mt-auto">
-                        <button type="button" onClick={() => setIsAddAddressModalOpen(false)} className="px-4 py-2 bg-gray-300 rounded-lg cursor-pointer">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddAddressModalOpen(false)}
+                          className="px-4 py-2 bg-gray-300 rounded-lg cursor-pointer"
+                        >
                           Cancel
                         </button>
-                        <button type="button" onClick={handleSaveNewAddress} className="px-4 py-2 bg-[#228B22] text-white rounded-lg cursor-pointer">
+                        <button
+                          type="button"
+                          onClick={handleSaveNewAddress}
+                          className="px-4 py-2 bg-[#228B22] text-white rounded-lg cursor-pointer"
+                        >
                           Save Address
                         </button>
                       </div>
                     </div>
                     <div className="flex flex-col h-full">
-                      <input ref={mapAutocompleteRef} id="add-map-autocomplete" type="text" placeholder="Search for an address" className="w-full rounded-lg border border-gray-300 px-4 py-2 mb-3" />
-                      <div ref={mapRef} className="w-full h-full rounded-lg border border-gray-300" />
-                      <p className="text-xs text-gray-500 mt-2">You can drag the marker or click on the map to pick location. The selected address will be auto-filled.</p>
+                      <input
+                        ref={mapAutocompleteRef}
+                        id="add-map-autocomplete"
+                        type="text"
+                        placeholder="Search for an address"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 mb-3"
+                      />
+                      <div
+                        ref={mapRef}
+                        className="w-full h-full rounded-lg border border-gray-300"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        You can drag the marker or click on the map to pick
+                        location. The selected address will be auto-filled.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -951,31 +1080,36 @@ const Post = () => {
             )}
 
             {/* Contact */}
-           <div>
-  <label className="block text-xs mb-1 font-bold">Contact</label>
-  <input
-    type="text"
-    name="contact"
-    value={formData.contact}
-    onChange={(e) => {
-      // Sirf digits nikal lo
-      let onlyNums = e.target.value.replace(/\D/g, "");
-      // Max 10 digits tak
-      if (onlyNums.length > 10) {
-        onlyNums = onlyNums.slice(0, 10);
-      }
-      handleInputChange({ target: { name: "contact", value: onlyNums } });
-    }}
-    placeholder="Enter Contact Number"
-    className={`w-full border rounded-md px-3 py-2 text-sm ${
-      validationErrors.contact ? "border-red-500" : "border-green-500"
-    }`}
-  />
-  {validationErrors.contact && (
-    <p className="text-red-500 text-xs">{validationErrors.contact}</p>
-  )}
-</div>
-
+            <div>
+              <label className="block text-xs mb-1 font-bold">Contact</label>
+              <input
+                type="text"
+                name="contact"
+                value={formData.contact}
+                onChange={(e) => {
+                  // Sirf digits nikal lo
+                  let onlyNums = e.target.value.replace(/\D/g, "");
+                  // Max 10 digits tak
+                  if (onlyNums.length > 10) {
+                    onlyNums = onlyNums.slice(0, 10);
+                  }
+                  handleInputChange({
+                    target: { name: "contact", value: onlyNums },
+                  });
+                }}
+                placeholder="Enter Contact Number"
+                className={`w-full border rounded-md px-3 py-2 text-sm ${
+                  validationErrors.contact
+                    ? "border-red-500"
+                    : "border-green-500"
+                }`}
+              />
+              {validationErrors.contact && (
+                <p className="text-red-500 text-xs">
+                  {validationErrors.contact}
+                </p>
+              )}
+            </div>
 
             {/* Deadline */}
             {/* <div>
@@ -1005,9 +1139,7 @@ const Post = () => {
                   id="deadline-input"
                   type="datetime-local"
                   value={
-                    formData.deadline
-                      ? formData.deadline.slice(0, 16)
-                      : ""
+                    formData.deadline ? formData.deadline.slice(0, 16) : ""
                   }
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -1044,15 +1176,36 @@ const Post = () => {
             {/* Image Upload */}
             <div className="border border-gray-300 rounded-lg p-3 text-center">
               <label className="cursor-pointer block">
-                <svg className="w-7 h-7 text-[#228B22] mx-auto mb-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3" />
+                <svg
+                  className="w-7 h-7 text-[#228B22] mx-auto mb-1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-3 3m3-3l3 3"
+                  />
                 </svg>
-                <span className="text-xs text-gray-700">Upload Photos (Optional)</span>
+                <span className="text-xs text-gray-700">
+                  Upload Photos (Optional)
+                </span>
 
-                <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
 
-                <button type="button"
-                  onClick={() => document.querySelector('input[type="file"]').click()}
+                <button
+                  type="button"
+                  onClick={() =>
+                    document.querySelector('input[type="file"]').click()
+                  }
                   className="block mx-auto mt-1 px-3 py-1 text-xs border border-[#228B22] text-[#228B22] rounded-md"
                 >
                   Choose Files
@@ -1063,13 +1216,18 @@ const Post = () => {
                 <div className="flex flex-wrap gap-2 mt-2 justify-center">
                   {formData.images.map((file, index) => (
                     <div key={index} className="relative">
-                      <img src={URL.createObjectURL(file)} className="w-14 h-14 object-cover rounded border" />
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="w-14 h-14 object-cover rounded border"
+                      />
                     </div>
                   ))}
                 </div>
               )}
 
-              <p className="text-xs text-green-600 mt-1">Max 5 photos (.jpg, .png)</p>
+              <p className="text-xs text-green-600 mt-1">
+                Max 5 photos (.jpg, .png)
+              </p>
             </div>
 
             <button
@@ -1081,7 +1239,6 @@ const Post = () => {
           </form>
         </div>
       </div>
-
 
       {/* Payment Confirmation Modal */}
       {showPaymentModal && (
@@ -1132,27 +1289,31 @@ const Post = () => {
       )}
 
       {/* Banner Slider */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
-        ) : bannerError ? (
-          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i}>
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div
+                key={index}
+                className="w-full h-[220px] sm:h-[400px] relative"
+              >
+                {/* Yeh image class perfect fit karegi har device pe */}
                 <img
                   src={banner}
-                  alt=""
-                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
-                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-fill object-center"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
                 />
               </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
-        )}
+            ))
+          ) : (
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">No banners available</p>
+            </div>
+          )}
+        </Slider>
       </div>
 
       <Footer />

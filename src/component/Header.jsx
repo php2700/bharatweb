@@ -948,113 +948,147 @@ useEffect(() => {
         {/* Center Section - Location Input and Navigation */}
         <div className="flex items-center gap-4 flex-1 justify-center">
           {isLoggedIn && (
-            <div className="relative" ref={addressDropdownRef}>
-              <div className="flex items-center gap-2 bg-[#EBEBEB] rounded-lg px-3 py-2 cursor-pointer w-full max-w-[250px] sm:max-w-[300px] md:max-w-[400px]">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5 text-[#334247] flex-shrink-0"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  placeholder={selectedAddress}
-                  className="bg-transparent focus:outline-none text-sm text-gray-700 w-full truncate"
-                  aria-label="Location input"
-                  onClick={() =>
-                    setIsAddressDropdownOpen(!isAddressDropdownOpen)
-                  }
-                  readOnly
-                />
+            <div
+  className="relative"
+  ref={addressDropdownRef}
+>
+  {/* Input Wrapper */}
+  <div
+    className="
+      flex items-center gap-2 bg-[#EBEBEB] rounded-lg px-3 py-2 cursor-pointer
+      w-full 
+      max-w-[250px] sm:max-w-[300px] md:max-w-[400px]
+
+      /* Mobile Better UI */
+      mobile:max-w-full mobile:w-full mobile:py-3 mobile:px-4 mobile:rounded-xl
+    "
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      stroke="currentColor"
+      className="w-5 h-5 text-[#334247] flex-shrink-0 mobile:w-6 mobile:h-6"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
+      />
+    </svg>
+
+    <input
+      type="text"
+      placeholder={selectedAddress}
+      className="
+        bg-transparent focus:outline-none text-sm text-gray-700 w-full truncate 
+        mobile:text-base
+      "
+      aria-label="Location input"
+      onClick={() => setIsAddressDropdownOpen(!isAddressDropdownOpen)}
+      readOnly
+    />
+  </div>
+
+  {/* Dropdown */}
+  {isAddressDropdownOpen && (
+    <div
+      className="
+        absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-4
+        
+        /* Desktop original size */
+        w-full max-w-[250px] sm:max-w-[300px] md:max-w-[400px]
+
+        /* Mobile full responsive */
+        mobile:w-screen mobile:max-w-none mobile:left-1/2 mobile:-translate-x-1/2
+        mobile:rounded-xl mobile:mt-3 mobile:px-5 mobile:py-4
+
+        /* Smooth dropdown animation */
+        animate-fadeIn
+      "
+    >
+      {savedAddresses.length === 0 ? (
+        <p className="text-sm text-gray-600 mobile:text-base">No saved addresses</p>
+      ) : (
+        savedAddresses.map((address, index) => (
+          <div
+            key={address._id || index}
+            className="
+              flex items-center justify-between py-2 gap-2
+              mobile:py-3
+            "
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <input
+                type="radio"
+                name="selectedAddress"
+                checked={selectedAddressId === address._id}
+                onChange={() => handleSelectAddress(index, address._id)}
+                className="form-radio h-4 w-4 text-[#228B22] flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate mobile:text-base">
+                  {address.title || address.address}
+                </p>
+                <p className="text-xs text-gray-500 truncate mobile:text-sm">
+                  {address.address}
+                </p>
               </div>
-              {isAddressDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-full max-w-[250px] sm:max-w-[300px] md:max-w-[400px] bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-4">
-                  {savedAddresses.length === 0 ? (
-                    <p className="text-sm text-gray-600">No saved addresses</p>
-                  ) : (
-                    savedAddresses.map((address, index) => (
-                      <div
-                        key={address._id || index}
-                        className="flex items-center justify-between py-2 gap-2"
-                      >
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <input
-                            type="radio"
-                            name="selectedAddress"
-                            checked={selectedAddressId === address._id}
-                            onChange={() =>
-                              handleSelectAddress(index, address._id)
-                            }
-                            className="form-radio h-4 w-4 text-[#228B22] flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-800 truncate">
-                              {address.title || address.address}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {address.address}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            onClick={() =>
-                              handleEditAddress(index, address._id)
-                            }
-                            className="text-sm text-[#228B22] hover:underline"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDeleteConfirm(index, address._id)
-                            }
-                            className="text-sm text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  <button
-                    onClick={() => {
-                      setEditingAddress(null);
-                      setCurrentAddress({
-                        title: "",
-                        landmark: "",
-                        address: "",
-                        latitude: 51.505,
-                        longitude: -0.09,
-                        houseno: "",
-                        street: "",
-                        area: "",
-                        pincode: "",
-                        _id: null,
-                      });
-                      setIsModalOpen(true);
-                      setIsAddressDropdownOpen(false);
-                    }}
-                    className="w-full mt-2 bg-[#228B22] text-white py-2 rounded-lg hover:bg-green-800"
-                  >
-                    Add Address
-                  </button>
-                </div>
-              )}
             </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => handleEditAddress(index, address._id)}
+                className="text-sm text-[#228B22] hover:underline mobile:text-base"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDeleteConfirm(index, address._id)}
+                className="text-sm text-red-600 hover:underline mobile:text-base"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+      )}
+
+      <button
+        onClick={() => {
+          setEditingAddress(null);
+          setCurrentAddress({
+            title: "",
+            landmark: "",
+            address: "",
+            latitude: 51.505,
+            longitude: -0.09,
+            houseno: "",
+            street: "",
+            area: "",
+            pincode: "",
+            _id: null,
+          });
+          setIsModalOpen(true);
+          setIsAddressDropdownOpen(false);
+        }}
+        className="
+          w-full mt-2 bg-[#228B22] text-white py-2 rounded-lg hover:bg-green-800
+          mobile:py-3 mobile:text-base mobile:rounded-xl
+        "
+      >
+        Add Address
+      </button>
+    </div>
+  )}
+</div>
+
           )}
           <nav className="hidden lg:flex items-center gap-6 text-[#969696] text-base font-medium">
             <Link to={homeLink} className="hover:text-black">

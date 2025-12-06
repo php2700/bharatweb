@@ -631,35 +631,33 @@ export default function HireDetail() {
 
 
         {/* Banner Slider */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i} className="w-full h-[220px] sm:h-[400px]">
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[220px] sm:h-[400px] relative"
+                >
+                  {/* Yeh image class perfect fit karegi har device pe */}
                   <img
                     src={banner}
-                    alt={`Banner ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.target.src = Work)}
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-fill object-center"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/Home-SP/default.png";
+                    }}
                   />
                 </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
+              ))
+            ) : (
+              <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
         </div>
 
         <div className="container mx-auto px-6 py-6">
@@ -1207,27 +1205,27 @@ export default function HireDetail() {
             )}
 
             {/* Pay Now - Sirf tab dikhe jab yeh bidder wahi ho jiski bid accept hui hai */}
-{hire_status === "accepted" && 
- !platFormFee && 
- location.state?.acceptedProviderId === id && (   // ← Yeh condition add karo
-  <div className="text-center px-4">
-    <button
-      className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md font-semibold cursor-pointer"
-      onClick={() => handlePayment(order_id, id)}
-    >
-      Pay Now
-    </button>
-  </div>
-)}
-{hire_status === "accepted" && 
- location.state?.acceptedProviderId && 
- location.state?.acceptedProviderId !== id && (
-  <div className="text-center py-6">
-    <p className="text-gray-600 font-medium text-lg">
-      Another bidder has been selected for this job.
-    </p>
-  </div>
-)}
+            {hire_status === "accepted" &&
+              !platFormFee &&
+              location.state?.acceptedProviderId === id && (   // ← Yeh condition add karo
+                <div className="text-center px-4">
+                  <button
+                    className="bg-[#228B22] text-white w-full px-6 sm:px-10 py-3 rounded-md font-semibold cursor-pointer"
+                    onClick={() => handlePayment(order_id, id)}
+                  >
+                    Pay Now
+                  </button>
+                </div>
+              )}
+            {hire_status === "accepted" &&
+              location.state?.acceptedProviderId &&
+              location.state?.acceptedProviderId !== id && (
+                <div className="text-center py-6">
+                  <p className="text-gray-600 font-medium text-lg">
+                    Another bidder has been selected for this job.
+                  </p>
+                </div>
+              )}
 
           </div>
         </div>

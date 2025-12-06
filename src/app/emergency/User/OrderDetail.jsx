@@ -811,8 +811,8 @@ export default function ViewProfile() {
                 Status:{" "}
                 <span
                   className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
-                      ? "bg-yellow-500"
-                      : ""
+                    ? "bg-yellow-500"
+                    : ""
                     } ${orderData?.hire_status === "cancelled" ||
                       orderData?.hire_status === "cancelledDispute"
                       ? "bg-[#FF0000]"
@@ -836,8 +836,8 @@ export default function ViewProfile() {
                   Refund:{" "}
                   <span
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-blue-500"
+                      ? "bg-yellow-500"
+                      : "bg-blue-500"
                       }`}
                   >
                     {orderData?.refundStatus?.charAt(0).toUpperCase() +
@@ -868,8 +868,8 @@ export default function ViewProfile() {
               Status:{" "}
               <span
                 className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.hire_status === "pending"
-                    ? "bg-yellow-500"
-                    : ""
+                  ? "bg-yellow-500"
+                  : ""
                   } ${orderData?.hire_status === "cancelled" ||
                     orderData?.hire_status === "cancelledDispute"
                     ? "bg-[#FF0000]"
@@ -893,8 +893,8 @@ export default function ViewProfile() {
                 Refund:{" "}
                 <span
                   className={`px-3 py-1 rounded-full text-white text-sm font-medium ${orderData?.refundStatus === "pending"
-                      ? "bg-yellow-500"
-                      : "bg-blue-500"
+                    ? "bg-yellow-500"
+                    : "bg-blue-500"
                     }`}
                 >
                   {orderData?.refundStatus?.charAt(0).toUpperCase() +
@@ -1080,8 +1080,8 @@ export default function ViewProfile() {
             orderData?.refundStatus === "rejected") && (
               <p
                 className={`mt-2 text-sm font-medium ${orderData?.refundStatus === "processed"
-                    ? "text-green-600"
-                    : "text-red-600"
+                  ? "text-green-600"
+                  : "text-red-600"
                   }`}
               >
                 Admin Remark: {orderData?.refundReasonDetails || "No Remark"}
@@ -1136,38 +1136,38 @@ export default function ViewProfile() {
                     <div className="flex flex-col items-center justify-center space-y-6 mt-6">
                       <div className="relative max-w-2xl mx-auto">
                         {/* Top Images - responsive sizes and wrap on small screens */}
-                                                <div className="relative z-10 flex justify-center gap-4 flex-wrap">
-                                                  <img
-                                                    src={Warning1}
-                                                    alt="Warning"
-                                                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
-                                                  />
-                                                  <img
-                                                    src={Warning3}
-                                                    alt="Warning2"
-                                                    className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
-                                                  />
-                                                </div>
-                        
-                                                {/* Yellow Box - spacing & text size responsive */}
-                                                <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
-                                                  <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
-                                                    Warning Message
-                                                  </h2>
-                                                  <p className="text-gray-700 text-sm sm:text-base">
-                                                    Pay securely — no extra charges from the platform. Choose simple and safe transactions.
-                                                  </p>
-                                                </div>
+                        <div className="relative z-10 flex justify-center gap-4 flex-wrap">
+                          <img
+                            src={Warning1}
+                            alt="Warning"
+                            className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                          />
+                          <img
+                            src={Warning3}
+                            alt="Warning2"
+                            className="w-24 h-24 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-white border border-[#228B22] rounded-lg p-2 object-contain"
+                          />
+                        </div>
+
+                        {/* Yellow Box - spacing & text size responsive */}
+                        <div className="bg-[#FBFBBA] border border-yellow-300 rounded-lg shadow-md p-4 sm:p-6 -mt-12 sm:-mt-16 pt-20 sm:pt-20 text-center w-full">
+                          <h2 className="text-[#FE2B2B] font-bold -mt-2 text-base sm:text-lg">
+                            Warning Message
+                          </h2>
+                          <p className="text-gray-700 text-sm sm:text-base">
+                            Pay securely — no extra charges from the platform. Choose simple and safe transactions.
+                          </p>
+                        </div>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:justify-center sm:space-x-4 space-y-3 sm:space-y-0 w-full max-w-2xl px-2">
                         {orderData?.hire_status !== "completed" && (
                           <>
                             <button
-    className="cursor-pointer bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto"
-    onClick={handleMarkComplete}
-  >
-    Mark as Complete
-  </button>
+                              className="cursor-pointer bg-[#228B22] hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md w-full sm:w-auto"
+                              onClick={handleMarkComplete}
+                            >
+                              Mark as Complete
+                            </button>
                             <ReviewModal
                               show={showCompletedModal}
                               onClose={() => {
@@ -1363,38 +1363,36 @@ export default function ViewProfile() {
         )}
 
       {/* Banner Slider */}
-      
-      {/* Banner Slider */}
-       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
 
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i} className="w-full h-[220px] sm:h-[400px]">
-                  <img
-                    src={banner}
-                    alt={`Banner ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.target.src = Work)}
-                  />
-                </div>
-              ))}
-            </Slider>
+      {/* Banner Slider */}
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div
+                key={index}
+                className="w-full h-[220px] sm:h-[400px] relative"
+              >
+                {/* Yeh image class perfect fit karegi har device pe */}
+                <img
+                  src={banner}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-fill object-center"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
+                />
+              </div>
+            ))
           ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">
+                No banners available
+              </p>
+            </div>
           )}
-        </div>
+        </Slider>
+      </div>
 
       <Footer />
       {isMapModalOpen && (

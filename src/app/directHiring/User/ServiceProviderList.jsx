@@ -88,7 +88,7 @@ export default function ServiceProviderList() {
           { category_id, subcategory_ids },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log("Data", data)
+        console.log("Data", data);
         if (data?.status) {
           const withToggle = (data.data || []).map((w) => ({
             ...w,
@@ -137,9 +137,9 @@ export default function ServiceProviderList() {
   const capitalizeWords = (text) =>
     text
       ? text
-        .split(" ")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-        .join(" ")
+          .split(" ")
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(" ")
       : "";
 
   const getTruncated = (text, limit = 25) => {
@@ -186,7 +186,7 @@ export default function ServiceProviderList() {
   }, [workers]);
 
   // -------------------------------------------------------------------
-  // 3️⃣ Convert incoming subcategory_ids → names  
+  // 3️⃣ Convert incoming subcategory_ids → names
   // -------------------------------------------------------------------
   useEffect(() => {
     // ignore if no subcategory_ids
@@ -210,103 +210,116 @@ export default function ServiceProviderList() {
         .filter(Boolean);
 
       setSelectedSubcats(names);
-
     }
   }, [subcategory_ids, allSubcategories, subcategoryIdToName]);
 
-
-
-
-
   /** Filtered & sorted list */
-const filteredWorkers = useMemo(() => {
-  let list = workers;
+  const filteredWorkers = useMemo(() => {
+    let list = workers;
 
-  // 1. SEARCH
-  if (searchQuery) {
-    const q = searchQuery.toLowerCase();
-    list = list.filter(
-      (w) =>
-        (w.full_name || "").toLowerCase().includes(q) ||
-        (w.skill || "").toLowerCase().includes(q) ||
-        (w.unique_id || "").toLowerCase().includes(q)
-    );
-  }
+    // 1. SEARCH
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (w) =>
+          (w.full_name || "").toLowerCase().includes(q) ||
+          (w.skill || "").toLowerCase().includes(q) ||
+          (w.unique_id || "").toLowerCase().includes(q)
+      );
+    }
 
-  // 2. SUB-CATEGORY FILTER
-  if (selectedSubcats.length) {
-    list = list.filter((w) =>
-      w.subcategory_names?.some((s) => selectedSubcats.includes(s))
-    );
-  }
+    // 2. SUB-CATEGORY FILTER
+    if (selectedSubcats.length) {
+      list = list.filter((w) =>
+        w.subcategory_names?.some((s) => selectedSubcats.includes(s))
+      );
+    }
 
-  // 3. RATING FILTER
-  if (minRating) {
-    const min = Number(minRating);
-    list = list.filter((w) => {
-      const rating = Number(w.averageRating) || 0;
-      return rating >= min;
-    });
-  }
+    // 3. RATING FILTER
+    if (minRating) {
+      const min = Number(minRating);
+      list = list.filter((w) => {
+        const rating = Number(w.averageRating) || 0;
+        return rating >= min;
+      });
+    }
 
-  // 4. SUBSCRIPTION FILTER (if applied manually)
-  if (subscriptionFilter) {
-    const filter = subscriptionFilter.toLowerCase();
-    list = list.filter((w) => {
+    // 4. SUBSCRIPTION FILTER (if applied manually)
+    if (subscriptionFilter) {
+      const filter = subscriptionFilter.toLowerCase();
+      list = list.filter((w) => {
+        const planName = (
+          (w.subscriptionPlan &&
+            w.subscriptionPlan[0] &&
+            w.subscriptionPlan[0].name) ||
+          w.subscriptionStatus ||
+          ""
+        )
+          .toString()
+          .toLowerCase();
+        if (filter === "premium") return planName.includes("premium");
+        if (filter === "professional")
+          return planName.includes("professional") || planName.includes("pro");
+        if (filter === "starter")
+          return planName.includes("starter") || planName === "";
+        return true;
+      });
+    }
+
+    // ——————————————————————————————————
+    // Subscription Priority (Premium > Pro > Starter)
+    // ——————————————————————————————————
+    const getSubscriptionRank = (w) => {
       const planName = (
-        (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
+        (w.subscriptionPlan &&
+          w.subscriptionPlan[0] &&
+          w.subscriptionPlan[0].name) ||
+        w.subscriptionStatus ||
+        ""
       )
         .toString()
         .toLowerCase();
-      if (filter === "premium") return planName.includes("premium");
-      if (filter === "professional") return planName.includes("professional") || planName.includes("pro");
-      if (filter === "starter") return planName.includes("starter") || planName === "";
-      return true;
+
+      if (planName.includes("premium")) return 1;
+      if (planName.includes("professional") || planName.includes("pro"))
+        return 2;
+      if (planName.includes("starter") || planName === "") return 3;
+      return 4;
+    };
+
+    list = [...list].sort((a, b) => {
+      const rankA = getSubscriptionRank(a);
+      const rankB = getSubscriptionRank(b);
+      if (rankA !== rankB) return rankA - rankB; // Premium top
+
+      // Same subscription tier → ab rating descending
+      const ratingA = Number(a.averageRating) || 0;
+      const ratingB = Number(b.averageRating) || 0;
+      if (ratingB !== ratingA) return ratingB - ratingA;
+
+      switch (sortOrder) {
+        case "asc":
+          return a.full_name.localeCompare(b.full_name);
+        case "desc":
+          return b.full_name.localeCompare(a.full_name);
+        case "tasks-desc":
+          return (b.totalTasks || 0) - (a.totalTasks || 0);
+        case "tasks-asc":
+          return (a.totalTasks || 0) - (b.totalTasks || 0);
+        default:
+          return a.full_name.localeCompare(b.full_name);
+      }
     });
-  }
 
-  // ——————————————————————————————————
-  // Subscription Priority (Premium > Pro > Starter)
-  // ——————————————————————————————————
-  const getSubscriptionRank = (w) => {
-    const planName = (
-      (w.subscriptionPlan && w.subscriptionPlan[0] && w.subscriptionPlan[0].name) || w.subscriptionStatus || ""
-    )
-      .toString()
-      .toLowerCase();
-
-    if (planName.includes("premium")) return 1;
-    if (planName.includes("professional") || planName.includes("pro")) return 2;
-    if (planName.includes("starter") || planName === "") return 3;
-    return 4;
-  };
-
-  list = [...list].sort((a, b) => {
-    const rankA = getSubscriptionRank(a);
-    const rankB = getSubscriptionRank(b);
-    if (rankA !== rankB) return rankA - rankB; // Premium top
-
-    // Same subscription tier → ab rating descending
-    const ratingA = Number(a.averageRating) || 0;
-    const ratingB = Number(b.averageRating) || 0;
-    if (ratingB !== ratingA) return ratingB - ratingA;
-
-    switch (sortOrder) {
-      case "asc":
-        return a.full_name.localeCompare(b.full_name);
-      case "desc":
-        return b.full_name.localeCompare(a.full_name);
-      case "tasks-desc":
-        return (b.totalTasks || 0) - (a.totalTasks || 0);
-      case "tasks-asc":
-        return (a.totalTasks || 0) - (b.totalTasks || 0);
-      default:
-        return a.full_name.localeCompare(b.full_name);
-    }
-  });
-
-  return list;
-}, [workers, searchQuery, selectedSubcats, sortOrder, minRating, subscriptionFilter]);
+    return list;
+  }, [
+    workers,
+    searchQuery,
+    selectedSubcats,
+    sortOrder,
+    minRating,
+    subscriptionFilter,
+  ]);
 
   const handleRouteHire = (id) =>
     navigate(`/profile-details/${id}/direct`, {
@@ -342,35 +355,33 @@ const filteredWorkers = useMemo(() => {
         </div>
 
         {/* BANNER SLIDER (same UI as NewTask.jsx) */}
-        <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-          {bannerLoading ? (
-            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">
-              Error: {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i}>
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[220px] sm:h-[400px] relative"
+                >
+                  {/* Yeh image class perfect fit karegi har device pe */}
                   <img
                     src={banner}
-                    alt=""
-                    className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-fill object-center"
                     onError={(e) => {
-                      e.target.src = defaultImage;
+                      e.target.src = "/src/assets/Home-SP/default.png";
                     }}
                   />
                 </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">
-              No banners available
-            </p>
-          )}
+              ))
+            ) : (
+              <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
         </div>
 
         {/* Workers list */}
@@ -409,7 +420,12 @@ const filteredWorkers = useMemo(() => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
 
@@ -420,7 +436,10 @@ const filteredWorkers = useMemo(() => {
                   size={1}
                   value={selectedSubcats}
                   onChange={(e) => {
-                    const opts = Array.from(e.target.selectedOptions, (o) => o.value);
+                    const opts = Array.from(
+                      e.target.selectedOptions,
+                      (o) => o.value
+                    );
                     setSelectedSubcats(opts);
                   }}
                   className="
@@ -433,7 +452,9 @@ const filteredWorkers = useMemo(() => {
                   style={{ appearance: "none" }}
                 >
                   <option disabled className="text-gray-400">
-                    {allSubcategories.length ? "— Select Sub-categories —" : "No sub-categories"}
+                    {allSubcategories.length
+                      ? "— Select Sub-categories —"
+                      : "No sub-categories"}
                   </option>
                   {allSubcategories.map((sc) => (
                     <option
@@ -448,7 +469,11 @@ const filteredWorkers = useMemo(() => {
                 </select>
 
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                  <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
@@ -496,7 +521,11 @@ const filteredWorkers = useMemo(() => {
                   </select>
 
                   <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                    <svg className="w-5 h-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg
+                      className="w-5 h-5 text-gray-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
                       <path
                         fillRule="evenodd"
                         d="M5.23 7.21a.75.75 0 011.06.02L10 11.188l3.71-3.96a.75.75 0 011.08 1.04l-4.25 4.53a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
@@ -505,8 +534,6 @@ const filteredWorkers = useMemo(() => {
                     </svg>
                   </div>
                 </div>
-
-              
               </div>
             </div>
           </div>
@@ -525,21 +552,32 @@ const filteredWorkers = useMemo(() => {
                 const planNameDisplay =
                   plan?.name ||
                   (worker?.subscriptionStatus
-                    ? capitalizeWords(worker.subscriptionStatus.replace(/_/g, " "))
+                    ? capitalizeWords(
+                        worker.subscriptionStatus.replace(/_/g, " ")
+                      )
                     : null);
                 // ---------------------------------------------------------------------
 
-                const fullAddress = capitalizeWords(worker?.location?.address) || "Unknown";
+                const fullAddress =
+                  capitalizeWords(worker?.location?.address) || "Unknown";
                 const addressLong = fullAddress.length > 70;
-                const displayedAddress = worker.isAddressExpanded ? fullAddress : getTruncated(fullAddress, 12);
+                const displayedAddress = worker.isAddressExpanded
+                  ? fullAddress
+                  : getTruncated(fullAddress, 12);
 
                 const fullSkill = capitalizeWords(worker?.skill) || "";
                 const skillLong = fullSkill.length > 70;
-                const displayedSkill = worker.isSkillExpanded ? fullSkill : getTruncated(fullSkill, 12);
+                const displayedSkill = worker.isSkillExpanded
+                  ? fullSkill
+                  : getTruncated(fullSkill, 12);
 
-                const subcatString = (worker?.subcategory_names || []).join(", ");
+                const subcatString = (worker?.subcategory_names || []).join(
+                  ", "
+                );
                 const subcatLong = subcatString.length > 70;
-                const displayedSubcat = worker.isSubcatExpanded ? subcatString : getTruncated(subcatString, 12);
+                const displayedSubcat = worker.isSubcatExpanded
+                  ? subcatString
+                  : getTruncated(subcatString, 12);
 
                 return (
                   <div
@@ -549,7 +587,6 @@ const filteredWorkers = useMemo(() => {
     transition hover:shadow-xl overflow-hidden
   "
                   >
-
                     {/* 🌟 Subscription Badge (Card top, above image) */}
                     <div className="col-span-12 flex justify-start">
                       <div
@@ -576,12 +613,8 @@ const filteredWorkers = useMemo(() => {
                       />
                     </div>
 
-
-
-
                     {/* Details */}
                     <div className="col-span-12 sm:col-span-8 flex flex-col justify-between min-w-0">
-
                       {/* NAME + RATING */}
                       <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center gap-2">
                         <h2 className="text-base sm:text-xl font-semibold text-gray-800 truncate max-w-full min-w-0">
@@ -593,32 +626,47 @@ const filteredWorkers = useMemo(() => {
 
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {ratingImg ? (
-                            <img className="h-4 w-4 sm:h-5 sm:w-5" src={ratingImg} alt="Rating" />
+                            <img
+                              className="h-4 w-4 sm:h-5 sm:w-5"
+                              src={ratingImg}
+                              alt="Rating"
+                            />
                           ) : null}
-                          <span className="font-medium text-sm">{worker?.averageRating ?? "N/A"}</span>
+                          <span className="font-medium text-sm">
+                            {worker?.averageRating ?? "N/A"}
+                          </span>
                         </div>
                       </div>
 
                       {/* Category */}
                       <p className="text-sm text-gray-700 mt-1 truncate w-full min-w-0">
-                        Category: <span className="font-medium">{worker?.category_name}</span>
+                        Category:{" "}
+                        <span className="font-medium">
+                          {worker?.category_name}
+                        </span>
                       </p>
 
                       {/* Total Tasks */}
                       <p className="text-sm text-gray-600 mt-1 w-full">
-                        Total Tasks: <span className="font-medium">{worker?.totalTasks ?? 0}</span>
+                        Total Tasks:{" "}
+                        <span className="font-medium">
+                          {worker?.totalTasks ?? 0}
+                        </span>
                       </p>
 
                       {/* SUBCATEGORY */}
                       <div className="flex items-start gap-2 text-gray-700 mt-2 w-full">
-                        <span className="font-medium text-sm flex-shrink-0">SubCategories:</span>
+                        <span className="font-medium text-sm flex-shrink-0">
+                          SubCategories:
+                        </span>
 
                         <div className="flex items-center flex-1 min-w-0">
                           <span
-                            className={`inline-block text-sm ${worker.isSubcatExpanded
-                              ? "break-words"
-                              : "whitespace-nowrap overflow-hidden text-ellipsis"
-                              }`}
+                            className={`inline-block text-sm ${
+                              worker.isSubcatExpanded
+                                ? "break-words"
+                                : "whitespace-nowrap overflow-hidden text-ellipsis"
+                            }`}
                             title={subcatString}
                           >
                             {displayedSubcat}
@@ -626,10 +674,14 @@ const filteredWorkers = useMemo(() => {
 
                           {subcatLong && (
                             <button
-                              onClick={() => toggleField(worker._id, "isSubcatExpanded")}
+                              onClick={() =>
+                                toggleField(worker._id, "isSubcatExpanded")
+                              }
                               className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
                             >
-                              {worker.isSubcatExpanded ? "See Less" : "See More"}
+                              {worker.isSubcatExpanded
+                                ? "See Less"
+                                : "See More"}
                             </button>
                           )}
                         </div>
@@ -637,15 +689,18 @@ const filteredWorkers = useMemo(() => {
 
                       {/* SKILL */}
                       <div className="mt-2 w-full">
-                        <p className="font-medium text-gray-800 text-sm">About My Skill</p>
+                        <p className="font-medium text-gray-800 text-sm">
+                          About My Skill
+                        </p>
 
                         <div className="flex items-start gap-1 w-full">
                           <div className="flex items-center flex-1 min-w-0">
                             <span
-                              className={`inline-block text-sm ${worker.isSkillExpanded
-                                ? "break-words"
-                                : "whitespace-nowrap overflow-hidden text-ellipsis"
-                                }`}
+                              className={`inline-block text-sm ${
+                                worker.isSkillExpanded
+                                  ? "break-words"
+                                  : "whitespace-nowrap overflow-hidden text-ellipsis"
+                              }`}
                               title={fullSkill}
                             >
                               {displayedSkill}
@@ -653,10 +708,14 @@ const filteredWorkers = useMemo(() => {
 
                             {skillLong && (
                               <button
-                                onClick={() => toggleField(worker._id, "isSkillExpanded")}
+                                onClick={() =>
+                                  toggleField(worker._id, "isSkillExpanded")
+                                }
                                 className="ml-1 text-xs font-medium text-green-600 hover:underline flex-shrink-0"
                               >
-                                {worker.isSkillExpanded ? "See Less" : "See More"}
+                                {worker.isSkillExpanded
+                                  ? "See Less"
+                                  : "See More"}
                               </button>
                             )}
                           </div>
@@ -665,26 +724,35 @@ const filteredWorkers = useMemo(() => {
 
                       {/* ADDRESS + BUTTONS */}
                       <div className="mt-3 grid grid-cols-1 sm:grid-cols-12 gap-3 w-full">
-
                         {/* Address */}
                         <div className="sm:col-span-8 flex items-start gap-2 text-gray-600 text-sm min-w-0">
-                          <FaMapMarkerAlt size={16} color="#228B22" className="flex-shrink-0 mt-1" />
+                          <FaMapMarkerAlt
+                            size={16}
+                            color="#228B22"
+                            className="flex-shrink-0 mt-1"
+                          />
 
-                          <div className="min-w-0 flex-1"> {/* ye flex-1 + min-w-0 magic hai */}
+                          <div className="min-w-0 flex-1">
+                            {" "}
+                            {/* ye flex-1 + min-w-0 magic hai */}
                             <div
-                              className={`inline-block text-sm break-words hyphens-auto ${!worker.isAddressExpanded ? "line-clamp-1" : ""
-                                }`}
+                              className={`inline-block text-sm break-words hyphens-auto ${
+                                !worker.isAddressExpanded ? "line-clamp-1" : ""
+                              }`}
                               title={fullAddress}
                             >
                               {displayedAddress}
                             </div>
-
                             {addressLong && (
                               <button
-                                onClick={() => toggleField(worker._id, "isAddressExpanded")}
+                                onClick={() =>
+                                  toggleField(worker._id, "isAddressExpanded")
+                                }
                                 className="ml-1 text-xs font-medium text-green-600 hover:underline focus:outline-none"
                               >
-                                {worker.isAddressExpanded ? "See Less" : "See More"}
+                                {worker.isAddressExpanded
+                                  ? "See Less"
+                                  : "See More"}
                               </button>
                             )}
                           </div>
@@ -707,7 +775,6 @@ const filteredWorkers = useMemo(() => {
                         </button>
                       </div>
                     </div>
-
                   </div>
                 );
               })}
@@ -715,38 +782,34 @@ const filteredWorkers = useMemo(() => {
           )}
         </div>
 
-
-
         {/* BANNER SLIDER (same UI as NewTask.jsx) */}
-        <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-          {bannerLoading ? (
-            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">
-              Error: {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i}>
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[220px] sm:h-[400px] relative"
+                >
+                  {/* Yeh image class perfect fit karegi har device pe */}
                   <img
                     src={banner}
-                    alt=""
-                    className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-fill object-center"
                     onError={(e) => {
-                      e.target.src = defaultImage;
+                      e.target.src = "/src/assets/Home-SP/default.png";
                     }}
                   />
                 </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">
-              No banners available
-            </p>
-          )}
+              ))
+            ) : (
+              <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
         </div>
       </div>
 

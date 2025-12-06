@@ -636,36 +636,31 @@ export default function Details() {
         </Link>
       </div>
       {/* Top banner */}
-      <div
-        className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]"
-      >
-        {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
-        ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            {bannerError}
-          </p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i} className="w-full h-[220px] sm:h-[400px]">
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div
+                key={index}
+                className="w-full h-[220px] sm:h-[400px] relative"
+              >
+                {/* Yeh image class perfect fit karegi har device pe */}
                 <img
                   src={banner}
-                  alt={`Banner ${i + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => (e.target.src = Work)}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-fill object-center"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
                 />
               </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
-        )}
+            ))
+          ) : (
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">No banners available</p>
+            </div>
+          )}
+        </Slider>
       </div>
       <div className="w-full bg-[#D9D9D9] py-6 mt-10">
         <div className="flex justify-center gap-10 mt-6">
@@ -762,9 +757,7 @@ export default function Details() {
                   className={`p-2 shadow-xl max-w-full sm:max-w-[600px] md:mt-2 mt-4 rounded-xl bg-white h-[260px]`}
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-base">
-                      About My Skill
-                    </h3>
+                    <h3 className="font-semibold text-base">About My Skill</h3>
                   </div>
                   <p className=" text-gray-700 text-base leading-relaxed break-all">
                     {aboutus}

@@ -32,9 +32,9 @@ export default function WorkCategories() {
   const [directHiring, setDirectHiring] = useState([]);
   const [directHiringLoading, setDirectHiringLoading] = useState(false);
   const [directHiringError, setDirectHiringError] = useState(null);
-    const [expandedDesc, setExpandedDesc] = useState({});
-    const [expandedLoc, setExpandedLoc] = useState({});
-    const [showBankWarning, setShowBankWarning] = useState(false);
+  const [expandedDesc, setExpandedDesc] = useState({});
+  const [expandedLoc, setExpandedLoc] = useState({});
+  const [showBankWarning, setShowBankWarning] = useState(false);
 
 
   // Fetch categories
@@ -87,7 +87,7 @@ export default function WorkCategories() {
       if (res.ok) {
         if (Array.isArray(data.data)) {
 
-          
+
           setDirectHiring(
             data.data.map((item) => ({
               id: item._id || "",
@@ -118,7 +118,7 @@ export default function WorkCategories() {
       setDirectHiringLoading(false);
     }
   };
-  
+
 
   // Fetch banner images
   // Fetch banner images
@@ -162,22 +162,22 @@ export default function WorkCategories() {
       setBannerLoading(false);
     }
   };
-useEffect(() => {
-  if (!profile) return;
+  useEffect(() => {
+    if (!profile) return;
 
-  const bankdetail = profile?.bankdetail;
+    const bankdetail = profile?.bankdetail;
 
-  const isBankFilled =
-    bankdetail &&
-    bankdetail.bankName &&
-    bankdetail.accountNumber &&
-    bankdetail.ifscCode &&
-    bankdetail.accountHolderName;
+    const isBankFilled =
+      bankdetail &&
+      bankdetail.bankName &&
+      bankdetail.accountNumber &&
+      bankdetail.ifscCode &&
+      bankdetail.accountHolderName;
 
-  setShowBankWarning(!isBankFilled); // ❗Banner open if bank details missing
-}, [profile]);
+    setShowBankWarning(!isBankFilled); // ❗Banner open if bank details missing
+  }, [profile]);
 
-;
+  ;
 
 
 
@@ -231,12 +231,12 @@ useEffect(() => {
     autoplaySpeed: 3000,
     arrows: true,
   };
-  
+
   const toggleLoc = (id) => {
     setExpandedLoc((prev) => ({ ...prev, [id]: !prev[id] }));
   };
   // console.log("images",bannerImages);
-    const DescriptionText = ({ text, id, expandedDesc, toggleDesc }) => {
+  const DescriptionText = ({ text, id, expandedDesc, toggleDesc }) => {
     const isExpanded = expandedDesc[id];
     const limit = 60;
     const displayText = isExpanded ? text : text.slice(0, limit);
@@ -247,7 +247,7 @@ useEffect(() => {
         <p className="break-words whitespace-normal leading-relaxed">
           {capitalizeFirst(displayText)}
           {!isExpanded && !showButton && "..."}
-          
+
           {showButton && (
             <span
               onClick={(e) => {
@@ -264,53 +264,53 @@ useEffect(() => {
     );
   };
   const LocationText = ({ text, id }) => {
-      const isExpanded = expandedLoc[id];
-      const limit = 35; // Characters limit
-      const displayText = isExpanded ? text : text.slice(0, limit);
-      const showButton = text.length > limit;
-  
-      return (
-        <div className="flex items-start gap-2 mt-2 text-gray-600 text-sm w-full">
-          <FaMapMarkerAlt className="text-[#228B22] flex-shrink-0 mt-1" size={16} />
-          <div className="flex-1 min-w-0">
-            <p className="break-words whitespace-normal leading-tight text-xs">
-              {capitalizeFirst(displayText)}
-              {!isExpanded && showButton && "..."}
-              
-              {showButton && (
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLoc(id);
-                  }}
-                  className="text-blue-600 font-semibold cursor-pointer ml-1 hover:underline whitespace-nowrap"
-                >
-                  {isExpanded ? "See less" : "See more"}
-                </span>
-              )}
-            </p>
-          </div>
+    const isExpanded = expandedLoc[id];
+    const limit = 35; // Characters limit
+    const displayText = isExpanded ? text : text.slice(0, limit);
+    const showButton = text.length > limit;
+
+    return (
+      <div className="flex items-start gap-2 mt-2 text-gray-600 text-sm w-full">
+        <FaMapMarkerAlt className="text-[#228B22] flex-shrink-0 mt-1" size={16} />
+        <div className="flex-1 min-w-0">
+          <p className="break-words whitespace-normal leading-tight text-xs">
+            {capitalizeFirst(displayText)}
+            {!isExpanded && showButton && "..."}
+
+            {showButton && (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleLoc(id);
+                }}
+                className="text-blue-600 font-semibold cursor-pointer ml-1 hover:underline whitespace-nowrap"
+              >
+                {isExpanded ? "See less" : "See more"}
+              </span>
+            )}
+          </p>
         </div>
-      );
-    };
-const handleBankUpdate = () => {
-  navigate("/account", {
-    state: {
-      openBankSection: true,   // 👈 flag to directly open bank details
-    },
-  });
-};
+      </div>
+    );
+  };
+  const handleBankUpdate = () => {
+    navigate("/account", {
+      state: {
+        openBankSection: true,   // 👈 flag to directly open bank details
+      },
+    });
+  };
 
 
   return (
     <>
       <Header />
-    
+
 
       <div className="font-sans text-gray-800 mt-25 md:mt-35">
-{showBankWarning && (
-  <div
-    className="
+        {showBankWarning && (
+          <div
+            className="
       max-w-[90%] mx-auto bg-gradient-to-r from-yellow-50 to-yellow-100
       border-l-[6px] border-yellow-600
       text-yellow-900 p-4 px-6 text-sm font-medium
@@ -318,58 +318,56 @@ const handleBankUpdate = () => {
      rounded-[17px]
       animate-slideDownFade relative lg:-top-[42px]
     "
-  >
-    <span className="flex items-center gap-2 font-semibold" style={{fontWeight:'650'}}>
-      ⚠️ Your bank details are incomplete.
-    </span>
+          >
+            <span className="flex items-center gap-2 font-semibold" style={{ fontWeight: '650' }}>
+              ⚠️ Your bank details are incomplete.
+            </span>
 
-   <button
-  onClick={handleBankUpdate}
-  className="
+            <button
+              onClick={handleBankUpdate}
+              className="
     bg-yellow-600 text-white font-semibold 
     px-4 py-1.5 rounded-lg shadow 
     hover:bg-yellow-700 hover:shadow-xl 
     transition-all duration-300 cursor-pointer
     transform hover:scale-[1.05] active:scale-[0.98]
   "
->
-  Update Now →
-</button>
+            >
+              Update Now →
+            </button>
 
-  </div>
-)}
+          </div>
+        )}
 
 
         {/* banner Section with Slider */}
-         <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i} className="w-full h-[220px] sm:h-[400px]">
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[220px] sm:h-[400px] relative"
+                >
+                  {/* Yeh image class perfect fit karegi har device pe */}
                   <img
                     src={banner}
-                    alt={`Banner ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.target.src = Work)}
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-fill object-center"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/Home-SP/default.png";
+                    }}
                   />
                 </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
+              ))
+            ) : (
+              <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
         </div>
 
         {/* Categories */}
@@ -452,11 +450,11 @@ const handleBankUpdate = () => {
                         <p className="text-black font-medium text-sm">₹{card.amount}</p>
                       </div>
 
-                    
-                      <DescriptionText text={card.description || "No Description"} id={card.id}  expandedDesc={expandedDesc}
- />
 
-                     
+                      <DescriptionText text={card.description || "No Description"} id={card.id} expandedDesc={expandedDesc}
+                      />
+
+
                       <LocationText text={card.location || "Location not available"} id={card.id} />
 
                       <div className="mt-auto pt-3">
@@ -470,21 +468,21 @@ const handleBankUpdate = () => {
                 </div>
               ) : <p className="text-center text-gray-500">No direct hiring tasks</p>}
 
-          
+
             </div>
           </div>
         </div>
 
         {/* About Section */}
-        
+
         <div className="max-w-6xl mx-auto px-4 sm:px-10 py-10 grid md:grid-cols-2  gap-6 lg:gap-12 items-center lg:pl-0">
-          <img src={banner1} alt="Worker"   className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
+          <img src={banner1} alt="Worker" className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
           <div className="flex flex-col justify-center h-full">
             <h2 className="text-[22px] sm:text-[24px] text-[#228B22] font-bold mb-4">
               Post Work with bidder
             </h2>
             <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-             The “Post Work With Bidder” feature helps you connect with a wide network of professionals. Once you submit your project details, qualified bidders review your requirements and submit their offers. You can compare bids, check profiles, verify experience, and communicate directly before selecting the right professional. This ensures you get the best talent at the best price.
+              The “Post Work With Bidder” feature helps you connect with a wide network of professionals. Once you submit your project details, qualified bidders review your requirements and submit their offers. You can compare bids, check profiles, verify experience, and communicate directly before selecting the right professional. This ensures you get the best talent at the best price.
             </p>
             <button
               onClick={postWork}
@@ -503,7 +501,7 @@ const handleBankUpdate = () => {
                 Emergency Work
               </h2>
               <p className="text-[16px] sm:text-[18px] font-bold text-[#838383] leading-relaxed">
-               When you post an Emergency Work request, our platform instantly connects you with nearby qualified service providers who are ready to respond without delay. Whether it’s an urgent repair, last-minute support, or time-sensitive assistance, your request is prioritized so professionals can quickly review the details and reach out with immediate help. Get fast responses, transparent communication, and reliable service exactly when you need it the most.
+                When you post an Emergency Work request, our platform instantly connects you with nearby qualified service providers who are ready to respond without delay. Whether it’s an urgent repair, last-minute support, or time-sensitive assistance, your request is prioritized so professionals can quickly review the details and reach out with immediate help. Get fast responses, transparent communication, and reliable service exactly when you need it the most.
               </p>
               <button
                 onClick={postEmergencyWork}
@@ -512,7 +510,7 @@ const handleBankUpdate = () => {
                 Post Work
               </button>
             </div>
-            <img src={banner2} alt="Emergency"  className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
+            <img src={banner2} alt="Emergency" className="rounded-lg w-full max-h-[320px] md:max-h-[380px] object-cover mx-auto" />
           </div>
         </div>
 

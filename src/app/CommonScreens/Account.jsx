@@ -12,7 +12,6 @@ import { useLocation } from "react-router-dom";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function Account() {
-  
   const [activeTab, setActiveTab] = useState("membership");
   const [bannerImages, setBannerImages] = useState([]);
   const [bannerLoading, setBannerLoading] = useState(true);
@@ -20,11 +19,11 @@ export default function Account() {
 
   const location = useLocation();
   useEffect(() => {
-  if (location.state?.openBankSection) {
-    // Yaha bank details section ko auto-open kar dena
-    setActiveTab("bank"); 
-  }
-}, [location.state]);
+    if (location.state?.openBankSection) {
+      // Yaha bank details section ko auto-open kar dena
+      setActiveTab("bank");
+    }
+  }, [location.state]);
 
   // Fetch banner images
   const fetchBannerImages = async () => {
@@ -52,7 +51,8 @@ export default function Account() {
           setBannerError("No banners available");
         }
       } else {
-        const errorMessage = data.message || `HTTP error ${res.status}: ${res.statusText}`;
+        const errorMessage =
+          data.message || `HTTP error ${res.status}: ${res.statusText}`;
         console.error("Failed to fetch banner images:", errorMessage);
         setBannerError(errorMessage);
       }
@@ -134,36 +134,34 @@ export default function Account() {
         </div>
 
         {/* Banner Slider */}
-       <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-  {bannerLoading ? (
-    <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-      Loading banners...
-    </p>
-  ) : bannerError ? (
-    <p className="absolute inset-0 flex items-center justify-center text-red-500">
-      {bannerError}
-    </p>
-  ) : bannerImages.length > 0 ? (
-    <Slider {...sliderSettings}>
-      {bannerImages.map((banner, i) => (
-        <div key={i} className="w-full h-[220px] sm:h-[400px]">
-          <img
-            src={banner}
-            alt={`Banner ${i + 1}`}
-            className="w-full h-full object-cover"
-            onError={(e) => (e.target.src = Work)}
-          />
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+          <Slider {...sliderSettings}>
+            {bannerImages.length > 0 ? (
+              bannerImages.map((banner, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[220px] sm:h-[400px] relative"
+                >
+                  {/* Yeh image class perfect fit karegi har device pe */}
+                  <img
+                    src={banner}
+                    alt={`Banner ${index + 1}`}
+                    className="w-full h-full object-fill object-center"
+                    onError={(e) => {
+                      e.target.src = "/src/assets/Home-SP/default.png";
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                <p className="text-gray-600 font-medium">
+                  No banners available
+                </p>
+              </div>
+            )}
+          </Slider>
         </div>
-      ))}
-    </Slider>
-  ) : (
-    <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-      No banners available
-    </p>
-  )}
-</div>
       </div>
 
       <Footer />
