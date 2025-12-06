@@ -989,27 +989,33 @@ export default function BiddingNewTask() {
       </div>
 
       {/* BANNER SLIDER */}
-      <div className="w-full max-w-7xl mx-auto rounded-3xl overflow-hidden my-10 h-48 sm:h-64 lg:h-[400px] bg-[#f2e7ca]">
-        {bannerLoading ? (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">Loading banners...</p>
-        ) : bannerError ? (
-          <p className="flex items-center justify-center h-full text-red-500 text-sm sm:text-base">Error: {bannerError}</p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i}>
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+        <Slider {...sliderSettings}>
+          {bannerImages.length > 0 ? (
+            bannerImages.map((banner, index) => (
+              <div
+                key={index}
+                className="w-full h-[220px] sm:h-[400px] relative"
+              >
+                {/* Yeh image class perfect fit karegi har device pe */}
                 <img
                   src={banner}
-                  alt=""
-                  className="w-full h-48 sm:h-64 lg:h-[400px] object-cover"
-                  onError={(e) => { e.target.src = "/src/assets/profile/default.png"; }}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-fill object-center"
+                  onError={(e) => {
+                    e.target.src = "/src/assets/Home-SP/default.png";
+                  }}
                 />
               </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="flex items-center justify-center h-full text-gray-500 text-sm sm:text-base">No banners available</p>
-        )}
+            ))
+          ) : (
+            <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+              <p className="text-gray-600 font-medium">
+                No banners available
+              </p>
+            </div>
+          )}
+        </Slider>
       </div>
 
       <div className="mt-[50px]">

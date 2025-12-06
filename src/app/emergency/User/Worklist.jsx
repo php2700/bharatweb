@@ -334,36 +334,34 @@ export default function Worklist() {
       </div>
 
       {/* Top banner */}
-      <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-        {bannerLoading ? (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            Loading banners...
-          </p>
-        ) : bannerError ? (
-          <p className="absolute inset-0 flex items-center justify-center text-red-500">
-            {bannerError}
-          </p>
-        ) : bannerImages.length > 0 ? (
-          <Slider {...sliderSettings}>
-            {bannerImages.map((banner, i) => (
-              <div key={i} className="w-full h-[220px] sm:h-[400px]">
-                <img
-                  src={banner}
-                  alt={`Banner ${i + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => (e.target.src = Work)}
-                />
-              </div>
-            ))}
-          </Slider>
-        ) : (
-          <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-            No banners available
-          </p>
-        )}
-      </div>
+      <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+              <Slider {...sliderSettings}>
+                {bannerImages.length > 0 ? (
+                  bannerImages.map((banner, index) => (
+                    <div
+                      key={index}
+                      className="w-full h-[220px] sm:h-[400px] relative"
+                    >
+                      {/* Yeh image class perfect fit karegi har device pe */}
+                      <img
+                        src={banner}
+                        alt={`Banner ${index + 1}`}
+                        className="w-full h-full object-fill object-center"
+                        onError={(e) => {
+                          e.target.src = "/src/assets/Home-SP/default.png";
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                    <p className="text-gray-600 font-medium">
+                      No banners available
+                    </p>
+                  </div>
+                )}
+              </Slider>
+            </div>
 
       {/* Main section */}
       <div className="container max-w-full mx-auto my-10">
@@ -579,36 +577,34 @@ export default function Worklist() {
         ) */}
 
         {/* Bottom banner */}
-        <div className="w-full max-w-[90%] mx-auto rounded-[50px] overflow-hidden relative bg-[#f2e7ca] mt-5 
-  h-[220px] sm:h-[400px]">
-
-          {bannerLoading ? (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              Loading banners...
-            </p>
-          ) : bannerError ? (
-            <p className="absolute inset-0 flex items-center justify-center text-red-500">
-              {bannerError}
-            </p>
-          ) : bannerImages.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {bannerImages.map((banner, i) => (
-                <div key={i} className="w-full h-[220px] sm:h-[400px]">
-                  <img
-                    src={banner}
-                    alt={`Banner ${i + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => (e.target.src = Work)}
-                  />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <p className="absolute inset-0 flex items-center justify-center text-gray-500">
-              No banners available
-            </p>
-          )}
-        </div>
+        <div className="w-full max-w-[95%] mx-auto rounded-[50px] overflow-hidden shadow-2xl relative bg-[#f2e7ca] mt-5 h-[220px] sm:h-[400px]">
+              <Slider {...sliderSettings}>
+                {bannerImages.length > 0 ? (
+                  bannerImages.map((banner, index) => (
+                    <div
+                      key={index}
+                      className="w-full h-[220px] sm:h-[400px] relative"
+                    >
+                      {/* Yeh image class perfect fit karegi har device pe */}
+                      <img
+                        src={banner}
+                        alt={`Banner ${index + 1}`}
+                        className="w-full h-full object-fill object-center"
+                        onError={(e) => {
+                          e.target.src = "/src/assets/Home-SP/default.png";
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full h-[220px] sm:h-[400px] bg-gray-300 flex items-center justify-center">
+                    <p className="text-gray-600 font-medium">
+                      No banners available
+                    </p>
+                  </div>
+                )}
+              </Slider>
+            </div>
       </div>
 
       <Footer />
